@@ -1,0 +1,4 @@
+# Off-anchor deployment profile (team workstation, genomicschain.ch app tier).
+# Copy to genomicschain_core.yml on nodes that must NOT expose submit tools.
+genomicschain:
+  anchor_profile: false

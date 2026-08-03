@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier1_report.schema.json",
+  "title": "GenomicsChain Tier-1 Report Record",
+  "description": "Synoptis evidence manifest for a signed Tier-1 readiness assessment (design v0.4.1 §3.3.1). Wraps canonical report.json fields required for verification.",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "report_content_hash",
+    "headline",
+    "funnel_stage",
+    "assessor_stack",
+    "trust_tier",
+    "operator"
+  ],
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": ["tier1_report"]
+    },
+    "record_version": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$"
+    },
+    "mcp_tool_name": {
+      "type": "string",
+      "enum": ["gc_tier1_submit"]
+    },
+    "mcp_tool_version": {
+      "type": "string"
+    },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^doi:.+$",
+      "description": "Paper subject, e.g. doi:10.1101/2025.10.28.685023"
+    },
+    "report_content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "canonical_id_value": {
+      "type": "string",
+      "description": "Duplicate of report.json canonical_id.value for evidence readability."
+    },
+    "rubric_version": { "type": "string" },
+    "rubric_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "headline": {
+      "type": "object",
+      "required": ["static_readiness"],
+      "properties": {
+        "static_readiness": { "type": "string" }
+      }
+    },
+    "funnel_stage": {
+      "enum": ["stage1-prose-only", "stage2-code-verified"]
+    },
+    "assessor_stack": {
+      "type": "object",
+      "required": ["operator_id", "llm", "stage"],
+      "properties": {
+        "operator_id": { "type": "string" },
+        "stage": { "type": "string" },
+        "llm": {
+          "type": "object",
+          "required": ["provider", "model", "invoked_at"],
+          "properties": {
+            "provider": { "type": "string" },
+            "model": { "type": "string" },
+            "invoked_at": { "type": "string" }
+          }
+        }
+      }
+    },
+    "assessor_id": { "type": "string" },
+    "manifest_b1_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Pre-scoring b1_manifest_hash copied from report.json for evidence."
+    },
+    "manifest_supersedes": { "type": ["string", "null"] },
+    "trust_tier": {
+      "type": "string",
+      "enum": ["self_reported"]
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operator": { "type": "object" }
+  }
+}

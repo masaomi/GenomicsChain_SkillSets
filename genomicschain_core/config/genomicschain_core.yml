@@ -1,0 +1,15 @@
+# GenomicsChain core deployment profile.
+#
+# anchor_profile decides whether this node registers the submit tools at all.
+# It ships false: off-anchor, gc_tier1_submit and gc_tier2_submit are absent from
+# the tool list rather than present-and-refusing, so a node that was never meant
+# to sign cannot be talked into signing.
+#
+# Exactly one node in a deployment should set this to true — the one that holds
+# the signing key and owns the Synoptis proof registry. Set it deliberately; see
+# genomicschain_core.anchor.yml.example.
+#
+# `kairos-chain skillset install --force` preserves config/, so this value
+# survives upgrades of this SkillSet.
+genomicschain:
+  anchor_profile: false

@@ -1,0 +1,19 @@
+{
+  "name": "genomicschain_tier2",
+  "version": "0.3.0",
+  "description": "GenomicsChain Tier-2 executed-R execution layer (backends, comparator, executor, gc_tier2_execute only)",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [
+    {"name": "genomicschain_core", "version": ">= 0.2.0"}
+  ],
+  "provides": ["genomics_job_execution", "tier2_executed_r"],
+  "tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainTier2::Tools::GcTier2Execute"
+  ],
+  "config_files": [],
+  "knowledge_dirs": [],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

@@ -1,1 +1,176 @@
 # GenomicsChain_SkillSets
+
+Reproducibility assessment and attestation for genomics research, packaged as
+add-on SkillSets for [KairosChain](https://github.com/masaomi/KairosChain_2026).
+
+These are not part of KairosChain. They install into an existing instance and are
+removed the same way. KairosChain itself needs no modification to host them.
+
+## What is here
+
+| Package | Version | Role |
+|---|---|---|
+| `genomicschain_core` | 0.2.0 | Submit path: digest, admission gates, signing, Synoptis recording |
+| `genomicschain_tier1` | 0.1.0 | Tier-1 readiness assessment — report schema v0.2.6 and the rubric |
+| `genomicschain_tier2` | 0.3.0 | Tier-2 executed-R — execution backends, output comparator |
+
+The three version independently but install as a set: `tier1` and `tier2` both
+declare `genomicschain_core >= 0.2.0`.
+
+### The two tiers
+
+**Tier-1** reads a paper and asks what it *claims* about reproducibility — are
+versions pinned, is the environment closed, is the data reachable. It never runs
+anything, so it produces a ceiling: an upper bound on what a code check could
+later confirm, not a reproducibility rate.
+
+**Tier-2** executes a subject on a compute backend and compares the output against
+a validated expectation. That is where a reproduction is actually established.
+
+### Tools
+
+| Tool | From | Registered when |
+|---|---|---|
+| `gc_tier1_submit` | core | `anchor_profile: true` only |
+| `gc_tier2_submit` | core | `anchor_profile: true` only |
+| `gc_tier2_execute` | tier2 | always |
+
+## Requirements
+
+- KairosChain (`gem install kairos-chain`). Developed against 3.55–3.57.
+- `synoptis` and `llm_client` — ship with the gem and install automatically.
+- `mmp` — ships inside the gem but is **not** auto-installed. It supplies the
+  anchor's identity and signing key; without it the submit path fails closed.
+  `install.sh` installs it for you.
+
+### A note on the synoptis generation
+
+These packages record through `synoptis`, and its verification semantics changed
+on 2026-08-02: the verifying key now comes from the caller only. Before that
+change, a proof could be verified against a key recorded inside itself, and since
+the envelope's `version` field selects which fields are signed — and `version` is
+a field of the record — a forged proof could be relabelled to verify clean from
+the record alone.
+
+They will run against an older `synoptis`; submits still record. What differs is
+what a later verification means. The signing tests here encode the newer contract
+and fail against the older one, which is the intended signal.
+
+As of 2026-08-03 the newer `synoptis` is committed in KairosChain_2026 but is not
+yet in a released gem. There is currently no field in `skillset.json` to declare a
+minimum core version for this (only `llm_client` has `min_core_version`), so this
+paragraph is the constraint.
+
+## Install
+
+```sh
+git clone https://github.com/masaomi/GenomicsChain_SkillSets.git
+cd GenomicsChain_SkillSets
+bash install.sh --data-dir /path/to/your/.kairos
+kairos-chain skillset list
+```
+
+Or by hand, in dependency order:
+
+```sh
+kairos-chain skillset install ./genomicschain_core
+kairos-chain skillset install ./genomicschain_tier1
+kairos-chain skillset install ./genomicschain_tier2
+```
+
+`install` copies the package and enables it.
+
+## Upgrade
+
+`install` copies rather than links, so `git pull` alone does not change what your
+instance runs:
+
+```sh
+git pull
+bash install.sh --force --data-dir /path/to/your/.kairos
+```
+
+`--force` preserves `config/`, so your `anchor_profile` setting is not reset.
+
+## anchor_profile — read this before deploying
+
+`genomicschain_core` ships with `anchor_profile: false`, and off-anchor the submit
+tools are **absent from the tool list** rather than present-and-refusing. A node
+that was never meant to sign cannot be talked into signing.
+
+Exactly one node in a deployment should be the anchor: the one holding the signing
+key and owning the Synoptis proof registry. To make a node the anchor, copy
+`genomicschain_core.anchor.yml.example` over `config/genomicschain_core.yml` in the
+*installed* copy and restart.
+
+Proofs are append-only. A second anchor recording under a different key cannot be
+un-recorded, only superseded.
+
+## Verifying a proof
+
+The verifying key comes from the caller and only from the caller. A key recorded
+inside a proof would be a self-report — it tells you which key to check against
+only if you already trust whoever wrote the record, which is the thing being
+checked. So `attestation_verify` needs the anchor's public key obtained out of
+band; omitting it returns `no_public_key_for_verification` and the proof is
+reported invalid.
+
+Binding a key to a named attester needs a trusted key list, which this layer does
+not have. What a verified proof establishes is that these bytes were signed by
+that key and have not changed since.
+
+## Layout
+
+```
+genomicschain_core/
+  lib/     submit pipeline, manifest, digests, Synoptis attestor
+  tools/   gc_tier1_submit, gc_tier2_submit  (anchor only)
+  schemas/ tier1 report submit gate (v0.2.6), tier2 verdict
+  config/  deployment profile + anchor example
+  test/
+genomicschain_tier1/
+  assets/    report schema v0.2.6
+  knowledge/ repro_tier1_guide.md — the rubric
+genomicschain_tier2/
+  lib/     execution backends (local, Thoa), comparator, executor
+  tools/   gc_tier2_execute
+  test/
+```
+
+## Tests
+
+The suites fall into three groups, because some of them test integration with
+sibling SkillSets and therefore need those siblings to exist.
+
+**Run from a clone, no extra paths** — `genomicschain_core/test/b1_manifest_hash_test.rb`,
+`tip_source_test.rb`, and all three of `genomicschain_tier2/test/`:
+
+```sh
+cd genomicschain_core && ruby -Ilib -Itest test/b1_manifest_hash_test.rb
+cd genomicschain_tier2 && ruby -Ilib -Itest -I../genomicschain_core/lib test/tools_test.rb
+```
+
+**Run from a clone with synoptis and mmp on the load path** — `tier1_submit_test.rb`,
+`tier2_submit_test.rb`:
+
+```sh
+cd genomicschain_core
+T="$(ruby -e 'puts Gem::Specification.find_by_name("kairos-chain").gem_dir')/templates/skillsets"
+ruby -Ilib -Itest -I"$T/synoptis/lib" -I"$T/mmp/lib" test/tier1_submit_test.rb
+```
+
+**Need an installed instance** — `synoptis_attestor_signing_test.rb` and
+`topology_test.rb`. Both resolve siblings through `../../`: the signing suite reads
+the shipped `synoptis/config/synoptis.yml` rather than a value it chose, and the
+topology suite inspects which packages are enabled and which tools register. Run
+them from `.kairos/skillsets/genomicschain_core/` after installing.
+
+## Status
+
+Prototype. The schemas and the submit contract are still moving; the digest and
+admission gates are covered by tests and by mutation sweeps, but nothing here has
+been through external security review.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

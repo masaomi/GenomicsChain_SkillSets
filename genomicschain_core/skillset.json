@@ -1,0 +1,21 @@
+{
+  "name": "genomicschain_core",
+  "version": "0.2.0",
+  "description": "GenomicsChain shared substrate: SubmitCore (Synoptis-only recording), Signer, TipSource, and anchor-profile submit tools",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [
+    {"name": "synoptis", "version": ">= 0.1.0"}
+  ],
+  "provides": ["reproducibility_submit", "reproducibility_manifest", "genomicschain_anchor"],
+  "tool_classes": [],
+  "anchor_profile_tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainCore::Tools::GcTier2Submit",
+    "KairosMcp::SkillSets::GenomicschainCore::Tools::GcTier1Submit"
+  ],
+  "config_files": ["config/genomicschain_core.yml"],
+  "knowledge_dirs": [],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

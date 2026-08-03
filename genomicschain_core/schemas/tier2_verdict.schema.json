@@ -1,0 +1,237 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier2_verdict.schema.json",
+  "title": "GenomicsChain Tier-2 executed-R Verdict Record",
+  "description": "Metadata-only record for a Tier-2 executed-R reproduction verdict (design v0.3 §7.3'). DISTINCT record type from job_manifest.schema.json — NOT a variant. Raw genomic inputs/outputs stay local; only hashes + verdict identity + attestation binding are recorded on-chain. input_files/output_files are HASHES-ONLY and OPTIONAL. Pre-1.0 (0.x); fields may change until promoted.",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "jobspec_digest",
+    "verdict",
+    "trust_tier",
+    "result_hash",
+    "expected_output",
+    "expected_output_sha256",
+    "comparator_id",
+    "comparator_version",
+    "backend_id",
+    "started_at",
+    "elapsed_seconds",
+    "operator"
+  ],
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": ["tier2_verdict"],
+      "description": "Record-type discriminator. Distinguishes Tier-2 verdicts from job_manifest job records in the same chain."
+    },
+    "record_version": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$",
+      "description": "Schema version. Pre-1.0 (0.x) during Beta; bump freely on field changes."
+    },
+    "mcp_tool_name": {
+      "type": "string",
+      "enum": ["gc_tier2_submit"],
+      "description": "Canonical Tier-2 submit tool identifier."
+    },
+    "mcp_tool_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^repro://.+$",
+      "description": "Reproduction subject, e.g. repro://656122/C9 (paper/step)."
+    },
+    "jobspec_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the canonical JobSpec (env lock + data pins + pipeline). Server RECOMPUTES from submitted jobspec_json/ref and validates against the accepted Stage-2 subject (design v0.3 §5'(e))."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "executed_r",
+        "executed_mismatch",
+        "executed_inconclusive_needs_tolerance",
+        "outputs_unusable",
+        "env_failed",
+        "data_blocked"
+      ],
+      "description": "Tier-2 verdict vocabulary (design v0.3 §3, §4). executed-R semantics, NOT gc_reproduce determinism semantics."
+    },
+    "trust_tier": {
+      "type": "string",
+      "enum": ["self_reported", "peer_verified", "hardware_attested"],
+      "description": "Enforceable guarantee tier (design v0.3 §1b'). MVP: server enforces self_reported. self_reported = non-repudiable signed assertion of a CLAIMED run; execution NOT independently verified."
+    },
+    "result_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over the sorted canonical list [{relative_path, sha256, size_bytes}] of fetched outputs, RECOMPUTED locally by the runner (design v0.3 §1a'). Not the backend-reported hash."
+    },
+    "backend_result_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Optional backend-reported (e.g. Thoa) result hash. Divergence from result_hash -> verdict env_failed (transport/backend tamper)."
+    },
+    "expected_output": {
+      "type": "object",
+      "required": ["target", "sha256", "source"],
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "checksum | figure_source_data_ref | tolerance_spec reference."
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "source": {
+          "type": "string",
+          "enum": ["paper_declared", "llm_extracted", "operator_supplied"],
+          "description": "Provenance of the comparison target. Only paper_declared (with resolvable citation) OR independently validated_by targets back a leaderboard verdict; llm_extracted/operator_supplied without independent validation are DIAGNOSTIC only (design v0.3 §1d')."
+        },
+        "source_citation": {
+          "type": "string",
+          "description": "DOI / supplementary-table / figure reference the hosted side can spot-check."
+        },
+        "extractor_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "validated_by": {
+          "type": ["string", "null"],
+          "description": "Independent validator identity (MUST differ from the submitter for leaderboard eligibility). null = unvalidated."
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected_output_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Top-level copy of expected_output.sha256, part of the signed verdict identity (design v0.3 §5')."
+    },
+    "comparator_id": {
+      "type": "string",
+      "description": "Comparator used, e.g. exact_sha256. Part of the signed identity + aggregation key."
+    },
+    "comparator_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "backend_id": {
+      "type": "string",
+      "enum": ["thoa", "aws_ec2", "local", "aws_tee"],
+      "description": "Execution backend that produced the result."
+    },
+    "input_files": {
+      "type": "array",
+      "description": "OPTIONAL, HASHES-ONLY. Metadata-only submit keeps raw data local.",
+      "items": {
+        "type": "object",
+        "required": ["sha256"],
+        "properties": {
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "relative_path": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "output_files": {
+      "type": "array",
+      "description": "OPTIONAL, HASHES-ONLY.",
+      "items": {
+        "type": "object",
+        "required": ["sha256"],
+        "properties": {
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "relative_path": { "type": "string" },
+          "size_bytes": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "container_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Legacy field (v0.3 chain path). v0.4.1 uses result_evidence_sha256 in Synoptis evidence envelope."
+    },
+    "result_evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the Tier-2 result bundle (backend outputs, jobspec digest, output file list). Not a digest of the manifest itself (R4-F3)."
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256(canonical_json({digest_subject_hash, signed_identity, operator_pubkey})). Recovery lookup key (INV-10)."
+    },
+    "leaderboard_eligible": {
+      "type": "boolean",
+      "description": "Server-set eligibility CLAIM (impl-review I1 + R2-B). Under trust_tier=self_reported this is a SIGNED, NON-REPUDIABLE self-claim, NOT a verified fact: the member controls the run and self-asserts provenance. MVP grants the claim only when expected_output.source == paper_declared with a (signed) source_citation the server can later spot-check; validated_by alone does NOT confer eligibility (its independence is unverifiable in self_reported). All eligibility-governing provenance (source, validated_by, source_citation, target) is in the SIGNED verdict identity. Real verification is deferred to peer_verified / a validator-attestation registry."
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "backend_metadata": {
+      "type": "object",
+      "description": "Optional backend-specific fields (thoa_job_id, etc.). Not signed.",
+      "additionalProperties": true
+    },
+    "operator": {
+      "type": "object",
+      "description": "Operator identity envelope (same 3-mode oneOf as job_manifest). Leaderboard-contributing verdicts require signed mode (design v0.3 §8'); anonymous is excluded from consensus.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["mode", "pubkey", "signature"],
+          "properties": {
+            "mode": { "enum": ["signed"] },
+            "pubkey": { "type": "string", "pattern": "^ed25519:[A-Za-z0-9+/=_-]+$" },
+            "signature": {
+              "type": "object",
+              "required": ["algorithm", "value", "nonce", "chain_tip_hash"],
+              "properties": {
+                "algorithm": { "enum": ["ed25519"] },
+                "signed_fields": { "type": "array", "items": { "type": "string" } },
+                "value": { "type": "string", "pattern": "^[A-Za-z0-9+/=_-]+$", "maxLength": 256 },
+                "nonce": { "type": "string", "minLength": 32, "maxLength": 128, "pattern": "^[a-f0-9]+$" },
+                "chain_tip_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["mode", "anonymous_id"],
+          "properties": {
+            "mode": { "enum": ["anonymous"] },
+            "anonymous_id": { "type": "string", "pattern": "^anonymous-[a-f0-9]{16,32}$" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["mode", "legacy"],
+          "properties": {
+            "mode": { "enum": ["alpha_legacy"] },
+            "legacy": { "enum": [true] }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

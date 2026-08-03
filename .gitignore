@@ -1,0 +1,11 @@
+# Instance data. Running the CLI or the tests with the working directory inside a
+# SkillSet creates .kairos/ here; it is one instance's chain and proofs, never
+# part of the package.
+.kairos/
+
+# Local config chosen by the installing operator, if edited in place.
+# The tracked config/*.yml are the shipped defaults.
+*.local.yml
+
+.DS_Store
+*.gem
