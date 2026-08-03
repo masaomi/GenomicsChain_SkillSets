@@ -6,11 +6,17 @@ add-on SkillSets for [KairosChain](https://github.com/masaomi/KairosChain_2026).
 These are not part of KairosChain. They install into an existing instance and are
 removed the same way. KairosChain itself needs no modification to host them.
 
+**This repository is the source of truth for these packages.** Copies under any
+instance's `.kairos/skillsets/` are installed artifacts: edit here, then reinstall
+there. They were previously developed inside `GenomicsChain_MVP2_2026`, where the
+same directory was both the source and a running instance's copy — an arrangement
+that makes "which one is authoritative" unanswerable the moment the two differ.
+
 ## What is here
 
 | Package | Version | Role |
 |---|---|---|
-| `genomicschain_core` | 0.2.0 | Submit path: digest, admission gates, signing, Synoptis recording |
+| `genomicschain_core` | 0.2.1 | Submit path: digest, admission gates, signing, Synoptis recording |
 | `genomicschain_tier1` | 0.1.0 | Tier-1 readiness assessment — report schema v0.2.6 and the rubric |
 | `genomicschain_tier2` | 0.3.0 | Tier-2 executed-R — execution backends, output comparator |
 
@@ -37,29 +43,34 @@ a validated expectation. That is where a reproduction is actually established.
 
 ## Requirements
 
-- KairosChain (`gem install kairos-chain`). Developed against 3.55–3.57.
+- **KairosChain >= 3.58.0** (`gem install kairos-chain`). This is declared as
+  `min_core_version` in `genomicschain_core/skillset.json` and enforced: on an
+  older core the package is skipped with a message rather than loaded.
 - `synoptis` and `llm_client` — ship with the gem and install automatically.
 - `mmp` — ships inside the gem but is **not** auto-installed. It supplies the
   anchor's identity and signing key; without it the submit path fails closed.
   `install.sh` installs it for you.
 
-### A note on the synoptis generation
+### Why 3.58.0 and not earlier
 
-These packages record through `synoptis`, and its verification semantics changed
-on 2026-08-02: the verifying key now comes from the caller only. Before that
-change, a proof could be verified against a key recorded inside itself, and since
-the envelope's `version` field selects which fields are signed — and `version` is
-a field of the record — a forged proof could be relabelled to verify clean from
-the record alone.
+These packages record through `synoptis`, whose verification semantics changed in
+3.58.0: the verifying key now comes from the caller only. Before that, a proof
+could be verified against a key recorded inside itself — and since the envelope's
+`version` field selects which fields are signed, while `version` is itself a field
+of the record, a forged proof relabelled to `1.1.0` verified clean from the record
+alone with no key supplied. Measured on the published 3.57.0 gem:
 
-They will run against an older `synoptis`; submits still record. What differs is
-what a later verification means. The signing tests here encode the newer contract
-and fail against the older one, which is the intended signal.
+```
+forged, version 1.0.0, no key -> valid: false ["identity_outside_signature",
+                                               "no_public_key_for_verification"]
+forged, version 1.1.0, no key -> valid: true  errors: []
+```
 
-As of 2026-08-03 the newer `synoptis` is committed in KairosChain_2026 but is not
-yet in a released gem. There is currently no field in `skillset.json` to declare a
-minimum core version for this (only `llm_client` has `min_core_version`), so this
-paragraph is the constraint.
+On 3.58.0 both return `valid: false`.
+
+The floor is a floor, not a preference: on an older core these packages would
+still record, and the proofs they wrote would be verifiable by anyone who
+relabelled them. That is why it is a declared minimum rather than a note.
 
 ## Install
 

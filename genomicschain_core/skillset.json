@@ -1,9 +1,10 @@
 {
   "name": "genomicschain_core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "GenomicsChain shared substrate: SubmitCore (Synoptis-only recording), Signer, TipSource, and anchor-profile submit tools",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",
+  "min_core_version": "3.58.0",
   "depends_on": [
     {"name": "synoptis", "version": ">= 0.1.0"}
   ],
