@@ -67,18 +67,38 @@ paragraph is the constraint.
 git clone https://github.com/masaomi/GenomicsChain_SkillSets.git
 cd GenomicsChain_SkillSets
 bash install.sh --data-dir /path/to/your/.kairos
-kairos-chain skillset list
 ```
+
+`install.sh` also installs `mmp`, and checks afterwards that all four packages
+are actually listed — see the note on argument order below.
 
 Or by hand, in dependency order:
 
 ```sh
+export KAIROS_DATA_DIR=/path/to/your/.kairos
 kairos-chain skillset install ./genomicschain_core
 kairos-chain skillset install ./genomicschain_tier1
 kairos-chain skillset install ./genomicschain_tier2
+kairos-chain skillset list
 ```
 
 `install` copies the package and enables it.
+
+### Argument order matters, and getting it wrong is silent
+
+`--data-dir` must come *after* the subcommand, or not be used at all:
+
+```sh
+kairos-chain skillset list --data-dir DIR    # works
+KAIROS_DATA_DIR=DIR kairos-chain skillset list    # works
+kairos-chain --data-dir DIR skillset list    # starts the server, exits 0, does nothing
+```
+
+In the third form `--data-dir` is parsed as a server option and the subcommand is
+never reached. It prints two INFO lines and returns success, so a script wrapping
+it will report an install that did not happen. `install.sh` passes the target
+through the environment for this reason, and verifies the result rather than
+trusting the exit status.
 
 ## Upgrade
 
