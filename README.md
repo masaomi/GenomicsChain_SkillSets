@@ -17,7 +17,7 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 | Package | Version | Role |
 |---|---|---|
 | `genomicschain_core` | 0.2.1 | Submit path: digest, admission gates, signing, Synoptis recording |
-| `genomicschain_tier1` | 0.1.0 | Tier-1 readiness assessment — report schema v0.2.6 and the rubric |
+| `genomicschain_tier1` | 0.2.0 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
 | `genomicschain_tier2` | 0.3.0 | Tier-2 executed-R — execution backends, output comparator |
 
 The three version independently but install as a set: `tier1` and `tier2` both
@@ -37,6 +37,7 @@ a validated expectation. That is where a reproduction is actually established.
 
 | Tool | From | Registered when |
 |---|---|---|
+| `gc_tier1_assess` | tier1 | always |
 | `gc_tier1_submit` | core | `anchor_profile: true` only |
 | `gc_tier2_submit` | core | `anchor_profile: true` only |
 | `gc_tier2_execute` | tier2 | always |

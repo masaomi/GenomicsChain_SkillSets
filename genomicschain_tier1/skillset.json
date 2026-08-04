@@ -1,7 +1,7 @@
 {
   "name": "genomicschain_tier1",
-  "version": "0.1.0",
-  "description": "GenomicsChain Tier-1 readiness assessment assets (report schema v0.2.6, rubric knowledge)",
+  "version": "0.2.0",
+  "description": "GenomicsChain Tier-1 readiness assessment: gc_tier1_assess, report schema v0.2.6, rubric knowledge",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",
   "depends_on": [
@@ -9,7 +9,10 @@
     {"name": "llm_client", "version": ">= 0.1.0"}
   ],
   "provides": ["tier1_readiness_assessment"],
-  "tool_classes": [],
+  "tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainTier1::Tools::GcTier1Assess"
+  ],
+  "gem_dependencies": ["json_schemer"],
   "config_files": [],
   "knowledge_dirs": ["knowledge"],
   "plugin": {

@@ -12,6 +12,7 @@ SUBMIT_TOOLS = [
   'KairosMcp::SkillSets::GenomicschainCore::Tools::GcTier1Submit'
 ].freeze
 EXECUTE_TOOL = 'KairosMcp::SkillSets::GenomicschainTier2::Tools::GcTier2Execute'
+ASSESS_TOOL = 'KairosMcp::SkillSets::GenomicschainTier1::Tools::GcTier1Assess'
 
 class TopologyTest < Minitest::Test
   CORE_PATH = File.expand_path('..', __dir__)
@@ -85,11 +86,15 @@ class TopologyTest < Minitest::Test
     refute tier2.tool_class_names.any? { |t| t.include?('Submit') }
   end
 
-  def test_tier1_package_has_no_mcp_tools
+  # tier1 shipped no tools until gc_tier1_assess (spec v0.2). What must stay true is
+  # narrower than "no tools": assessment is off-anchor work, so tier1 may register the
+  # assessor everywhere, but the submit path stays in core behind the anchor profile.
+  def test_tier1_package_exposes_assess_only
     ensure_core_on_load_path
     tier1 = KairosMcp::Skillset.new(File.join(SKILLSETS_DIR, 'genomicschain_tier1'))
     tier1.load!
-    assert_empty tier1.tool_class_names
+    assert_equal [ASSESS_TOOL], tier1.tool_class_names
+    refute tier1.tool_class_names.any? { |t| t.include?('Submit') }
   end
 
   def test_monolith_exposes_no_tool_classes
