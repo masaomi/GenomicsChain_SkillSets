@@ -349,3 +349,30 @@ class GateTest < Minitest::Test
                    'sources' => [{ 'kind' => 'tweet', 'ref' => 'r', 'content' => 'x' }])
   end
 end
+
+class LiveRunRegressionTest < Minitest::Test
+  include AssessHelpers
+
+  # Both found on the first run against a real assessor (2026-08-04,
+  # 10.1101/2025.11.08.687335).
+
+  # The assessor emitted no step_ids, and a flat S1..S19 sequence hides the
+  # layer that inter-rater agreement is aligned on.
+  def test_generated_step_ids_follow_the_corpus_C_W_convention
+    steps = [step('', layer: 'C'), step('', layer: 'W'), step('', layer: 'C')]
+    ids = run_assess(llm_fields(steps: steps))['report']['steps'].map { |s| s['step_id'] }
+
+    assert_equal %w[C1 W1 C2], ids
+  end
+
+  # An assessor that scores every axis >= 1 and then writes NI has contradicted
+  # itself; axis-min wins, but that correction goes UP and must say so.
+  def test_a_verdict_raised_by_axis_min_is_not_labelled_a_demotion
+    out = run_assess(llm_fields(steps: [step('C1', data: 1, code: 1, version: 1, params: 2, verdict: 'NI')]))
+    change = out.dig('guards', 'stage_demotions').find { |d| d['field'] == 'verdict' }
+
+    assert_equal 'RI', out['report']['steps'].first['verdict']
+    assert_equal 'axis-min-raised', change['reason']
+    refute_includes out['report']['steps'].first['subflags'], 'stage1-ceiling-demoted'
+  end
+end

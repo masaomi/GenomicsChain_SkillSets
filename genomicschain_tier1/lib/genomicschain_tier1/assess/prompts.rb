@@ -66,8 +66,11 @@ module KairosMcp
                (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo). Note presence and a coarse
                status: stated-in-paper / URL-present / none.
             4. Build a COARSE step list from the Methods prose: one step per named tool or analysis
-               invocation (rubric Step 1). Give each a stable step_id and set layer C (computational)
-               or W (wet-lab, out of scope). Score each C-step's axes 0/1/2:
+               invocation (rubric Step 1). Prefer FEWER, larger steps: |S| is the denominator of
+               every ratio in the report, so splitting one tool invocation into its sub-commands
+               changes the numbers without adding information. Give each step a stable step_id of
+               the form C1, C2 ... for computational steps and W1, W2 ... for wet-lab steps, and set
+               layer accordingly (W is out of scope and is not scored). Score each C-step's axes 0/1/2:
                  - data:    2 public+accessible or legitimately controlled-access; 1 accidental
                             gating or missing id; 0 absent.
                  - code:    2 public+exact; 1 reconstructable; 0 absent or private.

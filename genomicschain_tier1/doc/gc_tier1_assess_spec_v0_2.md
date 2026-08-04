@@ -461,6 +461,76 @@ state and was replaced by `test_tier1_package_exposes_assess_only`. What it now 
 narrower invariant that actually matters: tier1 may register the assessor everywhere, but the
 submit path stays in core behind the anchor profile.
 
+## 13. First live runs (2026-08-04) — what a real assessor changed
+
+Two runs against a real provider (`claude_code` / `claude-opus-5`, ~72 s each) on
+`10.1101/2025.11.08.687335`, a paper the corpus already carries a hand-driven report for.
+Harness: `test/live_assess_probe.rb`, deliberately outside the test suite — it spends an LLM
+call and needs the network.
+
+Retrieval note for the fetching work: `<doi>v1.source.xml` returns HTML, not JATS. The
+`https://api.biorxiv.org/details/biorxiv/<doi>` response carries a `jatsxml` URL that does
+serve the real article XML.
+
+### 13a. Three defects the stubs could not reach
+
+1. **`extract_fields` never reached the assessor's output.** `llm_client` passes the adapter's
+   raw response through untouched, so `response['response']` is
+   `{'content' => '<json>'}` for `claude_code`, an array of content blocks for the Anthropic
+   API, and possibly an already-parsed object for a provider honouring `output_schema`. The
+   original code returned the first Hash it found — the transport envelope — as if it were the
+   scores. Now all four shapes funnel through one coercion, and only a Hash carrying `steps`
+   is accepted as fields; fenced JSON and a leading line of prose are stripped.
+2. **Generated `step_id`s were a flat `S1..S19`.** Agreement is computed over aligned step ids,
+   so the layer has to be legible in the id. Generated ids now follow the corpus `C1..`/`W1..`
+   convention. Assessor-supplied ids are still kept verbatim — a shared canonical step list is
+   supplied, not invented.
+3. **An upward correction was recorded as a demotion.** A step scored `1/1/1/2` and labelled
+   `NI` is self-contradictory; axis-min is the rubric's rule so the axes win, but the change is
+   a *raise* and was being written to `guards.stage_demotions` under
+   `stage1-ceiling-demoted`. It is now `axis-min-raised`.
+
+### 13b. Extraction variance is the open problem, and it is large
+
+| | hand (corpus) | live run 1 | live run 2 |
+|---|---|---|---|
+| `S` | 9 | 19 | 13 |
+| `n_R` | 0 | 0 | 0 |
+| `n_RI` | 1 | 1 | 1 |
+| `n_NI` | 7 | 12 | 12 |
+| `n_X` | 1 | 6 | 0 |
+| `capture_claim` | exact_pins_partial | floating | exact_pins_partial |
+| `stage2_candidate` | false | false | false |
+
+Same rubric, same model generation, same paper. `|S|` — which rubric line 34 calls the value
+that "controls every ratio" — varies by more than 2×.
+
+What is stable is worth naming: `n_R = 0` (structural, §6a), `n_RI`, `paper_type`, and
+`stage2_candidate`, i.e. the funnel decision the survey actually acts on agrees across all
+three. What is unstable is the granularity of the step list and the harshness of the 0-axis
+calls.
+
+This is not a defect in the tool. It is the extraction layer, which rubric line 81 records as
+"deferred, NOT done" and which collection protocol §7 exists to measure. The stage-1 prompt now
+asks for fewer, larger steps and gives the reason (splitting one tool invocation into
+sub-commands changes the denominator without adding information), but whether that converges is
+an inter-rater question, not something a prompt edit can settle.
+
+### 13c. Corpus counts disagree with their own steps arrays
+
+Checking all 201 corpus reports against their own `steps`:
+
+```
+counts.S disagrees:        0 / 201
+verdict tallies disagree:  0 / 201
+counts.W disagrees:       46 / 201   (23%)
+```
+
+Wet-lab steps are counted but not listed — `W stated 17, steps have 0` and similar. That
+inflates the denominator of `coverage = S/(S+W)`. Deriving counts from steps (§6d) makes this
+shape unreachable. Together with the 59 schema failures in §11, the hand-driven run's error
+rate is now measured along two independent axes.
+
 ## Changelog
 
 **v0.2 (2026-08-04)** — first revision after locating the assessor prompts that produced the

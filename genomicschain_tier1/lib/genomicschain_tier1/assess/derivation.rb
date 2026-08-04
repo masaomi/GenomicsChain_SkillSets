@@ -82,10 +82,15 @@ module KairosMcp
 
           # §6b-2 — the three shapes the 201-report corpus got wrong 59 times.
           def normalise_steps(raw, demotions)
-            raw.each_with_index.map do |step, i|
+            seen = Hash.new(0)
+            raw.map do |step|
               s = step.transform_keys(&:to_s)
-              s['step_id'] ||= "S#{i + 1}"
               s['layer'] = %w[C W].include?(s['layer'].to_s) ? s['layer'].to_s : 'C'
+              # Generated ids follow the corpus convention C1../W1.. rather than a
+              # flat sequence: inter-rater agreement is computed over aligned
+              # step_ids, so the layer has to be legible in the id itself.
+              seen[s['layer']] += 1
+              s['step_id'] = "#{s['layer']}#{seen[s['layer']]}" if s['step_id'].to_s.strip.empty?
               s['subflags'] = Array(s['subflags'])
               s['axes'] = normalise_axes(s, demotions)
 
@@ -174,13 +179,23 @@ module KairosMcp
           # Verdict follows axis-min. Where the min is 0 the rubric distinguishes
           # recoverable (NI) from unrecoverable (X), which is a judgement the axes do
           # not carry — so the assessor's choice is kept there, defaulting to NI.
+          # Verdict order, strongest first. Used only to describe which way a
+          # correction went — the rule itself is always axis-min.
+          RANK = { 'R' => 4, 'RI' => 3, 'NI' => 2, 'X' => 1, 'OOS' => 0 }.freeze
+
           def settle_verdict!(step, demotions, reason, cap: nil)
             was = step['verdict']
             now = axis_min_verdict(step['axes'], was)
             now = cap if cap == 'RI' && now == 'R'
             return if was == now
 
-            note(demotions, step, 'verdict', was, now, reason)
+            # An assessor that scores every axis >= 1 and then writes NI has
+            # contradicted itself. Axis-min is the rubric's rule, so the axes win
+            # — but that is a correction UPWARD and must not be recorded under a
+            # demotion label. Seen live on the first real run (S6, NI with axes
+            # 1/1/1/2), which is why the direction is now named.
+            applied = RANK[now] > RANK[was] ? 'axis-min-raised' : reason
+            note(demotions, step, 'verdict', was, now, applied)
             step['verdict'] = now
             step['subflags'] |= [reason] if reason == 'stage1-ceiling-demoted' && was == 'R'
           end

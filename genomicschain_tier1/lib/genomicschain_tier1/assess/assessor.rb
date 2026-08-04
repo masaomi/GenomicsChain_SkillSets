@@ -155,14 +155,50 @@ module KairosMcp
              response['provider'] || input.dig('llm', 'provider') || 'unknown']
           end
 
+          # Providers disagree on where the text lives, and llm_client passes the
+          # adapter's raw response through untouched: claude_code returns
+          # {'content' => '<json>'}, the Anthropic API returns
+          # {'content' => [{'type' => 'text', 'text' => '<json>'}]}, and a
+          # provider honouring output_schema natively may return the object
+          # already parsed. All four shapes have to land in the same place, and
+          # a Hash that is merely the transport envelope must not be mistaken for
+          # the assessor's fields.
           def extract_fields(response)
             raise AssessError, "LLM call failed: #{response['error'] || 'no response'}" if response['status'] == 'error'
 
-            body = response['fields'] || response['parsed'] || response['text'] || response['response']
-            body = body['text'] if body.is_a?(Hash) && body.key?('text')
-            return body.transform_keys(&:to_s) if body.is_a?(Hash)
+            candidate = response['fields'] || response['parsed'] || response['response'] || response['text']
+            fields = coerce_fields(candidate)
+            raise AssessError, 'assessor returned no scorable fields' if fields.nil?
 
-            JSON.parse(body.to_s).transform_keys(&:to_s)
+            fields
+          end
+
+          def coerce_fields(value)
+            case value
+            when Hash
+              return value.transform_keys(&:to_s) if value.key?('steps') || value.key?(:steps)
+
+              # Transport envelope: unwrap and try again.
+              inner = value['content'] || value['text'] || value['result']
+              inner.nil? ? nil : coerce_fields(inner)
+            when Array
+              # Anthropic-style content blocks.
+              text = value.filter_map { |b| b.is_a?(Hash) ? (b['text'] || b[:text]) : b }.join
+              text.empty? ? nil : coerce_fields(text)
+            when String
+              parse_json_object(value)
+            end
+          end
+
+          # Models fence JSON even when told not to, and sometimes prepend a line
+          # of prose. Take the outermost object rather than failing on the wrapper.
+          def parse_json_object(text)
+            stripped = text.strip.sub(/\A```(?:json)?\s*/m, '').sub(/```\s*\z/m, '').strip
+            first = stripped.index('{')
+            last = stripped.rindex('}')
+            raise AssessError, 'assessor returned no JSON object' if first.nil? || last.nil? || last < first
+
+            JSON.parse(stripped[first..last]).transform_keys(&:to_s)
           rescue JSON::ParserError => e
             raise AssessError, "assessor returned non-conforming JSON: #{e.message}"
           end
