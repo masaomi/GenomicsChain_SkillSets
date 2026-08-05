@@ -531,6 +531,52 @@ inflates the denominator of `coverage = S/(S+W)`. Deriving counts from steps (§
 shape unreachable. Together with the 59 schema failures in §11, the hand-driven run's error
 rate is now measured along two independent axes.
 
+## 14. Retrieval (2026-08-05) — implemented on the service side, and a defect it exposed
+
+Retrieval stays off this tool by design (§1: the caller supplies resolved `sources`). It now
+exists in genomicschain.ch as `PaperRetrieval`, so a bioRxiv or medRxiv DOI is a complete
+submission:
+
+```
+  DOI  ->  https://api.biorxiv.org/details/{biorxiv|medrxiv}/<doi>   (JSON, carries `jatsxml`)
+       ->  that jatsxml URL                                          (the real JATS)
+       ->  PaperRetrieval::JatsText                                  (JATS -> text)
+```
+
+Both servers are tried, the newest version is taken, the fetched URL is constrained to the
+preprint hosts, and the report's `source_ref` names `<server> JATS <doi>v<n>` so the report
+records which article XML it was scored against.
+
+### 14a. `<back>` was being deleted before the assessor saw the paper
+
+`live_assess_probe.rb`'s JATS-to-text step dropped `<back>` wholesale. In JATS, "Availability
+of data and materials" / "Code availability" live in `<back>`, not `<body>` — so the single
+most load-bearing passage in a Tier-1 assessment was removed from the input. The runs recorded
+in §13b were scored on a paper with its availability statement deleted; on
+`10.1101/2025.11.08.687335` the repository URL happened to also appear in the abstract, which
+is why the defect did not announce itself. Only `<ref-list>` is dropped now, and the probe
+prefers plain text so that `PaperRetrieval::JatsText` is the one converter a real submission
+goes through.
+
+### 14b. A third live run, on properly retrieved text
+
+Same paper, same rubric. Run 3 has both changes since §13b: the retrieved text (availability
+section present) and the stage-1 prompt's fewer-larger-steps line.
+
+| | hand (corpus) | run 1 | run 2 | run 3 |
+|---|---|---|---|---|
+| `S` | 9 | 19 | 13 | **7** |
+| `n_RI` | 1 | 1 | 1 | 0 |
+| `n_NI` | 7 | 12 | 12 | 7 |
+| `n_X` | 1 | 6 | 0 | 0 |
+| `capture_claim` | exact_pins_partial | floating | exact_pins_partial | floating |
+| `stage2_candidate` | false | false | false | false |
+
+`|S|` moved from 19/13 toward the hand value of 9, and `n_NI` now matches it exactly. This is
+one run and settles nothing — with n=1 it is indistinguishable from noise, and it is not the
+inter-rater measurement collection protocol §7 calls for. `stage2_candidate` remains stable
+across all four, which is still the funnel decision the survey acts on.
+
 ## Changelog
 
 **v0.2 (2026-08-04)** — first revision after locating the assessor prompts that produced the
