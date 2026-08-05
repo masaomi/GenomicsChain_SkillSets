@@ -1,7 +1,16 @@
-# Instance data. Running the CLI or the tests with the working directory inside a
-# SkillSet creates .kairos/ here; it is one instance's chain and proofs, never
-# part of the package.
+# A KairosChain instance, created by running the CLI with this directory as the
+# working directory -- `kairos-chain upgrade --apply` here installs eleven
+# SkillSets and projects Claude Code artifacts, all of it instance-local.
+#
+# Keeping it is useful: it is a working instance to test installs against. None of
+# it belongs in a package repository, and two pieces must not be published at all.
+# CLAUDE.md points at .claude/kairos/instruction_mode.md, which is the author's
+# personal instruction mode; .mcp.json carries an absolute path from one machine.
 .kairos/
+.claude/
+.mcp.json
+CLAUDE.md
+command.log
 
 # Local config chosen by the installing operator, if edited in place.
 # The tracked config/*.yml are the shipped defaults.
