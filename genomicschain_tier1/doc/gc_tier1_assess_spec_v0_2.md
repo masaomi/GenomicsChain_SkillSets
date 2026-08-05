@@ -298,8 +298,12 @@ n_fetch_required           = |{s in S : "fetch-required" in subflags}|
 n_exact_capture_unexecuted = |{s in S : axes.version == 2}|
 ```
 
-`n_fetch_required` is confirmed against the corpus (4 of 201 reports carry a non-zero value,
-each matching the `fetch-required` subflag count). `n_exact_capture_unexecuted` is **inferred
+`n_fetch_required` was recorded here as "confirmed against the corpus (4 of 201 reports carry a
+non-zero value, each matching the `fetch-required` subflag count)". **That check ran in one
+direction only.** 25 reports carry the subflag on at least one step; 21 of them record
+`n_fetch_required: 0`. The non-zero values matched, and the zeros were never looked at — a
+check over the positives says nothing about the negatives. The formula above is unchanged and
+correct; the corpus was wrong, and is repaired (§15 R3). `n_exact_capture_unexecuted` is **inferred
 from the rubric only** — version=2 means exact capture, and Tier-1 never executes. All 201
 corpus reports have 0 here, so the corpus cannot confirm it. Flagged for a second opinion
 before implementation.
@@ -576,6 +580,45 @@ section present) and the stage-1 prompt's fewer-larger-steps line.
 one run and settles nothing — with n=1 it is indistinguishable from noise, and it is not the
 inter-rater measurement collection protocol §7 calls for. `stage2_candidate` remains stable
 across all four, which is still the funnel decision the survey acts on.
+
+## 15. Corpus repair (2026-08-05) — 59 schema failures down to 8
+
+`data/tier1_survey/scripts/repair_corpus.rb` (dry run by default) fixes the three classes where
+the rubric or this specification states the rule, and prints every class it did not touch.
+
+| | What | Scale |
+|---|---|---|
+| R1 | `version_subtier` removed where `axes.version != 1` (rubric line 45), restricted to values outside the schema enum | 459 steps |
+| R2 | hyphenated house spellings at `version == 1` → `exact_pins_partial` | 29 steps |
+| R3 | `counts.n_fetch_required` recomputed from the `fetch-required` subflags (§6d) | 21 reports |
+
+79 of 201 reports changed. Schema-invalid: **59 → 8**. `stats.json` regenerates byte-identical
+apart from its timestamp — nothing repaired here is anything the survey publishes, which is the
+property that made the pass safe to run without a prior decision.
+
+### 15a. What was left alone, and why it is a finding rather than a defect
+
+| | What | Scale |
+|---|---|---|
+| W | `counts.W` states wet-lab steps the `steps` array does not list — every case understates the list, never the count | 46 reports |
+| V | `version_subtier` `"env_lock_claimed"` (a `capture_claim` value in the wrong field) or `"none"` at `version == 1` | 6 reports |
+| A | null `axes` on out-of-scope wet-lab steps. Arguably the **schema** is wrong: an OOS step has no axis scores, and writing integers would invent them | 1 report |
+| G | `gaps` and `liveness` written as tally objects. The array form carries a per-gap location that the object form does not, so the conversion is not reconstructable | 1 report |
+
+W is the one that matters. `coverage = S/(S+W)` and "fully computational" are published, and
+`export_stats.rb` already takes wet-lab from **two different places**: `steps.wet_lab_oos` from
+the steps array (550), `coverage` and `fully_computational` from `counts.W` (841 summed).
+
+| Published quantity | From `counts.W` (as published) | From the steps array |
+|---|---|---|
+| coverage median | 83% | 96% |
+| coverage p25 | 75% | 81% |
+| fully computational | 52 papers (26.0%) | 98 papers (49.0%) |
+
+Choosing a side is a survey decision, not a repair: if the count is right the list is
+incomplete, and if the list is right the corpus overstates wet-lab work in a quarter of its
+papers. Deriving counts from steps (§6d) makes the shape unreachable for new reports either
+way.
 
 ## Changelog
 
