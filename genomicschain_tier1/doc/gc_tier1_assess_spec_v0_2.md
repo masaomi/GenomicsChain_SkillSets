@@ -596,29 +596,53 @@ the rubric or this specification states the rule, and prints every class it did 
 apart from its timestamp — nothing repaired here is anything the survey publishes, which is the
 property that made the pass safe to run without a prior decision.
 
-### 15a. What was left alone, and why it is a finding rather than a defect
+### 15a. `counts.W` — settled as a reading, not as an edit
 
-| | What | Scale |
-|---|---|---|
-| W | `counts.W` states wet-lab steps the `steps` array does not list — every case understates the list, never the count | 46 reports |
-| V | `version_subtier` `"env_lock_claimed"` (a `capture_claim` value in the wrong field) or `"none"` at `version == 1` | 6 reports |
-| A | null `axes` on out-of-scope wet-lab steps. Arguably the **schema** is wrong: an OOS step has no axis scores, and writing integers would invent them | 1 report |
-| G | `gaps` and `liveness` written as tally objects. The array form carries a per-gap location that the object form does not, so the conversion is not reconstructable | 1 report |
+46 reports count wet-lab steps their `steps` array does not enumerate. This is not a schema
+failure; nothing validates it. It is load-bearing because `coverage = S/(S+W)` and "fully
+computational" are published, and `export_stats.rb` was taking wet-lab from **two different
+places in one file**: `steps.wet_lab_oos` off the steps array (550), `coverage` and
+`fully_computational` off `counts.W` (841 summed).
 
-W is the one that matters. `coverage = S/(S+W)` and "fully computational" are published, and
-`export_stats.rb` already takes wet-lab from **two different places**: `steps.wet_lab_oos` from
-the steps array (550), `coverage` and `fully_computational` from `counts.W` (841 summed).
-
-| Published quantity | From `counts.W` (as published) | From the steps array |
+| Published quantity | From `counts.W` | From the steps array |
 |---|---|---|
 | coverage median | 83% | 96% |
 | coverage p25 | 75% | 81% |
 | fully computational | 52 papers (26.0%) | 98 papers (49.0%) |
 
-Choosing a side is a survey decision, not a repair: if the count is right the list is
-incomplete, and if the list is right the corpus overstates wet-lab work in a quarter of its
-papers. Deriving counts from steps (§6d) makes the shape unreachable for new reports either
-way.
+**`counts.W` is the trustworthy side**, on evidence from a third field neither of the two is
+derived from. Cross-tabulating against `paper_type`:
+
+| Report shape | n | `paper_type` |
+|---|---|---|
+| count > 0, nothing enumerated (the 46) | 46 | **mixed 44**, pure-computational 1, hybrid 1 |
+| count > 0, enumerated (consistent) | 103 | mixed 98, pure-wet-lab 2, other 3 |
+| count 0, nothing enumerated (consistent) | 52 | **pure-computational 37**, tool-methods 12, hybrid 3 |
+
+Two things follow. The disagreement runs one way in all 46 — the count always exceeds the
+enumeration, never the reverse, which is the signature of an omission rather than of
+miscounting. And 44 of the 46 are typed `mixed`: the assessor recorded wet-lab work in a field
+independent of both `counts` and `steps`. Reading the enumeration instead would assert that 44
+papers with lab work have no lab steps, contradicting their own `paper_type`. Papers that
+genuinely have no lab work sit in the third row, where all three records agree.
+
+So what is missing is the **identity of the individual wet-lab steps**, and that is not
+reconstructable — the judgement behind the count was never written down. The published figures
+stand; the corpus is incomplete. Recorded in
+`data/tier1_survey/collection/known_incompleteness.json`, following the pre-registration's rule
+for exclusions: recorded as counts, not as silence. `export_stats.rb` now reads wet-lab from
+`counts.W` throughout, and reports the enumerated total separately as
+`steps.wet_lab_oos_enumerated` rather than as if it were the same quantity.
+
+Deriving counts from steps (§6d) makes the shape unreachable for reports the tool produces.
+
+### 15b. Still open
+
+| | What | Scale |
+|---|---|---|
+| V | `version_subtier` `"env_lock_claimed"` (a `capture_claim` value in the wrong field) or `"none"` at `version == 1` | 6 reports |
+| A | null `axes` on out-of-scope wet-lab steps. Arguably the **schema** is wrong here: an OOS step has no axis scores, and writing integers would invent them. A schema v0.2.7 permitting null axes when `layer == "W"` is the likelier fix | 1 report |
+| G | `gaps` and `liveness` written as tally objects. The array form carries a per-gap location the object form does not, so the conversion is not reconstructable | 1 report |
 
 ## Changelog
 
