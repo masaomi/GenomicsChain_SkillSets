@@ -64,7 +64,7 @@ Four phases in one call:
                                | assessor_id | assessed_at [| "stage2"] )
            |
            v
-  phase 2  SCORE               (LLM, temperature 0)
+  phase 2  SCORE               (LLM, provider-default sampling — see Changelog v0.2.1)
     system = stage-specific procedure (§5)
     user   = sources (+ prior stage-1 report when stage 2)
     -> steps[], gaps[], liveness[], capture_claim, ...   (nothing else)
@@ -645,6 +645,13 @@ Deriving counts from steps (§6d) makes the shape unreachable for reports the to
 | G | `gaps` and `liveness` written as tally objects. The array form carries a per-gap location the object form does not, so the conversion is not reconstructable | 1 report |
 
 ## Changelog
+
+**v0.2.1 (2026-08-07)** — phase 2 no longer sends `temperature: 0`. Claude Sonnet 5 rejects
+any non-default temperature with a 400, and the operator decided to unify all GenomicsChain
+LLM calls (Rails chat and Tier-1 assess) on Bedrock `eu.anthropic.claude-sonnet-5`. Scoring
+determinism via greedy decoding is deliberately given up: repeat runs of the same paper may
+now differ. `rubric_hash` and `b1_manifest_hash` are unaffected (phase 1, no LLM). Any future
+κ measurement must treat within-assessor variance as nonzero.
 
 **v0.2 (2026-08-04)** — first revision after locating the assessor prompts that produced the
 corpus. Five rules in v0.1 were wrong or missing:

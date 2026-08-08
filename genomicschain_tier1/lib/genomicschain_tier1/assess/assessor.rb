@@ -145,7 +145,10 @@ module KairosMcp
                                'content' => Prompts.user_for(sources: input['sources'],
                                                              prior_report: prior_report(input)) }],
               'output_schema' => Prompts.output_schema(stage),
-              'temperature' => 0,
+              # No temperature: Claude Sonnet 5 rejects non-default temperature
+              # with a 400, and the operator unified all GenomicsChain LLM calls
+              # on Sonnet 5 (decision 2026-08-07). Scoring determinism via
+              # temperature 0 is deliberately given up; provider default applies.
               'model' => input.dig('llm', 'model'),
               'max_tokens' => input.dig('llm', 'max_tokens'),
               'provider_override' => input.dig('llm', 'provider')
