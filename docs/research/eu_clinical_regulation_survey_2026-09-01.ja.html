@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>欧州臨床試験データ規制 — 調査と事業仮説（2026-09-01）</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --ink-1: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --s1: #2a78d6;
+    --s2: #eb6834;
+    --s3: #1baf7a;
+    --good: #0ca30c;
+    --warn: #fab219;
+    --serious: #ec835a;
+    --crit: #d03b3b;
+    --seq-250: #86b6ef;
+    --seq-350: #5598e7;
+    --seq-450: #2a78d6;
+    --seq-600: #184f95;
+    --wash: rgba(42,120,214,0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+      --seq-250: #184f95; --seq-350: #256abf; --seq-450: #3987e5; --seq-600: #86b6ef;
+      --wash: rgba(57,135,229,0.12);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --seq-250: #184f95; --seq-350: #256abf; --seq-450: #3987e5; --seq-600: #86b6ef;
+    --wash: rgba(57,135,229,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 6rem;
+    background: var(--page); color: var(--ink-1);
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.85;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 1.5rem; }
+  header.masthead { border-bottom: 1px solid var(--border); padding: 2.5rem 0 1.6rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.8rem; line-height: 1.4; margin: 0 0 .5rem; }
+  .sub { color: var(--ink-2); font-size: .92rem; margin: 0; line-height: 1.7; }
+  h2 { font-size: 1.28rem; margin: 3.2rem 0 .4rem; padding-top: 1.4rem; border-top: 1px solid var(--border); line-height: 1.5; }
+  h2 .num { color: var(--ink-muted); font-variant-numeric: tabular-nums; margin-right: .55rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .5rem; line-height: 1.6; }
+  p { margin: .7rem 0; }
+  .lede { font-size: 1.03rem; color: var(--ink-2); }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; }
+
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.3rem; margin: 1.2rem 0; }
+  .verdict { background: var(--surface-1); border: 1px solid var(--border); border-left: 4px solid var(--s1);
+             border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.4rem 0; }
+  .verdict strong { font-size: 1.08rem; }
+
+  blockquote { margin: 1.1rem 0; padding: .85rem 1.1rem; background: var(--wash);
+               border-left: 3px solid var(--s1); border-radius: 0 6px 6px 0; color: var(--ink-1); }
+  blockquote p { margin: .35rem 0; }
+  blockquote cite { display: block; margin-top: .5rem; font-style: normal; font-size: .84rem; color: var(--ink-2); }
+  .orig { font-size: .85rem; color: var(--ink-2); line-height: 1.65; border-top: 1px dashed var(--axis); margin-top: .6rem; padding-top: .5rem; }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.1rem 0; font-size: .9rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--grid); vertical-align: top; line-height: 1.7; }
+  th { color: var(--ink-2); font-weight: 600; font-size: .82rem; letter-spacing: .03em; border-bottom: 1px solid var(--axis); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: .8rem; margin: 1.4rem 0; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: .95rem 1rem; }
+  .tile .v { font-size: 1.8rem; font-weight: 650; line-height: 1.15; letter-spacing: -0.02em; }
+  .tile .k { font-size: .82rem; color: var(--ink-2); margin-top: .3rem; line-height: 1.65; }
+  .tile .src { font-size: .72rem; color: var(--ink-muted); margin-top: .4rem; line-height: 1.55; }
+
+  .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; font-weight: 600;
+          padding: .12rem .5rem; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .c-good { color: var(--good); }
+  .c-warn { color: #8a6100; }
+  .c-serious { color: #a3502a; }
+  .c-crit { color: var(--crit); }
+  :root[data-theme="dark"] .c-warn { color: var(--warn); }
+  :root[data-theme="dark"] .c-serious { color: var(--serious); }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .c-warn { color: var(--warn); }
+    :root:where(:not([data-theme="light"])) .c-serious { color: var(--serious); } }
+
+  .chart { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.3rem; margin: 1.3rem 0; }
+  .chart h4 { margin: 0 0 .2rem; font-size: 1rem; line-height: 1.6; }
+  .chart .cap { margin: 0 0 1.1rem; font-size: .85rem; color: var(--ink-2); line-height: 1.7; }
+  /* 最長の棒の外側に置く値ラベルの逃げ場を確保する */
+  .bars { display: grid; gap: .5rem; padding-right: 3.4rem; }
+  .barrow { display: grid; grid-template-columns: minmax(160px, 44%) 1fr; gap: .8rem; align-items: center; }
+  .barlabel { font-size: .83rem; color: var(--ink-2); line-height: 1.6; }
+  .bartrack { position: relative; height: 22px; background: var(--grid); border-radius: 4px; }
+  .barfill { height: 100%; border-radius: 4px; background: var(--seq-450); }
+  .barrow[data-hi="1"] .barfill { background: var(--seq-600); }
+  .barval { position: absolute; left: calc(100% + .5rem); top: 50%; transform: translateY(-50%);
+            font-size: .82rem; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink-1); white-space: nowrap; }
+  .barrow:hover .bartrack { outline: 2px solid var(--axis); outline-offset: 2px; }
+  .axisnote { margin-top: 1rem; padding-top: .6rem; border-top: 1px solid var(--grid); font-size: .78rem; color: var(--ink-muted); }
+
+  .flow { display: grid; gap: .55rem; margin: 1.2rem 0; }
+  .fbox { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: .7rem .9rem; font-size: .9rem; }
+  .fbox .t { font-weight: 650; display: block; margin-bottom: .15rem; line-height: 1.6; }
+  .fbox .d { color: var(--ink-2); font-size: .86rem; line-height: 1.7; }
+  .arrow { text-align: center; color: var(--ink-muted); font-size: 1.05rem; line-height: 1.2; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  @media (max-width: 720px) { .cols2, .cols3 { grid-template-columns: 1fr; } .barrow { grid-template-columns: 1fr; }
+    .bars { padding-right: 0; }
+    .barval { position: static; transform: none; display: block; margin-top: .2rem; } }
+
+  .ladder { display: grid; gap: .35rem; margin: 1rem 0; }
+  .rung { display: grid; grid-template-columns: 145px 1fr; gap: .8rem; align-items: center; }
+  .rungbar { border-radius: 5px; padding: .55rem .8rem; font-size: .84rem; font-weight: 650; color: #fff; text-align: center; }
+  .rungtxt { font-size: .87rem; color: var(--ink-2); line-height: 1.7; }
+  @media (max-width: 720px) { .rung { grid-template-columns: 1fr; } }
+
+  .tl { position: relative; margin: 1.4rem 0 1rem; padding-left: 1.4rem; border-left: 2px solid var(--axis); }
+  .tlitem { position: relative; padding: 0 0 1.15rem .2rem; }
+  .tlitem::before { content: ""; position: absolute; left: -1.85rem; top: .6rem; width: 10px; height: 10px;
+                    border-radius: 50%; background: var(--s1); border: 2px solid var(--surface-1); }
+  .tlitem[data-kind="crit"]::before { background: var(--crit); }
+  .tlitem[data-kind="done"]::before { background: var(--ink-muted); }
+  .tldate { font-size: .82rem; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--ink-1); }
+  .tlbody { font-size: .88rem; color: var(--ink-2); line-height: 1.75; }
+
+  details { margin: 1rem 0; border: 1px solid var(--border); border-radius: 8px; padding: .6rem .9rem; background: var(--surface-1); }
+  summary { cursor: pointer; font-size: .88rem; font-weight: 600; color: var(--ink-2); }
+  .warnbox { border-left: 4px solid var(--crit); }
+  .okbox { border-left: 4px solid var(--good); }
+  .toggle { position: fixed; top: 1rem; right: 1rem; z-index: 10; background: var(--surface-1); color: var(--ink-2);
+            border: 1px solid var(--border); border-radius: 999px; padding: .4rem .85rem; font-size: .8rem; cursor: pointer; font-family: inherit; }
+  footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: .82rem; color: var(--ink-muted); line-height: 1.8; }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeToggle" aria-label="配色を切り替える">◐ 配色</button>
+
+<div class="wrap">
+
+<header class="masthead">
+  <h1>欧州臨床試験データ規制<br>—— 調査と事業仮説</h1>
+  <p class="sub">GenomicsChain / KairosChain 向け &middot;
+     2026-09-01 に 10 本の独立した一次資料調査から作成 &middot;
+     全文 <span class="mono">docs/research/eu_clinical_regulation_survey_2026-09-01.md</span></p>
+</header>
+
+<div class="verdict">
+  <strong>欧州は許可する。要求しない。</strong>
+  <p style="margin:.5rem 0 0">規制は<em>防御</em>に使える。需要がある証拠としては使えない。
+  売れるのは記録ではなく<em>判定</em>である。硬い技術核は証明のプロトコルであって、ゲノムの層ではない。</p>
+</div>
+
+<h2><span class="num">1</span>効く数字</h2>
+
+<div class="tiles">
+  <div class="tile">
+    <div class="v" style="color:var(--s1)">1</div>
+    <div class="k">EMA の計算機システム指針 52 ページ中、「分散型の改竄不能な台帳」の出現回数。それが §6.6 にある</div>
+    <div class="src">EMA/INS/GCP/112288/2023、原文 PDF で確認済み</div>
+  </div>
+  <div class="tile">
+    <div class="v" style="color:var(--crit)">0</div>
+    <div class="k">FDA が 21 CFR Part 11 を引用した回数（FY2021〜FY2025、全分野）</div>
+    <div class="src">各年度の査察指摘一覧、5 年連続</div>
+  </div>
+  <div class="tile">
+    <div class="v">0.36%</div>
+    <div class="k">US$610 万・61,073 人時の原資料検証で変更されたデータ項目の割合。主要評価項目への影響はゼロ</div>
+    <div class="src">I-SPY COVID、<em>Commun Med</em> 2025</div>
+  </div>
+  <div class="tile">
+    <div class="v">25<span style="font-size:.6em"> 年</span></div>
+    <div class="k">治験マスターファイルの保存義務。依頼者と治験責任医師の<em>両方</em>を拘束し、変更はすべて追跡可能でなければならない</div>
+    <div class="src">規則 (EU) No 536/2014 第58条</div>
+  </div>
+  <div class="tile">
+    <div class="v" style="color:var(--s2)">$1,000</div>
+    <div class="k">TEE の証明用署名鍵を抽出し、製造者自身の検証器を通る証明を偽造するのに要した機材費</div>
+    <div class="src">WireTap と TEE.fail、2025 年 10 月</div>
+  </div>
+  <div class="tile">
+    <div class="v">0 <span style="font-size:.5em">/ 0</span></div>
+    <div class="k">arXiv の <span class="mono">"workflow provenance" AND attestation</span> の該当論文数 / GitHub の <span class="mono">in-toto ro-crate</span> の該当リポジトリ数</div>
+    <div class="src">この案件が占められる空白</div>
+  </div>
+</div>
+
+<h2><span class="num">2</span>規制の地図 —— 最も多い間違い</h2>
+
+<p>この分野で最も多い誤りは<strong>適用範囲の取り違え</strong>である。Annex&nbsp;11 と Annex&nbsp;22 は
+<em>製造</em>（GMP）の文書であり、臨床試験を規律しない。治験依頼者に「Annex 11 対応」を売るのは分類の誤りになる。</p>
+
+<div class="flow">
+  <div class="fbox" style="border-left:3px solid var(--s1)">
+    <span class="t">規則 (EU) No 536/2014 —— 拘束力のある法律</span>
+    <span class="d">第56条 データは「正確に報告・解釈・<strong>検証</strong>」できる形で記録すること ·
+    第57条 治験マスターファイルは「常時」必須文書を含むこと ·
+    <strong>第58条 25 年保存。「治験マスターファイルの内容へのいかなる変更も追跡可能でなければならない」</strong></span>
+  </div>
+  <div class="arrow">↓ 第47条</div>
+  <div class="fbox">
+    <span class="t">ICH E6(R3) —— EU 発効 2025-07-23（附属書 2 は 2027-01-15）</span>
+    <span class="d">新設の第4節「データガバナンス」。監査証跡を無効化してはならない、時刻は協定世界時で一義的に、
+    証跡のレビューは<em>計画された、リスクに応じた</em>活動でなければならない</span>
+  </div>
+  <div class="arrow">↓ 査察が実際に照らす先</div>
+  <div class="fbox" style="border-left:3px solid var(--s2)">
+    <span class="t">EMA/INS/GCP/112288/2023 —— 計算機システム、2023-09-10 発効</span>
+    <span class="d">§4.5 で ALCOA++ を明文化 · §6.2.1 監査証跡 · <strong>§6.2.2 監査証跡のレビュー</strong> ·
+    §6.5 認証済み複製 · §6.10 移行の検証「例えば checksum」 · <strong>§6.6 データの管理</strong> ·
+    <em>AI は明示的に適用範囲外</em></span>
+  </div>
+</div>
+
+<div class="card" style="border-left:4px solid var(--ink-muted)">
+  <strong>別系統 —— 製造のみ。すべて草案のまま</strong>
+  <p style="margin:.4rem 0 0;font-size:.9rem;color:var(--ink-2)">EudraLex 第4巻 Annex 11 · Annex 22（AI）· 第4章。
+  Annex 11 の改訂案に <span class="mono">AI / ML / model</span> は<strong>一件も出てこない</strong>。
+  AI は独立して改訂できるよう意図的に Annex 22 へ分離された。Annex 22 には<strong>確定期日が存在せず</strong>、
+  EMA は中核の除外規定（重要な製造用途での生成 AI の全面禁止）を撤回するか検討中である。</p>
+</div>
+
+<h2><span class="num">3</span>技術を名指しした唯一の条項</h2>
+
+<p>EMA 指針の §6.6 は、原文 PDF を手元に落として直接読んだ。52 ページの文書中、
+<em>ledger</em> という語はここに一度だけ出てくる。</p>
+
+<blockquote>
+  <p>治験依頼者は、いかなる時点においても、計算機システムに入力されたデータを<strong>排他的に管理してはならない</strong>。
+  依頼者が保有する試験データはすべて、<strong>依頼者が保有していない（保有したことのない）複製に照らして検証可能</strong>
+  でなければならない。</p>
+  <p>［中略］独立したサービス提供者が維持するシステムに代えて、依頼者は排他的管理を排除する他の適切な技術的手段を
+  採ってもよい。例えば、<strong>独立した（分散型の）改竄不能な台帳によるデータ（取引）の検証可能性は、
+  独立したサービス提供者が維持するシステムと同等の安全性を与えうる</strong>。
+  <strong>これは正当化され、文書化されなければならない。</strong></p>
+  <div class="orig"><em>原文:</em> “…the verifiability of data (transactions) by an independent (distributed)
+  tamper-proof ledger may provide comparable security to a system maintained by an independent service provider.
+  This should be justified and documented.”</div>
+  <cite>EMA/INS/GCP/112288/2023 §6.6、22/52 ページ —— 2023 年 9 月 10 日から効力</cite>
+</blockquote>
+
+<div class="cols3">
+  <div class="fbox okbox"><span class="t">台帳が果たす役割</span>
+    <span class="d"><em>独立性</em>を果たす —— 依頼者による排他的管理を排除する。
+    「独立したサービス提供者を使う」ことの代替である。</span></div>
+  <div class="fbox warnbox"><span class="t">果たさない役割</span>
+    <span class="d">完全性の代替ではない。監査証跡の代替でもない。保存義務の代替でもない。</span></div>
+  <div class="fbox"><span class="t">付いてくる代償</span>
+    <span class="d">「正当化され、文書化されること」。この正当化の文書それ自体が必須の成果物であり、
+    したがって商品になる。</span></div>
+</div>
+
+<h2><span class="num">4</span>許可は需要ではない —— 同じ形が三つ</h2>
+
+<div class="cols3">
+  <div class="card" style="margin:0;border-top:3px solid var(--s1)">
+    <strong>EMA §6.6</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">分散型の改竄不能な台帳を名指しする ——
+    ただし、より簡単で既に標準の経路の<em>代替案として</em>。</p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s2)">
+    <strong>BSI C5:2026 OPS-32/33</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">機密計算を詳細に定義する ——
+    ただし条件付きで。<em>「クラウドサービスが機密計算の機能を備えている場合は……」</em></p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s3)">
+    <strong>米国 DSCSA</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">改竄検知の<em>義務</em>が予告どおり到来した ——
+    そして非ブロックチェーンの事業者が市場を丸ごと取った。</p>
+  </div>
+</div>
+
+<h3>DSCSA の逆転が、この調査で最も重い反証である</h3>
+
+<div class="cols2">
+  <div class="card warnbox" style="margin:0">
+    <strong>Chronicled / MediLedger</strong>
+    <p style="font-size:.88rem;margin:.45rem 0 0">先行者。FDA 主催の <em>DSCSA 実証事業最終報告書</em>（2020-02-21）に
+    24 社のサプライチェーン企業とともに掲載された —— 本物の規制当局との関与である。
+    義務化は 2023〜2025 年に予告どおり到来した。</p>
+    <p style="font-size:.88rem;margin:.45rem 0 0"><strong>そして撤退した。</strong>
+    現在のホームページで <span class="mono">dscsa</span> / <span class="mono">serializ</span> /
+    <span class="mono">track-and-trace</span> の該当は <span class="mono">0</span> 件、
+    「blockchain」は <span class="mono">5</span> 件のまま。
+    <span class="mono">mediledger.com</span> は駐車ページである。</p>
+  </div>
+  <div class="card okbox" style="margin:0">
+    <strong>TraceLink —— 従来型の EPCIS メッセージング</strong>
+    <p style="font-size:.88rem;margin:.45rem 0 0">2026 年 2 月時点で <strong>顧客 1,790 社超</strong>、
+    年間 <strong>70 億件超</strong>の規制対象取引、週あたり <strong>約 300</strong> の新規稼働接続。</p>
+    <p style="font-size:.88rem;margin:.45rem 0 0">サイト上の blockchain 言及は <strong>0 件</strong>。
+    確認した他の稼働中 DSCSA 事業者（rfxcel, LSPedia, Movilitas, OPTEL）も全社 0 件だった。</p>
+  </div>
+</div>
+
+<p><strong>義務が到来し、それはチェーンを選ばなかった。</strong>これは §6.6 と矛盾しない。
+二つは異なる次元で働いている。<strong>§6.6 は許可を与え、DSCSA は需要の不在を測っている。
+許可は防御に使い、予測には使わないこと。</strong></p>
+
+<h2><span class="num">5</span>義務はあるが方法がない —— 空いている場所</h2>
+
+<blockquote>
+  <p>「……処理が解決策に不可分である場合［中略］<strong>処理が正しく動作することを検証できなければならない。</strong>」</p>
+  <div class="orig"><em>原文:</em> “It should be possible to validate the correct operation of the processing.”</div>
+  <cite>EMA/INS/GCP/112288/2023 §4.4</cite>
+</blockquote>
+
+<div class="card warnbox">
+  <p style="margin:0"><strong>バイオインフォマティクスのパイプラインをどう検証するかを述べた EU の法令・指針は存在しない。</strong>
+  臨床試験規則にも、ICH E6(R3) にも、計算機システム指針にもない。最も近い文書 ——
+  EMA/CHMP/718998/2016（good pharmacogenomic practice、2018-09-01 発効）—— は NGS の全工程を列挙したうえで、
+  「<em>検証された</em>バイオインフォマティクスの方法とアルゴリズムを用いること」とだけ述べ、
+  品質保証を ISO 15189 または CAP/CLIA に委任している。計算機システムの仕組みを持たない科学ガイドラインである。</p>
+</div>
+
+<div class="flow">
+  <div class="fbox"><span class="t">義務は ある</span><span class="d">§4.4 —— 処理が正しく動作することを検証できること</span></div>
+  <div class="arrow">↕</div>
+  <div class="fbox"><span class="t">方法は ない</span><span class="d">依頼者は ISO 15189 と FDA の文書を見ながら場当たりに対処している</span></div>
+</div>
+
+<h2><span class="num">6</span>問題が実在すること —— 同じデータ、違う答え</h2>
+
+<div class="chart">
+  <h4>同じデータを二度解析したとき、答えはどれだけ一致するか</h4>
+  <p class="cap">一致率・再現率（%）。各行は同一の入力に対する公表済みの研究。
+  濃い棒は、検査法ではなく<em>公表された計算解析</em>そのものについての 2 行。</p>
+
+  <div class="bars" role="img" aria-label="一致率・再現率の棒グラフ。7.5% から 74.9% まで">
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">液体生検の報告が完全に一致した割合 —— 一回の採血を 2 つの CLIA 認可事業者に分割</div>
+      <div class="bartrack" title="7.5% —— 40 名中 3 名。Torga &amp; Pienta, JAMA Oncol 2018">
+        <div class="barfill" style="width:10.0%"></div><span class="barval">7.5%</span></div>
+    </div>
+    <div class="barrow" data-hi="1">
+      <div class="barlabel">生物医学論文由来の Jupyter ノートブックが同一の結果を出した割合</div>
+      <div class="bartrack" title="10,388 件中 8.5%。Samuel &amp; Mietchen, GigaScience 2024">
+        <div class="barfill" style="width:11.3%"></div><span class="barval">8.5%</span></div>
+    </div>
+    <div class="barrow" data-hi="1">
+      <div class="barlabel">Nature Genetics のマイクロアレイ論文が独立 2 チームにより完全再現された割合</div>
+      <div class="bartrack" title="18 本中 2 本。Ioannidis et al., Nat Genet 2009">
+        <div class="barfill" style="width:14.8%"></div><span class="barval">11.1%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">indel の一致率 —— 5 つのパイプライン、15 検体のエクソーム、同一の生データ</div>
+      <div class="bartrack" title="26.8%。O’Rawe et al., Genome Med 2013">
+        <div class="barfill" style="width:35.7%"></div><span class="barval">26.8%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">ACMG/AMP の 5 分類が 9 つの CLIA 検査室で完全一致した割合</div>
+      <div class="bartrack" title="158 変異のうち 54%。Amendola et al., AJHG 2016">
+        <div class="barfill" style="width:72.0%"></div><span class="barval">54%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">SNV の一致率 —— 5 つのパイプライン、15 検体のエクソーム、同一の生データ</div>
+      <div class="bartrack" title="57.4%。O’Rawe et al., Genome Med 2013">
+        <div class="barfill" style="width:76.5%"></div><span class="barval">57.4%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">TMB の高低分類 —— パネル対全エクソーム、15 施設</div>
+      <div class="bartrack" title="74.9%。Stenzinger et al., JTO 2020（独 QuIP リング試験）">
+        <div class="barfill" style="width:100%"></div><span class="barval">74.9%</span></div>
+    </div>
+  </div>
+  <p class="axisnote">目盛りは 0〜75%。棒はこの範囲内の比例表示。棒に触れると出典と年が出る。</p>
+
+  <details>
+    <summary>表で見る（読み上げ・印刷用）</summary>
+    <table>
+      <thead><tr><th>内容</th><th class="num">割合</th><th>年</th><th>出典</th></tr></thead>
+      <tbody>
+        <tr><td>液体生検の報告が完全一致（40 名中 3 名、2 事業者、一回の採血）</td><td class="num">7.5%</td><td>2018</td><td>Torga &amp; Pienta, <em>JAMA Oncol</em></td></tr>
+        <tr><td>Jupyter ノートブックが同一結果（10,388 件中）</td><td class="num">8.5%</td><td>2024</td><td>Samuel &amp; Mietchen, <em>GigaScience</em></td></tr>
+        <tr><td><em>Nature Genetics</em> 論文の完全再現（18 本中 2 本）</td><td class="num">11.1%</td><td>2009</td><td>Ioannidis et al., <em>Nat Genet</em></td></tr>
+        <tr><td>indel 一致率、5 パイプライン、同一生データ</td><td class="num">26.8%</td><td>2013</td><td>O’Rawe et al., <em>Genome Med</em></td></tr>
+        <tr><td>ACMG/AMP 5 分類の完全一致、9 検査室（158 変異）</td><td class="num">54%</td><td>2016</td><td>Amendola et al., <em>AJHG</em></td></tr>
+        <tr><td>SNV 一致率、5 パイプライン、同一生データ</td><td class="num">57.4%</td><td>2013</td><td>O’Rawe et al., <em>Genome Med</em></td></tr>
+        <tr><td>TMB 高低分類の一致、パネル対全エクソーム、15 施設</td><td class="num">74.9%</td><td>2020</td><td>Stenzinger et al., <em>JTO</em></td></tr>
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<div class="card okbox">
+  <strong>再現性の文献で最も使える一文</strong>
+  <blockquote style="margin:.6rem 0 0">
+    <p>固定されたデータと固定されたツールの上で、
+    「<strong>オペレーティングシステムと導入方法が、変異検出の性能に最も影響する要因だった</strong>」。</p>
+    <div class="orig"><em>原文:</em> “the operating systems and installation methods were the most influential
+    factors in variant-calling performance”</div>
+    <cite>Ertürk et al., <em>PLoS Comput Biol</em> 2025 —— 同一の SEQC2 データに 12 の体細胞変異パイプライン</cite>
+  </blockquote>
+  <p style="margin:.7rem 0 0;font-size:.9rem">依存の閉包を<em>実行時に</em>捕捉することの工学上の根拠がこれである。
+  閉包は手作業で文書化するには大きすぎ、しかも結果を支配している。</p>
+</div>
+
+<h3>査察官が実際に書いていること</h3>
+<blockquote>
+  <p>「<strong>この試験の IRT の監査証跡は、査察時に提供できなかった —— ベンダーによって既に廃止されていたためである。</strong>
+  したがって査察官は、IRT 上で行われた活動を査察中に検証できなかった。」</p>
+  <cite>MHRA GCP 査察指標 2019/20 —— 重大指摘 4 件を受けた CRO について</cite>
+</blockquote>
+<p>証拠は存在した。そしてベンダーがそれを止めた。EMA 自身の言い方と並べて読むとよい ——
+<em>「義務づけられた保存期間の満了前に完全性が失われることは、データを使用不能にし、
+データの喪失・破壊と等価である」</em>。</p>
+
+<h2><span class="num">7</span>反証 —— 営業資料を作る前に読む節</h2>
+
+<p class="lede">ここに並ぶ事実は、審査員も、製薬の品質保証責任者も、競合の営業も、いずれ持ち出す。
+先に自分で出すこと。</p>
+
+<table>
+  <thead><tr><th>反証</th><th>中身</th></tr></thead>
+  <tbody>
+    <tr><td><strong>どの規制当局も暗号による証明を求めていない</strong></td>
+        <td>21 CFR Part 11、Annex 11、EMA 指針、ICH E6(R3)、規則 536/2014、FDA の 2024 年 Q&amp;A を全文計数:
+        <span class="mono">cryptograph / hash / blockchain / immutable</span> はほぼ全て 0。唯一の例外が §6.6。</td></tr>
+    <tr><td><strong>Part 11 は執行されていない</strong></td>
+        <td>FDA の 2003 年 <em>Scope and Application</em> 指針: 「検証、<strong>監査証跡</strong>、記録保持、
+        記録複製の各要件について、遵守を強制する執行措置を採る意図を持たない」。
+        Part 11 の引用回数は FY2021〜FY2025 の全分野で <strong>0 件</strong>。</td></tr>
+    <tr><td><strong>当局が、自動化しようとしている範囲を自ら狭めている</strong></td>
+        <td>MHRA: 「監査証跡のレビューが、すべてのシステム活動を含む<strong>必要はない</strong>」。
+        機能が存在しない場合に認められる代替管理は「手順書で工程を定義し、<strong>紙の記録簿</strong>を使うこと」。</td></tr>
+    <tr><td><strong>指摘の分布の逆側に売っている</strong></td>
+        <td>FY2025 の FDA 生物研究モニタリング引用のうち <strong>56.3%</strong> が治験実施医療機関に、
+        <strong>4.5%</strong> だけが依頼者に着地。指摘を受ける当事者は、予算を持つ当事者ではない。</td></tr>
+    <tr><td><strong>検証は既に莫大な費用がかかり、何も見つけていない</strong></td>
+        <td>I-SPY COVID: US$610 万と 61,073 人時で変更は 0.36%、主要評価項目への影響ゼロ。
+        最良の「痛みの費用」であると同時に、<em>追加の保証の限界収益が低いことの最強の論拠</em>でもある。</td></tr>
+    <tr><td><strong>顧客の側が答えを公表しており、しかも無料</strong></td>
+        <td>北欧の認定臨床バイオインフォマティクス 13 施設、2025 年:
+        「<strong>データ完全性はファイルのハッシュにより検証されなければならない。</strong>」
+        加えて nf-core のパイプライン 156 本、Galaxy（無料、利用者 40 万人超）、RO-Crate、
+        そして <strong>2001 年 8 月</strong>から標準化過程にある RFC 3161。</td></tr>
+    <tr><td><strong>Wüst &amp; Gervais の判定</strong></td>
+        <td>書き手が一つ ＋ 常時稼働の信頼できる第三者 → 判定図は<em>「ブロックチェーンを使うな」</em>で終端する。
+        単一の研究室が自分で証明を書き込む構成は、この検査に落ちる。</td></tr>
+    <tr><td><strong>予算の行が存在しない</strong></td>
+        <td>米 HHS/ASPE の臨床試験費用分解は 11 の費目を挙げるが、
+        <strong>ソフトウェアの費目もデータ完全性の費目も無い</strong>。</td></tr>
+    <tr><td><strong>Veeva が既に「査察対応可能」を所有している</strong></td>
+        <td>FY2026 年次報告書、顧客 1,552 社、売上 US$31.95 億。監査証跡と Part 11 を当然の前提として扱う。
+        「blockchain」の出現回数: <strong>0</strong>。</td></tr>
+    <tr><td><strong>体系的レビュー</strong></td>
+        <td>臨床試験向けブロックチェーン系 10 件中 10 件が「試作または模擬であり、
+        実際の規制環境で試験されたものは一つもない」。</td></tr>
+  </tbody>
+</table>
+
+<h3>申請書の第一段落が答えなければならない問い</h3>
+<div class="card warnbox">
+  <p style="margin:0"><strong><span class="mono">sha256sum</span> ＋ RFC 3161 の時刻認証 ＋ RO-Crate が
+  既にやらないことを、これは何をするのか。</strong>
+  顧客の側の専門家合意文書が「ハッシュで足りる」と自分で書いており、
+  その規制当局が一度としてそれ以上を求めたことがない相手に対して。</p>
+</div>
+
+<div class="card okbox">
+  <strong>答え —— 売っているのは記録ではなく判定である。</strong>
+  <p style="margin:.5rem 0 .3rem;font-size:.9rem">ハッシュは「ファイルが変わっていない」と言う。言えないことが三つある。</p>
+  <div class="cols3">
+    <div class="fbox"><span class="t">1 · そもそも再実行できるのか</span>
+      <span class="d"><span class="mono">gc_codescan</span> は宣言された依存の閉包について固定の強さを
+      <span class="mono">env_capture_class</span> A/B/C に格付けする。ハッシュは格付けをしない。</span></div>
+    <div class="fbox"><span class="t">2 · 比較する相手が存在するのか</span>
+      <span class="d"><span class="mono">gc_tier2_execute</span> は
+      <span class="mono">no_target_declared</span> を<em>完全な結果</em>として報告する。
+      ハッシュは「対象がない」と言えない。</span></div>
+    <div class="fbox"><span class="t">3 · 誰が判定したのか</span>
+      <span class="d">Tier-2 は第三者の設備で再実行する。ハッシュは自己申告のままでも成立してしまう。</span></div>
+  </div>
+  <p style="margin:.8rem 0 0;font-size:.9rem">これは買い手の問題も解く。<em>判定</em>は品質保証部門が買い、
+  <em>記録基盤</em>は情報システム部門が買う。</p>
+</div>
+
+<h2><span class="num">8</span>墓場</h2>
+
+<table>
+  <thead><tr><th>会社</th><th>持っていたもの</th><th>2026-09 の状態</th><th>死因</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Triall</strong>（蘭）</td>
+      <td>商用試験 6 件 · <strong>Mayo Clinic</strong> の肺動脈性肺高血圧症試験（10 施設・500 名超）·
+          EC の Seal of Excellence</td>
+      <td><span class="chip c-crit">✕ 死亡</span><br>
+          <span class="mono">triall.io</span> は解決せず、whois は <span class="mono">pendingDelete</span></td>
+      <td>2024 年 3 月の自社告知: 事業停止 ——「ベンチャー資金の調達失敗と M&amp;A 交渉の決裂」。
+          <strong>買い手が付かなかった。</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Guardtime</strong>（愛沙尼亜）</td>
+      <td>KSI のハッシュ連鎖時刻認証が 2012 年から本番稼働 · エストニアの国民医療記録 ·
+          政府との VaccineGuard · Epic 連携</td>
+      <td><span class="chip c-crit">✕ 医療事業として死亡</span><br>
+          全ドメインが 2026-05-23 頃から消灯</td>
+      <td>エストニア商業登記: <strong>従業員 1 名</strong>（2026 年第1四半期）、係属中の審理 8 件、
+          未処分利益 €930 万が遊休。<strong>この分野で最良の暗号が、反復可能な市場を作れなかった。</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Chronicled / MediLedger</strong>（米）</td>
+      <td>DSCSA という市場を作った側 · FDA 実証事業の最終報告書に 24 社とともに掲載</td>
+      <td><span class="chip c-serious">▲ 存続、ただし停滞</span></td>
+      <td>義務が到来した<em>後で</em> DSCSA から撤退。「blockchain」の語を残し、市場を失った。</td>
+    </tr>
+    <tr>
+      <td>ClinTex, Shivom, LunaDNA, EncrypGen, Everledger, CSBWG</td>
+      <td>—</td>
+      <td><span class="chip c-crit">✕ 消滅</span></td>
+      <td>資金枯渇。トークンが<em>事業モデルそのもの</em>だった。2 社のドメインは現在、賭博サイトになっている。
+          CSBWG は 8 年間、本番に到達した実証が一つもない。</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="card">
+  <strong>生存者は全員、同じ方法で生き延びた —— 語を消した。</strong>
+  <p style="margin:.45rem 0 0;font-size:.9rem">PharmaLedger —— €2,200 万の EU IMI 旗艦事業。現在はスイスの非営利法人で、
+  GSK・MSD・Takeda・Moderna・Elanco が会員、2022 年から本番稼働、価格は添付文書あたり年 CHF 2,250 から
+  月額 CHF 19,999 まで —— のホームページ見出しは <strong>「トークンなし · ブロックチェーンなし」</strong>。
+  Hyperledger は内部に静かに残っている。Embleema、BurstIQ（blockchain 0 件 / AI 37 件）、
+  Longenesis、Hashed Health も全て 0 件。</p>
+</div>
+
+<h2><span class="num">9</span>TEE —— 主張できる範囲を三段に分ける</h2>
+
+<p>安全性の履歴は、この 12 か月で明確に悪化した。正直な立場は、攻撃者を三つに分ける。</p>
+
+<div class="ladder">
+  <div class="rung">
+    <div class="rungbar" style="background:var(--good)">✓ 主張できる</div>
+    <div class="rungtxt"><strong>(a) 遠隔のソフトウェア攻撃者。</strong>TDX と SEV-SNP は概ね持ちこたえている。
+    これが擁護可能な主張である。</div>
+  </div>
+  <div class="rung">
+    <div class="rungbar" style="background:var(--serious);color:#241109">▲ 弱まっている</div>
+    <div class="rungtxt"><strong>(b) 悪意あるクラウド運用者。</strong>これこそ TEE が<em>売られている</em>根拠だが、
+    ソフトウェアで繰り返し破られている。</div>
+  </div>
+  <div class="rung">
+    <div class="rungbar" style="background:var(--crit)">✕ 主張が存在しない</div>
+    <div class="rungtxt"><strong>(c) 物理アクセスを持つ攻撃者。</strong>Intel も AMD も、interposer 攻撃は
+    <em>対象外</em>であり<em>緩和の予定はない</em>と明言している。残存リスクではなく、除外された脅威である。</div>
+  </div>
+</div>
+
+<h3>この 12 か月</h3>
+<div class="tl">
+  <div class="tlitem" data-kind="done">
+    <div class="tldate">2024 · Heckler（USENIX Sec）</div>
+    <div class="tlbody">ハイパーバイザからの悪意ある割り込みが <strong>TDX ＋ SGX ＋ SEV-SNP</strong> を破る。ソフトウェアのみ。</div>
+  </div>
+  <div class="tlitem">
+    <div class="tldate">2025-05 · BadRAM &nbsp;<span class="mono">$10 未満</span></div>
+    <div class="tlbody">SEV-SNP と旧来の SGX。</div>
+  </div>
+  <div class="tlitem">
+    <div class="tldate">2025-09 · Battering RAM &nbsp;<span class="mono">$50 未満</span></div>
+    <div class="tlbody">Scalable SGX と SEV-SNP の証明を<em>迂回</em>する。起動時の信頼検査を全て通過する。</div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2025-10 · WireTap &nbsp;<span class="mono">$1,000 未満</span></div>
+    <div class="tlbody">Quoting Enclave の ECDSA 鍵を抽出し、<strong>Intel 自身の検証ライブラリを通る</strong>証明を偽造した。</div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2025-10 · TEE.fail &nbsp;<span class="mono">$1,000 未満</span>、鞄に収まる</div>
+    <div class="tlbody">Intel TDX ＋ SGX、暗号文隠蔽つきの SEV-SNP、NVIDIA CC。著者いわく
+    <em>「我々は自分のものでない装置から NVIDIA の証明を『借りる』ことができる…… GPU を一台も持っていないのに」</em>。</div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2026-05 · VCEK seed の抽出 &nbsp;<span class="mono">ソフトウェアのみ</span></div>
+    <div class="tlbody">EPYC Milan の SEV-SNP。root seed を抽出し、<em>任意の</em>ファームウェア版について
+    有効な証明報告を偽造する —— <strong>物理アクセスは一切不要</strong>。</div>
+  </div>
+</div>
+
+<div class="card warnbox">
+  <strong>相続する一文</strong>
+  <p style="margin:.45rem 0 0">「これは TEE の中で走った」は、
+  「<strong>有効な鍵を持つ誰かが、TEE の中で走ったと述べた</strong>」に変わる。
+  規制上の証拠としては別の文であり、真なのは後者だけである。</p>
+</div>
+
+<h3>ただし、二つの用途のうち壊れたのは片方だけ</h3>
+<div class="cols2">
+  <div class="card warnbox" style="margin:0">
+    <strong>(A) 第三者への証明</strong>
+    <p style="font-size:.88rem;margin:.4rem 0 0">「この計算は改変されずに走った」。
+    <strong>壊れた</strong> —— 証明は $1,000 で偽造できる。</p>
+  </div>
+  <div class="card okbox" style="margin:0">
+    <strong>(B) 運用者からの秘匿</strong>
+    <p style="font-size:.88rem;margin:.4rem 0 0">顧客の閉じたデータと設定を、<em>読めない状態のまま</em>計算する。
+    遠隔ソフトウェア攻撃者に対しては<strong>壊れていない</strong>。
+    そしてゲノム規模では他に手段がない（零知識証明は 10⁴〜10⁶ 倍足りない）。</p>
+  </div>
+</div>
+
+<h3>設計上の帰結 —— BSI C5:2026 OPS-33.01AC は「誰が検証するか」を格付けする</h3>
+<div class="ladder">
+  <div class="rung"><div class="rungbar" style="background:var(--seq-600)">very strong</div>
+    <div class="rungtxt">顧客が証跡を取得し、<em>顧客が</em>完全に信頼する環境で検証する</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-450)">very strong</div>
+    <div class="rungtxt">提供者が検証し、<strong>結果<em>と</em>証跡の両方</strong>を返し、顧客が自分の環境で再検証する</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-350)">strong</div>
+    <div class="rungtxt">顧客が証跡を取得し、顧客が信頼する検証サービスへ送る</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-250);color:#0b0b0b">weak</div>
+    <div class="rungtxt"><strong>提供者が取得し、自らの管理下のサービスで検証し、結果だけを返す</strong></div></div>
+</div>
+<p><strong>設計は一行に落ちる —— 結果ではなく証跡を渡し、相手の環境で検証させる。</strong>
+同じ規則が KairosChain 自身の INV-5（「判定する context は、それを判定するものを著述してはならない」）に
+独立に現れている。</p>
+
+<h3>規制上の受け入れ —— そして都合の悪い型</h3>
+<table>
+  <thead><tr><th>当局</th><th>TEE の証明を証拠として受け入れるか</th></tr></thead>
+  <tbody>
+    <tr><td><strong>BSI C5:2026</strong>（独）</td><td><span class="chip c-good">✓ はい —— 唯一</span> OPS-32/33、適用は <strong>2027-06-01</strong> から、条件付き</td></tr>
+    <tr><td>NIST CMVP / FIPS 140-3</td><td><span class="chip c-crit">✕ いいえ</span> NVIDIA H100 の認証 #5446 は実在するが、証明用 ECDSA は「Non-Approved, <strong>No Security Claimed</strong>」</td></tr>
+    <tr><td>Common Criteria</td><td><span class="chip c-crit">✕ いいえ</span> 認証済み・保管分 8,466 件に <strong>Intel 0 件、AMD 0 件</strong></td></tr>
+    <tr><td>eIDAS</td><td><span class="chip c-crit">✕ 構造的にいいえ</span> 法的推定力は<em>適格トラストサービス提供者</em>の封印に付く</td></tr>
+    <tr><td>FDA · EMA · Annex 11 · GAMP 5 · PIC/S · MHRA</td><td><span class="chip c-warn">— 沈黙</span></td></tr>
+    <tr><td>EHDS（規則 (EU) 2025/327）</td><td><span class="chip c-warn">— 沈黙</span>「secure processing environment」48 回、trusted execution / attestation は 0 回。<strong>第73条(5) の技術実施法令は 2027-03-26 までに採択が必要 —— まだ書かれていない</strong></td></tr>
+    <tr><td><strong>NIST IR 8432</strong>「ゲノムデータのサイバーセキュリティ」</td><td><span class="chip c-serious">▲ 別のものを推奨</span> FHE・MPC・ZKP。機密計算は <strong>0 回</strong></td></tr>
+    <tr><td>スイス FDPIC</td><td><span class="chip c-serious">▲ 別のものを推奨</span> 技術的措置の手引は <strong>準同型暗号</strong>に §5.7 を割く。TEE の言及 0 件</td></tr>
+  </tbody>
+</table>
+
+<div class="card warnbox">
+  <strong>用意しておくべき反論</strong>
+  <p style="margin:.45rem 0 0"><em>ゲノム</em>を具体的に検討した当局はすべて —— NIST、スイス FDPIC、
+  CNIL の LINC、EDPB —— <strong>準同型暗号と秘密計算</strong>を名指しし、TEE を名指ししていない。
+  スイスではこれが具体的にぶつかる: <strong>SPHN は連合クエリ層を Tune Insight（準同型暗号 ＋ 秘密計算 ＋
+  k 匿名化）に既に賭けている。</strong>「TEE の方が速い」は答えにならない。</p>
+</div>
+
+<div class="card okbox">
+  <strong>存在証明と、論法の型</strong>
+  <p style="margin:.45rem 0 0"><strong>Edgeless Systems × gematik ePA</strong> —— ドイツの国民電子カルテ。
+  Intel の機密計算、最大 5,000 万人規模、2025-10-01 から医療機関に義務化。
+  駆動したのは規制上の<em>運用者排除（Betreiberausschluss）</em>である。これは別の法域における §6.6 の論理そのものだ。
+  ゲノムデータは扱っていない。</p>
+  <p style="margin:.45rem 0 0;font-size:.88rem;color:var(--ink-2)">一方ゲノムでは:
+  TDX の論文 <strong>0 本</strong>、SEV-SNP の論文 <strong>0 本</strong>、
+  全ゲノム規模の TEE による変異検出・アライメントの論文 <strong>0 本</strong>。
+  Decentriq（チューリッヒ）は実在の医療顧客を持つが、ゲノムは <strong>0 件</strong>。</p>
+</div>
+
+<h2><span class="num">10</span>データ保護 —— 設計を確定させる節</h2>
+
+<p><strong>EDPB のブロックチェーン指針 02/2025 が 2026-07-07 に確定版 v2.0 になった。</strong>
+CNIL 2018 のメモを置き換え、明確に厳しくなっている。</p>
+
+<table>
+  <thead><tr><th>条項</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td><strong>§104</strong></td><td>個人データを<em>平文・暗号化・<strong>ハッシュ</strong></em>のいずれの形でオンチェーンに置くことも「推奨されない」。オフチェーンに置くこと。</td></tr>
+    <tr><td><strong>§52</strong></td><td><strong>ハッシュもまた個人データである。</strong>「塩なし・鍵なしのハッシュは、一般に十分とみなされるべきでない」—— CNIL 2018 の反転。</td></tr>
+    <tr><td>§53–54</td><td>オンチェーンは「存在証明」の形に限る —— ポインタ、<strong>暗号学的コミットメント</strong>、鍵付きハッシュ。§53 は<em>完全秘匿コミットメント</em>を選好。</td></tr>
+    <tr><td>§50</td><td>「技術的に不可能であることは、不遵守の正当化に使えない」。</td></tr>
+    <tr><td>§40</td><td>「組織は<strong>許可型</strong>のチェーンを選好すべきである」。</td></tr>
+    <tr><td>§13</td><td><strong>単一の主体</strong>が生成し管理するチェーンは、本指針の一部の適用対象外。</td></tr>
+    <tr><td>勧告 9</td><td>当事者の個人データを削除できない構成では、同意を法的根拠に使うべきでない。</td></tr>
+  </tbody>
+</table>
+
+<p>スペインの AEPD の実証は、オンチェーンの削除を<strong>検証者多数決によるハードフォーク</strong>で実装している。
+規制当局はチェーンを書き換え可能なものとして扱っている。
+<em>不変性は盾ではなく、正当化を求められる設計判断である。</em></p>
+
+<div class="card warnbox">
+  <strong>選択的開示の売り文句に刺さる二つ</strong>
+  <p style="margin:.5rem 0 0"><strong>1 · 「我々はデータを見ない」は処理者にしてくれない。</strong>
+  ガイドライン 1/2026 第135項: 事業者は「<em>個人データを一切処理していなくても</em>、あるいは仮名化データのみを
+  処理していても」管理者になりうる。役割は<em>統治の仕組み</em>で決まる。</p>
+  <p style="margin:.5rem 0 0"><strong>2 · ゲノムデータは匿名だと主張できない。</strong>
+  ガイドライン 1/2026 第165項: 遺伝的プロファイルは既定で個人データであり、匿名とみなせるのは例外的な場合のみ。
+  第167項はリスクを<em>血縁者にも恒久的に</em>及ぼす。
+  CNIL はより弱い主張をした <strong>IQVIA に €500 万</strong>の制裁を科した（2026-05-26）。</p>
+</div>
+
+<h3>結論としての設計</h3>
+<div class="flow">
+  <div class="fbox okbox"><span class="t">オンチェーン</span><span class="d">鍵付きコミットメントのみ。完全秘匿を選好。
+    <strong>塩なし・鍵なしのハッシュは不可。</strong></span></div>
+  <div class="fbox"><span class="t">オフチェーン</span><span class="d">個人データのすべて。鍵の破棄手順を文書化し、試験の証跡を残す。</span></div>
+  <div class="fbox"><span class="t">チェーン種別</span><span class="d">許可型 · 参加者は既知 · ノードは EEA / スイスに居住。</span></div>
+  <div class="fbox"><span class="t">運用主体</span><span class="d">単一運用者から始める（§13 により露出が小さい）。
+    多者化するときは、共同管理者としての第26条の取決めを<em>設計に入れる</em>。後から足さない。</span></div>
+  <div class="fbox"><span class="t">同意</span><span class="d">同意記録それ自体を台帳の目的にしない（勧告 9）。
+    記録するのは<em>いつ効力が生じたか</em>だけ。</span></div>
+  <div class="fbox"><span class="t">封印</span><span class="d"><strong>eIDAS の適格タイムスタンプ</strong> ——
+    ブロックチェーンの固定には無い法定の推定力を持つ。</span></div>
+</div>
+
+<p class="lede">一致に注目してほしい。EDPB が<em>選好する</em>オンチェーンの形 —— 暗号学的コミットメント ——
+は、選択的開示のプロトコルがどのみち必要とする部品と同じものである。制約と設計が同じものを求めている。</p>
+
+<h2><span class="num">11</span>先行研究 —— 新規性はどこに残るか</h2>
+
+<div class="card okbox">
+  <strong>優先権はこちらにある。</strong>
+  <p style="margin:.45rem 0 0">「Synoptis: Mutual Attestation for Trustworthy MCP Agent Networks」、Hatakeyama、
+  Zenodo <strong>2026-03-22</strong>、doi:10.5281/zenodo.19161453、OpenAlex 収録 ——
+  最も近い先行研究（Sokolov）の初回登録である 2026 年 6 月より <strong>三か月早い</strong>。</p>
+</div>
+
+<h3>最も近い先行研究は、最大の脅威ではない</h3>
+<table>
+  <thead><tr><th>先行研究</th><th>既に済んでいること</th><th>判定</th></tr></thead>
+  <tbody>
+    <tr><td><strong>arXiv 2608.00801</strong>（Sokolov、2026-08-01）</td>
+        <td>IETF RATS と、署名された追記専用の「行動証拠パッケージ」を合成する。ただし <em>単一当事者</em>、
+        外部固定なし、撤回・訂正なし、選択的開示なし、領域への束縛なし。エミュレートした TPM、公開リポジトリなし、被引用 0。
+        著者自身が「機構は意図的に新しくない」と明言している。</td>
+        <td><span class="chip c-warn">— 見出しのみ重なる</span></td></tr>
+    <tr><td><strong>SLSA Verification Summary Attestation</strong></td>
+        <td>合成の脚が<em>既に標準化され配備済み</em>。検証者が生産者の証跡をポリシーに照らして評価し、
+        署名済みの要約を出す。消費者はそれを<em>基の証跡の代わりに</em>使う。
+        <strong>ただし検証者の独立性を要求していない。</strong></td>
+        <td><span class="chip c-crit">✕ 脚が既にある</span></td></tr>
+    <tr><td><strong>RFC 9943（SCITT）＋ RFC 9942</strong>（2026-06、Standards Track）</td>
+        <td>追記専用で第三者が検証できるログの脚が完成済み。唯一の穴: <em>成果物についての</em>陳述は扱うが、
+        <em>陳述についての</em>陳述は扱わない。</td>
+        <td><span class="chip c-crit">✕ 脚が既にある</span></td></tr>
+    <tr><td><strong>Agentic Witnessing</strong>（Rowstron、arXiv:2604.24203、2026-04）</td>
+        <td>TEE 内に隔離した LLM 監査者が MCP 経由で非公開データセットを検査し、判定と、推論の軌跡をデータと
+        ハードウェア根拠に束ねた署名済みハッシュ連鎖を出す。<strong>評価対象は 21 本の論文の公開コードの検証。</strong></td>
+        <td><span class="chip c-crit">✕ 学術用途と正面衝突</span></td></tr>
+    <tr><td><strong>Halimi et al.</strong>, PoPETs 2022(3):732–753</td>
+        <td><strong>ゲノム領域で</strong>「A が申告し、B が検証し、全面開示なしに」を既に実施。動機はワークフローの来歴。
+        検証は暗号ではなく統計的で、署名記録は無い。</td>
+        <td><span class="chip c-serious">▲ 自領域での「もう誰かがやった」</span></td></tr>
+  </tbody>
+</table>
+
+<div class="card warnbox">
+  <strong>危険が二つ</strong>
+  <p style="margin:.45rem 0 0"><strong>「Mutual Attestation」は占有された語である。</strong>
+  arXiv の該当 10 件すべてが<em>二つのエンクレーブが互いのコード測定値を検証する</em>意味で使っている。
+  セキュリティの査読者は題名だけで別の棚に入れる。<strong>改名すること。</strong></p>
+  <p style="margin:.45rem 0 0"><strong>五次元の信頼スコアは既に攻撃されている</strong> ——
+  Hu, Rong &amp; Van Kleek, FAccT 2026（arXiv:2605.30169）は、エージェントは「存在論的に解離しており」
+  評判型の統治は「構造的に適用不能」と論じる。捨てるか、明示的に防御するか。</p>
+</div>
+
+<h3>残るもの —— 狭いが実在する</h3>
+<div class="cols2">
+  <div class="card" style="margin:0;border-top:3px solid var(--s1)">
+    <strong>1 · 検証者の独立性を、運ばれる検査可能な性質にすること</strong>
+    <p style="font-size:.9rem;margin:.4rem 0 0">「B は A によって著述・設定・制御されていない」を、
+    配備によって<em>仮定される</em>ものではなく、<em>証跡の中に運ばれる</em>不変条件にする。
+    SLSA VSA はこれを要求していない。</p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s2)">
+    <strong>2 · 領域への束縛</strong>
+    <p style="font-size:.9rem;margin:.4rem 0 0"><strong>BioCompute Object（IEEE 2791）</strong>を暗号的に
+    証明したものが存在しない。検証キットも FDA の一致試験も手続き的で手作業である。
+    <strong>SCITT のどの文書も、医療・臨床試験・ゲノムに一度も言及していない。</strong></p>
+  </div>
+</div>
+
+<p><strong>正直な内訳: プロトコルは新規ではない。独立性の不変条件は薄いが実在する。領域への束縛が本体である。</strong></p>
+
+<div class="card okbox">
+  <strong>同じ規則に、独立に三つが到達している</strong>
+  <table style="margin:.5rem 0 0">
+    <tbody>
+      <tr><td>KairosChain INV-5</td><td>判定する context は、それを判定するものを著述してはならない</td></tr>
+      <tr><td>BSI C5:2026 OPS-33.01AC</td><td>提供者が自社サービスで検証し結果だけを返す構成は <strong>weak</strong></td></tr>
+      <tr><td>上記の新規性の主張</td><td>検証者の独立性を証跡の<em>中に</em>運ぶ</td></tr>
+    </tbody>
+  </table>
+  <p style="margin:.6rem 0 0;font-size:.9rem">規則は三か所で既知である。
+  <strong>存在しないのは、それを運ぶ実装である。</strong>新規性はそこに置く。</p>
+</div>
+
+<h2><span class="num">12</span>事業の形</h2>
+
+<div class="flow">
+  <div class="cols2">
+    <div class="fbox"><span class="t">顧客側</span>
+      <span class="d">計算を実行 · 自己申告 · 自らの主張に対して KairosChain の証明を発行</span></div>
+    <div class="fbox"><span class="t">こちら側</span>
+      <span class="d">TEE 内で再実行 · 出力を突き合わせ · <strong>結果だけでなく証跡を返す</strong></span></div>
+  </div>
+  <div class="arrow">↓ 二つの証明を合成</div>
+  <div class="fbox okbox"><span class="t">第三者（規制当局・提携先・認証機関）に出すもの</span>
+    <span class="d">「証明書」ではない —— 制度上そのような書類は存在しない。存在するのは、検証文書、
+    監査証跡レビューの記録、認証済み複製、適格性評価の一式である。
+    <strong>依頼者が自分の書類束に入れて弁明できる証拠を作る。</strong></span></div>
+</div>
+
+<div class="cols3">
+  <div class="card" style="margin:0">
+    <strong>段階を持つ —— 再実行が常に可能とは限らないから</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">管理アクセスのデータは共有できないことが多い。
+    <span class="mono">gc_tier1_assess</span>（主張）→ <span class="mono">gc_codescan</span>（固定強度）→
+    <span class="mono">gc_tier2_execute</span>（実行）。<strong>この階段そのものが商品である。</strong></p>
+  </div>
+  <div class="card" style="margin:0">
+    <strong>文書生成が、最も規制に支持されている部分</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">EMA §6.6「正当化され、文書化されること」·
+    EDPB ブロックチェーン指針 勧告 1「書面の論拠、検討した代替案」· BSI C5 OPS-32.01AC の 8 項目の枠組み。
+    <strong>三つの規制が明文で文書を要求している。</strong></p>
+  </div>
+  <div class="card" style="margin:0">
+    <strong>「証明できない箇所」も商品である</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">「認証します」より擁護可能で、しかも次の受注につながる。
+    Tier-2 が <span class="mono">no_target_declared</span> を完全な結果として報告する設計は、
+    既にこの思想を体現している。</p>
+  </div>
+</div>
+
+<h3>購買手続きを抜ける</h3>
+<p>製薬への販売は 6〜18 か月、ベンダー適格性審査だけで 2〜4 か月、セキュリティ質問票はしばしば 200 問超。
+業界紙が名指しする失敗形は <em>「製薬の購買手続きが終わる前にスタートアップの資金が尽きる」</em>。
+文献で裏づけのある抜け道が二つある。</p>
+<div class="cols2">
+  <div class="fbox okbox"><span class="t">(a) 一年目 —— 役務として売る</span>
+    <span class="d">顧客<em>自身の</em>品質管理体系の下で働くコンサルタントになる →
+    ベンダー適格性審査がそもそも発動しない。</span></div>
+  <div class="fbox"><span class="t">(b) 拡大期 —— 適格性を通った相手を通して売る</span>
+    <span class="d">CRO やコンサル会社が自社の資格の下で成果物を再販する →
+    1 社ごとに 200 問答えずに済む。</span></div>
+</div>
+
+<h3>最初の顧客と、設計の相手</h3>
+<table>
+  <thead><tr><th>相手</th><th>理由</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SCTO 加盟の大学病院臨床試験部門</strong>（USZ, Basel, Bern）</td>
+        <td>公的資金で動くため <strong>製薬の購買手続きが存在しない</strong>。監査・データ管理・モニタリングの
+        全国プラットフォームを運営している。GCP 上の義務は商用と同一。金額は小さいが、速く、引用可能な実績になる。</td></tr>
+    <tr><td><strong>SPHN / BioMedIT</strong></td>
+        <td>倫理枠組が、同意の撤回を「<strong>ネットワーク全体に</strong>速やかに反映する」ことを義務づけ、
+        <strong>その仕組みを提供していない</strong>。欧州で見つかった最も明確な未充足要求である。</td></tr>
+    <tr><td><strong>TRE-FX / Five Safes RO-Crate</strong></td>
+        <td>承認手順を署名済みの Action として既に記録しており、EOSC-ENTRUST と DARE-UK に採用が進行中。
+        <em>彼らの</em>形式に暗号を足すことで、標準化団体がそのまま販路になる。</td></tr>
+    <tr><td><strong>Federated EGA</strong></td>
+        <td>本当に稼働している —— 10 ノード、<strong>スイスも 2025 年に参加</strong>（SIB, ETH Zurich,
+        Health 2030, SDSC, Switch）、21,516 データセット、そして
+        <strong>相互に無調整なデータアクセス委員会が 1,235 個</strong>。この最後の数字が未解決の問題である。</td></tr>
+  </tbody>
+</table>
+
+<div class="card okbox">
+  <strong>最も鋭い一手</strong>
+  <p style="margin:.45rem 0 0">Nextflow の <span class="mono">nf-prov</span> プラグインは、既に
+  Workflow Run RO-Crate <em>と</em> BioCompute Object（IEEE 2791 —— FDA が NGS で受け取る形式）の
+  <em>両方</em>を出力している。<strong>どちらも何も署名していない。</strong>
+  実行を証明し<em>署名済みの</em> WRROC / BCO を出力するプラグインは、既存の導入基盤に競合せず<em>刺さる</em>。
+  しかも顧客を持つ既存事業者（Seqera、「上位 20 社中 14 社の製薬」、GxP 対応版を 2026-04-30 に投入）の
+  GxP のページは <span class="mono">cryptograph</span> = 0、<span class="mono">signature</span> = 0 である。
+  <strong>空き水域の見積もり: 3 年ではなく 12〜18 か月。</strong></p>
+</div>
+
+<h2><span class="num">13</span>見張るべき日付</h2>
+
+<div class="tl">
+  <div class="tlitem" data-kind="crit"><div class="tldate">2026-09-26</div>
+    <div class="tlbody">IVDR クラス C —— 認証機関との書面合意。申請だけでは足りず、逃すと旧来のクラス C 機器は
+    移行措置を失う。</div></div>
+  <div class="tlitem" data-kind="done"><div class="tldate">2026-10-31</div>
+    <div class="tlbody">EU の Genomic Data Infrastructure が<strong>終了する</strong>。調達の窓ではない ——
+    3 ノードが 3 段階中の第 1 段階を完了、本番カタログは 20 データセットのうち 12 以上が合成データ、
+    最終成果物は動画。Genome EDIC は存在しない。</div></div>
+  <div class="tlitem"><div class="tldate">2026-11-04</div>
+    <div class="tlbody">EIC Accelerator の締切。スイスは 2025 年から Horizon Europe に associated で EIC を利用できる
+    （助成金 最大 €250 万 ＋ 出資 €50〜1,000 万）。法人化された中小企業であることが前提。</div></div>
+  <div class="tlitem" data-kind="crit"><div class="tldate">2027-03-26</div>
+    <div class="tlbody"><strong>EHDS 第73条(5)</strong> —— 欧州委員会は安全な処理環境の技術実施法令を採択せねばならない。
+    起草は 2026 年 12 月に締まる。<strong>安全な処理環境が技術的に何であるべきかを、誰もまだ一言も書いていない</strong>
+    —— EHDS 提案に対する EDPB・EDPS の共同意見に「secure processing environment」は 0 回しか出てこない。
+    欧州で最も梃子の効く、開いた扉である。</div></div>
+  <div class="tlitem"><div class="tldate">2027-06-01</div>
+    <div class="tlbody">BSI C5:2026 の適用開始 —— OPS-32/33 が監査可能な基準になる。</div></div>
+  <div class="tlitem"><div class="tldate">2027-12-02</div>
+    <div class="tlbody">AI Act 附属書 III の高リスク義務（規則 (EU) 2026/1744、2026-07-27 発効により
+    2026-08-02 から延期）。</div></div>
+  <div class="tlitem"><div class="tldate">2028-08-02</div>
+    <div class="tlbody">AI Act 附属書 I の高リスク —— MDR/IVDR 製品を含む。
+    <em>ここで</em>ゲノムパイプラインが捕まる。捕まえるのはアルゴリズムではなく、意図された用途である。</div></div>
+  <div class="tlitem"><div class="tldate">2031-03-26</div>
+    <div class="tlbody">EHDS の二次利用のうち、ゲノム・オミクス・臨床試験データの区分。2029 年ではない。
+    そしてスイスの主体は、EU 内の拠点なしにはおよそ 2035 年まで EHDS のデータ利用者になれない。</div></div>
+</div>
+
+<h2><span class="num">14</span>引用してはいけないもの</h2>
+<div class="card warnbox">
+  <table style="margin:0">
+    <thead><tr><th>言いたくなること</th><th>実際（全文の用語計数で確認）</th></tr></thead>
+    <tbody>
+      <tr><td>「EMA の AI 反省文書が来歴・監査証跡・版管理を要求している」</td>
+          <td>18 ページ中: <span class="mono">audit</span> 0 · <span class="mono">provenance</span> 0 ·
+          <span class="mono">lineage</span> 0 · <span class="mono">reproducibility</span> 0 ·
+          <span class="mono">model versioning</span> 0</td></tr>
+      <tr><td>「EMA のデータ品質枠組が AI のデータ要件を定めている」</td>
+          <td><span class="mono">artificial intelligence</span> と <span class="mono">machine learning</span> が 0 回。AI の文書ではない</td></tr>
+      <tr><td>「Annex 11 の改訂が AI をカバーする」</td>
+          <td><span class="mono">AI / ML / model</span> が 0 回。AI は Annex 22 に分離された</td></tr>
+      <tr><td>「承認遅延 1 日あたり US$100 万〜800 万」</td>
+          <td>10 通りの検索式で一次資料に到達せず。<strong>代わりに DiMasi の「第3相の期間 1 か月短縮＝
+          期待正味現在価値 US$1,726 万」を使う</strong></td></tr>
+      <tr><td>「全事業者が報告した変異は 25〜30% のみ」（Stetson 2019）</td>
+          <td>抄録に無く、本文は有料。<strong>未検証 —— 使わない</strong></td></tr>
+      <tr><td>ISO 20387</td><td>一切確認できなかった。<strong>引用しない</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2><span class="num">15</span>未決の項目</h2>
+<ol>
+  <li><strong>Halimi et al., PoPETs 2022(3):732–753</strong> —— doi:10.56553/popets-2022-0094。全文未読。
+      自領域で最も出やすい「もう誰かがやった」という反論の元。</li>
+  <li><strong>Pritchard &amp; Wicenec, arXiv:2406.01146</strong> —— 暗号的なワークフロー実行署名。全文未読。</li>
+  <li>規則 (EU) 2026/1744 の官報原文 —— EUR-Lex が自動取得を遮断。日付は 4 つの法律事務所の分析で一致するが、
+      原文は未読。</li>
+  <li>AI の Omnibus が規格準備の条件付き発動を残したか、固定日にしたか —— 事務所間で見解が分かれる。</li>
+  <li>MDCG 2019-11 の原文（HTTP 403）。上記の医療機器ソフトウェアの判定基準は伝聞。</li>
+  <li>Annex 22 の確定日 —— <strong>存在しない</strong>。EMA は意見募集の結果をなお検討中。</li>
+</ol>
+
+<p style="font-size:.9rem;color:var(--ink-2)"><strong>技術的な補足。</strong>SEV-SNP には RTMR 相当が無い。
+位置や段階の測定への束縛が必要なら、それは TDX を選ぶ理由になる。</p>
+
+<footer>
+  <p>2026-09-01 に 10 本の独立した一次資料調査から作成。
+  ★ の付いた主張と「未決の項目」の各行は、申請書や顧客向け文書に入れる前に一次資料で再確認すること。
+  作業文書の全文: <span class="mono">docs/research/eu_clinical_regulation_survey_2026-09-01.md</span>。
+  L2 の記録: <span class="mono">eu_clinical_data_regulation_survey_2026_09</span>。</p>
+  <p>配色は可視化の検証器で明暗両方・全組合せについて検査済み（明度帯・彩度下限・色覚多様性の分離・
+  通常視の下限がすべて合格）。唯一 3:1 を下回る色は、直接ラベルと表形式の併記で救済している。</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  var stored = null;
+  try { stored = localStorage.getItem('reportTheme'); } catch (e) {}
+  if (stored) root.setAttribute('data-theme', stored);
+  else root.removeAttribute('data-theme');
+  btn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    var next;
+    if (cur === 'dark') next = 'light';
+    else if (cur === 'light') next = 'dark';
+    else next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('reportTheme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "genomicschain_regwatch",
+  "version": "0.1.0",
+  "description": "Regulatory and standards watch for GenomicsChain and KairosChain. gc_regwatch_scan fetches each watched source, compares a normalised digest against the recorded baseline, and counts down the dated triggers; gc_regwatch_report renders the watchlist and the findings as a bilingual (en/ja) standalone HTML report. Fetches and compares only — it never judges whether a change is material, because the party that produced a finding must not also be the party that rules on it.",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [],
+  "provides": ["regulatory_watchlist", "source_drift_detection", "bilingual_report_render"],
+  "tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainRegwatch::Tools::GcRegwatchScan",
+    "KairosMcp::SkillSets::GenomicschainRegwatch::Tools::GcRegwatchReport"
+  ],
+  "config_files": [],
+  "knowledge_dirs": ["knowledge"],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

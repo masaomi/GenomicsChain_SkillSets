@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EU Clinical-Trial Data Regulation — Survey &amp; Business Hypothesis (2026-09-01)</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --ink-1: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --s1: #2a78d6;
+    --s2: #eb6834;
+    --s3: #1baf7a;
+    --good: #0ca30c;
+    --warn: #fab219;
+    --serious: #ec835a;
+    --crit: #d03b3b;
+    --seq-250: #86b6ef;
+    --seq-350: #5598e7;
+    --seq-450: #2a78d6;
+    --seq-600: #184f95;
+    --wash: rgba(42,120,214,0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+      --seq-250: #184f95; --seq-350: #256abf; --seq-450: #3987e5; --seq-600: #86b6ef;
+      --wash: rgba(57,135,229,0.12);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --seq-250: #184f95; --seq-350: #256abf; --seq-450: #3987e5; --seq-600: #86b6ef;
+    --wash: rgba(57,135,229,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 6rem;
+    background: var(--page); color: var(--ink-1);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.62;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 1.5rem; }
+  header.masthead { border-bottom: 1px solid var(--border); padding: 2.5rem 0 1.6rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .5rem; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); font-size: .95rem; margin: 0; }
+  h2 {
+    font-size: 1.3rem; margin: 3.2rem 0 .4rem; letter-spacing: -0.01em;
+    padding-top: 1.4rem; border-top: 1px solid var(--border);
+  }
+  h2 .num { color: var(--ink-muted); font-variant-numeric: tabular-nums; margin-right: .55rem; font-weight: 600; }
+  h3 { font-size: 1.02rem; margin: 2rem 0 .5rem; }
+  p { margin: .7rem 0; }
+  .lede { font-size: 1.06rem; color: var(--ink-2); }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.2rem 1.3rem; margin: 1.2rem 0;
+  }
+  .verdict {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-left: 4px solid var(--s1);
+    border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.4rem 0;
+  }
+  .verdict strong { font-size: 1.1rem; }
+
+  blockquote {
+    margin: 1.1rem 0; padding: .85rem 1.1rem;
+    background: var(--wash); border-left: 3px solid var(--s1);
+    border-radius: 0 6px 6px 0; color: var(--ink-1);
+  }
+  blockquote p { margin: .35rem 0; }
+  blockquote cite { display: block; margin-top: .5rem; font-style: normal; font-size: .85rem; color: var(--ink-2); }
+
+  table { border-collapse: collapse; width: 100%; margin: 1.1rem 0; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { color: var(--ink-2); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--axis); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .8rem; margin: 1.4rem 0; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: .95rem 1rem; }
+  .tile .v { font-size: 1.85rem; font-weight: 650; line-height: 1.1; letter-spacing: -0.02em; }
+  .tile .k { font-size: .82rem; color: var(--ink-2); margin-top: .3rem; line-height: 1.4; }
+  .tile .src { font-size: .72rem; color: var(--ink-muted); margin-top: .4rem; }
+
+  /* status chips: colour never alone — icon + label */
+  .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; font-weight: 600;
+          padding: .12rem .5rem; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .chip .ico { font-size: .95em; }
+  .c-good { color: var(--good); }
+  .c-warn { color: #8a6100; }
+  .c-serious { color: #a3502a; }
+  .c-crit { color: var(--crit); }
+  :root[data-theme="dark"] .c-warn { color: var(--warn); }
+  :root[data-theme="dark"] .c-serious { color: var(--serious); }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .c-warn { color: var(--warn); }
+    :root:where(:not([data-theme="light"])) .c-serious { color: var(--serious); } }
+
+  /* bar chart */
+  .chart { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.3rem; margin: 1.3rem 0; }
+  .chart h4 { margin: 0 0 .2rem; font-size: 1rem; }
+  .chart .cap { margin: 0 0 1.1rem; font-size: .85rem; color: var(--ink-2); }
+  /* reserve room for the absolutely-positioned value label past the longest bar */
+  .bars { display: grid; gap: .5rem; padding-right: 3.4rem; }
+  .barrow { display: grid; grid-template-columns: minmax(150px, 42%) 1fr; gap: .8rem; align-items: center; }
+  .barlabel { font-size: .84rem; color: var(--ink-2); line-height: 1.35; }
+  .bartrack { position: relative; height: 22px; background: var(--grid); border-radius: 4px; }
+  .barfill { height: 100%; border-radius: 4px; background: var(--seq-450); position: relative; }
+  .barrow[data-hi="1"] .barfill { background: var(--seq-600); }
+  .barval { position: absolute; left: calc(100% + .5rem); top: 50%; transform: translateY(-50%);
+            font-size: .82rem; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink-1); white-space: nowrap; }
+  .barrow:hover .bartrack { outline: 2px solid var(--axis); outline-offset: 2px; }
+  .axisnote { margin-top: 1rem; padding-top: .6rem; border-top: 1px solid var(--grid); font-size: .78rem; color: var(--ink-muted); }
+
+  /* generic diagram boxes */
+  .flow { display: grid; gap: .55rem; margin: 1.2rem 0; }
+  .fbox { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: .7rem .9rem; font-size: .9rem; }
+  .fbox .t { font-weight: 650; display: block; margin-bottom: .15rem; }
+  .fbox .d { color: var(--ink-2); font-size: .86rem; }
+  .arrow { text-align: center; color: var(--ink-muted); font-size: 1.05rem; line-height: 1; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  @media (max-width: 720px) { .cols2, .cols3 { grid-template-columns: 1fr; } .barrow { grid-template-columns: 1fr; }
+    .bars { padding-right: 0; }
+    .barval { position: static; transform: none; display: block; margin-top: .2rem; } }
+
+  /* ladder */
+  .ladder { display: grid; gap: .35rem; margin: 1rem 0; }
+  .rung { display: grid; grid-template-columns: 130px 1fr; gap: .8rem; align-items: center; }
+  .rungbar { border-radius: 5px; padding: .55rem .8rem; font-size: .85rem; font-weight: 650; color: #fff; }
+  .rungtxt { font-size: .87rem; color: var(--ink-2); }
+
+  /* timeline */
+  .tl { position: relative; margin: 1.4rem 0 1rem; padding-left: 1.4rem; border-left: 2px solid var(--axis); }
+  .tlitem { position: relative; padding: 0 0 1.15rem .2rem; }
+  .tlitem::before { content: ""; position: absolute; left: -1.85rem; top: .42rem; width: 10px; height: 10px;
+                    border-radius: 50%; background: var(--s1); border: 2px solid var(--surface-1); }
+  .tlitem[data-kind="crit"]::before { background: var(--crit); }
+  .tlitem[data-kind="done"]::before { background: var(--ink-muted); }
+  .tldate { font-size: .8rem; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--ink-1); }
+  .tlbody { font-size: .88rem; color: var(--ink-2); }
+
+  details { margin: 1rem 0; border: 1px solid var(--border); border-radius: 8px; padding: .6rem .9rem; background: var(--surface-1); }
+  summary { cursor: pointer; font-size: .88rem; font-weight: 600; color: var(--ink-2); }
+  .warnbox { border-left: 4px solid var(--crit); }
+  .okbox { border-left: 4px solid var(--good); }
+  .toggle { position: fixed; top: 1rem; right: 1rem; z-index: 10; background: var(--surface-1); color: var(--ink-2);
+            border: 1px solid var(--border); border-radius: 999px; padding: .4rem .85rem; font-size: .8rem; cursor: pointer;
+            font-family: inherit; }
+  footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); font-size: .82rem; color: var(--ink-muted); }
+  .kbd { border: 1px solid var(--border); border-radius: 4px; padding: 0 .3rem; font-size: .85em; background: var(--surface-1); }
+</style>
+</head>
+<body>
+<button class="toggle" id="themeToggle" aria-label="Toggle colour theme">◐ theme</button>
+
+<div class="wrap">
+
+<header class="masthead">
+  <h1>EU Clinical-Trial Data Regulation</h1>
+  <p class="sub">Survey and business hypothesis for GenomicsChain / KairosChain &middot;
+     compiled 2026-09-01 from 10 independent primary-source research passes &middot;
+     <span class="mono">docs/research/eu_clinical_regulation_survey_2026-09-01.md</span></p>
+</header>
+
+<div class="verdict">
+  <strong>Europe permits. It does not demand.</strong>
+  <p style="margin:.5rem 0 0">Regulation is usable as a <em>defence</em> — never as evidence of demand.
+  What sells is not the record but the <em>verdict</em>. The hard technical core is the attestation
+  protocol, not the genomics tier.</p>
+</div>
+
+<h2><span class="num">1</span>The numbers that matter</h2>
+
+<div class="tiles">
+  <div class="tile">
+    <div class="v" style="color:var(--s1)">1</div>
+    <div class="k">occurrences of “distributed&nbsp;… tamper-proof ledger” in the EMA computerised-systems guideline — and it is in §6.6</div>
+    <div class="src">EMA/INS/GCP/112288/2023, verified in the source PDF</div>
+  </div>
+  <div class="tile">
+    <div class="v" style="color:var(--crit)">0</div>
+    <div class="k">times 21 CFR Part 11 was cited by FDA in any programme area, FY2021–FY2025</div>
+    <div class="src">FDA inspection-observation workbooks, five consecutive years</div>
+  </div>
+  <div class="tile">
+    <div class="v">0.36%</div>
+    <div class="k">of data fields changed by a US$6.1M / 61,073-person-hour source-data-verification exercise. No primary-outcome impact</div>
+    <div class="src">I-SPY COVID, <em>Commun Med</em> 2025</div>
+  </div>
+  <div class="tile">
+    <div class="v">25<span style="font-size:.6em"> yr</span></div>
+    <div class="k">mandatory retention of the trial master file, binding sponsor <em>and</em> investigator — with every alteration traceable</div>
+    <div class="src">Regulation (EU) No 536/2014, Art. 58</div>
+  </div>
+  <div class="tile">
+    <div class="v" style="color:var(--s2)">$1,000</div>
+    <div class="k">equipment cost to extract a TEE attestation signing key and forge quotes that pass the vendor’s own verifier</div>
+    <div class="src">WireTap &amp; TEE.fail, Oct 2025</div>
+  </div>
+  <div class="tile">
+    <div class="v">0 <span style="font-size:.5em">/ 0</span></div>
+    <div class="k">arXiv papers on <span class="mono">"workflow provenance" AND attestation</span>; GitHub repos for <span class="mono">in-toto ro-crate</span></div>
+    <div class="src">The gap this project can occupy</div>
+  </div>
+</div>
+
+<h2><span class="num">2</span>The regulatory map — and the mistake everyone makes</h2>
+
+<p>The single most common error in this field is a <strong>scope mix-up</strong>. Annex&nbsp;11 and
+Annex&nbsp;22 are <em>manufacturing</em> (GMP) documents. They do not govern clinical trials. Selling
+“Annex 11 compliance” to a trial sponsor is a category error.</p>
+
+<div class="flow">
+  <div class="fbox" style="border-left:3px solid var(--s1)">
+    <span class="t">Regulation (EU) No 536/2014 — binding law</span>
+    <span class="d">Art. 56 data recorded so it can be “accurately reported, interpreted and <strong>verified</strong>” ·
+    Art. 57 TMF complete “at all times” ·
+    <strong>Art. 58 25-year archive; “any alteration to the content of the clinical trial master file shall be traceable”</strong></span>
+  </div>
+  <div class="arrow">↓ Art. 47</div>
+  <div class="fbox">
+    <span class="t">ICH E6(R3) — in force in the EU 2025-07-23 (Annex 2: 2027-01-15)</span>
+    <span class="d">New standalone §4 “Data governance”: audit trails must not be disabled, UTC timestamps unambiguous,
+    audit-trail review must be a <em>planned, risk-based</em> activity</span>
+  </div>
+  <div class="arrow">↓ what inspectors actually inspect against</div>
+  <div class="fbox" style="border-left:3px solid var(--s2)">
+    <span class="t">EMA/INS/GCP/112288/2023 — computerised systems, in effect 2023-09-10</span>
+    <span class="d">ALCOA++ codified at §4.5 · audit trail §6.2.1 · <strong>audit-trail review §6.2.2</strong> ·
+    certified copies §6.5 · migration “e.g. checksum” §6.10 · <strong>control of data §6.6</strong> ·
+    <em>AI explicitly out of scope</em></span>
+  </div>
+</div>
+
+<div class="card" style="border-left:4px solid var(--ink-muted)">
+  <strong>Separate stack — manufacturing only, all still draft</strong>
+  <p style="margin:.4rem 0 0;font-size:.9rem;color:var(--ink-2)">EudraLex Vol. 4 Annex 11 · Annex 22 (AI) · Chapter 4.
+  The Annex 11 revision contains <strong>zero</strong> occurrences of AI/ML/model — AI was deliberately split into
+  Annex 22 so it could be revised independently. Annex 22 has <strong>no finalisation date</strong>, and EMA is
+  reconsidering its central exclusion (a blanket ban on generative AI in critical GMP applications).</p>
+</div>
+
+<h2><span class="num">3</span>The one hook that names the technology</h2>
+
+<p>Section 6.6 of the EMA guideline was read directly from the source PDF. The word
+<em>ledger</em> appears exactly once in the 52-page document, here:</p>
+
+<blockquote>
+  <p>The sponsor should not have exclusive control of the data entered in a computerised system at any point
+  in time. All data held by the sponsor that has been generated in a clinical trial should be verifiable to
+  a copy of these data that is <strong>not held (or that has not been held) by the sponsor</strong>.</p>
+  <p>[…] Instead of a system maintained by an independent service provider, the sponsor may take other
+  adequate technical measures that preclude sole control. E.g. <strong>the verifiability of data
+  (transactions) by an independent (distributed) tamper-proof ledger may provide comparable security</strong>
+  to a system maintained by an independent service provider. <strong>This should be justified and
+  documented.</strong></p>
+  <cite>EMA/INS/GCP/112288/2023 §6.6, p. 22/52 — in effect since 10 September 2023</cite>
+</blockquote>
+
+<div class="cols3">
+  <div class="fbox okbox"><span class="t">What the ledger does</span>
+    <span class="d">Discharges <em>independence</em> — precludes sole sponsor control. It is a substitute for
+    “use an independent service provider”.</span></div>
+  <div class="fbox warnbox"><span class="t">What it does not do</span>
+    <span class="d">It is <em>not</em> a substitute for integrity, for the audit trail, or for retention.</span></div>
+  <div class="fbox"><span class="t">The price</span>
+    <span class="d">“This should be justified and documented.” The justification document is itself a required
+    deliverable — and therefore a product.</span></div>
+</div>
+
+<h2><span class="num">4</span>Permission is not demand — three instances of the same shape</h2>
+
+<div class="cols3">
+  <div class="card" style="margin:0;border-top:3px solid var(--s1)">
+    <strong>EMA §6.6</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">Names a distributed tamper-proof ledger —
+    <em>as an alternative</em> to the simpler, already-standard route.</p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s2)">
+    <strong>BSI C5:2026 OPS-32/33</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">Defines confidential computing in detail —
+    but conditionally: <em>“If the cloud service comprises confidential computing capabilities…”</em></p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s3)">
+    <strong>US DSCSA</strong>
+    <p style="font-size:.87rem;color:var(--ink-2);margin:.4rem 0 0">A tamper-evidence <em>mandate</em> arrived on
+    schedule — and non-blockchain vendors took the entire market.</p>
+  </div>
+</div>
+
+<h3>The DSCSA inversion is the single most important counter-evidence in this survey</h3>
+
+<div class="cols2">
+  <div class="card warnbox" style="margin:0">
+    <strong>Chronicled / MediLedger</strong>
+    <p style="font-size:.88rem;margin:.45rem 0 0">First mover. Named in the FDA-hosted <em>DSCSA Pilot Project
+    Final Report</em> (21 Feb 2020) alongside 24 supply-chain companies — genuine regulator engagement.
+    Enforcement landed 2023–2025 exactly as predicted.</p>
+    <p style="font-size:.88rem;margin:.45rem 0 0"><strong>They walked away.</strong> Their live homepage returns
+    <span class="mono">0</span> hits for <span class="mono">dscsa</span>, <span class="mono">serializ</span>,
+    <span class="mono">track-and-trace</span> — and <span class="mono">5</span> for “blockchain”.
+    <span class="mono">mediledger.com</span> is a parked lander.</p>
+  </div>
+  <div class="card okbox" style="margin:0">
+    <strong>TraceLink — conventional EPCIS messaging</strong>
+    <p style="font-size:.88rem;margin:.45rem 0 0">February 2026: <strong>1,790+ customers</strong>,
+    <strong>7 billion+</strong> regulated transactions annually, <strong>~300</strong> new DSCSA live links per week.</p>
+    <p style="font-size:.88rem;margin:.45rem 0 0">Mentions of blockchain on the site: <strong>zero</strong>.
+    Every other live DSCSA vendor checked (rfxcel, LSPedia, Movilitas, OPTEL) also scored zero.</p>
+  </div>
+</div>
+
+<p><strong>The mandate arrived, and it did not select for chains.</strong> This does not contradict §6.6 —
+the two operate at different levels. §6.6 grants permission; DSCSA measures demand. Use permission to
+defend; never to forecast.</p>
+
+<h2><span class="num">5</span>The obligation with no method — where the opening is</h2>
+
+<blockquote>
+  <p>“…where the processing is an integral part of the solution […] <strong>It should be possible to validate
+  the correct operation of the processing.</strong>”</p>
+  <cite>EMA/INS/GCP/112288/2023 §4.4</cite>
+</blockquote>
+
+<div class="card warnbox">
+  <p style="margin:0"><strong>No EU instrument states how to validate a bioinformatics pipeline.</strong>
+  Not the CTR, not ICH E6(R3), not the computerised-systems guideline. The nearest text —
+  EMA/CHMP/718998/2016 on good pharmacogenomic practice (in effect 2018-09-01) — walks the whole NGS
+  workflow and then says only “use <em>validated</em> bioinformatics methods and algorithms”, delegating
+  quality assurance to ISO 15189 or CAP/CLIA. It is a scientific guideline with no computerised-systems
+  apparatus.</p>
+</div>
+
+<div class="flow">
+  <div class="fbox"><span class="t">The obligation exists</span><span class="d">§4.4 — validate the correct operation of the processing</span></div>
+  <div class="arrow">↕</div>
+  <div class="fbox"><span class="t">The method does not</span><span class="d">Sponsors improvise against ISO 15189 and FDA texts</span></div>
+</div>
+
+<h2><span class="num">6</span>Why the problem is real — same data, different answers</h2>
+
+<div class="chart">
+  <h4>When the same data is analysed twice, how often do the answers agree?</h4>
+  <p class="cap">Agreement / reproduction rate, %. Each row is a published study on identical input.
+  Darker bars are the two rows about published <em>computational analyses</em> rather than assays.</p>
+
+  <div class="bars" role="img" aria-label="Bar chart of agreement and reproduction rates, ranging from 7.5% to 74.9%">
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">Fully matching liquid-biopsy report — one blood draw, two CLIA vendors</div>
+      <div class="bartrack" title="7.5% — 3 of 40 patients. Torga &amp; Pienta, JAMA Oncol 2018">
+        <div class="barfill" style="width:10.0%"></div><span class="barval">7.5%</span></div>
+    </div>
+    <div class="barrow" data-hi="1">
+      <div class="barlabel">Jupyter notebooks from biomedical papers producing identical results</div>
+      <div class="bartrack" title="8.5% of 10,388 notebooks. Samuel &amp; Mietchen, GigaScience 2024">
+        <div class="barfill" style="width:11.3%"></div><span class="barval">8.5%</span></div>
+    </div>
+    <div class="barrow" data-hi="1">
+      <div class="barlabel">Nature Genetics microarray papers fully reproduced by two independent teams</div>
+      <div class="bartrack" title="2 of 18 papers. Ioannidis et al., Nat Genet 2009">
+        <div class="barfill" style="width:14.8%"></div><span class="barval">11.1%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">Indel concordance — 5 pipelines, 15 exomes, identical raw data</div>
+      <div class="bartrack" title="26.8%. O’Rawe et al., Genome Med 2013">
+        <div class="barfill" style="width:35.7%"></div><span class="barval">26.8%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">ACMG/AMP full 5-category variant agreement across 9 CLIA laboratories</div>
+      <div class="bartrack" title="54% of 158 variants. Amendola et al., AJHG 2016">
+        <div class="barfill" style="width:72.0%"></div><span class="barval">54%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">SNV concordance — 5 pipelines, 15 exomes, identical raw data</div>
+      <div class="bartrack" title="57.4%. O’Rawe et al., Genome Med 2013">
+        <div class="barfill" style="width:76.5%"></div><span class="barval">57.4%</span></div>
+    </div>
+    <div class="barrow" data-hi="0">
+      <div class="barlabel">TMB high/low classification — panel vs whole-exome, 15 centres</div>
+      <div class="bartrack" title="74.9%. Stenzinger et al., JTO 2020 (German QuIP ring trial)">
+        <div class="barfill" style="width:100%"></div><span class="barval">74.9%</span></div>
+    </div>
+  </div>
+  <p class="axisnote">Scale: 0–75%. Bars are proportional within that range; hover any bar for the study and year.</p>
+
+  <details>
+    <summary>Table view (accessibility / print)</summary>
+    <table>
+      <thead><tr><th>Finding</th><th class="num">Rate</th><th>Year</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Fully matching liquid-biopsy report, two CLIA vendors, one blood draw (3/40)</td><td class="num">7.5%</td><td>2018</td><td>Torga &amp; Pienta, <em>JAMA Oncol</em></td></tr>
+        <tr><td>Jupyter notebooks producing identical results (of 10,388)</td><td class="num">8.5%</td><td>2024</td><td>Samuel &amp; Mietchen, <em>GigaScience</em></td></tr>
+        <tr><td><em>Nature Genetics</em> papers fully reproduced (2/18)</td><td class="num">11.1%</td><td>2009</td><td>Ioannidis et al., <em>Nat Genet</em></td></tr>
+        <tr><td>Indel concordance, 5 pipelines, identical raw data</td><td class="num">26.8%</td><td>2013</td><td>O’Rawe et al., <em>Genome Med</em></td></tr>
+        <tr><td>ACMG/AMP full 5-category agreement, 9 CLIA labs (158 variants)</td><td class="num">54%</td><td>2016</td><td>Amendola et al., <em>AJHG</em></td></tr>
+        <tr><td>SNV concordance, 5 pipelines, identical raw data</td><td class="num">57.4%</td><td>2013</td><td>O’Rawe et al., <em>Genome Med</em></td></tr>
+        <tr><td>TMB high/low agreement, panel vs WES, 15 centres</td><td class="num">74.9%</td><td>2020</td><td>Stenzinger et al., <em>JTO</em></td></tr>
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<div class="card okbox">
+  <strong>The most useful single sentence in the reproducibility literature</strong>
+  <blockquote style="margin:.6rem 0 0">
+    <p>On a fixed dataset with fixed tools, “<strong>the operating systems and installation methods were the
+    most influential factors in variant-calling performance</strong>.”</p>
+    <cite>Ertürk et al., <em>PLoS Comput Biol</em> 2025 — 12 somatic pipelines on the same SEQC2 data</cite>
+  </blockquote>
+  <p style="margin:.7rem 0 0;font-size:.9rem">This is the engineering case for capturing the dependency
+  closure <em>at execution time</em>: the closure is too large to document by hand, and it dominates the
+  result.</p>
+</div>
+
+<h3>What inspectors actually say</h3>
+<blockquote>
+  <p>“The <strong>IRT audit trail for the trial could not be provided during the inspection… as it had been
+  decommissioned by the vendor.</strong> Therefore, the inspector was unable to verify during the inspection
+  the activities performed in IRT.”</p>
+  <cite>MHRA GCP inspection metrics 2019/20 — a CRO that received four critical findings</cite>
+</blockquote>
+<p>The evidence existed, and then the vendor turned it off. Compare EMA’s own framing:
+<em>“Lack of integrity before the expiration of the mandated retention period may render the data unusable
+and is equivalent to data loss/destruction.”</em></p>
+
+<h2><span class="num">7</span>Counter-evidence — the section to read before the pitch deck</h2>
+
+<p class="lede">Everything here will be raised by a jury, a pharma QA head, or a competitor.
+Raise it first.</p>
+
+<table>
+  <thead><tr><th>Counter-evidence</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td><strong>No regulator asks for cryptographic proof</strong></td>
+        <td>Term counts across 21 CFR Part 11, Annex 11, the EMA guideline, ICH E6(R3), Reg. 536/2014 and FDA’s 2024 Q&amp;A:
+        <span class="mono">cryptograph / hash / blockchain / immutable</span> ≈ 0 throughout. The one exception is §6.6.</td></tr>
+    <tr><td><strong>Part 11 is not enforced</strong></td>
+        <td>FDA’s 2003 <em>Scope and Application</em> guidance: “we do not intend to take enforcement action…
+        [on] the validation, <strong>audit trail</strong>, record retention, and record copying requirements”.
+        Part 11 cited <strong>0 times</strong> in any programme area, FY2021–FY2025.</td></tr>
+    <tr><td><strong>The regulator narrows the scope you would automate</strong></td>
+        <td>MHRA: “It is <strong>not necessary</strong> for audit trail review to include every system activity.”
+        Where the functionality does not exist, an acceptable control is “an SOP, and use of <strong>log books</strong>.”</td></tr>
+    <tr><td><strong>Wrong end of the citation distribution</strong></td>
+        <td>FY2025 FDA BIMO citations: <strong>56.3%</strong> land on investigator sites, <strong>4.5%</strong> on sponsors.
+        The party being cited is not the party with the budget.</td></tr>
+    <tr><td><strong>Verification already costs a fortune and finds nothing</strong></td>
+        <td>I-SPY COVID: US$6.1M and 61,073 person-hours changed 0.36% of fields, zero primary-outcome impact.
+        Best cost-of-pain slide <em>and</em> the strongest argument that marginal assurance has low yield.</td></tr>
+    <tr><td><strong>The customer published the answer, and it is free</strong></td>
+        <td>Thirteen accredited Nordic clinical-bioinformatics units, 2025: “<strong>Data integrity must be
+        verified using file hashing.</strong>” Plus 156 nf-core pipelines, Galaxy (free, 400k+ users), RO-Crate,
+        and RFC 3161 — Standards Track since <strong>August 2001</strong>.</td></tr>
+    <tr><td><strong>Wüst &amp; Gervais</strong></td>
+        <td>Single writer + an always-online trusted third party → the decision flowchart terminates at
+        <em>“Don’t use blockchain.”</em> A single lab writing its own attestations fails this test.</td></tr>
+    <tr><td><strong>No budget line exists</strong></td>
+        <td>The HHS/ASPE clinical-trial cost decomposition names eleven components and contains
+        <strong>no software or data-integrity line at all</strong>.</td></tr>
+    <tr><td><strong>Veeva already owns “inspection ready”</strong></td>
+        <td>FY2026 10-K, 1,552 customers, US$3.195bn revenue, treats audit trails and Part 11 as baseline.
+        Occurrences of “blockchain”: <strong>zero</strong>.</td></tr>
+    <tr><td><strong>Systematic review</strong></td>
+        <td>10 of 10 clinical-trial blockchain systems were “prototypes or simulations, and none were tested
+        in real-world regulatory settings”.</td></tr>
+  </tbody>
+</table>
+
+<h3>The question the first paragraph must answer</h3>
+<div class="card warnbox">
+  <p style="margin:0"><strong>What does this do that <span class="mono">sha256sum</span> + an RFC 3161 timestamp
+  + an RO-Crate does not</strong> — for a customer whose own professional consensus document already says
+  hashing is sufficient, and whose regulator has never once asked for more?</p>
+</div>
+
+<div class="card okbox">
+  <strong>The answer: what is sold is the verdict, not the record.</strong>
+  <p style="margin:.5rem 0 .3rem;font-size:.9rem">A hash says a file did not change. It cannot say:</p>
+  <div class="cols3">
+    <div class="fbox"><span class="t">1 · Can this even be re-run?</span>
+      <span class="d"><span class="mono">gc_codescan</span> grades the pinning strength of the declared
+      dependency closure — <span class="mono">env_capture_class</span> A/B/C. A hash does not grade.</span></div>
+    <div class="fbox"><span class="t">2 · Is there anything to compare against?</span>
+      <span class="d"><span class="mono">gc_tier2_execute</span> reports
+      <span class="mono">no_target_declared</span> as a <em>complete</em> result. A hash cannot say “there is
+      no target”.</span></div>
+    <div class="fbox"><span class="t">3 · Who judged?</span>
+      <span class="d">Tier-2 re-executes on a third party’s infrastructure. A hash is compatible with pure
+      self-report.</span></div>
+  </div>
+  <p style="margin:.8rem 0 0;font-size:.9rem">This also fixes the buyer problem: a <em>verdict</em> is bought by
+  quality assurance; a <em>record platform</em> is bought by IT.</p>
+</div>
+
+<h2><span class="num">8</span>The graveyard</h2>
+
+<table>
+  <thead><tr><th>Company</th><th>What it had</th><th>Status 2026-09</th><th>Cause</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Triall</strong> (NL)</td>
+      <td>6 commercial trial projects · a <strong>Mayo Clinic</strong> PAH trial across 10 sites with 500+ patients ·
+          EC Seal of Excellence</td>
+      <td><span class="chip c-crit"><span class="ico">✕</span>dead</span><br>
+          <span class="mono">triall.io</span> NXDOMAIN, whois <span class="mono">pendingDelete</span></td>
+      <td>Own announcement, March 2024: closing operations — “inability to secure venture capital and failed
+          M&amp;A negotiations”. <strong>Nobody wanted to buy it.</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Guardtime</strong> (EE)</td>
+      <td>KSI hash-linked timestamping in production since 2012 · Estonian national eHealth records ·
+          VaccineGuard live with government · Epic integration</td>
+      <td><span class="chip c-crit"><span class="ico">✕</span>dead as a health company</span><br>
+          all domains dark since ~2026-05-23</td>
+      <td>Estonian register: <strong>1 employee</strong> (Q1 2026), 8 court hearings, €9.3M undistributed profit idle.
+          <strong>The best cryptography in the sector could not create a repeatable market.</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Chronicled / MediLedger</strong> (US)</td>
+      <td>Created the DSCSA market · in the FDA pilot final report with 24 named companies</td>
+      <td><span class="chip c-serious"><span class="ico">▲</span>alive, stalled</span></td>
+      <td>Abandoned DSCSA <em>after</em> the mandate arrived. Kept the word “blockchain”; lost the market.</td>
+    </tr>
+    <tr>
+      <td>ClinTex, Shivom, LunaDNA, EncrypGen, Everledger, CSBWG</td>
+      <td>—</td>
+      <td><span class="chip c-crit"><span class="ico">✕</span>gone</span></td>
+      <td>Funding exhaustion; the token <em>was</em> the business model. Two domains now serve gambling sites.
+          CSBWG: eight years, no pilot reached production.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="card">
+  <strong>Every survivor survived the same way: by deleting the word.</strong>
+  <p style="margin:.45rem 0 0;font-size:.9rem">PharmaLedger — the €22M EU IMI flagship, now a Swiss non-profit
+  with GSK, MSD, Takeda, Moderna and Elanco as members, in production since 2022, charging CHF 2,250/leaflet/yr
+  to CHF 19,999/month — leads its homepage with <strong>“No token · no blockchain”</strong>, while Hyperledger
+  quietly remains inside. Embleema, BurstIQ (blockchain 0 / AI 37), Longenesis and Hashed Health all score zero.</p>
+</div>
+
+<h2><span class="num">9</span>TEE — what may be claimed, in three tiers</h2>
+
+<p>The security record got materially worse in the last twelve months. The honest position separates
+three adversaries.</p>
+
+<div class="ladder">
+  <div class="rung">
+    <div class="rungbar" style="background:var(--good)">✓ can claim</div>
+    <div class="rungtxt"><strong>(a) Remote software adversary.</strong> TDX and SEV-SNP hold up reasonably.
+    This is the defensible claim.</div>
+  </div>
+  <div class="rung">
+    <div class="rungbar" style="background:var(--serious);color:#241109">▲ weakened</div>
+    <div class="rungtxt"><strong>(b) Malicious cloud operator.</strong> This is what TEEs are <em>sold</em> on,
+    and it has been broken in software repeatedly.</div>
+  </div>
+  <div class="rung">
+    <div class="rungbar" style="background:var(--crit)">✕ no claim exists</div>
+    <div class="rungtxt"><strong>(c) Adversary with physical access.</strong> Intel and AMD both state
+    interposer attacks are <em>out of scope</em> with <em>no mitigations planned</em>. An excluded threat,
+    not a residual risk.</div>
+  </div>
+</div>
+
+<h3>The last twelve months</h3>
+<div class="tl">
+  <div class="tlitem" data-kind="done">
+    <div class="tldate">2024 · Heckler (USENIX Sec)</div>
+    <div class="tlbody">Malicious interrupts from the hypervisor break <strong>TDX + SGX + SEV-SNP</strong>. Software only.</div>
+  </div>
+  <div class="tlitem">
+    <div class="tldate">2025-05 · BadRAM &nbsp;<span class="mono">&lt; $10</span></div>
+    <div class="tlbody">SEV-SNP and classic SGX.</div>
+  </div>
+  <div class="tlitem">
+    <div class="tldate">2025-09 · Battering RAM &nbsp;<span class="mono">&lt; $50</span></div>
+    <div class="tlbody">Attestation <em>bypass</em> on Scalable SGX and SEV-SNP — passes every startup trust check.</div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2025-10 · WireTap &nbsp;<span class="mono">&lt; $1,000</span></div>
+    <div class="tlbody">Extracted the Quoting Enclave ECDSA key and forged a quote that
+    <strong>passes Intel’s own verification library</strong>.</div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2025-10 · TEE.fail &nbsp;<span class="mono">&lt; $1,000</span>, fits in a briefcase</div>
+    <div class="tlbody">Intel TDX + SGX, SEV-SNP with ciphertext hiding, NVIDIA CC. The authors:
+    <em>“we can ‘borrow’ Nvidia attestations from devices that aren’t ours… we don’t even own a GPU.”</em></div>
+  </div>
+  <div class="tlitem" data-kind="crit">
+    <div class="tldate">2026-05 · VCEK seed extraction &nbsp;<span class="mono">software only</span></div>
+    <div class="tlbody">SEV-SNP on EPYC Milan: extracts the root seed and forges valid attestation reports for
+    <em>any</em> firmware version — <strong>with no physical access at all</strong>.</div>
+  </div>
+</div>
+
+<div class="card warnbox">
+  <strong>The sentence you inherit</strong>
+  <p style="margin:.45rem 0 0">“This ran in a TEE” becomes
+  “<strong>someone holding a valid key asserted that this ran in a TEE</strong>.”
+  For regulated evidence those are different sentences, and only the second is true.</p>
+</div>
+
+<h3>But only one of the two uses is damaged</h3>
+<div class="cols2">
+  <div class="card warnbox" style="margin:0">
+    <strong>(A) Proving to a third party</strong>
+    <p style="font-size:.88rem;margin:.4rem 0 0">“This computation ran unmodified.”
+    <strong>Damaged</strong> — quotes are forgeable for $1,000.</p>
+  </div>
+  <div class="card okbox" style="margin:0">
+    <strong>(B) Confidentiality from the operator</strong>
+    <p style="font-size:.88rem;margin:.4rem 0 0">Computing over a customer’s closed data and configuration
+    <em>without being able to read them</em>. <strong>Intact</strong> against a remote software adversary — and
+    there is no alternative at genomic scale (ZK is 10⁴–10⁶× short).</p>
+  </div>
+</div>
+
+<h3>The design consequence: BSI C5:2026 OPS-33.01AC grades who verifies</h3>
+<div class="ladder">
+  <div class="rung"><div class="rungbar" style="background:var(--seq-600)">very strong</div>
+    <div class="rungtxt">Customer retrieves the evidence and verifies it in an environment <em>they</em> fully trust</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-450)">very strong</div>
+    <div class="rungtxt">Provider verifies and returns the <strong>result <em>and</em> the evidence</strong>; customer re-verifies in its own environment</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-350)">strong</div>
+    <div class="rungtxt">Customer retrieves the evidence and sends it to a verification service it trusts</div></div>
+  <div class="rung"><div class="rungbar" style="background:var(--seq-250);color:#0b0b0b">weak</div>
+    <div class="rungtxt"><strong>Provider retrieves, verifies in a service under its own control, and returns only the result</strong></div></div>
+</div>
+<p><strong>One line of architecture follows: hand over the evidence, not the result — and let the other party
+verify it in their own environment.</strong> The same rule appears independently in KairosChain’s own INV-5
+(“the deciding context must never author what judges it”).</p>
+
+<h3>Regulatory standing — and an inconvenient pattern</h3>
+<table>
+  <thead><tr><th>Body</th><th>Accepts TEE attestation as evidence?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>BSI C5:2026</strong> (Germany)</td><td><span class="chip c-good"><span class="ico">✓</span>yes — the only one</span> OPS-32/33, applies from <strong>2027-06-01</strong>, conditional</td></tr>
+    <tr><td>NIST CMVP / FIPS 140-3</td><td><span class="chip c-crit"><span class="ico">✕</span>no</span> NVIDIA H100 cert #5446 exists, but its attestation ECDSA is “Non-Approved, <strong>No Security Claimed</strong>”</td></tr>
+    <tr><td>Common Criteria</td><td><span class="chip c-crit"><span class="ico">✕</span>no</span> Across 8,466 certified + archived products: <strong>zero</strong> Intel, <strong>zero</strong> AMD</td></tr>
+    <tr><td>eIDAS</td><td><span class="chip c-crit"><span class="ico">✕</span>structurally no</span> The legal presumption attaches to a <em>qualified trust service provider’s</em> seal</td></tr>
+    <tr><td>FDA · EMA · Annex 11 · GAMP 5 · PIC/S · MHRA</td><td><span class="chip c-warn"><span class="ico">—</span>silent</span></td></tr>
+    <tr><td>EHDS (Reg. (EU) 2025/327)</td><td><span class="chip c-warn"><span class="ico">—</span>silent</span> “secure processing environment” ×48; trusted execution / attestation ×0. <strong>Art. 73(5) technical implementing act due 2027-03-26 — still unwritten</strong></td></tr>
+    <tr><td><strong>NIST IR 8432</strong> — <em>Cybersecurity of Genomic Data</em></td><td><span class="chip c-serious"><span class="ico">▲</span>recommends something else</span> FHE, MPC, ZKP. Confidential computing: <strong>0 occurrences</strong></td></tr>
+    <tr><td>Swiss FDPIC</td><td><span class="chip c-serious"><span class="ico">▲</span>recommends something else</span> Its technical-measures guide devotes §5.7 to <strong>homomorphic encryption</strong>; TEE mentions: 0</td></tr>
+  </tbody>
+</table>
+
+<div class="card warnbox">
+  <strong>The objection to prepare for</strong>
+  <p style="margin:.45rem 0 0">Every authority that has looked at <em>genomics</em> specifically — NIST, the Swiss
+  FDPIC, CNIL’s LINC, the EDPB — named <strong>homomorphic encryption and secure multi-party computation</strong>,
+  not TEEs. In Switzerland this is concrete: <strong>SPHN has already committed its federated-query layer to
+  Tune Insight (HE + MPC + k-anonymity)</strong>. “TEEs are faster” is not an answer.</p>
+</div>
+
+<div class="card okbox">
+  <strong>The existence proof, and the argument template</strong>
+  <p style="margin:.45rem 0 0"><strong>Edgeless Systems × gematik ePA</strong> — Germany’s national electronic
+  patient record, Intel confidential computing, scaled for up to 50 million insured, mandatory for medical
+  facilities since 2025-10-01. The driver was a regulatory <em>Betreiberausschluss</em> — operator exclusion.
+  That is precisely §6.6’s logic in another jurisdiction. No genomic data.</p>
+  <p style="margin:.45rem 0 0;font-size:.88rem;color:var(--ink-2)">Meanwhile in genomics: <strong>zero</strong>
+  TDX papers, <strong>zero</strong> SEV-SNP papers, <strong>zero</strong> TEE variant-calling or alignment papers
+  at whole-genome scale. Decentriq (Zurich) has real health customers and <strong>zero</strong> genomics.</p>
+</div>
+
+<h2><span class="num">10</span>Data protection — the section that fixes the architecture</h2>
+
+<p><strong>EDPB Guidelines 02/2025 on blockchain reached final v2.0 on 2026-07-07</strong>, replacing the CNIL
+2018 note and materially tightening it.</p>
+
+<table>
+  <thead><tr><th>Clause</th><th>What it says</th></tr></thead>
+  <tbody>
+    <tr><td><strong>§104</strong></td><td>Personal data on-chain in <em>clear text, encrypted <strong>or hashed</strong></em> form is “not advisable”. Store off-chain.</td></tr>
+    <tr><td><strong>§52</strong></td><td><strong>The hash is also personal data.</strong> “Unsalted or unkeyed hashes should, in general, not be considered sufficient” — a reversal of CNIL 2018.</td></tr>
+    <tr><td>§53–54</td><td>On-chain only as “proof of existence” — a pointer, a <strong>cryptographic commitment</strong>, or a keyed hash. §53 prefers <em>perfectly-hiding commitments</em>.</td></tr>
+    <tr><td>§50</td><td>“Technical impossibility cannot be invoked to justify non-compliance.”</td></tr>
+    <tr><td>§40</td><td>“Organisations should favour <strong>permissioned</strong> blockchains.”</td></tr>
+    <tr><td>§13</td><td>Chains generated and controlled <strong>by and for a single entity</strong> are out of scope for part of the guidelines.</td></tr>
+    <tr><td>Rec. 9</td><td>Consent should not be the legal basis where the architecture cannot delete the parties’ personal data.</td></tr>
+  </tbody>
+</table>
+
+<p>Spain’s AEPD proof-of-concept implements on-chain erasure by a <strong>coordinated hard fork</strong>.
+Regulators treat chains as rewritable. <em>Immutability is not a shield; it is a design choice you will be
+asked to justify.</em></p>
+
+<div class="card warnbox">
+  <strong>Two hits on the selective-disclosure pitch</strong>
+  <p style="margin:.5rem 0 0"><strong>1 · “We never see the data” does not make you a processor.</strong>
+  Guidelines 1/2026 §135: an entity can be a controller “even though it does not process personal data at all…
+  or only processes pseudonymised data”. Roles turn on the <em>governance mechanism</em>.</p>
+  <p style="margin:.5rem 0 0"><strong>2 · Genomic data cannot be argued into anonymity.</strong>
+  Guidelines 1/2026 §165: genetic profiles are personal data by default, anonymous only in exceptional
+  circumstances; §167 extends the risk to blood relatives, permanently.
+  CNIL fined <strong>IQVIA €5,000,000</strong> (2026-05-26) running a weaker version of that argument.</p>
+</div>
+
+<h3>Resulting architecture</h3>
+<div class="flow">
+  <div class="fbox okbox"><span class="t">On-chain</span><span class="d">Keyed commitments only; perfectly-hiding preferred.
+    <strong>Unsalted, unkeyed hashes: not permitted.</strong></span></div>
+  <div class="fbox"><span class="t">Off-chain</span><span class="d">All personal data. Documented key-destruction procedure with test evidence.</span></div>
+  <div class="fbox"><span class="t">Chain type</span><span class="d">Permissioned · known participants · nodes resident in the EEA / CH.</span></div>
+  <div class="fbox"><span class="t">Operator</span><span class="d">Start single-operator (§13 exposure is smaller). When it goes multi-party, design the Art. 26 joint-controller arrangement <em>in</em>, not after.</span></div>
+  <div class="fbox"><span class="t">Consent</span><span class="d">Never make the consent record itself the ledger’s purpose (Rec. 9). Record only <em>when an effect began</em>.</span></div>
+  <div class="fbox"><span class="t">Sealing</span><span class="d"><strong>eIDAS qualified timestamp</strong> — it carries a statutory legal presumption that a blockchain anchor does not.</span></div>
+</div>
+
+<p class="lede">Note the convergence: the on-chain form the EDPB <em>prefers</em> — a cryptographic commitment —
+is exactly the primitive a selective-disclosure protocol needs anyway. The constraint and the design want
+the same thing.</p>
+
+<h2><span class="num">11</span>Prior art — and what novelty is left</h2>
+
+<div class="card okbox">
+  <strong>Priority is ours.</strong>
+  <p style="margin:.45rem 0 0">“Synoptis: Mutual Attestation for Trustworthy MCP Agent Networks”, Hatakeyama,
+  Zenodo <strong>2026-03-22</strong>, doi:10.5281/zenodo.19161453, indexed in OpenAlex —
+  <strong>three months before</strong> the nearest neighbour’s first deposit (Sokolov, June 2026).</p>
+</div>
+
+<h3>The nearest neighbour is not the biggest threat</h3>
+<table>
+  <thead><tr><th>Prior work</th><th>What is already done</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>arXiv 2608.00801</strong> (Sokolov, 2026-08-01)</td>
+        <td>Composes IETF RATS with signed append-only “action evidence packages”. But: <em>single-party</em>,
+        no anchoring, no revocation or correction, no selective disclosure, no domain binding; emulated TPM,
+        no public repository, 0 citations. The author states the mechanism is “deliberately not new”.</td>
+        <td><span class="chip c-warn"><span class="ico">—</span>overlaps headline only</span></td></tr>
+    <tr><td><strong>SLSA Verification Summary Attestation</strong></td>
+        <td>The composition leg, <em>already standardised and deployed</em>: a verifier evaluates a producer’s
+        evidence against policy and emits a signed summary consumers use <em>instead of</em> the underlying
+        attestations. <strong>But it does not require its verifier to be independent.</strong></td>
+        <td><span class="chip c-crit"><span class="ico">✕</span>leg already built</span></td></tr>
+    <tr><td><strong>RFC 9943 (SCITT) + RFC 9942</strong> — Standards Track, June 2026</td>
+        <td>The append-only, third-party-checkable log leg, complete. Its one gap: it models statements about
+        <em>artifacts</em>, not statements <em>about statements</em>.</td>
+        <td><span class="chip c-crit"><span class="ico">✕</span>leg already built</span></td></tr>
+    <tr><td><strong>Agentic Witnessing</strong> (Rowstron, arXiv:2604.24203, 2026-04)</td>
+        <td>An LLM auditor isolated in a TEE inspects a private dataset over MCP and emits a verdict plus a
+        signed hash chain binding the reasoning trace to data and hardware root. <strong>Evaluated on verifying
+        21 papers’ released codebases.</strong></td>
+        <td><span class="chip c-crit"><span class="ico">✕</span>collides with the academic use case</span></td></tr>
+    <tr><td><strong>Halimi et al.</strong>, PoPETs 2022(3):732–753</td>
+        <td>A-declares / B-verifies / without-full-disclosure <strong>in genomics</strong>, motivated by workflow
+        provenance. Statistical rather than cryptographic; no signed record.</td>
+        <td><span class="chip c-serious"><span class="ico">▲</span>the “already done” objection in-domain</span></td></tr>
+  </tbody>
+</table>
+
+<div class="card warnbox">
+  <strong>Two hazards</strong>
+  <p style="margin:.45rem 0 0"><strong>“Mutual attestation” is an occupied term.</strong> All ten arXiv hits mean
+  <em>two enclaves verifying each other’s code measurements</em>. A security reviewer will mis-file the work on
+  the title alone. <strong>Rename.</strong></p>
+  <p style="margin:.45rem 0 0"><strong>The five-dimensional trust-scoring model is already attacked</strong> —
+  Hu, Rong &amp; Van Kleek, FAccT 2026 (arXiv:2605.30169) argue agents are “ontologically dissociative” and that
+  reputation-style governance is “structurally inapplicable”. Drop it or defend it explicitly.</p>
+</div>
+
+<h3>What is left — narrow, but real</h3>
+<div class="cols2">
+  <div class="card" style="margin:0;border-top:3px solid var(--s1)">
+    <strong>1 · Verifier independence as a carried, checkable property</strong>
+    <p style="font-size:.9rem;margin:.4rem 0 0">“B was not authored, configured or controlled by A” — as an
+    invariant carried <em>in the evidence</em>, rather than assumed by deployment.
+    SLSA VSA conspicuously does not require this.</p>
+  </div>
+  <div class="card" style="margin:0;border-top:3px solid var(--s2)">
+    <strong>2 · The domain binding</strong>
+    <p style="font-size:.9rem;margin:.4rem 0 0">Nothing cryptographically attests a
+    <strong>BioCompute Object (IEEE 2791)</strong>. The verification kit and the FDA concordance workflow are
+    procedural and manual. <strong>No SCITT document mentions healthcare, clinical trials or genomics at all.</strong></p>
+  </div>
+</div>
+
+<p><strong>Honest split: the protocol is not novel; the independence invariant is thin but real; the domain
+binding is the substantial part.</strong></p>
+
+<div class="card okbox">
+  <strong>Three independent arrivals at the same rule</strong>
+  <table style="margin:.5rem 0 0">
+    <tbody>
+      <tr><td>KairosChain INV-5</td><td>The deciding context must never author what judges it</td></tr>
+      <tr><td>BSI C5:2026 OPS-33.01AC</td><td>Provider verifies in its own service and returns only the result → <strong>weak</strong></td></tr>
+      <tr><td>The novelty claim above</td><td>Carry verifier independence <em>in</em> the evidence</td></tr>
+    </tbody>
+  </table>
+  <p style="margin:.6rem 0 0;font-size:.9rem">The rule is known in three places. <strong>What does not exist is an
+  implementation that carries it.</strong> That is where the novelty sits.</p>
+</div>
+
+<h2><span class="num">12</span>The business shape</h2>
+
+<div class="flow">
+  <div class="cols2">
+    <div class="fbox"><span class="t">Customer side</span>
+      <span class="d">Runs the computation · self-declares · issues a KairosChain attestation over its own claim</span></div>
+    <div class="fbox"><span class="t">Our side</span>
+      <span class="d">Re-executes inside a TEE · compares the output · <strong>hands back the evidence, not just the result</strong></span></div>
+  </div>
+  <div class="arrow">↓ compose the two attestations</div>
+  <div class="fbox okbox"><span class="t">Output for a third party (regulator, partner, notified body)</span>
+    <span class="d">Not a “certificate” — no such instrument exists in regulation. What exists: validation
+    documentation, audit-trail-review records, certified copies, qualification dossiers.
+    <strong>Build evidence a sponsor can put in its own dossier and defend.</strong></span></div>
+</div>
+
+<div class="cols3">
+  <div class="card" style="margin:0">
+    <strong>Graded, because re-execution is not always possible</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">Controlled-access data often cannot be shared.
+    <span class="mono">gc_tier1_assess</span> (claims) → <span class="mono">gc_codescan</span> (pinning class) →
+    <span class="mono">gc_tier2_execute</span> (execution). <strong>The ladder itself is the product.</strong></p>
+  </div>
+  <div class="card" style="margin:0">
+    <strong>Document generation is the most regulation-backed part</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">EMA §6.6 “justified and documented” · EDPB blockchain
+    Recommendation 1 “written rationale, alternatives considered” · BSI C5 OPS-32.01AC eight-point framework.
+    <strong>Three instruments explicitly require a document.</strong></p>
+  </div>
+  <div class="card" style="margin:0">
+    <strong>“What you cannot prove” is also the product</strong>
+    <p style="font-size:.87rem;margin:.4rem 0 0">More defensible than “we certify you”, and it generates the
+    next engagement. Tier-2 reporting <span class="mono">no_target_declared</span> as a complete result already
+    embodies this.</p>
+  </div>
+</div>
+
+<h3>Getting past procurement</h3>
+<p>Selling into pharma runs 6–18 months, with vendor qualification alone taking 2–4 months and security
+questionnaires “often 200+ questions”. The named failure mode in the trade press:
+<em>startups run out of money before the purchasing cycle completes.</em> Two documented ways around it:</p>
+<div class="cols2">
+  <div class="fbox okbox"><span class="t">(a) Sell the service, year one</span>
+    <span class="d">Work as a consultant <em>under the sponsor’s own quality system</em> → vendor qualification
+    is never triggered.</span></div>
+  <div class="fbox"><span class="t">(b) Sell through a qualified party, later</span>
+    <span class="d">A CRO or consultancy resells the output under its existing qualification → no 200-question
+    questionnaire per logo.</span></div>
+</div>
+
+<h3>First customers and design partners</h3>
+<table>
+  <thead><tr><th>Who</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A Swiss academic Clinical Trial Unit in the SCTO network</strong> (USZ, Basel, Bern)</td>
+        <td>Publicly funded — <strong>no pharma procurement gauntlet</strong>. Runs national platforms in auditing,
+        data management and monitoring. GCP obligations identical to commercial. Small money, fast, citable.</td></tr>
+    <tr><td><strong>SPHN / BioMedIT</strong></td>
+        <td>Its Ethical Framework requires that consent revocations be “swiftly acted upon <strong>across the
+        Network</strong>” — and <strong>ships no mechanism for it</strong>. The clearest unmet requirement found in Europe.</td></tr>
+    <tr><td><strong>TRE-FX / Five Safes RO-Crate</strong></td>
+        <td>Already records approval steps as signed-off Actions, being folded into EOSC-ENTRUST and DARE-UK.
+        Adding cryptography to <em>their</em> profile converts a standards body into a distribution channel.</td></tr>
+    <tr><td><strong>Federated EGA</strong></td>
+        <td>Genuinely operational — 10 nodes, <strong>Switzerland joined in 2025</strong> (SIB, ETH Zurich,
+        Health 2030, SDSC, Switch), 21,516 datasets, and <strong>1,235 uncoordinated data access committees</strong>.
+        That last number is the unsolved problem.</td></tr>
+  </tbody>
+</table>
+
+<div class="card okbox">
+  <strong>The sharpest single move</strong>
+  <p style="margin:.45rem 0 0">Nextflow’s <span class="mono">nf-prov</span> plugin already emits <em>both</em>
+  Workflow Run RO-Crate <em>and</em> BioCompute Objects (IEEE 2791 — the FDA-facing NGS format).
+  <strong>Neither signs anything.</strong> A plugin that attests a run and emits a <em>signed</em> WRROC/BCO
+  plugs into the installed base rather than competing with it — and the incumbent that owns the customer
+  (Seqera, “14 of 20 top pharma”, GxP tier launched 2026-04-30) has
+  <span class="mono">cryptograph</span>&nbsp;=&nbsp;0 and <span class="mono">signature</span>&nbsp;=&nbsp;0 on
+  its own GxP page. <strong>Estimated open water: 12–18 months, not three years.</strong></p>
+</div>
+
+<h2><span class="num">13</span>Dates to watch</h2>
+
+<div class="tl">
+  <div class="tlitem" data-kind="crit"><div class="tldate">2026-09-26</div>
+    <div class="tlbody">IVDR class C — written agreement with a notified body. Applying is not enough; miss it and a
+    legacy class C device loses its transition benefit.</div></div>
+  <div class="tlitem" data-kind="done"><div class="tldate">2026-10-31</div>
+    <div class="tlbody">EU Genomic Data Infrastructure <strong>ends</strong>. Not a procurement window — 3 nodes completed
+    phase 1 of 3, the production catalogue holds 20 datasets of which ≥12 are synthetic, and the final deliverable
+    is a video. Genome EDIC does not exist.</div></div>
+  <div class="tlitem"><div class="tldate">2026-11-04</div>
+    <div class="tlbody">EIC Accelerator cut-off. Switzerland is associated to Horizon Europe with EIC access since 2025
+    (grant up to €2.5M plus €0.5–10M equity). Requires an incorporated SME.</div></div>
+  <div class="tlitem" data-kind="crit"><div class="tldate">2027-03-26</div>
+    <div class="tlbody"><strong>EHDS Art. 73(5)</strong> — the Commission must adopt the secure-processing-environment
+    technical implementing act. Drafting closes December 2026. <strong>Nobody has written a word about what an SPE
+    must technically be</strong> — the EDPB–EDPS joint opinion on the EHDS proposal contains zero occurrences of
+    “secure processing environment”. The highest-leverage open door in Europe.</div></div>
+  <div class="tlitem"><div class="tldate">2027-06-01</div>
+    <div class="tlbody">BSI C5:2026 applies — OPS-32/33 become auditable criteria.</div></div>
+  <div class="tlitem"><div class="tldate">2027-12-02</div>
+    <div class="tlbody">AI Act Annex III high-risk obligations (deferred from 2026-08-02 by Reg. (EU) 2026/1744,
+    in force 2026-07-27).</div></div>
+  <div class="tlitem"><div class="tldate">2028-08-02</div>
+    <div class="tlbody">AI Act Annex I high-risk — including MDR/IVDR products. <em>This</em> is where a genomic
+    pipeline gets caught: not by the algorithm, but by the intended purpose.</div></div>
+  <div class="tlitem"><div class="tldate">2031-03-26</div>
+    <div class="tlbody">EHDS secondary use for genomic, omics and clinical-trial data. Not 2029.
+    And a Swiss entity cannot be an EHDS data user without an EU establishment before roughly 2035.</div></div>
+</div>
+
+<h2><span class="num">14</span>Do not cite these</h2>
+<div class="card warnbox">
+  <table style="margin:0">
+    <thead><tr><th>Tempting claim</th><th>Reality (verified by full-text term counts)</th></tr></thead>
+    <tbody>
+      <tr><td>“The EMA AI reflection paper requires provenance / audit trails / version control”</td>
+          <td>In 18 pages: <span class="mono">audit</span> 0 · <span class="mono">provenance</span> 0 ·
+          <span class="mono">lineage</span> 0 · <span class="mono">reproducibility</span> 0 ·
+          <span class="mono">model versioning</span> 0</td></tr>
+      <tr><td>“The EMA Data Quality Framework sets AI data requirements”</td>
+          <td><span class="mono">artificial intelligence</span> and <span class="mono">machine learning</span>: 0 occurrences. It is not an AI document.</td></tr>
+      <tr><td>“The Annex 11 revision covers AI”</td>
+          <td><span class="mono">AI/ML/model</span>: 0 occurrences. AI was split into Annex 22.</td></tr>
+      <tr><td>“$1M–$8M per day of approval delay”</td>
+          <td>No primary source found across ten query formulations. <strong>Use DiMasi’s $17.26M eNPV per month of
+          Phase 3 cycle-time reduction instead.</strong></td></tr>
+      <tr><td>“Only ~25–30% of variants were reported by all vendors” (Stetson 2019)</td>
+          <td>Not in the abstract; the paper is paywalled. <strong>Unverified — do not use.</strong></td></tr>
+      <tr><td>ISO 20387</td><td>Could not be verified at all. <strong>Do not cite.</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2><span class="num">15</span>Open items</h2>
+<ol>
+  <li><strong>Halimi et al., PoPETs 2022(3):732–753</strong> — doi:10.56553/popets-2022-0094. Full text unread;
+      the likeliest “already done” objection in-domain.</li>
+  <li><strong>Pritchard &amp; Wicenec, arXiv:2406.01146</strong> — cryptographic workflow-execution signatures. Full text unread.</li>
+  <li>Official Journal text of Reg. (EU) 2026/1744 — EUR-Lex blocks automated retrieval; dates corroborated across
+      four law-firm analyses but not read first-hand.</li>
+  <li>Whether the AI omnibus kept a standards-readiness trigger or fixed dates — firms disagree.</li>
+  <li>MDCG 2019-11 full text (HTTP 403); the MDSW qualification test above is second-hand.</li>
+  <li>Annex 22 finalisation date — <strong>does not exist</strong>; EMA is still weighing the consultation outcome.</li>
+</ol>
+
+<p style="font-size:.9rem;color:var(--ink-2)"><strong>Technical note.</strong> SEV-SNP has no RTMR equivalent.
+If binding to location or to staged measurements matters, that is an argument for TDX.</p>
+
+<footer>
+  <p>Compiled 2026-09-01 by 10 independent primary-source research passes.
+  Every ★-marked claim and every row in <em>Open items</em> must be re-checked against the primary source before
+  it enters an application or a customer-facing document.
+  Full working document: <span class="mono">docs/research/eu_clinical_regulation_survey_2026-09-01.md</span>.
+  L2 context: <span class="mono">eu_clinical_data_regulation_survey_2026_09</span>.</p>
+  <p>Palette validated with the data-visualisation validator (light and dark, all-pairs): lightness band,
+  chroma floor, CVD separation and normal-vision floor all pass; the one sub-3:1 slot carries visible direct
+  labels and a table view.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  var stored = null;
+  try { stored = localStorage.getItem('reportTheme'); } catch (e) {}
+  if (stored) root.setAttribute('data-theme', stored);
+  else root.removeAttribute('data-theme');
+  btn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    var next;
+    if (cur === 'dark') next = 'light';
+    else if (cur === 'light') next = 'dark';
+    else next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('reportTheme', next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
