@@ -1,0 +1,20 @@
+{
+  "name": "genomicschain_tier3",
+  "version": "0.5.0",
+  "description": "GenomicsChain Tier-3 execution layer (backends, comparator, executor, gc_tier3_execute, gc_tier3_estimate). Record 0.3: two verdict axes.",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [
+    {"name": "genomicschain_core", "version": ">= 0.2.0"}
+  ],
+  "provides": ["genomics_job_execution", "tier3_executed_r"],
+  "tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Execute",
+    "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Estimate"
+  ],
+  "config_files": [],
+  "knowledge_dirs": [],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

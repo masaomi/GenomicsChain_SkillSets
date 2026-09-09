@@ -1,0 +1,108 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.19.654820",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.19.654820v1",
+      "biorxiv:2025.05.19.654820v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Spatially-explicit forward population-genetic simulation of mito-nuclear discordance under sex-biased dispersal: a non-Wright-Fisher SLiM v4.0.1 model (SCRIPT_MITONUCLEAR.slim; 2D 1x1 landscape, K=20000, ten 160kb nuclear fragments + one 16kb maternally-inherited mitochondrial segment, mu_nuc=1e-8, mu_mt=1e-7, r_nuc=1e-8, r_mt=0, 100'000 generations x 10 seeded replicates) across NBD + 6 sex-biased dispersal scenarios (FBD/MBD x dispersal multipliers), followed by a Python/Jupyter analysis notebook (Correlation_Github.ipynb) that samples 100 individuals every 200 generations and computes Pearson correlations among nuclear diversity, mitochondrial diversity, and geometric distance (nu-geo, mt-geo, nu-mt).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-computational-stage from biorxiv full-text Methods prose (JATS XML 403-blocked; full-text HTML retrieved via curl). Two computational stages: (C1) SLiM forward simulation, (C2) Pearson-correlation sampling/statistics. Data availability names one GitHub repo (giannef/Simulations-mito-nuclear-discordance) containing SCRIPT_MITONUCLEAR.slim, Correlation_Github.ipynb, and a README with slim/qsub run commands; repo landing+README read at prose level only (no line-by-line source read at stage1). No external empirical input data (de novo simulation seeded by seeds 1..10). Pure-computational; W=0.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "SLiM v4.0.1 non-Wright-Fisher spatially-explicit forward simulation (SCRIPT_MITONUCLEAR.slim; NBD + 6 sex-biased dispersal models; K, mutation/recombination rates, dispersal radii, 100'000 generations, 10 seeded replicas)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked", "param-source-mismatch"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Sampling + Pearson-correlation statistics (Correlation_Github.ipynb Python/Jupyter notebook; sample 100 individuals every 200 generations, count unshared nuclear/mitochondrial mutations, compute nu-geo/mt-geo/nu-mt correlations) — no language/package versions or env named",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 1,
+    "n_NI": 1,
+    "n_X": 0,
+    "S": 2,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/2 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 1/2 computational steps: the SLiM simulation carries an exact version pin (SLiM v4.0.1, Haller & Messer 2023) and the .slim script is provided in the repo, so it reaches the stage1 RI ceiling (partial capture, no environment closure). The analysis step (C2, Correlation_Github.ipynb) caps at NI because no language/interpreter/package version or environment is named anywhere in the prose or README. R★ not assignable at stage1. No conda env, lockfile, or container is claimed for either stage, so even under stage2 no step exceeds RI without an executed environment capture — none is claimed to exist.",
+    "coverage": "2 computational steps assessed from biorxiv full-text Methods prose + linked GitHub README prose. No wet-lab steps (pure in-silico simulation study); W=0.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (SLiM simulation + Python analysis notebook)",
+      "missing": "No environment lockfile, no container, no conda/env spec anywhere in the paper or the GitHub README. The README documents slim/qsub run commands and SLiM is version-pinned (v4.0.1) in Methods, but there is no dependency closure for either SLiM's build or the notebook's Python environment.",
+      "how_to_close": "Provide a lockfile (conda-lock/pixi) or container digest pinning the SLiM build and the full Python/Jupyter stack (interpreter + numpy/pandas/scipy/etc.) used by Correlation_Github.ipynb."
+    },
+    {
+      "type": 3,
+      "where": "C2 analysis notebook (Correlation_Github.ipynb)",
+      "missing": "No version information for the analysis environment: neither the language/interpreter (presumably Python) nor any package versions are named in the Methods prose or README. This caps the analysis step at NI.",
+      "how_to_close": "Record the Python version and exact package versions used for the correlation/statistics notebook (e.g. a requirements.txt/environment.yml or an in-notebook version dump)."
+    },
+    {
+      "type": 4,
+      "where": "C1 simulation parameters — paper vs repo README",
+      "missing": "Parameter-source mismatch: the paper states carrying capacity K=20'000, while the README run commands invoke SLiM with -d K=50000; one female-biased dispersal value is written '0.0020' in prose (likely a typo for 0.020). The authoritative parameter set for reproduction is ambiguous.",
+      "how_to_close": "Reconcile K and the dispersal-multiplier values between Methods text and the committed run scripts, and publish a single canonical parameter table matching the shipped commands."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/giannef/Simulations-mito-nuclear-discordance (contains SCRIPT_MITONUCLEAR.slim, Correlation_Github.ipynb, README.md; default branch main, last pushed 2025-03-24) — landing + README read at prose level only (stage1)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl + GitHub contents API, github.com / raw.githubusercontent.com"
+    },
+    {
+      "artifact": "data accession: NONE — pure in-silico simulation with no external empirical input data; inputs are random seeds (1..10, documented in README) and model parameters. No GEO/SRA/ENA/figshare/Zenodo accession is applicable or cited.",
+      "http_status": "n/a (no data accession exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "data availability statement parsed from biorxiv full-text prose"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "0428d92b953549a35c14802d6c2c172440072912558f02be0aebf8046764e85c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

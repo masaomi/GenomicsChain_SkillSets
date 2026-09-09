@@ -290,7 +290,9 @@ module KairosMcp
               "n_fetch_required=#{counts['n_fetch_required']}"
           end
 
-          # Rubric line 67: weights are guesses until Tier-2; refuse when |S| < 4;
+          # Rubric line 67: weights are guesses until execution — Tier-3 in the
+          # 2026-09-09 numbering. The rubric text (v0.2.5) still says "Tier-2" and the
+          # emitted note quotes it verbatim until the rubric is bumped. Refuse when |S| < 4;
           # emit only as a tuple, 1 significant figure.
           def repro_index(counts)
             s = counts['S']

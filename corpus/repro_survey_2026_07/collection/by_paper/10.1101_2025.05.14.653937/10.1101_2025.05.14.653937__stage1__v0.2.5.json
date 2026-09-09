@@ -1,0 +1,288 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.14.653937",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.14.653937v1",
+      "biorxiv:2025.05.14.653937v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Downstream bioinformatic analyses of four sequencing assays comparing LSD1 WT vs S166A (and siSET) cells: (1) RNA-seq DEG (FastQC/MultiQC QC -> Rsubread hg38 align + featureCounts -> edgeR CPM/RPKM norm -> ROTS differential expression), (2) ATAC-seq (Bowtie2 GRCh38 align -> samtools/Picard -> MACS2 peaks -> Homer/bedtools annotation -> DESeq2 differential accessibility -> TOBIAS footprinting), (3) RRBS (TrimGalore/Cutadapt -> Bismark/Bowtie2 -> methylKit differential methylation), (4) ChIP-seq (nf-core/chipseq 2.1.0 hg38 + MACS2 -> tidybulk differential abundance -> deepTools), plus enrichment (Enrichr/GREAT/ChEA3/iPathwayGuide). CRITICAL: the paper has NO data-availability statement and NO sequencing-data accession (no GEO/SRA/ENA/ArrayExpress/PRIDE), and no analysis-code/script repository for the pipelines. Extensive wet-lab molecular biology, MS proteomics, and mouse xenograft work is upstream (W layer, OOS for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the RNA sequencing / ATAC-seq / RRBS / ChIP-seq data-analysis / Bioinformatics Analysis prose in Material and Methods. No sequencing data accession exists anywhere in the paper, so the data axis is 0 for every C-layer step and no step can reach RI even in principle -> all C-layer verdicts are NI. No pipeline code/script repository or code-availability statement exists (the single GitHub repo cited, CellMigrationLab/Plot-Stats, is for microscopy randomization-test/effect-size plotting, NOT the sequencing pipelines). Wet-lab / MS / in-vivo procedures counted in W, not verdicted. Stage-1 prose-only: no code executed, no workflow source read.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "RNA-seq QC: FastQC (v0.11.8) + MultiQC (v1.10) on raw paired-end reads (2x50bp, NovaSeq 6000)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "RNA-seq alignment/quantification: Rsubread (v2.0.0) align to hg38 (paired-end, RefSeq annotation) + featureCounts (reverse-stranded), in Bioconductor (v3.9) / R (v3.6.1)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C3",
+      "label": "RNA-seq normalization: edgeR (v3.28.0) CPM + RPKM; hierarchical clustering with amap (v0.8-18, Pearson); PCA (R pca, unit-variance scaling)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "custom-r-analysis-unscripted"]
+    },
+    {
+      "step_id": "C4",
+      "label": "RNA-seq differential expression: ROTS (v1.14.0), 166A vs control, FDR<0.05 and fold-change >=2 (824 DEGs reported)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "custom-r-analysis-unscripted"]
+    },
+    {
+      "step_id": "C5",
+      "label": "ATAC-seq alignment: FastQC (0.11.9) QC; Bowtie2 (2.4.5) align to GRCh38 (2x50bp)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "ATAC-seq BAM processing: samtools (1.8) bam conversion; Picard (2.27.1) SortSam/BuildBamIndex/MarkDuplicates",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "ATAC-seq peak calling: MACS2 (v2.2.9.1), params --gsize hs --qvalue 0.05 --format bam --nomodel --bdg --call-summits",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "ATAC-seq peak annotation/counting: Homer (4.10) annotatePeaks.pl (hg38); bedtools (2.29.1) slop (-l 250 -r 249) + coverage; median-of-ratio + RPM normalization",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C9",
+      "label": "ATAC-seq differential accessibility + viz: DESeq2 (v1.40.2), R (4.3.1); pheatmap (1.0.12), EnhancedVolcano (1.18.0)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "custom-r-analysis-unscripted"]
+    },
+    {
+      "step_id": "C10",
+      "label": "ATAC-seq footprinting: TOBIAS (v0.15.1) ATACorrect / ScoreBigwig / BINDetect",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C11",
+      "label": "RRBS trimming: FastQC (0.11.9) QC; TrimGalore! (0.6.7) on Cutadapt (4.2), params --quality 22 --phred33 --gzip --rrbs --fastqc --paired",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C12",
+      "label": "RRBS alignment/methylation extraction: Bismark (0.22.3) with Bowtie2 (2.5.2), GRCh38 + Gencode v41; bismark_methylation_extractor + filter_non_conversion (params documented)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C13",
+      "label": "RRBS differential methylation: methylKit (v1.26.0), R (4.3.1), CpG + 500bp tiled windows, meth.diff 25% / q<0.01; biomaRt (2.56.1) annotation; pheatmap (1.0.12) / EnhancedVolcano (1.18.0) viz",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "custom-r-analysis-unscripted"]
+    },
+    {
+      "step_id": "C14",
+      "label": "ChIP-seq pipeline: nf-core/chipseq (2.1.0) align to hg38, narrow peak calling, MACS2 p-value 0.001",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": ["no-data-accession", "nf-core-versioned-pipeline", "container-by-design-not-claimed-in-text"]
+    },
+    {
+      "step_id": "C15",
+      "label": "ChIP-seq differential enrichment: tidybulk test_differential_abundance on consensus peak set (p<0.05, |log2FC|>0.5); GREAT regions-to-genes; Enrichr GO",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-data-accession", "no-code-script-shared", "tool-version-unrecorded", "web-tool-unversioned"]
+    },
+    {
+      "step_id": "C16",
+      "label": "ChIP-seq visualization: deepTools (v3.4.3) density plots + heatmaps",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-data-accession", "no-code-script-shared", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C17",
+      "label": "Functional/enrichment analysis: iPathwayGuide (AdvaitaBio), ChEA3 TF enrichment, Gene Set Correlation Enrichment (Chang et al. 2024), GSEA-based scoring — all web/black-box, no versions",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-data-accession", "web-tool-unversioned", "black-box-no-code"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 17,
+    "n_X": 0,
+    "S": 17,
+    "W": 24,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/17 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "NI ceiling on ALL 17 computational steps. Although most tools carry exact version pins (FastQC v0.11.8, Rsubread v2.0.0, MACS2 v2.2.9.1, Bismark 0.22.3, nf-core/chipseq 2.1.0, TOBIAS v0.15.1, etc.), the paper provides NO sequencing-data accession (no GEO/SRA/ENA/ArrayExpress/PRIDE deposit and no data-availability statement) and NO pipeline analysis code/scripts. Missing input data caps the data axis at 0 for every step, so NO step can reach RI even in principle from the paper as written — the inference-inclusive upper bound is NI, not RI. Stage2 could only lift these if the raw sequencing data and analysis scripts are located outside the paper (e.g. via author request or a not-yet-linked repository); nothing in-paper enables it.",
+    "coverage": "17 computational steps across RNA-seq, ATAC-seq, RRBS, ChIP-seq, and enrichment assessed from Methods prose; ~24 wet-lab / MS-proteomics / in-vivo steps counted (W) but out of computational-reproduction scope. No pipeline code repository exists; the only cited GitHub repo (CellMigrationLab/Plot-Stats) covers microscopy stats, not sequencing.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Entire sequencing analysis (RNA-seq, ATAC-seq, RRBS, ChIP-seq). No DATA AVAILABILITY statement anywhere; no GEO/SRA/ENA/ArrayExpress accession; no PRIDE/ProteomeXchange accession for the histone-PTM / AP-MS / targeted / xenograft proteomics.",
+      "missing": "Raw and processed sequencing data are not deposited or locatable. Without input FASTQ/count matrices no computational step can be run, so the entire reproduction target is blocked at the data axis.",
+      "how_to_close": "Deposit raw + processed sequencing data to GEO/SRA (RNA-seq, ATAC-seq, RRBS, ChIP-seq) and MS data to PRIDE/ProteomeXchange, and add a data-availability statement with accession numbers."
+    },
+    {
+      "type": 3,
+      "where": "All pipeline steps C1-C17. No code-availability statement; no GitHub/GitLab/Zenodo/Software Heritage repository for the RNA-seq/ATAC-seq/RRBS/ChIP-seq analysis. The single cited repo (github.com/CellMigrationLab/Plot-Stats) is for microscopy randomization tests / Cohen's D plotting only.",
+      "missing": "No analysis scripts, notebooks, nf-core config, or run order shared. edgeR/ROTS/DESeq2/methylKit/tidybulk custom-R analyses (C3,C4,C9,C13,C15) must be fully re-implemented from prose.",
+      "how_to_close": "Publish the pipeline scripts + nf-core config + R/Rmd analysis with a run order to a public repo (GitHub + Zenodo DOI)."
+    },
+    {
+      "type": 2,
+      "where": "Software environments across four assays (R 3.6.1/Bioconductor 3.9 for RNA-seq; R 4.3.1 for ATAC/RRBS; nf-core/chipseq 2.1.0 for ChIP-seq; plus ~20 named CLI/R tools).",
+      "missing": "No lockfile (renv.lock/conda-lock), no environment.yml, no container digest. Versions appear inline for most tools but transitive dependencies, OS, and system-lib closure are unspecified; several tools/methods carry no version (tidybulk, iPathwayGuide, ChEA3, Enrichr, GREAT, Gene Set Correlation Enrichment, R pca).",
+      "how_to_close": "Ship renv.lock / conda-lock and/or a container digest per assay and declared platform; pin all tool versions including tidybulk and enrichment tools."
+    },
+    {
+      "type": 6,
+      "where": "Stochastic steps: PCA/UMAP-style embeddings, DESeq2/edgeR/ROTS resampling, TOBIAS, MACS2 model.",
+      "missing": "No random seeds reported for any step; determinism of DEG/DAR/DMR figures not guaranteed on re-run.",
+      "how_to_close": "Report set.seed() values and pipeline -seed parameters."
+    },
+    {
+      "type": 5,
+      "where": "Reference genomes/annotations: hg38 (RNA-seq RefSeq via Rsubread; ChIP-seq), GRCh38 (ATAC Bowtie2; RRBS Bismark) with Gencode v41.",
+      "missing": "hg38 vs GRCh38 patch/build and exact RefSeq annotation release are not pinned to a specific version/URL for RNA-seq and ATAC/ChIP; only RRBS pins Gencode v41.",
+      "how_to_close": "Pin exact genome build/patch and annotation release (URL + checksum) for each assay."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab / MS / in-vivo (W ~24): cell culture, transfections, site-directed + CRISPR/Cas9 LSD1 mutagenesis, subcellular fractionation, western blot, light microscopy, focal-adhesion/beta1-integrin/stress-fiber quantification, PLA, Incucyte, histone-PTM MS, RT-qPCR, protein purification, LSD1 activity assays, nanoDSF, targeted proteomics, xenograft proteomics, AP-MS, co-IP, in-vitro pulldown, in-vivo mouse xenografts, multiplex IF, ChIP wet steps, library preps + NovaSeq sequencing.",
+      "missing": "Out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "sequencing data accession: NONE — no data-availability statement and no GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession found in abstract, methods, or notes",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-23",
+      "network_context": "JATS XML (biorxiv early/2025/05/17/...source.xml) full-text scanned for GSE/PXD/SRR/SRP/E-MTAB/PRJ/MSV/zenodo/'availab'/'deposit' — 0 data-accession hits"
+    },
+    {
+      "artifact": "MS proteomics accession (PRIDE/ProteomeXchange/MassIVE): NONE",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-23",
+      "network_context": "JATS XML scanned for PXD/MSV/ProteomeXchange — 0 hits despite extensive histone-PTM, AP-MS, targeted, and xenograft proteomics"
+    },
+    {
+      "artifact": "pipeline code repo: NONE — no code-availability statement, no GitHub/GitLab/Zenodo/Software Heritage repo for the sequencing pipelines",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-23",
+      "network_context": "only public versioned pipeline named is nf-core/chipseq 2.1.0 (nf-co.re/chipseq/2.1.0/), not the authors' own configured code"
+    },
+    {
+      "artifact": "peripheral code repo: github.com/CellMigrationLab/Plot-Stats (microscopy randomization tests + Cohen's D plotting; Jupyter notebooks + requirements.txt; MIT) — NOT the sequencing pipeline",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl + landing/README prose: requirements.txt present (floating deps, no lockfile/conda/Docker, no pinned versions)"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "651bcdad68ed24097f1f9a5054d5bb24c6d5479d36307b0e5f918fdf1931449f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

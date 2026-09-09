@@ -1,0 +1,441 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "5d69180642d713f7feaace3ad86009bd796ad5ce6b282b1fd6b32c7c58ebf905",
+  "canonical_id": {
+    "value": "10.64898/2025.12.19.693868",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.19.693868v1",
+      "biorxiv:2025.12.19.693868v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Secondary computational re-analysis of already-published cotton genomic/transcriptomic resources: (1) multi-tissue comparative transcriptomics of G. hirsutum (TM-1) vs G. barbadense (H7124) from CottonMD TPM matrices derived from BioProject PRJNA490626 (PCA/t-SNE/UMAP, expressed-gene correlation, expression-window stratification, Tau/SPM tissue specificity, WGCNA co-expression modules, Pfam/HMMER domain scan of a target module); (2) whole-genome comparison of the TM-1 T2T assembly against H7124 for presence/absence variation (MUMmer4 NUCmer + delta-filter, Minimap2 secondary filtering, reverse-BLASTN two-step validation), synteny/structural variation (SyRI, plotsr), MYB family cataloguing (Bitacora V1.4.2 + HMMER + BLASTP, PF00249), and a pan-genome retention/loss trajectory for MYB93/MYB111 across 26 Gossypium genomes (TBLASTN/BLASTN + custom Python best-hit script + ggplot2 bubble plots). No wet-lab experiment is reported in this study; all sequence data are re-used public resources.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis decomposition from the bioRxiv JATS XML Materials and Methods prose (source.xml fetched via curl after WebFetch returned HTTP 403; title-phrase check passed). 18 computational steps, 0 wet-lab steps (W=0) — the paper reports no new sequencing or phenotyping. The paper contains NO Data Availability section, NO Code Availability section, and NO code repository (GitHub/GitLab/Zenodo/figshare) anywhere in the full text; data provenance is stated only inline in Methods (CottonMD, BioProject PRJNA490626, CottonGen, NCBI, Supplementary Tables S1/S2). Two custom Python scripts are described in prose but not deposited. One numeric parameter is literally missing from the manuscript: 'The retention threshold was set to an E-value.' (C18) — the value was dropped in the submitted text. Several other truncations of the same kind appear in Results ('a TPM threshold of.', 'Pearson correlation coefficient ()'), indicating systematic loss of inline numeric values.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Reference and pan-genome assembly acquisition — TM-1 T2T assembly (Yan et al. 2025), H7124 assembly (Hu et al. 2019, via CottonMD), plus chromosome-level assemblies of 26 Gossypium species from CottonGen and NCBI (listed only in Supplementary Table S1); no assembly versions or accessions in prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Transcriptome acquisition and pre-filtering — normalized TPM matrices from the CottonMD database (raw data: BioProject PRJNA490626, Hu et al. 2019), subset to 21 tissues/stages (Supplementary Table S2); genes with TPM < 0.1 across all samples removed; CottonMD release/version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Principal Component Analysis of log2(TPM+1) expression matrices, visualized with the ggplot2 R package (Wickham 2016) in R (R Core Team 2025) — no R or ggplot2 version, no PCA implementation/centering/scaling/gene-set detail",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "t-Distributed Stochastic Neighbor Embedding with the Rtsne R package — no version, no perplexity/iterations/PCA-preprocessing settings, no RNG seed for a stochastic embedding",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Uniform Manifold Approximation and Projection with the umap R package — no version, no n_neighbors/min_dist/metric settings, no RNG seed for a stochastic embedding",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Pearson correlation of expressed-gene counts (TPM >= 0.1) between homologous tissues of TM-1 and H7124 using cor.test in R — thresholds given, R version not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Expression-abundance stratification into five windows (Very Low / Low / Medium / High / Very High) by within-tissue TPM rank and counting of genes shared within the same window between species — performed by a custom Python script that is described but not deposited; window boundaries and Python version unstated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Tissue Specificity Index (Tau) computed per Yanai et al. (2005) with tissue-specific genes defined as Specificity Measure (SPM) > 0.5 — method and thresholds stated, but no software package or version named for the computation",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "UpSet plots of tissue-specific gene-set intersections with the UpSetR R package (Conway et al. 2017) — no version, no plotting/intersection-selection parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Weighted gene co-expression network with the WGCNA R package (Langfelder & Horvath 2008) on the top 6,000 most-variable genes in fiber-development samples: Pearson correlation matrix, soft-thresholding to a scale-free network, TOM conversion, Dynamic Tree Cut module detection, module eigengene inspection — no WGCNA version; the soft-thresholding power, minModuleSize, deepSplit and mergeCutHeight are not given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Unbiased functional dissection of the target WGCNA module — hmmscan from HMMER 3.0 (Eddy 2011) against the Pfam-A database (Mistry et al. 2021) at E-value < 1e-5, domain-type cataloguing and family ranking by domain frequency; HMMER exactly pinned but the Pfam-A release is not identified",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Genome-wide MYB gene family identification in TM-1 and H7124 with the Bitacora pipeline V1.4.2 (Vizueta et al. 2020), integrating HMMER HMM search with BLASTP homology, using the Pfam MYB-domain seed PF00249; Bitacora exactly pinned but HMMER/BLASTP versions inside the pipeline, Pfam release, and Bitacora mode/threshold settings are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Presence/absence variation discovery by whole-genome alignment — NUCmer in MUMmer4 (Marcais et al. 2018) with --maxmatch -c 1000 -l 100, filtered with delta-filter -m -i 90 -l 100; full parameters given but only the product major version 'MUMmer4' is stated (no x.y.z pin)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Secondary PAV filtration with Minimap2 (Li 2018) using -c -x asm10 to eliminate candidate sequences still highly similar to the counterpart genome — parameters given, no Minimap2 version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Two-step PAV validation — CDS extraction of candidate species-specific genes followed by reverse BLASTN (Camacho et al. 2009) against the counterpart genome at E-value < 1e-5, discarding hits with Identity > 95% and Coverage > 80%; thresholds given, BLAST+ version not stated and the CDS-extraction procedure/script is not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Structural variation calling with SyRI (Goel et al. 2019) on TM-1 vs H7124 NUCmer/delta-filter alignments (--maxmatch -l 100 -c 1000; -m -i 90 -l 100), classifying syntenic regions, inversions, translocations, NOTAL and HDR, and interrogating the MYB93/MYB111 loci — no SyRI version, no SyRI-specific options stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Synteny and structural-variation landscape visualization with the Python tool plotsr (Goel & Schneeberger 2022) — no version, no plotting configuration/track specification",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "Pan-genome retention/loss trajectory for MYB93 and MYB111 — TBLASTN and BLASTN (BLAST+ package) of the CDS queries against 26 Gossypium genomes, best-hit identity/coverage extraction with a custom Python script (not deposited), bubble-plot visualization with ggplot2 in R. The retention threshold value is MISSING from the manuscript: 'The retention threshold was set to an E-value.' No BLAST+/R/ggplot2 versions",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 16,
+    "n_X": 0,
+    "S": 18,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) — stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 2/18 computational steps (C11 HMMER 3.0 hmmscan against Pfam-A, C12 Bitacora V1.4.2) — the only two steps in the paper carrying an exact software version pin. The remaining 16/18 steps cap at NI on the Version axis: every other named tool (ggplot2, Rtsne, umap, WGCNA, UpSetR, MUMmer4/NUCmer, delta-filter, Minimap2, BLAST+/BLASTN/TBLASTN, SyRI, plotsr, R itself) is cited by publication but carries no version, and three analyses (Tau/SPM, expression-window stratification, PCA) name no software package at all. No environment lockfile, container, or conda specification is claimed anywhere; there is no Data Availability section, no Code Availability section, and no code repository of any kind, so no README env-capture claim exists to inspect. Two custom Python scripts are described in prose but not deposited. Even under a Stage-2 pass no step could exceed RI without an executed environment capture, and none is claimed. Note that C4/C5 (t-SNE, UMAP) are stochastic with no RNG seed, so they are distributional-only regardless of environment.",
+    "coverage": "18 computational analysis steps assessed from the bioRxiv v1 JATS XML Materials and Methods prose; 0 wet-lab steps (W=0) — the study generates no new sequence or phenotype data and re-analyses published cotton genome assemblies and CottonMD expression matrices. Computational coverage = 18/18 (100%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper — no Code Availability section exists",
+      "missing": "The manuscript names no code repository (no GitHub/GitLab/Bitbucket/Zenodo/figshare/Software Heritage URL appears anywhere in the full text, and there is no Data Availability or Code Availability section at all). None of the 18 analysis steps has deposited or linked code; the entire analysis exists only as Methods prose.",
+      "how_to_close": "Deposit the full analysis code (R scripts for PCA/t-SNE/UMAP/WGCNA/UpSetR/ggplot2, shell driver scripts for MUMmer4/Minimap2/BLAST+/SyRI/plotsr/Bitacora, and the two custom Python scripts) in a public repository with an archived DOI (Zenodo/Software Heritage), and add explicit Data Availability and Code Availability statements."
+    },
+    {
+      "type": 5,
+      "where": "C7 (expression-window shared-gene counting) and C18 (pan-genome best-hit identity/coverage extraction)",
+      "missing": "Two 'custom Python script' components are described in prose but not deposited. For C7 the five expression-window boundaries are never defined, so the shared-gene counts cannot be recomputed; for C18 the best-hit selection and identity/coverage computation rules are unspecified.",
+      "how_to_close": "Publish both scripts with their input/output specifications and the exact window boundary definitions used for the five expression tiers."
+    },
+    {
+      "type": 2,
+      "where": "16 of 18 computational steps (all except C11 and C12)",
+      "missing": "Gap 2a — no version recorded. ggplot2, Rtsne, umap, WGCNA, UpSetR, Minimap2, SyRI, plotsr, BLAST+/BLASTN/TBLASTN/BLASTP and R itself are cited only by publication ('R Core Team 2025' is a citation year, not a version). MUMmer4 is given only as a product major version, not an x.y.z pin. PCA, the Tau/SPM tissue-specificity computation, and the expression-window stratification name no software package at all.",
+      "how_to_close": "Add a software/versions table pinning every tool and package to an exact release (e.g. R 4.5.1, ggplot2 3.5.x, WGCNA 1.72-x, MUMmer 4.0.0rc1, minimap2 2.28, blast+ 2.16.0, SyRI 1.7.0, plotsr 1.1.1, Rtsne 0.17, umap 0.2.10, UpSetR 1.4.0)."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment",
+      "missing": "No environment lockfile, container image/digest, conda environment file, or renv/pixi specification is claimed anywhere. The only exact pins in the paper are two tool versions in prose (HMMER 3.0, Bitacora V1.4.2), which is exact_pins_partial with no environment closure — no interpreter, channel, platform, or dependency-set capture.",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or a digest-pinned container covering the R stack, the Python stack, and the command-line aligners/BLAST toolchain used across all 18 steps."
+    },
+    {
+      "type": 1,
+      "where": "C1 (26 Gossypium assemblies, Supplementary Table S1), C2 (21-tissue subset, Supplementary Table S2), C18 (pan-genome queries)",
+      "missing": "The identity of the analysed genomes and the exact tissue/stage subset is externalized to supplementary tables; the Methods prose gives only 'collected from CottonGen and the NCBI database' with no accessions, assembly versions, or download dates. The TM-1 and H7124 assemblies are identified by citation only, with no assembly version or accession.",
+      "how_to_close": "List assembly accessions plus version/release identifiers (and access dates) for all 28 genomes and the CottonMD expression-matrix release directly in Methods or a machine-readable table."
+    },
+    {
+      "type": 4,
+      "where": "C4 (t-SNE via Rtsne) and C5 (UMAP)",
+      "missing": "Both embeddings are stochastic and no RNG seed is given, and none of perplexity / iterations / n_neighbors / min_dist / distance metric is stated. The reported figures cannot be regenerated point-for-point.",
+      "how_to_close": "Report the RNG seed and all embedding hyperparameters, or supply the scripts with seeds fixed."
+    },
+    {
+      "type": 1,
+      "where": "C18 (pan-genome homology retention threshold)",
+      "missing": "The threshold value is absent from the published text — the sentence reads verbatim 'The retention threshold was set to an E-value.' with the number dropped. The same defect appears in Results ('a TPM threshold of.', 'Pearson correlation coefficient ()'), so the manuscript systematically lost inline numeric values during preparation.",
+      "how_to_close": "Restore the missing numeric values in the manuscript text (E-value cutoff, TPM threshold, correlation coefficient) and re-check all inline numbers before resubmission."
+    },
+    {
+      "type": 1,
+      "where": "C10 (WGCNA module construction)",
+      "missing": "The soft-thresholding power, minModuleSize, deepSplit, mergeCutHeight, and network type (signed/unsigned) are not reported, and the variance-ranking input selection is described only as 'top 6,000 genes'. Module membership — the basis for identifying the MYB-enriched target module — cannot be reconstructed deterministically.",
+      "how_to_close": "Report all WGCNA parameters and deposit the module-assignment table as a supplementary file."
+    },
+    {
+      "type": 2,
+      "where": "C11 (Pfam-A database) and C12 (PF00249 seed / Bitacora reference set)",
+      "missing": "The Pfam-A release consumed by hmmscan and the Pfam version supplying the PF00249 MYB-domain seed are not identified. Pfam is a versioned, mutable reference resource; domain-hit counts and therefore the reported MYB family sizes (891 in TM-1) depend on the release.",
+      "how_to_close": "Pin the Pfam release (e.g. Pfam-A 36.0) and the CottonMD release, and record the download date/checksum for each reference artefact."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — the paper states no code repository (no GitHub/GitLab/Bitbucket/Zenodo/figshare/Software Heritage URL anywhere in the full text; no Data Availability and no Code Availability section exists)",
+      "http_status": "n/a (no artifact stated; not searched for per protocol)",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text grep of the bioRxiv JATS XML (source.xml) for 'github|gitlab|bitbucket|zenodo|figshare|code availability|data availability' — no match"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA490626 (raw sequencing of TM-1 and H7124, Hu et al. 2019; underlies the CottonMD expression matrices) — stated in Methods prose",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, www.ncbi.nlm.nih.gov/bioproject/PRJNA490626"
+    },
+    {
+      "artifact": "database: CottonMD (Yang et al. 2023) — source of the normalized TPM expression matrices and the H7124 genome; named in prose without a URL, accession, or release version",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, yanglab.hzau.edu.cn/CottonMD (URL not given in the paper; resolved from the cited database name)"
+    },
+    {
+      "artifact": "database: CottonGen (Yu et al. 2021) — source of chromosome-level assemblies for the 26 Gossypium species (identified only in Supplementary Table S1); named in prose without accessions",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, www.cottongen.org"
+    },
+    {
+      "artifact": "supplementary material: Supplementary Table S1 (26 genome list), Supplementary Table S2 (21 tissue/stage subset), Fig. S1, Fig. S2 — attached to the preprint (DC1-DC4)",
+      "http_status": "declared in JATS supplementary-material section (not separately fetched)",
+      "checked_at": "2026-07-28",
+      "network_context": "bioRxiv JATS XML sec-type=\"supplementary-material\""
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "cfe86a5a42bf2341cc31ae599f59e28a6a7050a7c315acc5c12924d277139503",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

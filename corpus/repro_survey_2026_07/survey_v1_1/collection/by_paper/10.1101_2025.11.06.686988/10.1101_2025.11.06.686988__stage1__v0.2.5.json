@@ -1,0 +1,504 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "b2f78d6e93a94567e7f2fa55f8dfa27ca6289c2fc8d79cd5935f0d95a883631b",
+  "canonical_id": {
+    "value": "10.1101/2025.11.06.686988",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.06.686988v3",
+      "biorxiv:2025.11.06.686988v3"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "cfDNA fragmentomics of active regulatory elements: paired-end cfDNA read processing (fastp trimming, BWA alignment to hg19, samtools filtering, bedtools BEDPE conversion and duplicate collapsing), chromatin-state stratified fragment size analysis using Roadmap ChromHMM consensus segmentations, correlation of fragment size x distance-to-TSS bins with eRNA/gene expression quantiles, HOMER transcription-factor motif enrichment on short vs long fragments, Transcriptional Activation Score (TAS) and position-free TAS (pfTAS) computation (public repository code), a generative nucleosome-digestion simulation with Bayesian optimization of NRL and nucleosome footprint size (public Jupyter notebook), nucleosome footprint score and NucTools NRL estimation, H1 ChIP-seq signal aggregation, lineage-associated gene definition from TCGA/GTEx with GeneHancer enhancer linking, SVM classification and t-SNE visualization of pfTAS vectors, hybrid-capture (SCLC/NSCLC) pfTAS analysis, and AR enhancer sliding-window pfTAS. HeLa wild-type / H1.2 knockout cell culture, nuclease digestion, library preparation, RNA extraction, NovaSeq sequencing and Western-blot knockout validation are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the bioRxiv v3 JATS XML Methods section, retrieved by curl (WebFetch of the .source.xml returned HTTP 403, then Cloudflare 1015/429 rate limiting; a delayed unauthenticated curl succeeded). There is no prose 'Data availability' or 'Code availability' section in the main text: dataset pointers appear only as JATS <fn fn-type=\"dataset\"> external links (GEO GSE243474, a bioRxiv supplementary-material URL, two bare GEO acc.cgi URLs with no accession appended, the GTEx portal root, and EGA dataset EGAD00001008460). The single author code repository is cited inline in Methods: https://github.com/Baca-Lab/TAS_fragmentomics (TAS module) and .../blob/main/simulations.ipynb (NRL simulation). Repository README prose was read (Stage-1 permitted); no workflow source was read. The FoundationOne liquid-biopsy BAM files used for the ERBB2/HER2 analysis are explicitly clinical data provided by Foundation Medicine under an IRB protocol and are not deposited anywhere, so that step is data-blocked. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Adapter trimming of paired-end cfDNA sequencing reads with fastp (0.23.2); no non-default parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Alignment to the hg19 reference with BWA (0.7.17), 'with insert size modeling disabled'; exact command line and reference build file not given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Read filtering with Samtools (1.11): remove MAPQ<5, non-proper pairs, and inter-chromosomal pairs",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Conversion of filtered reads to fragment coordinates in BEDPE with bedtools (2.30.0), collapsing identical start/end fragments as PCR duplicates and excluding published high-noise regions",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Secondary filtering of the Herberts et al. hg38 BAMs (11 named sequencer IDs discarded) and liftover of genomic annotations (e.g. TSSs) from hg19 to hg38; liftover tool and chain file are unnamed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "ERBB2 locus analysis on FoundationOne liquid-biopsy BAMs (hg19) provided by Foundation Medicine under a DFCI IRB protocol; HER2 status assigned from FoundationOne amplification calls plus IHC staining",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Definition of consensus chromatin states from the 27 Roadmap Epigenomics ChromHMM segmentation files for hematologic cells, retaining 200 bp bins where >=50% of samples share a state label; ChromHMM/Roadmap release not pinned, consensus script not provided",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Fragment-size analysis segregated by chromatin state: D/M ratio (300-340 bp counts / 140-180 bp counts) and modal dinucleosome size (mode within 300-340 bp), with Pearson correlation across states",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Correlation of cfDNA fragment density with expression: 30 PRO-cap eRNA expression quantiles (and PBMC RNA-seq quantiles for promoters), 5 bp size bins over 50-500 bp, 50 bp distance bins over -8 kb to +8 kb, per-quantile normalized density, Pearson r against median expression",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Transcription-factor motif enrichment with HOMER (findMotifsGenome.pl, '-size given -mask -p') on long vs short fragments within +/-500 bp of the top 10,000 enhancer TSSs; HOMER version and the -p thread value are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Transcriptional Activation Score (TAS) and position-free TAS (pfTAS) computation; public code at https://github.com/Baca-Lab/TAS_fragmentomics (run_tas.py, GPL-3.0), formula plus Gaussian smoothing (sigma 7.5 bp size / 75 bp distance), r<0.2 bin exclusion, positional weight Gaussian sigma 1000 bp, C(i,j) tables in Supplementary Tables 1-2. README declares only floating dependency bounds for the TAS module (Python 3, pandas>=1.1.5, numpy>=1.19.2)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Generative simulation of nuclease digestion of nucleosome-bound DNA plus Bayesian optimization (Expected Improvement, 5 runs x 200 evaluations from 20 uniform seeds) of {NRL_active, NRL_inactive, size_active, size_inactive}; public notebook simulations.ipynb, exhaustive grids seq(140,215,by=2) / seq(120,190,by=2), sd 10 bp, ~10,000 cut attempts per 100 kb, 0.001 cut probability inside nucleosomes. README pins Python 3.9.23, pandas 2.3.1, numpy 2.0.2, matplotlib 3.9.4 (joblib, scikit-optimize, scipy, tqdm unpinned); no RNG seed stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Nucleosome footprint score (NFS) from deeply sequenced WGS of five cancer-free volunteers: 35 bp windows tiled every 5 bp around TSSs, spanning vs ending fragment counts, computed 'as described' in a cited reference with no code of its own",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Nucleosome repeat length estimation with NucTools (filtering threshold raised to 1,000 for the deep cfDNA WGS; default threshold 20 for the HeLa nucleosome data); NucTools version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "H1 ChIP-seq signal aggregation: control-subtracted wig files obtained from a published study 'used without further processing', averaged in 10 bp bins for display; no accession, no processing script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Lineage-associated gene definition from TCGA (retrieved as TPM with TCGAbiolinks) and GTEx whole-blood TPM: Wilcoxon rank-sum p<0.01 one cancer type vs all others, mean fold change >2, genes lineage-associated in more than one cancer type discarded, top 600 blood genes by fold difference; TCGAbiolinks/R versions and TCGA/GTEx data-release versions not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Enhancer-gene linking with GeneHancer (confidence score >10) and gene-region definition with GENCODE v19 (8 kb upstream through gene body), with >=20 fragment coverage filters and per-sample standardization of pfTAS; GeneHancer release/version not pinned and the resource is license-restricted",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Binary cancer-vs-healthy classification on pfTAS vectors with RBF-kernel support vector machines, 5-fold stratified cross-validation, ROC averaged across folds; library, version, hyperparameters (C, gamma) and RNG seed are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "t-SNE visualization of the sample x pfTAS matrix with PCA initialization, gene-body and enhancer pfTAS concatenated; perplexity, learning rate, iteration count, library, version and seed are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Hybrid-capture (targeted) cfDNA analysis of SCLC/NSCLC-specific regulatory elements from Hiatt et al.: site selection by coverage >50% of sample-specific mean target coverage, per-site pfTAS standardized to mean 0 / sd 1, DLL3 TAS normalized by median housekeeping-gene TAS (housekeeping genes retained if coverage > sample mean target coverage in >90% of samples); tool versions not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "AR enhancer pfTAS profiling in 3 kb sliding windows with 50 bp step over hg19 chrX:66,116,500-66,133,950, windows with <150 overlapping fragments zeroed, profiles median-centered per sample",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W1",
+      "label": "HeLa wild-type (Abcam ab255928) and H1.2 knockout (Abcam ab261794) culture, nuclei isolation and Atlantis dsDNase digestion with the EZ Nucleosomal DNA Prep Kit (Zymo D5220; 0.5 U wild-type, 0.35 U knockout, 30 min at 42 C), KAPA HyperPrep library construction (Roche KK8504), RNeasy Mini Kit RNA extraction (Qiagen 74134), Illumina NovaSeq sequencing at Novogene",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "H1.2 knockout validation by Western blot (anti-H1.2 Abcam ab4086, anti-beta-actin Invitrogen MA1-140 loading control)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 15,
+    "n_X": 1,
+    "S": 21,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/21 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 5/21 computational steps (C1-C4 upstream read processing with exact prose pins fastp 0.23.2, BWA 0.7.17, Samtools 1.11, bedtools 2.30.0; C12 the NRL simulation notebook whose README pins Python 3.9.23, pandas 2.3.1, numpy 2.0.2, matplotlib 3.9.4). No environment closure of any kind is claimed - no lockfile, no container, no conda/env spec - so version cannot exceed 1 and no step can reach R-star from prose. 15/21 steps cap at NI because no software version is pinned at all: the liftover tool (C5), ChromHMM/Roadmap release (C7), the in-house fragment-size and correlation analyses (C8, C9), HOMER (C10), the TAS module itself (C11 - README declares only floating lower bounds pandas>=1.1.5, numpy>=1.19.2), NFS (C13), NucTools (C14), the H1 wig processing (C15), TCGAbiolinks/R (C16), GeneHancer release (C17), the SVM and t-SNE libraries (C18, C19), and the hybrid-capture and AR-enhancer pfTAS analyses (C20, C21). 1/21 is blocked (X): the ERBB2/HER2 analysis (C6) runs on FoundationOne clinical BAMs supplied by Foundation Medicine under a DFCI IRB protocol and deposited nowhere, so its input is unobtainable. Public author code covers only TAS/pfTAS computation and the NRL simulation; the entire upstream pipeline, all annotation-derived analyses, and all statistics/plotting code are absent.",
+    "coverage": "21 computational steps assessed from the bioRxiv v3 JATS Methods (DNA sequence data processing through AR enhancer pfTAS analysis) plus the GitHub README prose for the two code-backed steps. 2 wet-lab steps (HeLa WT / H1.2 KO culture, nuclease digestion, library prep, RNA extraction and NovaSeq sequencing; Western-blot knockout validation) counted in W and out of computational-reproduction scope. Coverage of the pipeline by public author code: 2/21 steps.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 21 computational steps)",
+      "missing": "No environment lockfile, container image or digest, conda/pixi environment file, or renv snapshot is claimed anywhere in the paper or in the GitHub README. The README gives a bare dependency list (some exact, some floating) and states only that development/testing occurred on CentOS 7.9, which is a platform note, not a captured environment. capture_claim is therefore exact_pins_partial at best.",
+      "how_to_close": "Ship a conda-lock / pixi lockfile or a container digest pinning the full toolchain used across the pipeline (fastp, BWA, Samtools, bedtools, HOMER, NucTools, ChromHMM, R + TCGAbiolinks, Python + pandas/numpy/scipy/scikit-learn/scikit-optimize/joblib/matplotlib/tqdm), and reference it from both the Methods and the repository."
+    },
+    {
+      "type": 3,
+      "where": "Steps C5, C7, C8, C9, C10, C11, C13, C14, C15, C16, C17, C18, C19, C20, C21",
+      "missing": "No version pins for the liftover tool, ChromHMM and the Roadmap Epigenomics segmentation release, HOMER, NucTools, TCGAbiolinks and the underlying R, the TCGA and GTEx data releases, the GeneHancer release, and the Python libraries used for the SVM and t-SNE. The TAS module in the public repository declares only floating lower bounds (Python 3, pandas>=1.1.5, numpy>=1.19.2), so even the flagship metric is version-unpinned.",
+      "how_to_close": "Pin an exact version (or commit/release tag) for every tool and library, replace floating lower bounds in the repository with exact pins, and version-stamp every downloaded annotation resource (Roadmap segmentation release, GENCODE v19 is already pinned, GeneHancer release, TCGA/GTEx data-release identifiers)."
+    },
+    {
+      "type": 5,
+      "where": "Steps C1-C10 and C13-C21 - code coverage of the pipeline",
+      "missing": "The public repository https://github.com/Baca-Lab/TAS_fragmentomics contains only the TAS/pfTAS calculation module and the NRL simulation notebook (2 of 21 computational steps). No code is published for the upstream read processing pipeline (trimming, alignment, filtering, BEDPE conversion, duplicate collapsing), the chromatin-state consensus derivation, the size x distance correlation analysis, the HOMER motif comparison, the NFS calculation, the lineage-gene definition, the SVM/t-SNE classification and visualization, the hybrid-capture analysis, or any figure-generating script. There is no Code availability statement; the repository is cited only inline in two Methods paragraphs.",
+      "how_to_close": "Publish the full analysis pipeline (driver scripts or a workflow-manager definition) plus the statistics and plotting scripts in the same repository, tag a release, archive it to Zenodo, and add an explicit Code availability statement citing the DOI."
+    },
+    {
+      "type": 4,
+      "where": "Data availability - all cfDNA cohorts and the newly generated HeLa data",
+      "missing": "The paper carries no prose Data availability statement. Machine-readable dataset links are GEO GSE243474, EGA dataset EGAD00001008460 (controlled access), the GTEx portal root, a bioRxiv supplementary-material URL, and two bare GEO acc.cgi URLs with no accession appended - so at least two intended accessions cannot be resolved from the text. The newly generated HeLa wild-type / H1.2 knockout nucleosome DNA and RNA sequencing data have no accession enumerated in the retrievable prose. The reused cohorts (Baca et al., Herberts et al., Hiatt et al., Snyder et al., the PRO-cap eRNA data, the H1 ChIP-seq wig files, the El Zarif et al. H3K27ac profiles) are cited by reference only, with no per-analysis accession or sample manifest.",
+      "how_to_close": "Add an explicit Data availability statement enumerating every accession (including the new HeLa nucleosome and RNA sequencing data), fix the two truncated GEO links, and publish a per-figure sample manifest mapping each cohort and sample identifier to the analysis that uses it."
+    },
+    {
+      "type": 8,
+      "where": "Step C6 - ERBB2 / HER2 analysis on FoundationOne data",
+      "missing": "The BAM files underlying the HER2 result were provided by Foundation Medicine from clinical liquid-biopsy tests ordered as part of patient care at DFCI and analyzed under an IRB-approved protocol. They are not deposited in any repository, controlled-access or otherwise, and no access procedure is described. This step is therefore not reproducible by any third party at any tier.",
+      "how_to_close": "Deposit the derived, de-identified fragment-level summaries (or the per-sample pfTAS matrices) sufficient to regenerate Fig. 5e-f, or state a formal controlled-access request route with a contact and a data-access-committee reference."
+    },
+    {
+      "type": 7,
+      "where": "Steps C1, C2, C10, C18, C19, C20",
+      "missing": "Parameter under-specification: fastp is invoked with no stated options; the BWA command line is not given beyond 'insert size modeling disabled' and the exact hg19 reference FASTA build is not identified; the HOMER '-p' thread argument has no value and the HOMER motif database version is unstated; the SVM hyperparameters (C, gamma) and the t-SNE perplexity / learning rate / iteration count are not given; the hybrid-capture site-selection thresholds are stated but the underlying target panel definition is not; the Bayesian optimization and the digestion simulation (C12) state no RNG seed, so the simulation is not bitwise deterministic even with the published notebook.",
+      "how_to_close": "State every non-default parameter, threshold, and RNG seed in Methods or, preferably, inside the published scripts, and identify the exact reference FASTA and motif-database builds."
+    },
+    {
+      "type": 6,
+      "where": "Steps C7, C16, C17 - annotation-derived resources",
+      "missing": "The consensus chromatin-state track (>=50% agreement across 27 Roadmap segmentations), the lineage-associated gene lists derived from TCGA and GTEx, and the GeneHancer-filtered enhancer-gene link set are all intermediate artifacts that every downstream figure depends on, and none is deposited as a citable file. GeneHancer additionally has license restrictions that may prevent independent redistribution.",
+      "how_to_close": "Deposit the consensus chromatin-state BED, the lineage-associated gene lists, and the enhancer-gene link table as supplementary or Zenodo-archived files with the generating script."
+    },
+    {
+      "type": 9,
+      "where": "Whole pipeline",
+      "missing": "No workflow manager (Snakemake, Nextflow, WDL, CWL, make) is used or mentioned. The pipeline is described only as narrative prose, so step ordering, intermediate file formats, and the coupling between the upstream BEDPE generation and the published TAS module must be inferred by the reader.",
+      "how_to_close": "Express the pipeline as a workflow-manager definition, or at minimum publish a driver script plus a documented intermediate-file contract for the fragment count matrices consumed by run_tas.py."
+    },
+    {
+      "type": 11,
+      "where": "Repository https://github.com/Baca-Lab/TAS_fragmentomics",
+      "missing": "No tagged release and no archival DOI (Zenodo / Software Heritage). The Methods cite a bare main-branch URL and a bare blob/main notebook path, both of which are mutable; the repository shows 25 commits with no version identifier attached to the state used for the paper. There is no way to retrieve the exact code state corresponding to this manuscript.",
+      "how_to_close": "Tag a release matching the manuscript, archive it to Zenodo, and cite the DOI (or at minimum a commit SHA) in the Methods instead of the mutable branch URL."
+    },
+    {
+      "type": 12,
+      "where": "Repository README - stated dependencies",
+      "missing": "The TAS module's declared dependencies are floating lower bounds (pandas>=1.1.5, numpy>=1.19.2) against an unpinned 'Python 3'; the simulation notebook pins four packages exactly but leaves joblib, scikit-optimize, scipy and tqdm unpinned. The mixture means the paper's overall capture claim is exact_pins_partial, not a coherent pinned environment, and the two code-backed steps are not mutually consistent in their pinning discipline.",
+      "how_to_close": "Adopt one pinning discipline across the repository: a single requirements lockfile or environment.yml covering both the TAS module and the simulation notebook, with exact versions for every transitive dependency."
+    },
+    {
+      "type": 13,
+      "where": "Repository README - validation and expected output",
+      "missing": "The README supplies one quick-start invocation against an example input file and an estimated runtime (~1 hour on a single CPU core for the notebook), but no expected output, no reference result to compare against, and no test suite. A Stage-2 execution would have nothing authoritative to diff its results against.",
+      "how_to_close": "Ship an expected-output file for the example input plus a minimal regression test, so that a reproduction attempt can be verified automatically."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 2)",
+      "missing": "HeLa wild-type and H1.2 knockout cell culture, nuclei isolation and Atlantis dsDNase digestion, KAPA HyperPrep library construction, RNeasy RNA extraction and NovaSeq sequencing, together with Western-blot knockout validation, are physical steps and out of scope for computational reproduction; counted in W and not verdicted. Reagents and catalogue numbers are given in full, which is good practice, but the resulting sequencing data have no enumerated accession (see gap type 4).",
+      "how_to_close": "N/A for Tier-1 computational readiness; the reproducible entry point would be the deposited HeLa nucleosome DNA and RNA sequencing data once their accessions are published."
+    },
+    {
+      "type": 1,
+      "where": "Whole paper - identification of the analysed samples",
+      "missing": "Sample counts are given per figure (34 healthy volunteers, 32 pooled lung-cancer LP-WGS samples, 49 PRAD samples, 5 deeply sequenced cancer-free volunteers, 286M pooled fragments) but no sample-identifier manifest maps these counts onto the cited cohorts and accessions, so the exact input set of any step cannot be reconstructed even where the cohort itself is public.",
+      "how_to_close": "Publish a supplementary table listing every sample identifier, its source cohort and accession, its coverage, and the figures it contributes to."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code): https://github.com/Baca-Lab/TAS_fragmentomics - cited inline in Methods as 'Source code for TAS is available in our laboratory GitHub repository'",
+      "http_status": "200 OK (URL-present, public, GPL-3.0, 25 commits, 1 star, 0 forks; no tagged release, no archival DOI)",
+      "checked_at": "2026-07-27",
+      "network_context": "WebFetch of the repository landing page; README prose read (Stage-1 permitted), no workflow source read"
+    },
+    {
+      "artifact": "code notebook: https://github.com/Baca-Lab/TAS_fragmentomics/blob/main/simulations.ipynb - cited inline in Methods as 'The corresponding notebook is uploaded to our laboratory GitHub repository'",
+      "http_status": "URL-present (mutable main-branch blob path; presence confirmed via the repository landing page and README, notebook itself not opened at Stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched line-by-line at Stage 1"
+    },
+    {
+      "artifact": "data accession (GEO): https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243474 - listed as a JATS dataset external link; no prose statement identifies which analysis it serves",
+      "http_status": "URL-present with resolvable accession (stated-in-paper; not fetched at Stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "extracted from the bioRxiv v3 JATS XML <fn fn-type=\"dataset\"> group"
+    },
+    {
+      "artifact": "data accession (GEO, truncated): two further JATS dataset links point to https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi with no acc= parameter",
+      "http_status": "URL-present but accession missing - unresolvable as published",
+      "checked_at": "2026-07-27",
+      "network_context": "extracted verbatim from the bioRxiv v3 JATS XML; recorded without interpretation of which datasets were intended"
+    },
+    {
+      "artifact": "data accession (EGA, controlled access): https://ega-archive.org/datasets/EGAD00001008460",
+      "http_status": "URL-present, controlled-access dataset (stated-in-paper; not fetched at Stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "extracted from the bioRxiv v3 JATS XML dataset link group"
+    },
+    {
+      "artifact": "data resource: https://www.gtexportal.org/ - portal root only, cited for whole-blood TPM values; no release version or file identifier",
+      "http_status": "URL-present (root, not a specific dataset)",
+      "checked_at": "2026-07-27",
+      "network_context": "extracted from the bioRxiv v3 JATS XML dataset link group"
+    },
+    {
+      "artifact": "data resource: https://www.biorxiv.org/content/10.1101/2022.04.08.487666v3.supplementary-material - supplementary material of a prior preprint, listed as a dataset link",
+      "http_status": "URL-present",
+      "checked_at": "2026-07-27",
+      "network_context": "extracted from the bioRxiv v3 JATS XML dataset link group"
+    },
+    {
+      "artifact": "clinical data: FoundationOne liquid-biopsy BAM files provided by Foundation Medicine, analysed under a DFCI IRB-approved protocol (step C6)",
+      "http_status": "none - explicitly not deposited; no repository, accession, or access route stated",
+      "checked_at": "2026-07-27",
+      "network_context": "stated verbatim in Methods ('BAM files from FoundationOne liquid biopsy test ... were provided by Foundation Medicine')"
+    },
+    {
+      "artifact": "reused public annotation resources: Roadmap Epigenomics ChromHMM segmentations (27 hematologic files), GENCODE v19, GeneHancer, TCGA (via TCGAbiolinks), high-noise region blacklist, published H1 ChIP-seq wig files",
+      "http_status": "cited by reference only - no URLs, accessions, or release versions given in the text (GENCODE v19 is the sole version-pinned resource)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at Stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "cd7f35a36dd14753342e985b5e50dab20e6ceaa3c5aa12709bbeea717e61129b",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

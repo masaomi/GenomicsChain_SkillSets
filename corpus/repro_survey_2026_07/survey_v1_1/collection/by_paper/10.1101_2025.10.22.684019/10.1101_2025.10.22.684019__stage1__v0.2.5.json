@@ -1,0 +1,540 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "090baa9c925b9f8ccd90b54710e5665e742a9f3ec8a5908bde675876624b5fc4",
+  "canonical_id": {
+    "value": "10.1101/2025.10.22.684019",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The computational chain supporting the central claim that resistant Drosophila suzukii lines show globally elevated alternative splicing: (a) de novo repeat library + softmasking of the LBDM_Dsuz_2.1.pri assembly, (b) BRAKER3 + PacBio Iso-Seq/TSEBRA genome re-annotation producing 17,159 gene models / 34,354 transcript models, (c) Salmon + SUPPA2 differential splicing analysis, (d) SortMeRNA/fastp/STAR/DESeq2 differential gene expression analysis, (e) ShinyGO functional enrichment, and the associated summary statistics. Wet-lab steps (isofemale line establishment, bioassays, RNA extraction, library prep, sequencing) are out of computational reproduction scope.",
+  "step_source": "prose-methods",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Establishment of insecticide-resistant/susceptible D. suzukii isofemale lines (8 generations sib-crossing) from field populations",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Discriminating-dose glass-vial residue bioassays and sublethal-dose determination (Malathion 102.78 mg/L; 0/5/10/20/40 ppm)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "TRI-reagent RNA extraction, Turbo DNase treatment, Bioanalyzer/Qubit/Nanodrop QC",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Illumina TruSeq Stranded mRNA library prep (24 libraries) and HiSeq X Ten PE150 sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "PacBio Iso-Seq library prep (48 libraries) and Sequel sequencing on five 8M SMRT cells",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "De novo repeat library construction with RepeatModeler2 (v2.0.4) on GCF_013340165.1, default settings + '-LTRStruct'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Two-round genome softmasking with RepeatMasker (v4.1.5) using Dfam v3.7 then the de novo repeat library",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Retrieval of 56 public D. suzukii RNA-seq SRA datasets (accession list in S. Table 2; last accessed 2023-06-28)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Read quality control with fastqc (v0.12.1) and multiqc (v1.14), pre- and post-trimming",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Adapter and low-quality read trimming with Trimmomatic (v0.39) for the annotation-evidence read set (no parameters stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Short-read alignment to the softmasked assembly with Hisat2 (v2.2.1) to produce BRAKER3 RNA-seq evidence",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Gene model prediction with BRAKER3 (v3.0.3) training ProtHint / GeneMark-ETP+ / AUGUSTUS on Hisat2 evidence + OrthoDB arthropoda_odb11 + D. melanogaster proteome UP000000803_7227",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Iso-Seq FLNC generation and clustering/collapse with isoseq (v4.0.0), 'isoseq cluster', 'isoseq collapse' with default settings and '--do-not-collapse-extra-5exons'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Mapping of high-quality Iso-Seq transcripts to the softmasked assembly with pbmm2 (v1.11.99), default settings",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Protein-coding region prediction on mapped Iso-Seq transcripts with GeneMarkS-T (v5.1) and unspecified conversion of results to GTF",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Merge of BRAKER3 gene models and Iso-Seq transcripts with the long-read version of TSEBRA (git branch 'long_reads', no version or commit, no config given)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "GTF-to-GFF conversion, collapse of redundant transcripts and pseudogene annotation with AGAT (v1.2.0)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Ribosomal RNA annotation with rnammer (v1.2) (no parameters stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Transfer RNA annotation with tRNAscan-SE (v2.0.12) (no parameters stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Functional annotation of the final transcript set with EnTAP (v1.0.1) in '-runP' mode against RefSeq Invertebrate, UniProt SwissProt, UniProtKB/TrEMBL and UP000000803_7227 (all last accessed 2024-02-14)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Transcript quantification of cleaned Illumina reads with Salmon (v1.10.1), default parameters (index construction not described; prose says reads were mapped to the genome assembly GCF_013340165.1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Differential splicing with SUPPA2 (v2.3): generateEvents '-e {SE,SS,MX,RI,FL}', psiPerEvent, diffsplice classical mode (pooled Susceptible reference for R-vs-S; Sus_1 reference for S-vs-S), FDR < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Percentage-of-significant-events computation and Fisher's Exact Test with Benjamini-Hochberg correction 'on R' (no R version, no package, no script for this analysis)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "GO enrichment with ShinyGO 0.76.3, FDR < 0.05 (species/background gene set and ontology database version not stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "rRNA read removal with SortMeRNA (v2.1) (no rRNA reference database or parameters stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Adapter/quality trimming with fastp (v0.24.0); stated settings are Trimmomatic-style (ILLUMINACLIP 2:30:10, LEADING:10, TRAILING:10, MINLEN:36) and do not correspond to fastp flags",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Alignment to the in-house re-annotation with STAR (v2.7.11b), '--quantMode GeneCounts' (index build parameters not stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Differential expression on STAR GeneCounts with DESeq2 in R (no DESeq2 version, no R version for this analysis, no design formula or script), BH-adjusted p < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "Biological-replicate correlation via Pearson's correlation coefficient using the 'stats' package in R (v4.2.1)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "Key-gene expression comparison by two-way ANOVA with Benjamini-Krieger-Yekutieli two-stage procedure in GraphPad Prism v10.3.0 (GUI, no script)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C26",
+      "label": "Bioassay mortality comparison by one-way ANOVA with Tukey's multiple comparison in GraphPad Prism v10.3.0; underlying per-replicate mortality counts are not deposited (Dryad holds only gene-level supplementary tables 4-31)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 17,
+    "n_NI": 8,
+    "n_X": 1,
+    "S": 26,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/26 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "17/26 (65%) of computational steps reach RI, the stage-1 ceiling; the remaining 9 are capped below RI by absent parameters (6 steps), absent tool versions (3 steps: TSEBRA long_reads branch, DESeq2, the R used for Fisher/BH) and one step (C26, bioassay ANOVA) whose input mortality data is not deposited. No step can exceed RI at stage 1 because version is capped at 1 without environment closure.",
+    "coverage": "26/31 named steps are computational (84%); 5 wet-lab steps (line establishment, bioassays, RNA extraction, Illumina and PacBio library prep/sequencing) are out of computational reproduction scope. Methods text fully retrieved from JATS XML; Data availability section present, no Code availability section exists."
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": {
+    "data_absent": 1,
+    "data_restricted": 0,
+    "code_absent": 26,
+    "code_partial": 0,
+    "version_absent": 3,
+    "version_floating": 2,
+    "params_absent": 6,
+    "params_partial": 13,
+    "env_absent": 26,
+    "seed_absent": 3,
+    "hardware_resource_absent": 26,
+    "intermediate_artifact_absent": 1,
+    "docs_absent": 1
+  },
+  "gaps_detail": {
+    "data_absent": "C26: per-replicate bioassay mortality counts underlying the one-way ANOVA/Tukey are not deposited; Dryad holds only supplementary tables 4-31 (differentially spliced genes, DEGs, enrichment results).",
+    "code_absent": "The paper contains no Code availability statement and no author-controlled repository. The only two GitHub URLs are third-party tool documentation (Gaius-Augustus/BRAKER long_read_protocol.md, Gaius-Augustus/TSEBRA tree/long_reads). All 26 computational steps therefore have no public code artifact; each is scored code=1 (reconstructable from prose + public tools), never code=2.",
+    "version_absent": "C11 TSEBRA (branch pointer only, no version/commit), C18 R used for Fisher's Exact + BH ('on R'), C23 DESeq2 (no package version; R version only stated in a different subsection as v4.2.1).",
+    "version_floating": "C11 TSEBRA is referenced as a mutable git branch ('tree/long_reads'), not a tag or commit SHA. Reference databases (Dfam v3.7 excepted) are pinned by access date rather than release: OrthoDB arthropoda_odb11 and UP000000803_7227 last accessed 2023-06-28; RefSeq Invertebrate, SwissProt and TrEMBL last accessed 2024-02-14.",
+    "params_absent": "C5 Trimmomatic (no trimming parameters), C10 GeneMarkS-T (no parameters; 'converted to GTF format' by unspecified means), C11 TSEBRA (no config file), C13 rnammer, C14 tRNAscan-SE, C20 SortMeRNA (no rRNA reference database).",
+    "env_absent": "No conda environment, no environment.yml, no lockfile, no Docker/Singularity image, no workflow manager (Snakemake/Nextflow), no sessionInfo/renv. Grep of the full text for docker|singularity|conda|snakemake|nextflow|lockfile|environment.yml|renv|sessionInfo returned zero hits.",
+    "seed_absent": "No random seeds stated for stochastic steps: RepeatModeler2 (C1), BRAKER3/AUGUSTUS training (C7), isoseq cluster (C8).",
+    "hardware_resource_absent": "No compute environment, OS, thread counts, memory or runtime reported for any step.",
+    "intermediate_artifact_absent": "The central derived artifact of the study - the D. suzukii re-annotation (17,159 gene models / 34,354 transcript models, GTF/GFF plus EnTAP functional annotations) - is not deposited to any repository. Every downstream step (C12, C15, C17, C22, C23) consumes it, so those steps score data=1 rather than 2.",
+    "docs_absent": "No Code availability section, no README, no workflow description, no parameter-file deposition.",
+    "prose_inconsistencies_noted": "(a) C21 attributes Trimmomatic-style parameters (ILLUMINACLIP 2:30:10, LEADING:10, TRAILING:10, MINLEN:36) to fastp v0.24.0, which does not accept those flags. (b) C16 states Salmon mapped reads to the 'genome assembly (RefSeq: GCF_013340165.1)' while the downstream SUPPA2 analysis operates on the updated in-house annotation; the index actually used is ambiguous. Both recorded as findings, not corrections."
+  },
+  "liveness": {
+    "code_repo": {
+      "present": false,
+      "status": "none",
+      "verbatim": "No code availability statement appears in the article. The only repository URLs in the Methods are third-party tool documentation: 'https://github.com/Gaius-Augustus/BRAKER/blob/master/docs/long_reads/long_read_protocol.md' and 'the long-read version of TSEBRA ( https://github.com/Gaius-Augustus/TSEBRA/tree/long_reads )'. Also cited: 'AGAT (v. 1.2.0) ( https://www.doi.org/10.5281/zenodo.3552717 )' and 'fastqc (v 0.12.1, http://www.bioinformatics.babraham.ac.uk/projects/fastqc )' - both are tool citations, not study code."
+    },
+    "data_accessions": [
+      {
+        "repository": "NCBI SRA",
+        "identifier": "PRJNA983428",
+        "present": true,
+        "status": "stated-in-paper",
+        "verbatim": "Raw Illumina and PacBio reads have been deposited to the NCBI Sequence Read Archive (SRA) and can be found under BioProject accession numbers PRJNA983428 and PRJNA1143070."
+      },
+      {
+        "repository": "NCBI SRA",
+        "identifier": "PRJNA1143070",
+        "present": true,
+        "status": "stated-in-paper",
+        "verbatim": "Raw Illumina and PacBio reads have been deposited to the NCBI Sequence Read Archive (SRA) and can be found under BioProject accession numbers PRJNA983428 and PRJNA1143070."
+      },
+      {
+        "repository": "Dryad",
+        "identifier": "https://datadryad.org/share/7xlDoiG7WR_2ClNUMbSWDa9jG2zP-Ky5_Ipsu2R6hGQ",
+        "present": true,
+        "status": "URL-present",
+        "verbatim": "Supplementary Tables 4-31 contain the lists of differentially spliced genes, differentially expressed genes, and the results of the functional enrichment analyses and have been uploaded to Dryad ( https://datadryad.org/share/7xlDoiG7WR_2ClNUMbSWDa9jG2zP-Ky5_Ipsu2R6hGQ )."
+      },
+      {
+        "repository": "NCBI RefSeq (reference input, not a study deposit)",
+        "identifier": "GCF_013340165.1",
+        "present": true,
+        "status": "stated-in-paper",
+        "verbatim": "We used the NCBI Drosophila suzukii Annotation Release 102 based on the LBDM_Dsuz_2.1.pri assembly (accession no. GCF_013340165.1)"
+      },
+      {
+        "repository": "NCBI SRA (public reuse, list in supplement)",
+        "identifier": "56 public D. suzukii RNA-seq datasets, S. Table 2",
+        "present": true,
+        "status": "stated-in-paper",
+        "verbatim": "we mined NCBI's Sequence Read Archive (SRA) for publicly available D. suzukii RNAseq datasets (last accessed June 28th, 2023), compiling a list of 56 sequencing datasets spanning both sexes and multiple tissue types ( S. Table 2 )."
+      }
+    ]
+  },
+  "assessable": {
+    "is_assessable": true,
+    "reason_if_not": null
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c308e158724fd8305b478f465baa0bfa63951af1dbf490fc18772bc629cd862a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.02.14.637727",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.02.14.637727v2",
+      "biorxiv:2025.02.14.637727v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Targeted-amplicon genomic surveillance analysis of Anopheles gambiae s.l. insecticide resistance: the AmpSeeker snakemake pipeline (BCL->fastq, trim/QC, bwa alignment, coverage, bcftools variant calling, snpEff annotation) plus downstream custom Jupyter-notebook analyses (scikit-allel diplotype/heterozygosity + PCA population structure, XGBoost/SVM/AIM taxon assignment, statsmodels GLM genotype:phenotype association, XGBoost bioassay-mortality prediction, Plotly/Jupyter-Book results book). Wet-lab work (mosquito collection, WHO cone bioassays, DNA extraction, PCR1/PCR2 barcoding, MiSeq library prep/sequencing) and one-time primer/panel design (in-house-modified mprimer, AnoPrimer) are out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the 'Bioinformatic analysis' + 'Ancestry analysis', 'Population structure', 'Kdr analysis', 'Genotype:phenotype associations', and 'Predicting bioassay mortality' Methods prose. AmpSeeker is a named, public, MIT-licensed snakemake workflow (github.com/sanjaynagi/AmpSeeker) with per-rule conda env YAMLs under workflow/envs/ and a public results book (sanjaynagi.github.io/agvampir002-results/); code axis is set to 2 for pipeline/module steps because the executable artifact exists and is identifiable, even though the paper gives no formal code-availability statement, no repository URL in the DA section, and no run commit/release pin. Version axis follows exact pins found in prose (BCL-Convert v4.3.6, scikit-allel v1.3.7) or in the conda YAMLs (snpeff=5.1, plotly==5.24.1, pandas==2.1.4); tools left floating in the conda envs (fastp, fastqc, bwa, samtools, mosdepth, bcftools, xgboost, scikit-learn, anjl, statsmodels, jupyter-book, papermill) score version 0. STAGE-1 PROSE ONLY: workflow source not read line-by-line, no code executed; env_capture_class='n/a' for all steps. One-time primer/panel design tools (in-house-modified mprimer, AnoPrimer) and wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "BCL->fastq conversion with BCL-Convert v4.3.6 (AmpSeeker snakemake rule)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["raw-bcl-not-deposited", "public-workflow"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Read trimming/quality assessment with fastp (Chen et al.); floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "default-params"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Index-read quality assessment with FastQC; floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool"]
+    },
+    {
+      "step_id": "C4",
+      "label": "Alignment to reference genome with bwa mem (Li & Durbin); floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "default-params", "reference-build-unstated"]
+    },
+    {
+      "step_id": "C5",
+      "label": "BAM indexing with samtools (conda spec samtools>=1.10, no exact pin)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["version-bound-not-exact"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Coverage assessment with mosdepth (conda spec mosdepth<0.3.11, no exact pin); IGV notebook read visualisation",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["version-bound-not-exact"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Variant calling with bcftools mpileup (Danecek et al.); floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "default-params"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Variant annotation with snpEff (conda pin snpeff=5.1)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["exact-pin-conda", "public-workflow"]
+    },
+    {
+      "step_id": "C9",
+      "label": "Vgsc diplotype complete-linkage clustering (Manhattan distance) + per-sample heterozygosity with scikit-allel v1.3.7 (allel.GenotypeArray.is_het)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["exact-pin-prose", "method-fully-described"]
+    },
+    {
+      "step_id": "C10",
+      "label": "Population-structure PCA + Neighbour-joining trees on filtered SNPs (2389 SNPs) with scikit-allel v1.3.7 (NJ via anjl)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["exact-pin-prose", "nj-lib-anjl-unpinned"]
+    },
+    {
+      "step_id": "C11",
+      "label": "AIM-based taxon painting/assignment (chr3 + X AIMs, 0.5/1.5 thresholds) from published marker sets; custom notebook code",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["thresholds-given", "unpinned-tool"]
+    },
+    {
+      "step_id": "C12",
+      "label": "XGBoost taxon-classification model trained on 7363 Ag1000g WGS individuals (5-fold CV, hyperparameter ranges given); floating xgboost/scikit-learn",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "hyperparam-ranges-given", "training-set-selection-unstated"]
+    },
+    {
+      "step_id": "C13",
+      "label": "SVM taxon classifier on first 4 PCs (probability threshold 0.8) with scikit-learn; floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "thresholds-given"]
+    },
+    {
+      "step_id": "C14",
+      "label": "Genotype:phenotype association: per-SNP binomial GLM (logit) + FDR correction with statsmodels (filters >20% missing, <2% MAF); floating in conda env",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "filters-given"]
+    },
+    {
+      "step_id": "C15",
+      "label": "Bioassay-mortality prediction with XGBoost (210 QC SNPs, 5-fold CV, GridSearchCV hyperparameter grid given, 'best params underlined'); floating xgboost/scikit-learn",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["unpinned-tool", "final-params-underlined-not-in-text"]
+    },
+    {
+      "step_id": "C16",
+      "label": "Notebook execution (papermill) + interactive results book assembly with Plotly (conda ==5.24.1) and Jupyter Book (unpinned)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["jupyterbook-unpinned", "plotly-pinned", "papermill-unpinned"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 13,
+    "n_X": 0,
+    "S": 16,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "Up to 3/16 (19%) reach the stage1 RI ceiling: AmpSeeker is a public, MIT-licensed snakemake workflow (github.com/sanjaynagi/AmpSeeker) with per-rule conda env YAMLs, and raw reads are deposited in SRA (PRJNA1207724), so steps whose primary tool carries an exact version pin — snpEff 5.1 (conda) and scikit-allel v1.3.7 (prose, used for Vgsc diplotype/heterozygosity and PCA) — cap at RI. The other 13 steps cap at NI: their primary tools are floating in the conda envs (fastp, fastqc, bwa, samtools, mosdepth, bcftools, xgboost, scikit-learn, anjl, statsmodels, jupyter-book, papermill) or their input (raw BCL) is not deposited (only reads/fastq are in SRA). No lockfile/container is present so full software-environment closure is unverified; capture_claim is exact_pins_partial and this is a legitimate stage2 candidate (read the conda envs / snakemake rules to confirm exact resolved versions).",
+    "coverage": "16 computational steps assessed from the AmpSeeker 'Bioinformatic analysis' + downstream ML/stats Methods prose; 6 wet-lab steps counted (W) out of computational-reproduction scope; one-time primer/panel design (in-house-modified mprimer, AnoPrimer) excluded from C. Code repo (AmpSeeker) 200 OK, results book (agvampir002-results) 200 OK, SRA BioProject PRJNA1207724 200 OK.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment for the AmpSeeker pipeline + custom notebooks (all C-steps)",
+      "missing": "No lockfile (conda-lock/pixi.lock), container image, or container digest is provided. The public repo ships per-rule conda env YAMLs (workflow/envs/*.yaml) but most dependencies are floating (fastp, fastqc, bwa, samtools>=1.10, mosdepth<0.3.11, bcftools, xgboost, scikit-learn, anjl, statsmodels, jupyter-book, papermill); only a minority are exactly pinned (snpeff=5.1, plotly==5.24.1, pandas==2.1.4, python bounds). No resolved software environment is captured for the specific run.",
+      "how_to_close": "Publish a resolved lock (conda-lock / pixi.lock) or a container digest for the exact run, so floating conda specs resolve to reproducible versions."
+    },
+    {
+      "type": 3,
+      "where": "Code provenance / run version pin",
+      "missing": "The paper names AmpSeeker and points to Supplementary Text 3 and the results book, but gives no formal code-availability statement, no repository URL in the Data availability section, and no commit hash / release tag identifying the exact pipeline version used. Downstream custom analyses (XGBoost taxon model, GLM association, mortality prediction) are attributed to notebooks but not explicitly linked to a versioned artifact.",
+      "how_to_close": "Add a code-availability statement citing github.com/sanjaynagi/AmpSeeker (and the agvampir002-results repo) with the exact commit/release and a Zenodo DOI for the frozen version used."
+    },
+    {
+      "type": 5,
+      "where": "C15 XGBoost mortality model; C4-C7 pipeline defaults",
+      "missing": "XGBoost mortality-model 'final best model parameters are underlined' but the underlined values are not recoverable from the prose text (only search ranges given). Pipeline steps (fastp/bwa/bcftools) rely on unstated 'best-practices' defaults that are not enumerated in prose.",
+      "how_to_close": "State the final selected hyperparameters explicitly and enumerate non-default pipeline parameters (or point to the config.yaml that encodes them)."
+    },
+    {
+      "type": 1,
+      "where": "Input data: raw BCL, reference genome build, Ag1000g training cohort",
+      "missing": "Raw BCL files (input to BCL-Convert) are not deposited (only reads via SRA PRJNA1207724). The reference genome build/version is not stated in prose. The 7363-individual Ag1000g training set used for the XGBoost/SVM taxon models is described but not provided as a curated machine-readable file/accession list.",
+      "how_to_close": "State the reference build/accession, provide the curated Ag1000g sample list, and note the fastq entry point (BCL not required if reads are the reproducible input)."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: mosquito collection/colonies, extended WHO cone bioassays, Qiagen DNeasy extraction, PCR1 locus-specific, PCR2 barcoding, MiSeq library prep/sequencing; plus one-time primer/panel design (mprimer, AnoPrimer)",
+      "missing": "Wet-lab generation and one-time panel-design steps are out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the AmpSeeker analysis pipeline and downstream notebooks."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: AmpSeeker snakemake workflow — https://github.com/sanjaynagi/AmpSeeker (MIT, snakemake >=8.0.0). Named in prose ('AmpSeeker is written in snakemake') though not linked in the Data availability section. Conda env YAMLs present at workflow/envs/ (AmpSeeker-python.yaml, -cli.yaml, -qc.yaml, -snpeff.yaml, etc.); GitHub Actions CI + tests/snakemake present.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl + GitHub API git/trees; conda envs are floating with partial exact pins (snpeff=5.1, plotly==5.24.1, pandas==2.1.4); no lockfile or Dockerfile found in tree"
+    },
+    {
+      "artifact": "results book (rendered outputs, executed notebooks, interactive plots): https://sanjaynagi.github.io/agvampir002-results/ (source repo github.com/sanjaynagi/agvampir002-results). Named in Data availability.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl; both the github.io page and the source repo return 200"
+    },
+    {
+      "artifact": "data accession: raw read data in SRA — BioProject PRJNA1207724 (https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1207724). Stated in Data availability.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl to ncbi.nlm.nih.gov/bioproject"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "4629027c3f0e05027a36b846186400b8de39b60d04a94414d6e87b54a1634210",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

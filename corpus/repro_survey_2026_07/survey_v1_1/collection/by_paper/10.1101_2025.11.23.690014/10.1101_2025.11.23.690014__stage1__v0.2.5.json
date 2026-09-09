@@ -1,0 +1,864 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "fd2014eaf8cc3d62a4ceb4b4e47b1f3342e60463426ff42794d3e7b69a93511e",
+  "canonical_id": {
+    "value": "10.1101/2025.11.23.690014",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.23.690014v2",
+      "biorxiv:2025.11.23.690014v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "A multi-omic atlas of human choroid plexus (CP) in Alzheimer's disease built from ROSMAP post-mortem tissue. The computational reproduction target is the analysis stack applied to five primary modalities: (1) single-nucleus RNA-seq of CP from 69 participants (bcl2fastq -> CellRanger v7.0.1 on GRCh38 -> Seurat v4.2.0 QC -> SoupX v1.6.2 ambient correction -> HTOdemux hashtag demultiplexing -> Harmony v0.1.0 integration, UMAP, Louvain clustering, marker detection); (2) single-nucleus ATAC-seq (Seurat v4.2.0 + Signac 1.10.0 TFIDF/SVD/clustering, gene-activity markers, motifmatchR v1.31.1 with JASPAR 2022, Signac Footprint); (3) Nanostring CosMx spatial transcriptomics of 8 CP samples (AtoMx pipeline software v1.2, Cellpose v2 segmentation, Seurat v5.1.0, SCTransform v0.4.1, harmony, RCTD supervised annotation); (4) TMT-16plex tissue proteomics (Proteome Discoverer v3.0 / Sequest HT vs the UniProt human proteome); (5) Olink Explore 384 CSF proteomics (Explore Calculation Module v3.8.1). Downstream cross-modality targets are voom+limma v3.54 differential expression / abundance / accessibility with age, sex, PMI and library covariates, fgsea v1.25 GO enrichment, cell-type proportion modelling, a template-matching progression analysis (early / late / progressive gene patterns), CellularNeighborhoods v0.0.0.9000 spatial-niche construction, CellChat v1.6.1 intercellular communication inference on both snRNA-seq and per-niche spatial data with a custom rankNet() ranking, cell-cell distance statistics, and quantitative image analysis of IHC / Phenocycler / Movat's pentachrome slides (ImageJ v1.54, QuPath v0.5, GraphPad Prism v10.5.0, pracma v2.4.4). All tissue collection, nuclei isolation, MULTI-seq hashing, 10x library preparation and sequencing, CosMx slide chemistry, mass-spectrometry acquisition, Olink assay, and all immunostaining are wet-lab (OOS).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation list derived from the 'Online Methods' section, whose subsections are: Tissue collection; Nuclei isolation for snRNA-seq; Nuclei hashtag oligonucleotide design and library preparation; Spatial transcriptomics of CP using Nanostring CosMx; TMT-based proteomics of choroid plexus tissue; Olink-based proteomics of cerebrospinal fluid; snRNA-seq; snATAC-seq; Spatial transcriptomics; Differential expression analyses; Enrichment analysis; Proportion analysis; Pattern matching in snRNA-seq; Nearest Neighbor analysis; CellChat; Cell-cell distance-based analysis; Immunohistochemistry; Multiplex immunohistochemical staining using Akoya Phenocycler fusion (PCF); Phenocycler Fusion Image Analysis; Movat's Pentachrome staining and analysis. Wet-bench subsections were scope-split to W. The stated code repository (https://github.com/Tristan-J-Philippe/Multi-omic_Choroid-Plexus_Alzheimers-Disease) was read at LANDING-PAGE + README-PROSE level only, per stage-1 rules: it contains a top-level README.md, a 'Supplementary Tables' directory of result spreadsheets, and an 'R code' directory holding 29 numbered R scripts (010/011 load-preprocess, 020-023 cell-type annotation for RNA/ATAC/ST, 030-038 limma/pattern/fgsea and differential analyses, 040/041 CellChat RNA, 050-053 plots, 060/061 spatial proximity, 070-073 spatial neighborhood, 080/081 spatial CellChat) with a second README.md mapping script numbers to analysis stages. Script-to-step mapping used for the code axis is taken from those two README prose listings and the file names only; no R source was read. Repository has 0 releases and 0 tags (GitHub API, 2026-07-28), so no immutable snapshot of the analysis code is citable.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "BCL to FASTQ conversion: 'We ran bcl2fastq, followed by CellRanger v7.0.1'. No bcl2fastq version, no sample sheet, no command-line options, and no lane/index configuration are stated; no script for this step appears in the repository's README listing (which begins at '010 Load_preprocess_util.R - Load, preprocess, and QC individual snRNA/ATAC-seq data samples').",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-command-line-stated",
+        "upstream-of-deposited-code",
+        "raw-bcl-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "CellRanger v7.0.1 generation of RNA, ATAC and hash count matrices 'using the GRCh38 genome'. Version of CellRanger is exactly pinned; the GRCh38 reference package (10x refdata release, Ensembl/GENCODE annotation version) is not identified, and no cellranger count / cellranger-arc command line or expected-cells / force-cells setting is given.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "reference-genome-release-unpinned",
+        "no-command-line-stated",
+        "upstream-of-deposited-code"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "snRNA-seq droplet QC in R Seurat v4.2.0: 'we excluded droplets with >12,000 or <500 features and <500 counts'; mitochondrial content >5% retained only in the epithelial cluster. Corresponds to repository scripts '010 Load_preprocess_util.R' and '011 Load_preprocess_SN_RNA_ATAC.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "no-r-version-stated",
+        "thresholds-fully-stated",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Ambient RNA correction with SoupX v1.6.2 using autoEstCont (tfidMin=0.7-0.9) 'to ensure at least 100 genes were used for estimation'. Covered by repository scripts 010/011.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "params-stated-as-range",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Hashtag demultiplexing of MULTI-seq-barcoded nuclei with Seurat HTOdemux, 'which also flagged hash doublets'. No positive.quantile, kfunc, or normalization (CLR margin) setting is stated; the 16 sample barcode sequences ARE listed verbatim in the Methods.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "no-demux-settings-stated",
+        "barcodes-listed-verbatim",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "snRNA-seq normalization/scaling on top 3k variable features plus curated markers, PCA (top 30 embeddings), Harmony v0.1.0 integration by sequencing library, UMAP, Louvain clustering (res=0.03-0.7), and marker identification by bimodal Wilcoxon rank-sum test (log2FC>0.25, p<0.05); semi-supervised doublet/mixed-signature removal using markers in Extended Data Table 30; iterative unsupervised reprocessing. Repository scripts '020 Cell_type_annotation_util.R' and '021 Cell_type_annotation_RNA.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "resolution-given-as-range-not-per-cluster",
+        "no-seed-stated",
+        "manual-curation-step",
+        "stochastic-distributional-only"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "snATAC-seq processing with Seurat v4.2.0 and Signac 1.10.0: exclusion of droplets with total fragments <100 or >5,000, blacklist ratio >0.1, nucleosome signal >4, TSS enrichment <3; HTODemux demultiplexing; RunTFIDF normalization, RunSVD, top 30 components for UMAP and clustering; pseudo-expression 'activity' matrix with bimodal Wilcoxon rank-sum marker test (log2FC>0.25, p<0.05). Repository script '022 Cell_type_annotation_ATAC.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "thresholds-fully-stated",
+        "blacklist-region-set-unidentified",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Chromatin feature annotation with the UCSC Genome Browser (no assembly release or track version stated), motif analysis with motifmatchR v1.31.1 against JASPAR 2022 at 'default thresholds', and transcription-factor activity with Signac Footprint at 'default settings'. No dedicated motif/footprint script is listed in the repository README (the ATAC scripts listed are 022, 035 annotation-differential, 035/036 cogdx-AD-differential).",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "motif-db-release-pinned-JASPAR2022",
+        "default-settings-only",
+        "ucsc-annotation-unversioned",
+        "no-script-listed-for-this-step"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Spatial transcriptomics preprocessing on the Nanostring AtoMx pipeline (MAN-10162-03; software v1.2) with Cellpose v2 segmentation (non-neuro human tissue, cell dilation 2.17 um, cell diameter 7.28 um, nucleus size 7.2 um, membrane size 5.7 um, model cyto2, flow threshold 0.1, probability threshold 2, min. size 3.6 um), followed by QC and flat-file export. AtoMx is a proprietary vendor cloud pipeline that cannot be redistributed or re-executed outside Nanostring infrastructure; no code for it exists in the repository.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "proprietary-vendor-pipeline",
+        "proprietary-ceiling-NI",
+        "segmentation-params-fully-stated",
+        "cellpose-major-version-only"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Spatial transcriptomics cell QC and normalization in Seurat v5.1.0: exclusion of segmented cells with <100 or >3500 counts, <50 or >2000 features, qcCellsFlagged==T, or area <10 um^2; SCTransform v0.4.1 correction/scaling/normalization; harmony correction for individual and slide effects; semi-supervised removal of segmentation errors; unsupervised annotation on top 2k features. Repository script '023 Cell_type_annotation_ST.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "thresholds-fully-stated",
+        "harmony-version-not-restated-for-ST",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Supervised mapping of spatial transcriptomics cell types with RCTD 'with default parameters, leveraging pseudobulked snRNA-seq expression profiles for each major cell type as reference', applied because unsupervised clustering could not resolve cell types with <6,000 cells. No RCTD / spacexr version is given anywhere in the paper; the tool is cited only by its publication (Cable et al. 2022).",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "default-settings-only",
+        "reference-built-from-internal-data"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "TMT proteomics database search and quantification: 'Raw files were processed in Proteome Discoverer v3.0 using Sequest HT against the UniProt human proteome database for TMT-based quantification, and protein abundances were normalized across channels'. Proteome Discoverer is commercial Thermo software (pinned to v3.0); the UniProt human proteome release/date and the FDR, enzyme, fixed/variable modification and TMT-correction settings are not stated; no raw MS files are deposited in PRIDE, MassIVE or any proteomics repository.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "proprietary-vendor-software",
+        "license-gated",
+        "proprietary-ceiling-NI",
+        "reference-db-release-unpinned",
+        "search-settings-incomplete",
+        "no-proteomics-repository-accession"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Olink Explore 384 CSF proteomics data processing: 'Data processing, QC, and normalization were performed using the Explore Calculation Module v3.8.1, applying intensity normalization on a log2 scale.' Vendor-only closed pipeline (pinned to v3.8.1); no NPX output, no QC-flag handling rule, no LOD policy, and no accession for the CSF NPX matrix are stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "proprietary-vendor-software",
+        "license-gated",
+        "proprietary-ceiling-NI",
+        "npx-matrix-not-accessioned"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Differential gene expression, protein abundance and chromatin accessibility with voom and limma v3.54: models adjusted for age, sex, post-mortem interval and sequencing library; exclusion of genes/proteins with <2 counts per sample or expressed in <1% of cells; removal of accessible regions and gene-activity scores with vst score <1; pseudobulk samples >100,000 counts split by library as technical replicates, samples <60,000 counts excluded; significance FDR<0.01 and |log2FC|>0.5 (relaxed to p<0.05, |log2FC|>0.2 for spatial transcriptomics, snATAC-seq and proteomics); contrasts on cogdx, adnc_ad and last cognitive score. Repository scripts '030 limma_pattern_fgsea_util.R', '032/033' (RNA), '035/036' (ATAC), '037/038' (ST).",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "model-and-thresholds-fully-stated",
+        "no-r-version-stated",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "GSEA-style enrichment with fgsea v1.25 on directionally stratified ranked gene lists against Gene Ontology Biological Process, Molecular Function and Cellular Component; significance NES>0.6 and FDR<0.15 for spatial transcriptomics, snATAC-seq and proteomics. The GO release / annotation database version and the source of the gene-set collection (msigdbr, org.Hs.eg.db, GO.db) are not stated, and no nperm/eps or minSize/maxSize setting is given. Repository script '030 limma_pattern_fgsea_util.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "gene-set-db-release-unpinned",
+        "thresholds-stated",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Visualization of enrichment and differential-expression results using ClueGO v2.5.10, Cytoscape v3.10.2, ComplexHeatmap (no version stated), Seurat (version not restated here) and ggplot2 v3.4.4. ClueGO/Cytoscape is an interactive GUI workflow with no stated kappa score, GO term-fusion, or grouping settings, and no ClueGO session file or Cytoscape network is deposited; repository plotting scripts 050-053 cover Seurat/ggplot2 figures only.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin-partial",
+        "complexheatmap-unversioned",
+        "gui-interactive-step",
+        "cluego-settings-not-stated"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Cell-type proportion analysis: linear modelling with empirical Bayes moderation to assess cell-type proportions as a function of cognitive diagnosis (cogdx), adjusted for parenchymal contamination, age, sex and PMI, with significance at FDR<0.01. No tool is named in this subsection (the framework is the limma v3.54 empirical-Bayes machinery pinned in the adjacent 'Differential expression analyses' subsection). Repository scripts '031 Cell_type_proportion_RNA.R' and '036/037 Cell_type_proportion_ST.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "tool-not-named-in-prose",
+        "version-inferred-from-adjacent-subsection",
+        "covariates-and-threshold-stated",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Template/pattern matching in snRNA-seq to classify disease-progression trajectories: differentially expressed genes (p<0.05, |log2FC|>0.25) from MCI vs NCI, ADd vs MCI and ADd vs NCI contrasts classified as early-stage, late-stage or progressive by which contrasts are significant, then correlated with the corresponding stage template and retained at p<0.05. Algorithm cited to Pavlidis & Noble 2001; no package or version is named, but the implementation is in the repository script '030 limma_pattern_fgsea_util.R' ('limma-Voom analyses, fgsea GO term analyses, and pattern matching analyses').",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "custom-analysis-code-deposited",
+        "tool-not-named-in-prose",
+        "classification-rules-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Spatial nearest-neighbour / niche analysis on 166,607 cells: 'A spatial neighborhood matrix was generated using CellularNeighborhoods v0.0.0.9000 available here: https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/cellular-neighborhoods'. Each cell's neighbourhood expression is the mean expression of a random 10-cell subset of its 25 nearest neighbours by centroid x-y; then normalization/scaling, PCA (50 components), Harmony (50 components; slide batch, individual, AD status), UMAP and k-means (k=3) to yield 3 niches. The cited version string is an unreleased development version and the URL points at a mutable branch ('Main') with no commit SHA. Random 10-cell subsetting and k-means are stochastic; no seed is stated. Repository scripts '070 Spatial_neighborhood_util.R', '071 Spatial_neighborhood.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "dev-version-string-not-resolvable",
+        "mutable-branch-url-no-commit",
+        "third-party-scratch-space-repo",
+        "no-seed-stated",
+        "stochastic-distributional-only"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "CellChat v1.6.1 inference of intercellular communication among major cell types stratified per cognitive diagnosis (NCI, MCI, ADd) 'with default parameters for the snRNA-seq dataset'. Repository scripts '040 CellChat_util_RNA.R', '041 CellChat_Major_RNA.R'. The CellChatDB version/species database release used is not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "cellchatdb-release-unpinned",
+        "default-parameters",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Spatially resolved CellChat per niche on SCTransformed counts with computeCommunProb(contact.range=20 um, interaction.range=250 um, scale.distance=0.69 'empirically determined'), all other parameters default; normalization of interaction weight, net$prob, netP$prob and centrality by the number of interaction-capable cell pairs; merging of per-diagnosis objects for comparative network analysis; a custom rankNet() function ranking pathways with p<0.05 by summed communication probability; netAnalysis_computeCentrality() for incoming+outgoing centrality; filtering of ligand-receptor pairs with |combined log2FC|<0.05, ligand in <5% of sender cells, receptor in <5% of receiver cells or net$p>0.05; pathway-level median log2FC with Wilcoxon signed-rank test on pathways with >=3 interactions plus FDR correction; significance at |median log2FC|>=0.15, FDR<=0.01, |AD-differential net centrality|>0.0001 and matched directionality. Repository scripts '080 Spatial_cellchat_util.R', '081 Spatial_cellchat.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin",
+        "custom-function-code-deposited",
+        "params-fully-stated",
+        "empirically-determined-constant",
+        "cellchatdb-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Cell-cell distance-based analysis: centroid x-y coordinates converted from pixels to microns (x0.18), per-cell distances to the nearest cell type (Mural/Endothelial, Epithelial, Parenchymal) computed, per-individual averages taken across spatial niches or cell subtypes, then a Kruskal-Wallis test and Dunn's test with Benjamini-Hochberg correction. No statistical package is named or versioned for the Kruskal-Wallis / Dunn's implementation (dunn.test, FSA, rstatix are all plausible and give different tie handling). Repository scripts '060 Spatial_proximity_util.R', '061 Spatial_proximity.R'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "stats-package-not-named",
+        "conversion-factor-and-tests-stated",
+        "code-public-no-release-tag"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "CROCC ciliary-rootlet puncta quantification: images imported into ImageJ (v1.54 stated later in the Movat's subsection), split into channels, CROCC channel converted to 8-bit and 'threshold was set to mask only the puncta' (threshold value and method not stated), Analyze Particles run with Size=1.5-25.0 um and Circularity=0.1-1.0, results exported and analysed in GraphPad Prism (v10.5.0). No ImageJ macro or Prism file is deposited; Prism is commercial closed software.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "proprietary-software-GraphPad-Prism",
+        "license-gated",
+        "proprietary-ceiling-NI",
+        "manual-threshold-unspecified",
+        "no-macro-deposited",
+        "imagej-version-stated-elsewhere-only"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "QuPath (v0.5) quantitative image analysis of PhenoImager and Phenocycler Fusion images: Cell Detection with fully stated parameters (requested pixel size 0.5 um; background radius 8 um for TTR, 20 um for CD163/CD3e; median filter radius 0 um; Gaussian sigma 1.5 um; min nucleus area 10-15 um^2; max 400 um^2; intensity threshold 2 or 50; cell expansion 5 um for TTR), followed by use of the QuPath 'Train object classifier' tool to classify TTR+ epithelial cells and CD4+/CD8+ T-cells, plus manual annotation of T-cells as inside or outside Caveolin/Collagen IV+ vessels. The trained classifier objects, the QuPath project, the ROI definitions and the raw qptiff/composite TIF images are not deposited anywhere; a trained interactive classifier cannot be reconstructed from prose.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "trained-classifier-not-deposited",
+        "manual-annotation-step",
+        "images-and-rois-not-deposited",
+        "detection-params-fully-stated",
+        "qupath-minor-version-only"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Movat's Pentachrome collagen quantification: images processed with the Colour Deconvolution Package (https://blog.bham.ac.uk/intellimic/g-landini-software/colour-deconvolution-2/, no plugin version) in ImageJ (v1.54) to extract the yellow channel, converted to 8-bit, exported as image txt files, then processed in R with background subtraction to align batches and exclusion of non-tissue pixels (neither rule quantitatively specified); per-ROI pixel-intensity distributions averaged per individual and per disease group, plotted with ggplot2; AUC at high collagen (cutoff 200) computed with trapz() from pracma v2.4.4 and tested by one-way ANOVA. No script for this analysis appears in the repository README listing.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-version-pin-partial",
+        "imagej-plugin-unversioned",
+        "background-subtraction-rule-unspecified",
+        "no-script-listed-for-this-step",
+        "images-not-deposited"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Tissue collection: human post-mortem choroid plexus from the lateral ventricles of 69 ROSMAP participants; tissue bisected, snap-frozen at -80 C (snRNA-seq, proteomics) or FFPE (immunostaining, spatial transcriptomics); clinical diagnosis, pathologic AD and CAA assessed as previously described; IRB approval and informed consent / Anatomic Gift Act.",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "human-subjects-controlled"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Nuclei isolation for snRNA-seq: 100 mg frozen CP minced, 0.1X lysis buffer (fully specified), 100 um strainer, Dounce homogenization, iodixanol gradient (37/29/25%), 40 um filtration, Trypan blue QC and counting; all steps at 4 C.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "protocol-fully-specified"
+      ]
+    },
+    {
+      "step_id": "W3",
+      "label": "Nuclei hashtag oligonucleotide design, MULTI-seq-based barcoding, 10x Genomics 3' v3.1 (CG000317 Rev C) and multiome (CG000338) library preparation, hashtag library index PCR and SPRI cleanups, and NovaSeq 6000 sequencing to ~50k RNA reads/cell and ~15k hash reads/cell.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "oligo-sequences-listed-verbatim"
+      ]
+    },
+    {
+      "step_id": "W4",
+      "label": "Nanostring CosMx spatial transcriptomics slide chemistry and instrument run on 8 CP samples (4 NCI, 4 AD): 5 um FFPE sections, antigen retrieval, Proteinase K permeabilization, 18 h probe hybridization, Cell Segmentation Mix 1 (CD298/B2M), Marker Mix 1 (PanCK/CD45), Marker Mix 2 (CD68), instrument manual MAN-10161-03-2 software v1.2, configuration B pre-bleach / configuration A segmentation, whole-tissue FOV selection.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "instrument-software-version-stated"
+      ]
+    },
+    {
+      "step_id": "W5",
+      "label": "TMT-based proteomics sample preparation and LC-MS/MS acquisition on 16 CP samples: urea lysis, DTT reduction, iodoacetamide alkylation, overnight trypsin digestion, TMTpro 16-plex labelling, high-pH reversed-phase fractionation, Orbitrap Lumos with 3000 RSLC nano-UPLC, 26-min gradient, 1.7 um C18, MS1 120,000 resolution, 3 s cycle, HCD 35%, MS2 50,000 resolution, 125k AGC, 86 ms max injection, 20 s dynamic exclusion.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "acquisition-params-fully-stated"
+      ]
+    },
+    {
+      "step_id": "W6",
+      "label": "Olink Explore 384 assay on 24 CSF samples across Cardiometabolic, Cardiometabolic II, Inflammation, Inflammation II, Neurology, Neurology II, Oncology and Oncology II panels.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "commercial-assay-panels-listed"
+      ]
+    },
+    {
+      "step_id": "W7",
+      "label": "Immunohistochemistry on FFPE CP sections with a Bond-Rx stainer and Akoya Opal 6-plex kit: CD45/Opal 620, DCN/Opal 570, TTR/Opal 690, PECAM/Opal 520, ACTA2/Opal 480 with stated dilutions and citrate pH 6.0 retrieval cycles; CROCC/TTR co-stain with pH 9.0 EDTA HIER, Alexa Fluor 647 and TSA Fluorescein; Trueblack quenching, spectral DAPI; PhenoImager 40X imaging, ROI selection in Phenochart 2.2.0, spectral unmixing in inForm.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "antibody-dilutions-stated",
+        "unmixing-software-unversioned"
+      ]
+    },
+    {
+      "step_id": "W8",
+      "label": "Multiplex immunohistochemical staining using the Akoya Phenocycler Fusion 2.0 workflow: overnight 60 C bake, dewax, pressure-cooker AR9 retrieval 20 min, 3 h room-temperature stain, wash and post-fixation, 20X imaging on the Phenocycler Fusion 2.0, qptiff export.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "antibody-panel-not-listed-in-methods-prose"
+      ]
+    },
+    {
+      "step_id": "W9",
+      "label": "Movat's Pentachrome staining: FFPE CP sections stained with the Abcam ab245884 kit per manufacturer's instructions in two batches, imaged on the Phenocycler imaging system at 40X, 4-10 ROIs (928 um x 697 um) per case selected in Akoya Phenochart 2.2.0, RGB TIFs exported with inForm.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope",
+        "batch-effect-acknowledged",
+        "roi-dimensions-stated"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 17,
+    "n_NI": 8,
+    "n_X": 0,
+    "S": 25,
+    "W": 9,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/25 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "17/25 (68%). This paper is unusually well pinned at the individual-tool level: the Online Methods give exact versions for CellRanger v7.0.1, Seurat v4.2.0 and v5.1.0, SoupX v1.6.2, Harmony v0.1.0, Signac 1.10.0, motifmatchR v1.31.1, SCTransform v0.4.1, limma v3.54, fgsea v1.25, ClueGO v2.5.10, Cytoscape v3.10.2, ggplot2 v3.4.4, CellChat v1.6.1, pracma v2.4.4, Proteome Discoverer v3.0, Olink Explore Calculation Module v3.8.1, AtoMx v1.2, ImageJ v1.54, QuPath v0.5, GraphPad Prism v10.5.0 and Phenochart 2.2.0, and a public GitHub repository holds 29 numbered R scripts that map cleanly onto the analysis subsections. But there is NO environment closure anywhere: no R version, no Bioconductor release, no CRAN snapshot date, no renv.lock, no conda environment.yml, no Dockerfile and no sessionInfo appear in the paper or in either README. Under the symmetric env-closure gate that is exactly exact_pins_partial, so every step caps at version=1 and no step is R-star-eligible from prose. The 8 NI steps fail for four distinct reasons: bcl2fastq and RCTD are named with no version at all (C1, C11); the Kruskal-Wallis/Dunn implementation is not named (C22); AtoMx, Proteome Discoverer, the Olink Calculation Module and GraphPad Prism are closed vendor software that hits the proprietary ceiling (C9, C12, C13, C23); and the QuPath trained object classifier plus the manual infiltrating/non-infiltrating T-cell annotation are undeposited custom artifacts that cannot be reconstructed from prose (C24). Even a perfect stage-2 code read cannot lift this paper above RI unless an environment lock is added, which is why it is not a stage2 candidate.",
+    "coverage": "25 computational steps and 9 wet-lab (OOS) steps from Online Methods prose; computational coverage 25/34 (74%). Data availability is verbatim: 'All snRNA-seq, snATAC-seq and spatial transcriptomic data are available at Synapse under accession code syn2580853. ROS/MAP data can be requested by qualified investigators (www.radc.rush.edu).' syn2580853 resolves (Synapse REST 200) but is the AD Knowledge Portal backend PROJECT root created 2014-08-07, not a study-specific dataset or folder, so no sample-to-file correspondence for this study can be established from the paper; every data axis is therefore 1, not 2. No GEO, SRA, ENA, dbGaP, EGA, PRIDE or MassIVE accession appears anywhere; the TMT proteomics raw files, the Olink NPX matrix, and all IHC / Phenocycler / Movat image data have no deposition statement at all. Code availability is verbatim: 'Code for analysis is available at GitHub (https://github.com/Tristan-J-Philippe/Multi-omic_Choroid-Plexus_Alzheimers-Disease).' That repository is live (HTTP 200), public, 10 commits, last pushed 2026-04-09, 0 releases, 0 tags, no license.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "All 25 computational steps; the paper as a whole and both README files in the code repository",
+      "missing": "No environment closure of any kind. Individual package versions are pinned in prose (CellRanger v7.0.1, Seurat v4.2.0/v5.1.0, SoupX v1.6.2, Harmony v0.1.0, Signac 1.10.0, motifmatchR v1.31.1, SCTransform v0.4.1, limma v3.54, fgsea v1.25, CellChat v1.6.1, ggplot2 v3.4.4, pracma v2.4.4 and others), but the R interpreter version is never stated, no Bioconductor release or CRAN snapshot date is given, and the repository contains no renv.lock, no DESCRIPTION, no conda environment.yml, no requirements file, no Dockerfile and no container digest. No sessionInfo() output is provided anywhere. This is the textbook exact_pins_partial pattern: enough to know what was intended, not enough to rebuild it.",
+      "how_to_close": "Add renv.lock (or a conda/pixi lock) plus the R version and Bioconductor release to the repository root, or ship a container image with a recorded digest; a single sessionInfo() dump committed alongside the scripts would already move the version axis from 1 toward closure."
+    },
+    {
+      "type": 1,
+      "where": "Data availability statement; every computational step that consumes primary data (C1-C25)",
+      "missing": "The stated accession syn2580853 resolves to 'AD Knowledge Portal - backend', a Synapse PROJECT container created 2014-08-07 that holds the whole portal, not a study-specific dataset, folder or fileview for this paper. No per-sample manifest, no file list, and no mapping from the 69 snRNA-seq participants / 8 CosMx samples / 16 TMT samples / 24 CSF samples to deposited files is given. A qualified investigator holding an AD Knowledge Portal data-use certificate still cannot determine which files belong to this study.",
+      "how_to_close": "Cite a study-specific Synapse folder or fileview synID (or an AD Knowledge Portal study DOI) and include a sample-to-file manifest as supplementary material, keyed to the participant identifiers used in Extended Data Table 1."
+    },
+    {
+      "type": 12,
+      "where": "TMT proteomics (C12, W5), Olink CSF proteomics (C13, W6), and all imaging modalities (C23, C24, C25, W7-W9)",
+      "missing": "The data availability statement covers only 'snRNA-seq, snATAC-seq and spatial transcriptomic data'. There is no PRIDE, MassIVE, jPOST or ProteomeXchange accession for the TMT raw files or the Proteome Discoverer output, no accession or deposited NPX matrix for the Olink Explore 384 CSF data, and no image repository (BioImage Archive, IDR, Zenodo) deposit for the PhenoImager composite TIFs, the Phenocycler qptiff files, the Movat's RGB TIFs, or the ROI definitions. Three of the paper's five modalities therefore have no deposition path other than the generic 'ROS/MAP data can be requested' sentence.",
+      "how_to_close": "Deposit the TMT raw and search-result files in ProteomeXchange/PRIDE, the Olink NPX matrix as supplementary data or in Synapse, and the imaging data plus ROI definitions in an image archive; cite each accession explicitly in the data availability statement."
+    },
+    {
+      "type": 11,
+      "where": "C9 (Nanostring AtoMx v1.2), C12 (Thermo Proteome Discoverer v3.0 + Sequest HT), C13 (Olink Explore Calculation Module v3.8.1), C23 (GraphPad Prism v10.5.0), and partially C16 (ClueGO/Cytoscape GUI workflow) and C24 (QuPath interactive classifier)",
+      "missing": "Four analysis steps run entirely inside closed vendor software that cannot be redistributed, scripted from the paper, or re-executed without the corresponding commercial licence and, for AtoMx, without Nanostring cloud infrastructure. These steps are version-pinned (license-gated) but hit the proprietary ceiling of NI regardless of how well the remaining axes score.",
+      "how_to_close": "Where possible, export and deposit the vendor-pipeline outputs at the earliest open format (AtoMx flat-file export, Proteome Discoverer PSM/protein tables, Olink NPX matrix, Prism-input CSVs) so that the open-source portion of each analysis is independently re-runnable, and state the full vendor parameter set for the closed portion."
+    },
+    {
+      "type": 5,
+      "where": "C24 (QuPath v0.5 trained object classifiers for TTR+ epithelial cells and CD4+/CD8+ T-cells; manual infiltrating vs non-infiltrating T-cell annotation), C23 (ImageJ CROCC thresholding), C16 (ClueGO/Cytoscape session)",
+      "missing": "The QuPath 'Train object classifier' models are interactively trained artifacts whose behaviour depends on the training annotations; neither the classifier JSON, the QuPath project, the ROI definitions, nor the training annotations are deposited. The CROCC puncta threshold is described only as 'threshold was set to mask only the puncta' with no value or auto-threshold method. The ClueGO network settings (kappa score, term fusion, grouping) are not stated and no session file is shipped. None of these appear in the repository, whose script listing stops at spatial CellChat.",
+      "how_to_close": "Export and deposit the QuPath classifiers, project and ROI geometries, publish the ImageJ macro with the explicit threshold value or auto-threshold method name, and ship the ClueGO/Cytoscape session file."
+    },
+    {
+      "type": 13,
+      "where": "C2 (GRCh38 reference for CellRanger), C7 (ATAC blacklist region set), C8 (UCSC Genome Browser annotation), C12 (UniProt human proteome), C15 (Gene Ontology BP/MF/CC gene sets), C20/C21 (CellChatDB)",
+      "missing": "Every external reference resource is named but not pinned to a release. 'the GRCh38 genome' does not identify a 10x refdata package or GENCODE/Ensembl annotation version; the ENCODE blacklist version behind 'blacklist ratio >0.1' is not stated; 'the UCSC Genome Browser' has no track or assembly release; 'the UniProt human proteome database' has no release date or proteome ID; the GO gene sets have no release version and no source package (msigdbr / org.Hs.eg.db / GO.db) is named; and the CellChat ligand-receptor database release is not stated. Every one of these changes results across releases. JASPAR 2022 (C8) is the sole reference resource that IS pinned.",
+      "how_to_close": "State the exact release for each reference resource (10x refdata-gex-GRCh38-YYYY-A, ENCODE blacklist version, UniProt release YYYY_MM with proteome ID, GO/msigdbr release, CellChatDB version) and, better, fetch each one inside the analysis code from a versioned URL or accession so that stage-2 class-A verification becomes possible."
+    },
+    {
+      "type": 4,
+      "where": "C6 (Louvain clustering, UMAP), C10 (ST clustering), C19 (random 10-cell subset of 25 nearest neighbours, PCA, Harmony, k-means k=3), C11 (RCTD)",
+      "missing": "No random seed is reported for any stochastic step. C19 explicitly draws 'a random 10-cell subset of its 25 nearest neighbours' for every one of 166,607 cells and then runs k-means, so the three spatial niches that carry much of the paper's spatial argument are not exactly reproducible without a seed. UMAP and Louvain clustering in C6/C10 have the same issue, compounded by the clustering resolution being given only as a range (res=0.03-0.7) rather than per cell-type-level.",
+      "how_to_close": "Report the seeds actually consumed (or set.seed() calls in the deposited scripts) and record the exact resolution used for each clustering round rather than the range explored."
+    },
+    {
+      "type": 6,
+      "where": "C19 (CellularNeighborhoods v0.0.0.9000)",
+      "missing": "The neighbourhood construction is externalized to third-party code cited as 'CellularNeighborhoods v0.0.0.9000 available here: https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/cellular-neighborhoods'. The version string is an unreleased development marker (x.y.z.9000 convention) that maps to no tag, and the URL points at the mutable 'Main' branch of a vendor 'scratch space' repository with no commit SHA. The state of that directory today is not necessarily the state the authors used.",
+      "how_to_close": "Cite the commit SHA (or vendor a copy of the neighbourhood code into the study repository) so that the exact implementation is recoverable."
+    },
+    {
+      "type": 3,
+      "where": "Code availability: https://github.com/Tristan-J-Philippe/Multi-omic_Choroid-Plexus_Alzheimers-Disease",
+      "missing": "The repository is live and public but has 0 releases, 0 tags and no archival DOI (no Zenodo, no Software Heritage snapshot cited), and no license file. It was last pushed 2026-04-09, i.e. after the v2 preprint date, so the code that produced the published figures is not identifiable by any immutable reference. There is also no license, which formally leaves reuse rights undefined.",
+      "how_to_close": "Tag a release matching the manuscript version, mint a Zenodo DOI for it, cite that DOI in the Code availability statement, and add a license file."
+    },
+    {
+      "type": 12,
+      "where": "Repository README.md (root) and 'R code/README.md'; steps C1, C8, C16, C23, C25",
+      "missing": "Neither README gives any run instructions: no entry point, no execution order beyond the numeric file prefixes, no statement of expected input file locations or formats, no description of how to obtain the Synapse inputs, and no expected outputs. The root README is three sentences. Several analyses described in the Methods have no corresponding script in the listing at all: bcl2fastq/CellRanger invocation (C1, C2), motif and footprint analysis (C8), the ClueGO/Cytoscape enrichment visualisation (C16), the CROCC puncta ImageJ analysis (C23), and the Movat's pentachrome colour-deconvolution and AUC pipeline (C25). The README also lists files ('034 Cell_type_proportion_ATAC.R', '037 Cell_type_proportion_ST.R', '039 cogdx_AD_differential_ST.R') under numbers that do not match the committed file names ('035 Cell_type_annotation_differential_ATAC.R', '035 cogdx_AD_differential_ATAC.R', '036 Cell_type_proportion_ST.R', '038 cogdx_AD_differential_ST.R'), and two committed files share the prefix '035'.",
+      "how_to_close": "Add a run-order section with concrete commands, document input paths and the Synapse download procedure, reconcile the README numbering with the committed filenames, and add the missing image-analysis, motif-analysis and upstream-processing scripts."
+    },
+    {
+      "type": 10,
+      "where": "W1-W9 (tissue collection, nuclei isolation, hashing and library prep, CosMx slide chemistry, TMT sample prep and LC-MS/MS acquisition, Olink assay, Opal 6-plex IHC, Phenocycler staining, Movat's staining)",
+      "missing": "Nine wet-lab steps are out of scope for computational reproducibility (NASEM 2019 definition) and are excluded from the |S| denominator. Documentation quality of these steps is high (buffer compositions, oligo sequences, antibody dilutions, MS acquisition parameters and kit catalogue numbers are all given verbatim); the only gap noted is that the Phenocycler Fusion antibody panel (W8) is not enumerated in the Methods prose.",
+      "how_to_close": "Not applicable to computational reproducibility; listing the Phenocycler antibody panel with clone and barcode identifiers would complete the wet-lab record."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/Tristan-J-Philippe/Multi-omic_Choroid-Plexus_Alzheimers-Disease - stated verbatim in the 'Code availability' section: 'Code for analysis is available at GitHub (https://github.com/Tristan-J-Philippe/Multi-omic_Choroid-Plexus_Alzheimers-Disease).' Public, not archived, created 2025-11-07T21:54:59Z, last pushed 2026-04-09T17:41:55Z, default branch 'main', 10 commits, 0 releases, 0 tags, license: null. Top level: README.md, 'R code/' (29 numbered .R scripts + a second README.md + two CSV lookup files), 'Supplementary Tables/' (CellChat and CellType result CSV/XLSX files). Root README.md verbatim in full: '# A Multi-omic Atlas of Human Choroid- Plexus in Alzheimer's Disease // #For complete snRNA-seq (RNA), snATAC-seq (ATAC), and spatial transcriptomics (ST) analysis pipelines go to R code // #For in depth statistical analysis results go to Supplementary Tables'. No renv.lock, no DESCRIPTION, no environment.yml, no requirements.txt, no Dockerfile, no sessionInfo, no LICENSE.",
+      "http_status": "200 OK (landing page); GitHub REST API repos/... 200, releases 200 with length 0, tags 200 with length 0",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to github.com plus authenticated gh api calls to api.github.com (metadata, releases, tags, git tree, contents of both README.md files). Landing page and README prose only, per stage-1 rules; no R source file was read."
+    },
+    {
+      "artifact": "data accession: Synapse syn2580853 - stated verbatim in 'Data availability': 'All snRNA-seq, snATAC-seq and spatial transcriptomic data are available at Synapse under accession code syn2580853.' The Synapse REST entity endpoint returns {\"name\":\"AD Knowledge Portal - backend\",\"id\":\"syn2580853\",\"createdOn\":\"2014-08-07T20:23:56.482Z\",\"modifiedOn\":\"2026-07-02T16:22:02.703Z\",\"parentId\":\"syn4489\",\"concreteType\":\"org.sagebionetworks.repo.model.Project\"} - i.e. a portal-wide Project container predating this study by eleven years, not a study-specific dataset. Controlled access via the AD Knowledge Portal data-use certificate.",
+      "http_status": "200 OK (https://www.synapse.org/Synapse:syn2580853) and 200 OK (https://repo-prod.prod.sagebase.org/repo/v1/entity/syn2580853)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to synapse.org web entity page and to the Sage Bionetworks repo REST API; entity JSON retrieved without login"
+    },
+    {
+      "artifact": "controlled-access request route: https://www.radc.rush.edu - stated verbatim in 'Data availability': 'ROS/MAP data can be requested by qualified investigators (www.radc.rush.edu).' This is the Rush Alzheimer's Disease Center data-request portal, the documented DAC path for ROSMAP.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to www.radc.rush.edu"
+    },
+    {
+      "artifact": "third-party analysis code: https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/cellular-neighborhoods - stated verbatim in 'Nearest Neighbor analysis': 'A spatial neighborhood matrix was generated using CellularNeighborhoods v0.0.0.9000 available here: https://github.com/Nanostring-Biostats/CosMx-Analysis-Scratch-Space/tree/Main/_code/cellular-neighborhoods'. Mutable branch URL ('Main'), no commit SHA, no release; the cited version string v0.0.0.9000 is an unreleased development marker.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to github.com; HTTP status and existence check only"
+    },
+    {
+      "artifact": "third-party ImageJ plugin: https://blog.bham.ac.uk/intellimic/g-landini-software/colour-deconvolution-2/ - stated verbatim in 'Movat's Pentachrome staining and analysis': 'Images were processed using the Colour Deconvolution Package (https://blog.bham.ac.uk/intellimic/g-landini-software/colour-deconvolution-2/) in ImageJ (v1.54)'. No plugin version is given.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to blog.bham.ac.uk"
+    },
+    {
+      "artifact": "proteomics repository accession (PRIDE / MassIVE / ProteomeXchange / jPOST): NONE STATED. The TMT-16plex tissue proteomics raw files and the Proteome Discoverer v3.0 output are not deposited anywhere according to the paper.",
+      "http_status": "n/a (no accession stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a - determined from the paper text ('Data availability' section and 'TMT-based proteomics of choroid plexus tissue' subsection)"
+    },
+    {
+      "artifact": "sequence-repository accessions (GEO / SRA / ENA / ArrayExpress / dbGaP / EGA): NONE STATED. The paper routes all snRNA-seq, snATAC-seq and spatial transcriptomic data through Synapse syn2580853 and ROSMAP request only; no GEO series, SRA BioProject or dbGaP study identifier appears anywhere in the article.",
+      "http_status": "n/a (no accession stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a - determined from the full JATS XML retrieved from biorxiv.org (grep for GSE/SRP/PRJ/phs/EGA patterns returned nothing)"
+    },
+    {
+      "artifact": "imaging data (PhenoImager composite TIFs, Phenocycler qptiff files, Movat's RGB TIFs, QuPath projects and ROI definitions) and Olink CSF NPX matrix: NONE DEPOSITED. No repository, accession or supplementary file is named for any of these.",
+      "http_status": "n/a (no accession stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a - determined from the paper text ('Data availability' and the four image-analysis Methods subsections)"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/12/17/2025.11.23.690014.source.xml (JATS XML, 160,626 bytes). Title match confirmed by grep for 'A Multi-omic Atlas of Human Choroid Plexus in Alzheimer' before scoring.",
+      "http_status": "200 OK via curl with a browser User-Agent (WebFetch on the same URL returned 403 Forbidden)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with Mozilla/5.0 User-Agent to www.biorxiv.org; fetched into the per-paper scratch directory /tmp/stage1_10.1101_2025.11.23.690014/paper.xml"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "eaf2c88398cc25ce41ee11294f70b1274fe174e9a7c6fa5a043cc6a03e6a33a0",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

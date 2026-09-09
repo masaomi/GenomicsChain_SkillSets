@@ -1,0 +1,320 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "115b7186c9ec720d9ad1c2c7dd60e74350c67f83ebc4ba4af345cefea5becdee",
+  "canonical_id": {
+    "value": "10.64898/2025.11.29.691288",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.11.29.691288v1",
+      "biorxiv:2025.11.29.691288v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "GALA (Genetic Algorithm-guided Large Deformation Alignment), a landmark-free spatial-transcriptomics alignment framework, plus the benchmark that supports the paper's three headline claims (accuracy, computational efficiency, biological interpretability). Computational target: (i) per-dataset preprocessing/QC of seven public ST datasets (DLPFC Visium Sample C, 10x mouse brain sagittal-posterior sections 1 and 2, Vizgen MERFISH mouse liver L2S1/L2S2, 10x Visium adult mouse brain coronal, 10x Xenium fresh-frozen mouse brain replicate 2, Xenium human lung cancer FFPE experiment 1, Xenium human breast cancer FFPE replicate 1); (ii) modality-aware rasterisation of transcriptomic and H&E channels onto a shared grid (Gaussian kernel sigma = 2*dx, dx ~ 1 unit for spot-level and 30 um for cell-level, Sobel gradient-magnitude greyscale for histology, extra total-expression channel); (iii) informative-gene selection by the GPSA R-squared / kNN-regression strategy with p = 3; (iv) global affine estimation by a genetic algorithm (PyGAD, ref. 27); (v) local EM-like LDDMM refinement jointly updating the diffeomorphic velocity field v_t and the matching probability field P_M, with alpha = 0.5 when histology is present and alpha = 1 otherwise, two global-local episodes by default; (vi) evaluation by label-consistency accuracy on mutual nearest neighbours, joint-GMM clustering with ARI/NMI, spatial cross-correlation, pseudo-spot cosine similarity, and landmark MAE for transcriptomics-to-histology; (vii) benchmarking against PASTE, PASTE2, STAligner, GPSA, SLAT, ST-GEARS and STalign; (viii) runtime/memory efficiency comparison. There is no wet-lab component: all data are pre-existing public datasets, so W = 0 and no step is OOS.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS source XML. WebFetch of the .source.xml returned HTTP 403; a direct curl with a browser User-Agent into the isolated directory /tmp/stage1_10.64898_2025.11.29.691288/paper.xml returned HTTP 200 / 129,031 bytes. Paper identity was verified BEFORE scoring by grepping the fetched XML for the title token 'Landmark-Free Framework' (present) and 'GALA' (6 hits); no swapped fetch occurred. Sections read: Abstract, 4 Methods (4.1 Data preprocessing and rasterisation, 4.2 Alignment objective and optimisation, 4.3 Selection of informative genes and hyper-parameters, 4.4 Evaluation metrics, 4.5 Implementation techniques for all alignment scenarios), 5 Data Availability, 6 Code Availability. Stage-1 permits the repo LANDING page and README PROSE: https://github.com/TaoDing2/GALA README was read (raw.githubusercontent.com/TaoDing2/GALA/main/README.md, HTTP 200) and the GitHub API was queried for repository metadata only (top-level file list, releases, tags, license) - pyproject.toml itself was NOT opened, that is Stage 2. Version scoring: the PAPER PROSE contains no software version pin of any kind (a grep for 'v[0-9]+.[0-9]+', 'version [0-9]', 'python', 'pytorch', 'conda', 'docker' over the de-tagged text returns exactly one 'python' - inside reference [27], the PyGAD citation - and one 'GPU', in a runtime sentence). All version evidence comes from the README: 'conda create -n gala_env python=3.12.9' (exact interpreter pin), 'PyTorch 2.6+ with CUDA 12.4' (floating lower bound), 'Other dependencies are listed in pyproject.toml'. That is exact pins WITHOUT environment closure - no channel/index, no platform declaration, no lockfile - so version = 1 with version_subtier exact_pins_partial for every GALA step, and version = 0 for the two benchmark steps where not even a floating pin exists for the seven baseline tools. Repository state at assessment: live, default branch main, pushed_at 2026-03-05, ZERO releases and ZERO tags, no LICENSE file (despite the paper's claim 'under an open-source licence'), top-level entries .DS_Store / GALA / GALA.egg-info / README.md / dist / overview.jpg / pyproject.toml / tutorials, and six scenario notebooks tutorial1-tutorial6.ipynb. Code axis = 2 for the GALA steps because the paper additionally cites a frozen Zenodo deposit ('the Zenodo repository contains scripts and processed data necessary to replicate all experiments and figures reported in this study'); the immutability of a Zenodo record is what carries 'exact' here, NOT the untagged GitHub URL.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Per-dataset preprocessing and quality control of the seven public ST datasets - 'preprocessed according to quantitative quality-control criteria, including standard procedures such as cell filtering, gene selection, and log-transformation. Detailed preprocessing steps for each dataset are provided in the accompanying GALA code package.' No filtering threshold, no minimum counts/genes, no normalisation target sum and no log base appear in the prose; every numeric criterion is deferred to the released code and to the Zenodo preprocessed objects",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Modality-aware rasterisation onto a shared grid: transcriptomic tensor I_st via Gaussian smoothing of expression over spatial anchors with sigma = 2*dx by default, dx approximately 1 unit for spot-level data and dx = 30 um for cell-level data, plus an extra channel holding total expression across all genes (I_st in R^((p+1) x H x W)); histology rasterised on the same grid by RGB-to-greyscale conversion, gradient-magnitude enhancement (Sobel operator) and Gaussian smoothing to I_histo in R^(1 x H x W), with a channel-wise RGB alternative noted but not used by default",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Informative-gene selection by the R-squared strategy adopted from GPSA: a k-nearest-neighbour regression predicts each gene's expression from the spatial coordinates of neighbouring spots/cells, genes are ranked by coefficient of determination on the SOURCE data, and the top p are retained with p = 3 as the stated default. The neighbourhood size k of the kNN regressor is never given, nor is the regression implementation or any distance metric",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Global (coarse) stage: population-based genetic-algorithm search for the affine matrix A (rotation, translation, scaling, reflection) and for the source-target overlap region, implemented with PyGAD (reference 27, Gad 2024). No PyGAD version, no population size, no generation count, no crossover/mutation operator or rate, no fitness-evaluation budget and NO RANDOM SEED are reported anywhere in the paper; the prose points to 'default parameter settings (Supplementary Tab. S1)' and to Supplementary Notes S1.3",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Local (fine) stage: EM-like LDDMM refinement jointly updating the time-varying velocity field v_t (diffeomorphic mapping phi_v) and the two-class Matching / Non-Matching posterior P_M under a Gaussian mixture with covariances Sigma_M, Sigma_N and non-matching mean mu_N estimated iteratively, plus an RKHS regularisation on v_t. alpha = 0.5 when histology is available and alpha = 1 otherwise; 'only two global-local episodes suffice to achieve stable alignment across most datasets'. The remaining hyper-parameters (sigma_M, sigma_N, sigma_R, RKHS kernel width, time discretisation of t in [0,1], per-episode iteration counts, convergence tolerance, prior pi_M initialisation) are stated only as 'default parameter settings (Supplementary Tab. S1)' and are absent from the main text",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Evaluation-metric computation: label-consistency accuracy over mutual-nearest-neighbour pairs between aligned slices; biological coherence via a joint Gaussian mixture model fitted to combined spatial and expression features of source plus target, compared to ground-truth labels with ARI and NMI; spatial cross-correlation with a Gaussian-kernel inter-spot weight matrix for annotation-free spot data; pseudo-spot aggregation followed by cosine similarity for cell-level data (following STalign); and mean absolute error of annotated landmark coordinates for transcriptomics-to-histology. Unstated: the GMM component count and initialisation (stochastic, no seed), the Gaussian kernel bandwidth of the cross-correlation weight matrix, the pseudo-spot neighbourhood size, and the provenance of the annotated landmarks used for MAE",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Baseline benchmarking against PASTE, PASTE2, STAligner, GPSA, SLAT, ST-GEARS and STalign across the spot-to-spot, cell-to-cell, cell-to-spot, cross-modality and partial-overlap scenarios. The seven baselines are cited only by literature reference (13, 24, 17, 18, 22, 19, 12); the paper gives NO repository URL, NO version or commit, and NO parameter setting for any of them, and does not state whether defaults were used. Whether the released Zenodo scripts cover the baseline runs is not asserted - the availability statement claims scripts to 'replicate all experiments and figures' generically",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Computational-efficiency benchmarking, one of the paper's three headline claims: reported runtimes include 'an average runtime of 74.16 seconds compared with STalign's 512.06 seconds' on the human breast cancer dataset, 'all under 30 seconds' for some baselines, alignment of 'hundreds of thousands of cells in under a minute', and a 500 GB memory failure for competitors on the MERFISH mouse liver data. The only hardware statement in the entire paper is the phrase 'GPU acceleration'. No CPU model, no GPU model, no core count, no RAM, no CUDA/driver version, no thread setting, no number of repeat timings and no variance are reported, for GALA or for any baseline",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "env-hardcoded",
+        "workflow-ref-unpinned"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 8,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/8 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "6/8 (75%) RI, 2/8 NI. This is an unusually well-provisioned tool paper: every input dataset is public (Lieber Institute DLPFC plus a Zenodo mirror, four 10x Genomics dataset pages, one Vizgen page), the implementation is public (https://github.com/TaoDing2/GALA, live, with six scenario tutorial notebooks), and a frozen Zenodo deposit (https://doi.org/10.5281/zenodo.17576488) is claimed to hold 'scripts and processed data necessary to replicate all experiments and figures'. Six of eight steps therefore reach the Stage-1 ceiling RI. What blocks R-star is entirely the version axis, and it is blocked for a structural reason rather than an accidental one: the paper prose contains ZERO software version pins (a de-tagged full-text grep for version strings, 'pytorch', 'conda' and 'docker' returns nothing; the single 'python' hit is inside the PyGAD citation), so all version evidence lives in the README - 'conda create -n gala_env python=3.12.9' plus 'PyTorch 2.6+ with CUDA 12.4' plus a pointer to pyproject.toml. That is an exact interpreter pin and a floating framework lower bound with no channel/index, no declared platform and no lockfile, i.e. exact_pins_partial, version = 1 by the symmetric env-closure gate. There is no environment.yml, no requirements.txt, no Dockerfile in the repository's top-level listing, and the repository has zero releases and zero tags, so neither the paper nor the README can name the exact code state that produced the figures. The two NI steps are the benchmark itself: C7 names seven competing methods with no version and no parameters at all, and C8 supports the efficiency claim (74.16 s vs 512.06 s; a 500 GB competitor memory failure) on the single word 'GPU' as its complete hardware description. A secondary hazard for Stage 2 is a Zenodo identifier mismatch - the paper cites https://doi.org/10.5281/zenodo.17576488 while the README cites https://zenodo.org/records/18803459 - which may be concept-DOI versus version-record but is unexplained in either place. Because capture_claim is exact_pins_partial, a Stage-2 code check would yield no R-star gain under rubric Delta-2 and this paper is NOT a positive-gate Stage-2 candidate; it would enter Stage 2 only through the stratified audit draw.",
+    "coverage": "8 computational steps enumerated from Methods sections 4.1-4.5 plus the benchmark reported in Results 2.2-2.6 (preprocessing/QC; rasterisation; informative-gene selection; GA affine stage; EM-like LDDMM local stage; evaluation metrics; baseline comparison; runtime/memory comparison). No wet-lab steps exist: all seven datasets are pre-existing public releases from the Lieber Institute, 10x Genomics and Vizgen, so W = 0 and no step is OOS. Coverage = 8/8 (100%) of enumerated steps are C-layer.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment - all 8 computational steps; paper Methods 4.1-4.5 and README 'Requirements' / 'Installation'",
+      "missing": "The paper itself pins nothing. A grep over the de-tagged full text for version patterns, 'pytorch', 'conda', 'docker' and 'requirements' returns no hit; the only 'python' occurrence is inside reference [27] (Gad, PyGAD). Every version fact comes from the README, verbatim: 'Python 3.12 is recommended', 'PyTorch 2.6+ with CUDA 12.4 (for GPU acceleration)', 'Other dependencies are listed in pyproject.toml', and 'conda create -n gala_env python=3.12.9'. This mixes an exact interpreter pin (2a is closed for Python) with a floating framework lower bound (2b for PyTorch, '2.6+') and an unenumerated remainder. There is no environment.yml, no requirements.txt, no conda-lock, no poetry.lock, no Dockerfile and no recorded container digest anywhere in the repository's top-level listing (.DS_Store, GALA, GALA.egg-info, README.md, dist, overview.jpg, pyproject.toml, tutorials), and no channel/index or declared platform. Under the symmetric env-closure gate this is exact_pins_partial, version = 1, and it is what holds all six otherwise-clean steps below R-star.",
+      "how_to_close": "Ship a real lock alongside pyproject.toml - conda-lock or uv.lock or poetry.lock - that pins the interpreter, the package source (channel/index), the declared platform(s) (at minimum linux-64 CUDA and a CPU fallback) and the full transitive closure, or publish a container image by digest. Replace 'PyTorch 2.6+' with the exact torch build actually used (including the +cu124 local version label) and state the CUDA driver requirement. Reference the lock or digest from the paper's Code Availability statement, not only from the README."
+    },
+    {
+      "type": 4,
+      "where": "C4 (genetic-algorithm affine search), C5 (EM-like LDDMM initialisation), C6 (joint GMM for ARI/NMI)",
+      "missing": "No random seed is reported anywhere in the paper. The coarse stage is explicitly 'a population-based search' by a genetic algorithm (PyGAD), which is stochastic in initialisation, selection, crossover and mutation; the EM-like local stage depends on that stochastic initialisation; and the ARI/NMI evaluation fits a joint Gaussian mixture model whose initialisation is also stochastic. The paper reports single-number metrics and single-number runtimes (74.16 s, 512.06 s) with no repetition count, no variance and no distributional statement, so a re-runner cannot tell whether a differing ARI is a failure or ordinary GA variance. Section 4.2 asserts that 'only two global-local episodes suffice to achieve stable alignment across most datasets' but gives no stability measurement to back it.",
+      "how_to_close": "Report the seed used for every reported figure and table (or, if the results are seed-averaged, state the repetition count and report mean with spread), expose the seed as a documented argument in the GALA API and in each tutorial notebook, and add a short seed-variance table for at least the DLPFC and MERFISH cases so a reproducer has a tolerance band to score against."
+    },
+    {
+      "type": 2,
+      "where": "C7 - the seven baseline methods PASTE, PASTE2, STAligner, GPSA, SLAT, ST-GEARS, STalign",
+      "missing": "The benchmark that carries the paper's accuracy claim runs seven competing tools with no version, no commit, no repository URL and no parameter setting for any of them. They appear only as literature citations (13, 24, 17, 18, 22, 19, 12) in Results and in the one-line comparison sentences of 4.4. It is not stated whether default parameters were used, whether the baselines were given the same informative-gene subset, whether the same preprocessing was applied, or which implementation (PyPI release versus GitHub main) was installed. Since several of these tools change behaviour materially between releases, the reported ARI/NMI/accuracy differences are not attributable to a specific comparator state.",
+      "how_to_close": "Add a comparator table listing, per baseline, the exact version or commit hash, install source, and the full argument set used, and release the baseline driver scripts in the same Zenodo deposit as the GALA scripts. State explicitly where a baseline was run at defaults."
+    },
+    {
+      "type": 7,
+      "where": "C8 - efficiency benchmarking, and by extension every reported runtime in Results 2.2-2.6",
+      "missing": "Computational efficiency is one of the three claims in the Abstract ('GALA outperforms existing methods in accuracy, computational efficiency, and biological interpretability'), and the entire hardware description supporting it is the phrase 'GPU acceleration' in a single Results sentence. No CPU model, GPU model, VRAM, host RAM, core/thread count, CUDA or driver version, batch/grid size or number of timing repetitions is given, and it is not stated whether the baselines were timed on the same machine or whether CPU-only baselines were compared against a GPU-accelerated GALA. The 500 GB memory figure quoted as a competitor failure on MERFISH mouse liver has no accompanying machine specification either.",
+      "how_to_close": "Publish the benchmark machine specification (CPU, GPU, VRAM, RAM, CUDA and driver versions, thread settings), state the number of timing repetitions and report spread rather than a single decimal figure, and make explicit whether each baseline was run on GPU or CPU. Release the timing harness with the other scripts."
+    },
+    {
+      "type": 3,
+      "where": "Code Availability, and the Data Availability Zenodo pointer; https://github.com/TaoDing2/GALA and https://doi.org/10.5281/zenodo.17576488 versus README https://zenodo.org/records/18803459",
+      "missing": "Three link-stability defects. (1) The GitHub repository is cited as a bare URL with no tag and no commit hash, and the repository has ZERO releases and ZERO tags (GitHub API, checked 2026-07-28; default branch main, pushed_at 2026-03-05T06:10:19Z), so the exact code state that produced the figures cannot be named - the repository has moved at least once since the 2025-12-02 posting. (2) The paper says the code is available 'under an open-source licence' but no LICENSE file exists in the repository's top-level listing and the GitHub API reports license: null, so the stated licence is unverifiable. (3) The Zenodo identifier differs between the two authoritative statements: the paper's Data Availability cites https://doi.org/10.5281/zenodo.17576488 while the repository README cites https://zenodo.org/records/18803459 for the same content. This is plausibly a concept-DOI versus version-record relationship, but neither document says so, and a reproducer following the paper and a reproducer following the README may retrieve different snapshots.",
+      "how_to_close": "Cut a tagged release matching the manuscript, archive that tag to Zenodo, and cite the version-specific Zenodo DOI (not only the concept DOI) plus the git commit hash in Code Availability. Add the LICENSE file that the paper already claims exists. State explicitly in both the paper and the README which Zenodo record is the manuscript snapshot and how the two identifiers relate."
+    },
+    {
+      "type": 13,
+      "where": "Data Availability - the seven source datasets, all cited as vendor web pages",
+      "missing": "Five of the seven datasets are cited as 10x Genomics or Vizgen product pages (https://www.10xgenomics.com/datasets/mouse-brain-serial-section-1-sagittal-posterior-1-standard-1-1-0, .../mouse-brain-serial-section-2-..., .../adult-mouse-brain-coronal-section-fresh-frozen-1-standard, .../fresh-frozen-mouse-brain-replicates-1-standard, .../xenium-human-lung-cancer-post-xenium-technote, https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast, https://info.vizgen.com/mouse-liver-data). These are unversioned, vendor-controlled, occasionally re-processed and sometimes registration-gated landing pages, not accessions: no file names, no download dates, no checksums, no Space Ranger / Xenium Ranger pipeline version. The DLPFC dataset is better provisioned (Lieber Institute GitHub tree plus a Zenodo mirror, https://zenodo.org/records/6334774) but the GitHub tree is cited at branch level with no commit. Which slices, which replicate files and which processing revision were consumed is therefore not pinned for the majority of the corpus.",
+      "how_to_close": "For each dataset record the exact downloaded file names, the access date, a sha256 per file and the vendor pipeline version stamped in the release, and - since the authors already deposit preprocessed objects on Zenodo - list the mapping from each vendor file to the corresponding Zenodo artefact so a reproducer can enter the workflow at either end without guessing."
+    },
+    {
+      "type": 6,
+      "where": "C1 (preprocessing thresholds), C3 (kNN neighbourhood size k), C4 and C5 (GA and LDDMM hyper-parameters)",
+      "missing": "Four separate parameter groups are externalised out of the main text. C1: 'Detailed preprocessing steps for each dataset are provided in the accompanying GALA code package' - no filtering thresholds, no normalisation target, no log base in prose. C3: the R-squared gene ranking is computed with 'a k-nearest neighbour (kNN) regression model' whose k is never given. C4 and C5: 'under default parameter settings (Supplementary Tab. S1)' and 'Supplementary Notes 1.2-1.3, S2.1' carry the GA operator settings, the LDDMM covariances sigma_M / sigma_N / sigma_R, the RKHS kernel, the time discretisation and the convergence criteria. The supplement is distributed as a single undifferentiated supplementary file (JATS 'DC1 Supplement') with no per-table identifier, so the numerical settings behind every reported result live outside both the main text and, for C1 and C3, outside prose entirely.",
+      "how_to_close": "Promote Supplementary Table S1 into the Methods as an inline default-parameter table (one row per hyper-parameter with symbol, default value and the sensitivity range tested), state k for the kNN regression, and write the per-dataset preprocessing thresholds into Methods 4.1 as a small table rather than deferring them wholly to the code package."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository for GALA. Verbatim from section 6 Code Availability: 'The source code implementing GALA is openly available at https://github.com/TaoDing2/GALA under an open-source licence. The repository provides detailed instructions for installation, data preparation, and reproduction of all analyses.'",
+      "http_status": "URL-present and live (GitHub API 200: full_name TaoDing2/GALA, default_branch main, pushed_at 2026-03-05T06:10:19Z, description null, license null; releases [] and tags [] both empty; top-level entries .DS_Store, GALA, GALA.egg-info, README.md, dist, overview.jpg, pyproject.toml, tutorials; README fetched 200 from raw.githubusercontent.com/TaoDing2/GALA/main/README.md)",
+      "checked_at": "2026-07-28",
+      "network_context": "landing page and README prose only, as Stage 1 permits; pyproject.toml was NOT opened and no workflow source was read. No release tag or commit hash is cited by the paper, and no LICENSE file exists despite the paper's 'under an open-source licence' claim"
+    },
+    {
+      "artifact": "study's own deposit of preprocessed data, alignment outputs and reproduction scripts. Verbatim from section 5: 'All preprocessed ST datasets and corresponding alignment outputs generated in this study are publicly available via Zenodo ( https://doi.org/10.5281/zenodo.17576488 ) to allow full reproduction of the analyses and figures presented.' Verbatim from section 6: 'In addition, the Zenodo repository contains scripts and processed data necessary to replicate all experiments and figures reported in this study.' The README instead states: 'All preprocessed spatial transcriptomics datasets and corresponding alignment outputs generated in this study are publicly available on [Zenodo](https://zenodo.org/records/18803459).'",
+      "http_status": "URL-present (stated-in-paper); automated resolution returned HTTP 403 from zenodo.org for the DOI redirect and for both record URLs, which is Zenodo bot-blocking of curl rather than evidence of absence - not independently confirmed at stage 1",
+      "checked_at": "2026-07-28",
+      "network_context": "IDENTIFIER MISMATCH recorded verbatim rather than resolved: paper cites 10.5281/zenodo.17576488, README cites zenodo.org/records/18803459. Neither document explains the relationship (possibly concept DOI versus version record)"
+    },
+    {
+      "artifact": "DLPFC Visium dataset (spot-to-spot, full and partial). Verbatim: 'The DLPFC dataset, used for full and partial spot-based alignment, was obtained from the Lieber Institute ( https://github.com/LieberInstitute/HumanPilot/tree/master/10X ); preprocessed data were downloaded from Zenodo ( https://zenodo.org/records/6334774 ).' Paper uses Sample C, four consecutive slices, seven annotated regions",
+      "http_status": "URL-present (stated-in-paper; GitHub tree cited at branch master with no commit, Zenodo record returned 403 to automated curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "the only dataset in the corpus with both a source repository and a frozen Zenodo mirror; no download date, no file names, no checksums"
+    },
+    {
+      "artifact": "10x Genomics mouse brain sagittal-posterior sections 1 and 2 (multimodal spot-level alignment with histology). Verbatim URLs: https://www.10xgenomics.com/datasets/mouse-brain-serial-section-1-sagittal-posterior-1-standard-1-1-0 and https://www.10xgenomics.com/datasets/mouse-brain-serial-section-2-sagittal-posterior-1-standard-1-1-0",
+      "http_status": "URL-present (stated-in-paper; vendor landing pages, not accessions; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "unversioned vendor dataset pages; no Space Ranger version, no file list, no access date, no checksums"
+    },
+    {
+      "artifact": "Vizgen MERFISH mouse liver, slices L2S1 and L2S2 from Animal 2 (cell-level landmark-free alignment). Verbatim: 'was obtained from Vizgen: https://info.vizgen.com/mouse-liver-data'",
+      "http_status": "URL-present (stated-in-paper; vendor page behind an information-request form; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "Vizgen showcase data are distributed through a registration-gated portal; the paper gives no accession, no file names and no access date"
+    },
+    {
+      "artifact": "10x Genomics Visium adult mouse brain coronal fresh-frozen (cross-platform spot-to-cell). Verbatim: https://www.10xgenomics.com/datasets/adult-mouse-brain-coronal-section-fresh-frozen-1-standard",
+      "http_status": "URL-present (stated-in-paper; vendor landing page; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "unversioned vendor dataset page"
+    },
+    {
+      "artifact": "10x Genomics Xenium fresh-frozen mouse brain, Replicate 2 (cross-platform and cross-modality with Visium). Verbatim: https://www.10xgenomics.com/datasets/fresh-frozen-mouse-brain-replicates-1-standard",
+      "http_status": "URL-present (stated-in-paper; vendor landing page; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "unversioned vendor dataset page; no Xenium Ranger version stated"
+    },
+    {
+      "artifact": "10x Genomics Xenium human lung cancer FFPE, Experiment 1 (image-to-cell alignment). Verbatim: https://www.10xgenomics.com/datasets/xenium-human-lung-cancer-post-xenium-technote",
+      "http_status": "URL-present (stated-in-paper; vendor landing page; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "unversioned vendor tech-note dataset page"
+    },
+    {
+      "artifact": "10x Genomics Xenium human breast cancer FFPE, Replicate 1 (image-to-cell alignment). Verbatim: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast",
+      "http_status": "URL-present (stated-in-paper; vendor preview-dataset page; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "a 'preview dataset' page, i.e. explicitly provisional vendor content; no version, no access date, no checksums"
+    },
+    {
+      "artifact": "third-party dependency cited by literature only: PyGAD (reference 27 - Gad, A. F. 'Pygad: An intuitive genetic algorithm python library', Multimedia Tools and Applications 83, 58029-58042, 2024), used for the global affine stage",
+      "http_status": "none (cited as a publication; no URL, no version, no commit anywhere in the paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "no web search performed; absence of a version pin is recorded as a finding rather than resolved by searching"
+    },
+    {
+      "artifact": "baseline methods used for benchmarking: PASTE (ref 13), PASTE2 (ref 24), STAligner (ref 17), GPSA (ref 18), SLAT (ref 22), ST-GEARS (ref 19), STalign (ref 12)",
+      "http_status": "none (cited as publications only; no repository URL, no version, no commit, no parameters given for any of the seven)",
+      "checked_at": "2026-07-28",
+      "network_context": "no web search performed; the absence of comparator versions and settings is recorded as a finding, not resolved by searching"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "502c959aafe87196272630d5bd6d36f4278d374bbc3a7859bd586e11a6cc0f17",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

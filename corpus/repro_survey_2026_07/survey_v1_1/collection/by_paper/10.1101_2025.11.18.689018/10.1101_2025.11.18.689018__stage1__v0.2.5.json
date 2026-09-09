@@ -1,0 +1,399 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "84c570f515463f940c0bf0e73d633d3bac5569d565e12cc6caea3cf68579c630",
+  "canonical_id": {
+    "value": "10.1101/2025.11.18.689018",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.18.689018v1",
+      "biorxiv:2025.11.18.689018v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "GWAS of fruit volatile organic compound (VOC) content in a European Fragaria vesca collection using previously published genotype and volatilome data, followed by candidate-gene identification and sequence/phylogenetic analysis of the SABATH methyltransferase FvJMT2. The computational reproduction target is: SNP filtering (2.9 M -> 1.4 M SNPs at MAF >= 5%), estimated-marginal-means combination of two harvest seasons, GWAS with GAPIT version 3 under MLMM and BLINK with three principal components as covariates and a Bonferroni threshold p < 6.75E-9, QTL definition by 1 Mb SNP clustering, multiple sequence alignment and Neighbor-Joining consensus tree building in Geneious v.2025.1, plus two small statistical analyses (Michaelis-Menten Km estimation by nonlinear regression, chi-square tests on the two-choice behavioral assay). Everything else in the paper is wet-lab: germplasm sampling, GC-MS volatile quantification, plasmid construction and site-directed mutagenesis, Agrobacterium-mediated transient expression in Nicotiana benthamiana and F. vesca receptacles, qPCR, recombinant protein expression/purification, radiochemical methyltransferase assays, and Drosophila suzukii rearing and behavioral assays.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS XML 'MATERIAL AND METHODS' section (retrieved by curl with a browser User-Agent; WebFetch of the .source.xml returned HTTP 403). Methods subsections used: Plant material; Genome-Wide Association Study (GWAS); Bioinformatic sequence analysis; FvJMT2 plasmid construction; Agroinfiltration of FvJMT2 overexpression constructs in Nicotiana benthamiana and Fragaria vesca; Methyl benzoate and methyl cinnamate quantification; Cloning, expression, and purification of recombinant FvJMT2 Protein; Enzyme activity assay and kinetic analysis; Drosophila suzukii colony maintenance; D. suzukii repellence/attractance assay. The paper carries NO 'Data availability' section and NO 'Code availability' section: the string 'availab' occurs only four times in the whole retrievable text (CC licence boilerplate, 'available genotypic and volatilome datasets', 'Supplementary Tables ... available online', and 'retrieved from GenBank (when available)'). No GitHub/GitLab/Bitbucket/Zenodo/figshare/Dryad URL and no GEO/SRA/ENA/BioProject accession appears anywhere in the text. Genotype and volatilome inputs are pointed at only indirectly, as 'previously generated and deposited in public repositories' citing Toivainen et al. (bioRxiv 2024.10.09.617376, ref 39) and Urrutia et al. (The Plant Journal 2023, ref 85); no accession, repository name, or version is given in this paper, and per protocol no web search was performed to locate one. GenBank protein accessions used as alignment inputs are partially given inline (PtJMT1 KC894590, CsJMT XP028087949, AtJMT AAG23343.1) with the remainder taken 'from the corresponding publications'.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: germplasm sampling of a Fragaria spp. diversity panel (diploid and octoploid wild species plus ancient and modern F. x ananassa cultivars) from the strawberry germplasm bank ESP138 at IFAPA Churriana, Malaga; ripe fruits harvested, frozen in liquid nitrogen, de-achened, ground and stored at -80 C in three biological pools",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: cultivation of F. vesca 'POR2' and 'POR3' in a shade house at IFAPA and 'Reine des vallees' in a greenhouse at IHSM La Mayora (UMA-CSIC), with 'Reine des vallees' fruits harvested at four ripening stages (green, white, turning, red) for VOC analysis",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: GC-MS quantification of methyl benzoate and methyl cinnamate at the IBMCP Metabolomics Service (Valencia), 'as previously described' (ref 85), with relative normalization to the red stage, to F. x ananassa cv. 'Camarosa', or as peak area for N. benthamiana leaves",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: FvJMT2 plasmid construction - amplification of the FvJMT2 C275 allele from ES10 cDNA with iProof polymerase, Q5 Site-Directed Mutagenesis to generate A275 and the truncated A275dC, Gateway cloning via pDONR into pK7WG2D under CaMV 35S with a 35S:GFP marker, electroporation into Agrobacterium tumefaciens GV3101, Sanger confirmation; primers in Table S3",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: transient overexpression of FvJMT2 allelic variants, controls and p19 in 3-week-old N. benthamiana leaves by needleless-syringe agroinfiltration, GFP checked at 4 days post-infiltration on a Leica DM2500",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Wet-lab: agroinfiltration of 35S:FvJMT2 C275 and empty vector into immature green receptacles of F. vesca 'POR2' and 'POR3', harvest at ripening (~10 days post-infiltration), de-acheming and grinding",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Wet-lab: RNA extraction (Norgen Plant Total RNA Purification Kit), cDNA synthesis (iScript) and qPCR confirmation of FvJMT2 overexpression, with L23 60S as housekeeping gene for N. benthamiana and DBP for F. vesca; primers in Table S3",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W8",
+      "label": "Wet-lab: cloning of FvJMT2 C275 CDS into pQE80L with N-terminal 6xHis, transformation of XL1-Blue, induction with 0.2 mM IPTG at 16 C overnight, Ni-NTA purification, Amicon Ultra-30K concentration, BCA quantification, storage in 10 mM Tris-HCl pH 8 / 500 mM NaCl / 1 mM beta-mercaptoethanol / 30% glycerol, SDS-PAGE on 4-20% Mini-PROTEAN TGX with Coomassie staining",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W9",
+      "label": "Wet-lab: radiochemical methyltransferase assay measuring [14C]-methyl transfer from SAM to ten carboxylic-acid substrates in 100 uL of 50 mM Tris-HCl pH 7.5, 2 mM substrate, 2.5 mM MgCl2, 5 mM DTT, 2.5 mM EDTA, 2 uL [14C]-SAM and 30 ug purified FvJMT2 C275, 30 C for 15 or 30 min, stopped with 2-propanol/acetic acid, hexane partition, liquid scintillation counting",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W10",
+      "label": "Wet-lab: Drosophila suzukii laboratory colony maintenance at IVIA (25 +/- 1 C, 60% RH, 14:10 L:D) in BugDorm cages on a cornmeal/sugar/brewer's-yeast/agar artificial diet with methylparaben and propionic acid, 13-15 day egg-to-adult cycle, monthly cage rotation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W11",
+      "label": "Wet-lab: two-choice repellence/attractance assay in a 25x25x25 cm BugDorm cage with four 50 mL vials (two control puree, two puree spiked to 196 ng/g FW methyl benzoate or 931 ng/g FW methyl cinnamate), 50 starved 3-5 day old females, scoring at 24 h, four replicates per compound",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Filtering of the previously published F. vesca genotype panel to retain only non-redundant SNPs with minor allele frequency >= 5%, reducing 2.9 M SNPs to a final set of 1.4 M SNPs - no tool named (no vcftools/PLINK/bcftools), no command line, and 'non-redundant' is not defined (LD pruning? duplicate-position removal?)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Combination of the two harvest-season volatilome datasets (125 and 170 accessions; 113 shared) into a single phenotype set using estimated marginal means per genotype, and per-season averaging of replicate values per accession - no software or package named (no emmeans/lme4), no model formula, no random/fixed effect structure, no transformation stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "GWAS of 99 VOC traits per harvest season with the R package GAPIT (version 3) under the Multiple Loci Mixed Model (MLMM), with the first three principal components included as covariates for population structure and significance at a Bonferroni-corrected p < 6.75E-9",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "GWAS with GAPIT (version 3) under the BLINK model, applied to each harvest season and to the combined estimated-marginal-means dataset (BLINK only for the combined set), same three-PC covariates and Bonferroni threshold p < 6.75E-9",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "QTL definition and candidate-gene assignment: significant SNPs located within < 1 Mb of each other collapsed into the same QTL, yielding 312 significant associations for 76 VOCs, with candidate genes named against the F. vesca v4 gene models (FvH4_ identifiers used throughout the results) - no script, no tool, and no annotation release version stated for the gene-model set used to nominate candidates",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Multiple sequence alignment and sequence distance matrix of SABATH-family methyltransferase protein sequences with Geneious v.2025.1 (Biomatters), using Geneious global alignment with free end gaps and the Blosum62 penalty matrix; input sequences retrieved from GenBank 'when available' (e.g. PtJMT1 KC894590, CsJMT XP028087949, AtJMT AAG23343.1) or from the corresponding publications - gap-open/gap-extension penalties and refinement iterations not stated, and the full accession list is not enumerated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Consensus tree construction in Geneious v.2025.1 using the Jukes-Cantor genetic distance model and the Neighbor-Joining method with 1000 bootstrap replicates - model, method and replicate count stated; outgroup/rooting, consensus support threshold and RNG seed not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Kinetic analysis of recombinant FvJMT2 C275: Michaelis-Menten constants (Km) determined by nonlinear regression fitting to the Michaelis-Menten equation while varying one substrate at saturating levels of the other, averaged over three independent measurements - no software or package named, no weighting or initial-value scheme, and the underlying scintillation-count measurements are not deposited anywhere",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Statistical analysis of the D. suzukii two-choice assay: chi-square tests of the deviation of the observed distribution from 50% at p < 0.05, with flies not on vials excluded - no software named, no correction for multiple tests, no continuity-correction statement, and the per-replicate count data are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 4,
+    "n_NI": 3,
+    "n_X": 2,
+    "S": 9,
+    "W": 11,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/9 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 4/9 computational steps: C3 and C4 (GAPIT 'version 3' with MLMM/BLINK, three PCs as covariates and an explicit Bonferroni threshold of 6.75E-9) and C6 and C7 (Geneious v.2025.1 with named alignment matrix, distance model, tree method and 1000 bootstraps). Note that 'GAPIT (version 3)' names a major release line, not an exact build (GAPIT 3.x spans several years of behaviour changes); it is scored version = 1 here as the most generous reading, and this is the single most contestable call in this report. 3/9 steps cap at NI because no software at all is named for them (SNP filtering, estimated-marginal-means combination, QTL collapsing). 2/9 steps are blocked (X) on the data axis: the enzyme-kinetics Km fitting (C8) and the chi-square analysis of the two-choice assay (C9) operate on in-house measurements that are not deposited in any repository and are reported only as figure summaries, so no input exists to re-run them. There is NO code repository of any kind - no GitHub/GitLab/Zenodo URL appears in the paper and there is no Code availability section - so no step can exceed RI even under stage-2 execution, and every code axis is at most 1 (reconstructable from prose). No lockfile, container, conda spec or renv is claimed.",
+    "coverage": "9 computational steps assessed from the bioRxiv v1 JATS 'MATERIAL AND METHODS'. 11 wet-lab steps (germplasm sampling, plant cultivation, GC-MS volatile quantification, plasmid construction, two agroinfiltration systems, RNA/qPCR, recombinant protein production, radiochemical enzyme assay, D. suzukii colony maintenance, two-choice behavioral assay) counted in W and out of computational-reproduction scope. Coverage = 9/20 (45%) of enumerated steps; this is a wet-lab-dominant mixed paper whose computational core is a single GWAS plus a small sequence-analysis and statistics tail.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Whole paper - all 9 computational steps (C1-C9)",
+      "missing": "There is no Code availability section and no code repository of any kind. No GitHub, GitLab, Bitbucket, Zenodo, figshare, Dryad or Software Heritage URL appears anywhere in the retrievable full text. The GWAS pipeline (SNP filtering, phenotype combination by estimated marginal means, GAPIT MLMM/BLINK invocation, QTL collapsing at 1 Mb, candidate-gene nomination) exists only as prose, so every step must be re-implemented from the description rather than re-run.",
+      "how_to_close": "Publish the GWAS driver scripts (filtering, phenotype preparation, GAPIT calls with their full argument lists, post-processing and QTL collapsing) plus the plotting scripts in a public repository, tag a release matching the manuscript, and archive it to Zenodo for a citable DOI; add a Code availability statement pointing at that DOI."
+    },
+    {
+      "type": 4,
+      "where": "Whole paper - steps C1-C5 (GWAS inputs) and C8-C9 (in-house measurement data)",
+      "missing": "There is no Data availability section. The genotype and volatilome inputs are described only as 'previously generated and deposited in public repositories' with citations to Toivainen et al. (bioRxiv 2024.10.09.617376) and Urrutia et al. (The Plant Journal 2023); no accession, no repository name, no dataset DOI, no release version and no download date is given in this paper, so the exact input matrices (2.9 M SNP panel, 99-VOC volatilome for 125 and 170 accessions across two seasons) cannot be located from this manuscript alone. Derived inputs and outputs are equally undeposited: the filtered 1.4 M SNP set, the estimated-marginal-means phenotype table, the full GWAS summary statistics, and the table of 312 significant associations for 76 VOCs are not archived (only Supplementary Tables S1-S3 are mentioned). The enzyme kinetics measurements (C8) and the per-replicate two-choice counts (C9) are not deposited at all, which is why those two steps score data = 0. The alignment input set for C6/C7 is only partially specified: three GenBank accessions are given inline and the rest are 'retrieved from the corresponding publications'.",
+      "how_to_close": "Add a Data availability section naming the exact accessions/DOIs and versions of the genotype and volatilome datasets used; deposit the filtered SNP set, the phenotype table, the full GWAS summary statistics and the significant-association table in a public archive; deposit the scintillation-count and behavioral-assay raw counts as supplementary machine-readable tables; enumerate every accession used in the alignment."
+    },
+    {
+      "type": 3,
+      "where": "Steps C1, C2, C5, C8, C9 (version = 0); reservation on C3/C4",
+      "missing": "No version is pinned for five of the nine computational steps because no software is named for them at all: the SNP filtering step (C1) names no tool, the estimated-marginal-means combination (C2) names neither a language nor a package, the QTL collapsing and candidate-gene nomination (C5) names no annotation release for the F. vesca v4 gene models it reports FvH4_ identifiers against, and the Km fitting (C8) and chi-square testing (C9) name no statistical software. R itself is never versioned even though GAPIT is an R package. The only two version strings in the entire paper are 'GAPIT (version 3)' - a major release line, not an exact build - and 'Geneious v.2025.1', which is an exact release identifier.",
+      "how_to_close": "State the exact R version and the exact GAPIT version (e.g. 3.4.0) rather than the major line, name and version every tool used for filtering, phenotype combination, curve fitting and statistics, state the F. vesca reference genome and annotation release (e.g. v4.0.a2), and record sessionInfo() output with the published scripts."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment - all 9 computational steps",
+      "missing": "No environment capture of any kind is claimed or present: no renv.lock, no DESCRIPTION, no conda/mamba environment file, no lockfile, no Dockerfile or Singularity definition, no container digest, no requirements.txt, and no sessionInfo() output. There is also no repository in which such an artifact could live. Because GAPIT is an R package whose MLMM/BLINK behaviour depends on the R and package stack, the absence of any closure means even a correctly-reimplemented pipeline cannot be shown to be running the same computation.",
+      "how_to_close": "Ship an renv.lock (or a conda/pixi lockfile, or a container image referenced by digest) covering R, GAPIT and all dependencies alongside the published scripts, and report sessionInfo() from the machine that produced the reported results."
+    },
+    {
+      "type": 1,
+      "where": "Steps C1, C2, C5, C6, C8, C9",
+      "missing": "Parameter under-specification. C1: 'non-redundant SNPs' is undefined - no LD-pruning window/r2 threshold, no duplicate-position rule, no missingness or depth filter, and no statement of how the 2.9 M panel was called. C2: the estimated-marginal-means model is not given (no formula, no fixed/random effects, no transformation, no handling of the 113 accessions shared between seasons versus the 12 and 57 season-specific ones). C5: the 1 Mb clustering rule is stated but the candidate-gene search window around each QTL and the annotation source are not. C6: gap-open and gap-extension penalties and refinement settings for the Geneious global alignment are not stated, and the input accession list is incomplete. C8: no fitting weights, initial values, or convergence criteria for the nonlinear Michaelis-Menten regression. C9: no multiple-testing correction across the compounds tested and no continuity-correction statement for the chi-square tests.",
+      "how_to_close": "State every non-default parameter, filter threshold, model formula and RNG seed in Methods, and publish the parameterised scripts so that defaults are determinate."
+    },
+    {
+      "type": 6,
+      "where": "Steps C8 and C9 - blocked steps",
+      "missing": "These two steps have no retrievable input. The kinetic assay measurements and the per-replicate fly counts exist only as summary figures; with no deposited numbers and no named software, neither the Km values nor the chi-square verdicts can be regenerated even approximately, which is why they are recorded as blocked (X) rather than merely inference-requiring.",
+      "how_to_close": "Deposit the raw scintillation counts per substrate/concentration/replicate and the raw vial counts per replicate as machine-readable supplementary tables, and publish the fitting and testing scripts with named software and versions."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: NONE. The paper contains no Code availability section and no repository URL of any kind (no GitHub, GitLab, Bitbucket, Zenodo, figshare, Dryad or Software Heritage link occurs anywhere in the retrievable full text).",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML full text retrieved by curl with a browser User-Agent; case-insensitive search of the de-tagged text for 'github|gitlab|zenodo|figshare|dryad|10.5061' returned zero hits. No web search was performed to locate a repository, per protocol."
+    },
+    {
+      "artifact": "data accession: NONE stated. Data are referenced only indirectly, verbatim: 'GWAS analysis was performed using the volatilome and genotypic data previously generated and deposited in public repositories 39 , 85 .' (ref 39 = Toivainen T et al., bioRxiv 2024; 2024.10.09.617376; ref 85 = Urrutia M et al., The Plant Journal 2023; 116: 1201-1217). No accession number, repository name, dataset DOI, release version or download date appears in this paper.",
+      "http_status": "stated-in-paper only (indirect citation, no identifier)",
+      "checked_at": "2026-07-27",
+      "network_context": "case-insensitive search of the de-tagged full text for 'PRJ|SRP|GSE|ERP|SRR|ERR|ArrayExpress|dbGaP|EGA' returned zero repository accessions; the only 'availab' occurrences are CC licence boilerplate, 'available genotypic and volatilome datasets', 'Supplementary Tables S1, S2, and S3 are available online', and 'retrieved from GenBank (when available)'."
+    },
+    {
+      "artifact": "sequence accessions used as alignment input (partial, inline in the Results/figure legend): Populus trichocarpa PtJMT1 (KC894590), Camellia sinensis CsJMT (XP028087949), Arabidopsis thaliana AtJMT (AAG23343.1); remaining sequences 'retrieved from GenBank (when available) or the corresponding publications'",
+      "http_status": "stated-in-paper (GenBank identifiers present but the set is not exhaustively enumerated; no download date, no sequence version pinning beyond the accession suffix where given)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "reference annotation: F. vesca v4 gene models implied by the FvH4_ locus identifiers used for candidate genes (e.g. FvH4_6g19300, FvH4_1g05400) - never named or versioned in Methods",
+      "http_status": "stated-in-paper implicitly (identifier prefix only; no release, no URL, no checksum)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "software: GAPIT version 3 (R package, cited as Lipka et al. 2012 with BLINK cited as Huang et al.) and Geneious v.2025.1 (Biomatters, Auckland, New Zealand) - Geneious is commercial and licence-gated",
+      "http_status": "stated-in-paper (no download URL, no exact GAPIT build, no R version)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "3872117c03da99dc6743b6b86df211de00451dbbaae9cb5b9ab586da6afb2af7",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

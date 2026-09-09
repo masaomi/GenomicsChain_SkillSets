@@ -1,0 +1,210 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage2 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2024.06.17.598857",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2024.06.17.598857v2",
+      "biorxiv:2024.06.17.598857v2",
+      "10.1186/s13059-026-03984-5"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "panREPET: a reference-free Snakemake pipeline that detects TE insertions shared between de novo assembled genomes of a species by pairwise comparison. Applied to a Brachypodium distachyon pan-genome (54 -> 42 accessions after QC). Steps: TE reference-library build (TEdenovo/REPET on Bd21 v3.2) and TE annotation (panTEannot, a Snakemake re-implementation of REPET TEannot via Blaster/Censor/RepeatMasker packaged in TE_finder); then panREPET proper: coverage-based TE-copy extraction (covcons/extractCopies.py), flanking-sequence extension (bedtools slop), reciprocal-best-hit detection (Minimap2 + Matcher/te_finder), clique detection (NetworkX find_cliques), phylogenetic-distance computation (Biopython Phylo), and downstream ecogenome/climate statistics (Seaborn/statsmodels, kgc R package).",
+  "step_source": "snakefile",
+  "granularity_note": "Stage-2 line-level code-check of two author repos on ForgeMIA GitLab (git clone --depth 1, env/workflow/container files only; NO data downloaded): panREPET (Snakefile, Snakefile_singularity, envs/*.yaml, containers/panREPET.def, config/example.yaml, containers/.gitlab-ci.yml) and panTEannot (workflow/Snakefile, workflow/config/config_Bd.yaml, containers/how_install_te-finder.txt). Coarse one-step-per-named-tool granularity from Stage-1 preserved. Code-check confirms: (a) reproducibility rests on per-rule bare conda specs (envs/*.yaml) with top-level version pins only and a floating 'python >= 3.5', no channel/build lock, no transitive closure, and tefinder.yaml carries NO version at all; (b) the container is referenced ONLY by mutable tags across three locations (README 'library://jconfais/repet/panrepet:1.0'; config/example.yaml 'oras://registry.forge.inrae.fr/urgi/urgi-anagen/panrepet:v1.0.0'; containers/README ':cicd'/':v1.0.0') with NO content digest anywhere; (c) containers/panREPET.def is a build-from-recipe with a floating base image (debian:11-slim tag), 'conda update -n base --all -y' (fully floating), a git clone '--branch dev-2.32.1' of te_finder (mutable branch, not a commit), and a version mismatch vs the conda envs (def pins networkx=2.5.1 while envs/networkX.yaml pins networkx=2.4) — so it is not a static lock and not even internally consistent. No external DB/reference is fetched in code: all genome assemblies, the TE consensus library and the RepetDB/TEdenovo library are supplied as pre-existing LOCAL file paths in config (example.yaml uses data/ files; panTEannot config_Bd.yaml uses absolute /mnt/... paths). No wet-lab steps (public de novo assemblies reused), so W=0.",
+  "funnel_stage": "stage2-code-verified",
+  "stage2_candidate": true,
+  "capture_claim": "container_digest_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "TE reference-library build with TEdenovo (REPET v3.0, Flutre et al. 2011) from the Bd21 v3.2 genome; library also distributed via RepetDB. REPET v3.0 named in panREPET README prose but this pipeline is NOT in either repo (library supplied as a pre-built data/ fasta); no REPET lock",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": ["out-of-repo-tool"]
+    },
+    {
+      "step_id": "C2",
+      "label": "panTEannot TE annotation (Snakemake re-implementation of REPET TEannot; Blaster/Censor/RepeatMasker packaged inside TE_finder). Code-check: workflow/Snakefile uses 'singularity: TE_finder' and config_Bd.yaml + containers/how_install_te-finder.txt pin te_finder 2.31 (library://hquesneville/default/te_finder:2.31, tag-only sif) — a code-level version pin, but tag-only container with no digest and no conda lock",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "container-tag-only-no-digest", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C3",
+      "label": "panREPET Step 1: extract TE copies by coverage percentage (extractCopies.py; cov_consensus param) - conda env envs/biopython.yaml (biopython=1.79, python>=3.5 floating), cov_consensus set in config/example.yaml (0.95)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "panREPET Step 2: add flanking genomic sequence via bedtools slop (extendGFF rule) - envs/bedtools.yaml pins bedtools=2.30.0 (no build string, no python pin); also bundled in the tag-only Singularity image",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "panREPET Step 3: bidirectional (reciprocal) best-hit detection via Minimap2 (minimap2 rule + launchMinimap2.py) then Matcher (matcher rule) - envs/minimap2.yaml pins minimap2=2.24 (python>=3.5 floating); Matcher provided only inside the tag-only Singularity image (README says 'matcher'; the .def actually builds blaster2.32/te_finder dev-2.32.1) - no standalone Matcher version, image-vs-README tool naming ambiguity",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "container-tag-only-no-digest", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "panREPET Step 4: TE-insertion clique detection with NetworkX (cliques.py: read_edgelist + find_cliques). Code-check CONFIRMS envs/networkX.yaml pins networkx=2.4 in the conda env (Stage-1 believed it was prose-only). NOTE: containers/panREPET.def pins networkx=2.5.1 - conda-env vs container version MISMATCH",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "env-container-version-mismatch", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Phylogenetic pairwise-distance computation between accessions using the Biopython Phylo module (biopython=1.79 pinned in envs/biopython.yaml and envs/minimap2.yaml; python>=3.5 floating)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Downstream ecogenome/climate statistics and figures: clustermaps (Seaborn), ANOVA (statsmodels, python 3.10.13), climate-class assignment (kgc R package v1.0.0.2). Code-check: NO analysis/figure/stat scripts present in either repo (panREPET stats.py only emits clique stats); Seaborn/statsmodels/kgc not in any env file",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["scripts-absent-from-repo"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 8,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/8 (0%) R★ — unexecuted; declared environment statically valid but not verified as the env that produced the results. Lever 1 (software_env_lock) is FALSE, so no step reaches R★ regardless of code/data completeness; n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "RI ceiling on 6/8 computational steps after code-check (up from 5/8 at Stage-1): C2 panTEannot rises NI->RI because the code (config_Bd.yaml + how_install_te-finder.txt) pins te_finder 2.31, and C3-C7 (panREPET proper) hold at RI on the per-rule conda specs (biopython=1.79, bedtools=2.30.0, minimap2=2.24, networkx=2.4). 2/8 cap at NI: C1 TEdenovo library build (REPET v3.0 is out-of-repo, prose-only) and C8 downstream stats (no scripts in either repo, Seaborn/statsmodels/kgc unpinned). No step exceeds RI: the environment is NOT statically locked — the Singularity image is referenced only by mutable tags (:1.0 / :v1.0.0 / :cicd) with no content digest, the envs/*.yaml are bare conda specs (floating python>=3.5, no build strings, no transitive closure, tefinder unversioned), and containers/panREPET.def is a build-recipe with a floating base, 'conda update --all', a mutable git branch clone, and an internal networkx version mismatch (2.4 vs 2.5.1).",
+    "coverage": "8 computational steps assessed from two author Snakemake repos (panREPET + panTEannot) at line level plus biorxiv v2 Methods prose. No wet-lab steps (public de novo assemblies reused), so W=0.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "no static lock present; container.def targets linux-64 (debian:11-slim / Miniconda3-py39, amd64) but is a build-recipe not a lock, and conda envs declare no platform"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole pipeline environment (panREPET: Snakefile conda directives + Singularity image + panREPET.def; panTEannot: TE_finder image)",
+      "missing": "No statically-complete environment lock exists. (1) Container referenced ONLY by mutable tags in three places (README library://jconfais/repet/panrepet:1.0; config/example.yaml oras://registry.forge.inrae.fr/urgi/urgi-anagen/panrepet:v1.0.0; containers/README :cicd) with NO @sha256 / content digest. (2) envs/*.yaml are bare conda specs: top-level version pins (biopython=1.79, bedtools=2.30.0, minimap2=2.24, networkx=2.4) but 'python >= 3.5' floating, no channels lock beyond conda-forge/bioconda, no build strings, no transitive closure; tefinder.yaml has NO version at all. (3) containers/panREPET.def is a build-from-recipe with floating base debian:11-slim, 'conda update -n base --all -y', a mutable 'git clone --branch dev-2.32.1' of te_finder, and pins networkx=2.5.1 (conflicting with envs/networkX.yaml networkx=2.4). None of these is a conda-lock/pixi/renv lockfile or a digest-pinned image.",
+      "how_to_close": "Publish a resolved lockfile (conda-lock or pixi.lock) covering interpreter+channels+platform+transitive deps for every rule, AND/OR pin the Singularity image by content digest (SIF sha256 / OCI @sha256) instead of a tag, then have Stage-2 execution validate the capture. Reconcile the networkx 2.4 vs 2.5.1 discrepancy."
+    },
+    {
+      "type": 3,
+      "where": "C1 TEdenovo/REPET, C2 panTEannot (TE_finder/Blaster/Censor/RepeatMasker), and Matcher (C5)",
+      "missing": "REPET v3.0 (C1) is named in README prose only and its pipeline is not in either repo (library supplied as a pre-built fasta). TE_finder 2.31 (C2) is pinned in config/how_install but via a tag-only sif; the RepeatMasker/Censor sub-tool versions inside TE_finder are not surfaced. Matcher (C5) is named in the README but the .def actually builds blaster2.32 (te_finder dev-2.32.1) — a naming/version ambiguity with no standalone Matcher version. Downstream Seaborn/statsmodels/kgc (C8) versions absent.",
+      "how_to_close": "Record exact versions/builds for all REPET-family tools (and the RepeatMasker/library versions inside TE_finder) and the downstream Python/R plotting-stats packages in a versions table or lockfile; disambiguate Matcher vs blaster/te_finder."
+    },
+    {
+      "type": 1,
+      "where": "Input genome assemblies and TE library (Data availability) — supplied as local paths, not fetched in code",
+      "missing": "The executable workflow obtains NO external DB in code: config/example.yaml points to bundled data/ files and panTEannot config_Bd.yaml points to absolute /mnt/Volume_Somia/... paths. Provenance of the 53 B. distachyon de novo assemblies (Phytozome, generic https://phytozome.jgi.doe.gov/, Gordon et al. 2017), BdTR7a (Stritt et al. 2019) and the Bd21 TE library (RepetDB / TEdenovo) is prose-only, with no versioned accession, release tag, or checksum in code.",
+      "how_to_close": "Provide an explicit accession/version table (or a deposited snapshot/DOI) for every genome assembly and the exact RepetDB/TEdenovo TE-library release, and reference those pinned identifiers from the workflow config."
+    },
+    {
+      "type": 11,
+      "where": "RepetDB and Phytozome database dependencies",
+      "missing": "RepetDB (urgi.versailles.inrae.fr/repetdb) and Phytozome are live, versioned-over-time databases with no pinned snapshot in code; retrieval is not deterministic. The generic Phytozome URL in the paper/README fails to resolve (000; content migrated to phytozome-next.jgi.doe.gov).",
+      "how_to_close": "Record the database release/date-stamped export used, or deposit the retrieved TE library and genome set as a fixed archive (Zenodo/figshare) with a DOI."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: panREPET (author pipeline) — https://forgemia.inra.fr/urgi-anagen/panREPET (git clone --depth 1; redirects to forge.inrae.fr; Snakefile, Snakefile_singularity, envs/*.yaml, containers/panREPET.def, config/example.yaml, .gitlab-ci.yml inspected)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated git clone + curl -L, forgemia.inra.fr -> forge.inrae.fr (ForgeMIA GitLab)"
+    },
+    {
+      "artifact": "code repo: panTEannot (companion TE-annotation pipeline) — https://forgemia.inra.fr/urgi-anagen/panTEannot (git clone --depth 1; workflow/Snakefile, workflow/config/config_Bd.yaml, containers/how_install_te-finder.txt inspected)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated git clone + curl -L, forgemia.inra.fr -> forge.inrae.fr (ForgeMIA GitLab)"
+    },
+    {
+      "artifact": "container CLAIM (panREPET): tag-only references in-repo — README 'library://jconfais/repet/panrepet:1.0' (Sylabs), config/example.yaml 'oras://registry.forge.inrae.fr/urgi/urgi-anagen/panrepet:v1.0.0', containers/README ':cicd'. Tag-pinned, NO content digest anywhere. Not pulled/validated (data-scope guardrail).",
+      "http_status": "n/a (registry/library reference, not HTTP-verified; no digest to verify against)",
+      "checked_at": "2026-07-23",
+      "network_context": "declared in panREPET README + config + containers/README prose"
+    },
+    {
+      "artifact": "container CLAIM (panTEannot): TE_finder image 'library://hquesneville/default/te_finder:2.31' (Sylabs; tag-only sif referenced by config_Bd.yaml te_finder_2.31.sif + how_install_te-finder.txt). Tag-pinned, no digest. Not pulled/validated.",
+      "http_status": "n/a (Sylabs library reference, not HTTP-verified at stage2)",
+      "checked_at": "2026-07-23",
+      "network_context": "declared in panTEannot containers/how_install_te-finder.txt + config prose"
+    },
+    {
+      "artifact": "data: RepetDB Brachypodium distachyon (Bd21) TE library + annotation — https://urgi.versailles.inrae.fr/repetdb/begin.do (Amselem et al. 2019; live database, no pinned snapshot; supplied to workflow as a local fasta, not fetched in code)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, urgi.versailles.inrae.fr (not re-fetched at stage2; status carried from stage1)"
+    },
+    {
+      "artifact": "data: B. distachyon de novo assemblies + annotations — Phytozome (https://phytozome.jgi.doe.gov/, Gordon et al. 2017); no versioned accession list; supplied as local paths in config",
+      "http_status": "000 (generic legacy URL does not resolve; content migrated to phytozome-next.jgi.doe.gov)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, phytozome.jgi.doe.gov (status carried from stage1)"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [
+    {
+      "step_id": "C2",
+      "change": "NI -> RI",
+      "reason": "Stage-1 (prose) said REPET/RepeatMasker versions unpinned. Stage-2 code-check found panTEannot pins te_finder 2.31 (config_Bd.yaml + containers/how_install_te-finder.txt), giving a code-level version pin (version 0->1). Still tag-only container / no lock, so capped at RI."
+    },
+    {
+      "step_id": "C6",
+      "change": "env-source correction (verdict unchanged RI)",
+      "reason": "Stage-1 believed NetworkX 2.4 was prose-only. Stage-2 confirmed envs/networkX.yaml pins networkx=2.4 in code; however containers/panREPET.def pins networkx=2.5.1 — a conda-env vs container version mismatch now recorded."
+    }
+  ],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage2 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "cc359b10e053dfd80cabd38ab76ec2ec3df802b5bbbc34f087a0558553b6efbe",
+    "chain_record": "not-yet-recorded",
+    "supersedes": "bcc1c76a41af047119959c64f36822465c466f65ea39ded360c7a054a04df09a"
+  }
+}

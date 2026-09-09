@@ -1,0 +1,524 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "04023cebba5566c8a65d8075a3d2e63fc71e65ef55f66a8269169f3dd403194d",
+  "canonical_id": {
+    "value": "10.64898/2025.12.12.694004",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.12.694004v1",
+      "biorxiv:2025.12.12.694004v1",
+      "PMID:41446131",
+      "PMCID:PMC12724715"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "SARS-CoV-2 intra-host single-nucleotide variant (iSNV) analysis of 4,295 -> 2,770 amplicon-sequenced genomes from the Boston University surveillance cohort. Computational reproduction target: the custom Nextflow bioinformatic pipeline (Trimmomatic, Kraken2/KrakenTools, FastQC, BWA, samtools, iVar, LoFreq, SnpEff, bcftools consensus, Pangolin), the post-pipeline phylogenetics (MAFFT, RAxML, TreeTime, IQ-TREE, UShER/matUtils), the R-based isolate/variant filtering including the batch-contamination heuristic, the transmission-pair inference from patristic distances (ape, ggraph, ggtree), and the dN/dS selection analysis (dNdScv). Wet-lab work (anterior-nares swab collection, Zymo Quick-RNA Viral 96 extraction, ARTIC amplicon generation, Illumina SBS sequencing) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation extracted from the METHODS section of the bioRxiv JATS XML (fetched HTTP 200 from https://www.biorxiv.org/content/early/2025/12/15/2025.12.12.694004.source.xml after two HTTP 429 Cloudflare rate-limit retries; title phrase 'University Surveillance Cohort' confirmed present in the fetched text before scoring). The paper's Methods explicitly delegate the parameter table and flowchart to the GitHub repository, so the repo README prose (root README.md and '1. Nextflow pipeline/README.md') was read as prose and used for parameter and dependency-install evidence; no workflow source file (Nextflow_pipeline.nf, nextflow.config, the .Rmd/.R scripts) was opened, per stage-1 rules. Two pipeline steps (Kraken2/KrakenTools contaminant-read removal, samtools depth coverage) appear only in the repository README pipeline table and not in the paper Methods; they are scored because they are part of the same pipeline prose, and are flagged as README-only. Wet-lab steps are counted in W (4) but are not enumerated in the steps array, consistent with prior stage-1 reports: swab collection under the BU testing mandate, Zymo Quick-RNA Viral 96 total RNA prep, ARTIC amplicon generation with primer versions 3-4, and Illumina SBS sequencing by BU's Microarray and Sequencing Resource.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Read trimming with Trimmomatic (v.0.39); README parameter table gives ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:8:true LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:20",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Read quality verification with FastQC ('successful trimming was verified with FastQC'), default parameters, no version stated in paper or README",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "defaults-asserted"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Contaminating-read identification and removal with Kraken2 (db: standard_db, default) and KrakenTools (--fastq-output --taxid 2697049); step appears only in the repository pipeline README, not in the paper Methods; no version for either tool, no Kraken2 database build date",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "db-snapshot-undated",
+        "readme-only-step"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Alignment to the Wuhan-Hu-1 reference genome (MN908947.3 in paper / NC_045512.2 downloaded in README) with BWA (v0.7.17-r1188), default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "defaults-asserted",
+        "reference-accession-mismatch"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Primer soft-clipping with iVar (v.1.4.4) using the ARTIC V4 primer BED; README gives -e (include reads with no primers), -m 30, -q 20, -s 4",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primer-scheme-version-conflict"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Variant calling with LoFreq (v. 2.1.5): 'lofreq call -N -B -q 30 -Q 30 -C 100 --call-indels; lofreq filter --cov-min 100 --snvqual-thresh 30 --sb-mtc fdr --sb-alpha 0.01 --sb-no-compound'; paper additionally states AAF >= 0.01, coverage >= 100, quality >= 30, strand-bias p < 0.01 with FDR correction",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Functional annotation with SnpEff (v 5.2), default parameters; the SnpEff SARS-CoV-2 annotation database name/release is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "defaults-asserted",
+        "db-snapshot-undated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Consensus sequence generation with bcftools consensus (v.1.22) from major variants (AAF >= 0.5), positions with coverage < 100 set to 'N'; README gives --mark-ins lc --mark-del '-' -m <bed>",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Per-base coverage extraction with samtools depth / mpileup plus awk post-processing for median depth, zero-coverage and <100x base counts; samtools version never stated (paper or README)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "defaults-asserted",
+        "readme-only-step"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Pangolin lineage assignment run in accurate (UShER) mode (v 4.3); the pangolin-data / UShER designation-tree release used for assignment is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "db-snapshot-undated"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Workflow orchestration: 'These processing steps were implemented in a custom Nextflow (v 23.10.0.5889) pipeline (Figure S1)'; repo ships nextflow.config + Nextflow_pipeline.nf, but the README run command invokes 'Nextflow_pipeline_NEW.nf' with cluster-absolute paths (--path_nextflow_dir, --path_conda_envs) under SLURM sbatch",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "script-name-mismatch",
+        "site-specific-absolute-paths"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Multiple sequence alignment with MAFFT (paper: v7.520; README downloads mafft-7.525-linux.tgz) using --thread 2 --6merpair --keeplength --addfragments against the Wuhan reference",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "version-conflict-paper-vs-readme",
+        "readme-shell-snippet-not-committed-script"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Maximum-likelihood phylogeny under GTR + Gamma, rooted on Wuhan-Hu-1. Paper states RAxML (v8.2.12); README instead installs and runs raxml-ng (conda, no version) with --model GTR+G --threads 8 --seed 1234 --prefix SARS_phylo",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "tool-identity-conflict-paper-vs-readme",
+        "readme-shell-snippet-not-committed-script"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Root-to-tip regression / temporal-signal check and outlier detection with TreeTime (v0.11.4): 'treetime clock --tree <raxml.bestTree> --dates <dates.csv> --sequence-len 29903 --clock-filter 3', run per VoC and for all VoCs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "readme-shell-snippet-not-committed-script"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Time-calibrated tree with IQ-TREE (v 2.2.5): 'iqtree -T 2 -s MSA_subset_IQtree.fa --date IQTREE_dates.txt -te IQtree.tre --date-root 2020-03-18 -m GTR+G'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "readme-shell-snippet-not-committed-script"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Mutation-annotated phylogeny with UShER and matUtils to count independent origins of fixed SNPs ('usher -t UShER.tre -v merged.vcf -o global_assignments.pb'; 'matUtils extract -i global_assignments.pb -A node_mutations.tsv'; VCF built with faToVcf). No version for usher, matUtils, or faToVcf",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "readme-shell-snippet-not-committed-script"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Exclusion of low-quality isolates in R (v.4.3.1) [repo: 2.Data_Cleaning/1.Filter_Isolates.Rmd]: 4,295 -> 2,770 isolates by removing 390 without batch information, 619 with Ct >= 32, 348 with > 10% N/gaps, 103 non-Delta/BA.1/BA.2 lineages, 68 phylogenetic outliers (> 3 SD of within-VoC mean pairwise distance, plus TreeTime outliers)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "r-package-versions-absent"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "False-positive iSNV removal in R (v.4.3.1) [repo: 2.Data_Cleaning/2.Filter_VCF.Rmd + Contamination/]: batch/AAF/lineage-defining-mutation contamination heuristic (9,497 iSNVs -> 2,815 kept as fixed SNP, 6,682 reverted to reference), AAF < 0.03 artifact cut, removal of iSNVs recurring at 0.01 <= AF < 0.05 across >= 5 batches (n = 35,708) or >= 2 isolates within a batch (n = 122,640), reclassification of within-batch recurrent major-frequency iSNVs (n = 186), restoration of C22792T as fixed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "r-package-versions-absent",
+        "heuristic-detailed-in-supplementary-text"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Transmission-pair inference and visualisation in R: consensus SNP differences estimated as patristic distance x 29,903 bp via ape::cophenetic.phylo, links mapped onto the time-calibrated phylogeny with ggraph and ggtree. No version for ape, ggraph or ggtree; the numeric SNP-difference / shared-iSNV threshold defining a 'likely transmission pair' is not given in Methods prose",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "thresholds-unstated"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Selection analysis with the dNdScv R package (v. 0.0.1.0), default substitution model and the SARS-CoV-2 reference file of Tonkin-Hill, Martincorena, Amato et al. (2021); within-host dN/dS on iSNVs with 0.03 <= AF < 0.95, population-level dN/dS on fixed SNPs (AF >= 0.95) counted once per independent origin from the UShER mutation-annotated tree",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "external-reference-file-unversioned"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 15,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 20,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/20 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "15/20 (75%) computational steps reach RI at the stage-1 prose ceiling. This is an unusually high prose ceiling for the cohort: the Methods pin exact versions for Trimmomatic v0.39, BWA v0.7.17-r1188, iVar v1.4.4, LoFreq v2.1.5, SnpEff v5.2, bcftools v1.22, Pangolin v4.3, Nextflow v23.10.0.5889, MAFFT v7.520, RAxML v8.2.12, TreeTime v0.11.4, IQ-TREE v2.2.5, R v4.3.1 and dNdScv v0.0.1.0, the raw reads are in a public SRA BioProject (PRJNA892225), the code is in a public GitHub repository, and the repository README carries an explicit per-step parameter table plus verbatim command lines. The 5 NI steps are those where no version exists anywhere: FastQC, Kraken2/KrakenTools (with an unpinned 'standard_db'), samtools depth/mpileup, UShER/matUtils/faToVcf, and the ape/ggraph/ggtree transmission analysis. No step can exceed version=1 at stage 1: the repository ships no environment.yml, no lockfile, no renv snapshot, no container and no Dockerfile - the README installs dependencies with bare unversioned 'conda install bioconda::<tool>' commands, so the exact pins in prose have no environment closure. Three paper-vs-README conflicts additionally cap confidence without changing verdicts: MAFFT v7.520 (paper) vs mafft-7.525 (README download), RAxML v8.2.12 (paper) vs raxml-ng (README install and run), and ARTIC primer 'versions 3-4' (paper) vs ARTIC V4 only (repo primer file and iVar BED).",
+    "coverage": "20 computational steps assessed from Methods prose plus the GitHub landing page, the root README and the '1. Nextflow pipeline/README.md' prose; 4 wet-lab steps counted (W) and treated as out of computational-reproduction scope (not enumerated, n_X = 0, per prior stage-1 convention). Full text obtained from the bioRxiv JATS XML endpoint (HTTP 200 on the third attempt; two prior attempts returned HTTP 429 Cloudflare rate limiting, and WebFetch on the same URL returned HTTP 403). Repo read limited to landing page, directory listings via the GitHub contents API, and README prose; no workflow source, config, or analysis script was opened.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment for the entire pipeline (all 20 C-steps)",
+      "missing": "No conda environment.yml, no lockfile, no requirements.txt, no renv snapshot, no Dockerfile or container digest, and no sessionInfo appear in the paper or in the repository. The pipeline README's 'Install Dependencies' section creates one conda environment per tool with unpinned commands ('conda install bioconda::fastqc', 'conda install bioconda::bwa', 'conda install ivar', 'conda install bioconda::lofreq', 'conda install bioconda::snpeff', 'conda install bioconda::pangolin', 'conda install -c bioconda raxml-ng', 'conda install -c bioconda treetime', 'conda install usher', 'conda install bioconda::seqkit'), so the exact prose version pins are not enforceable at install time. Java is inconsistent within the same README: section 1.2 comments 'conda install openjdk=17' while section 3 is titled 'Install Java 11' and comments 'conda install openjdk=11'. R is pinned to v4.3.1 but no R package versions (ape, ggraph, ggtree, tidyverse) are given, and dNdScv is a GitHub-only package whose install source is not recorded.",
+      "how_to_close": "Ship a single conda/mamba environment file with pinned versions and a solved lockfile (or a container image referenced by digest) covering all pipeline tools, plus an renv.lock or recorded sessionInfo for the R analyses; resolve the openjdk 11 vs 17 inconsistency."
+    },
+    {
+      "type": 12,
+      "where": "Software identity / provenance of the analysis code (all 20 C-steps)",
+      "missing": "The Data Summary cites only a bare GitHub URL: 'All code is open-access and available in GitHub at: https://github.com/Leacavalli/Sars-cov-2-Intrahost-Variation'. The repository has no release, no tag, no Zenodo or Software Heritage DOI, and no license file; the paper cites no commit hash. The default branch (main) was last pushed 2026-01-15, after the 2025-12-15 preprint posting, so the code state corresponding to the manuscript is not identifiable. Absent a license, downstream reuse is legally undefined despite the 'open-access' claim.",
+      "how_to_close": "Tag a release matching the preprint, archive it to Zenodo for a DOI, cite that DOI (not the bare URL) in the Data Summary, and add an explicit open-source license file."
+    },
+    {
+      "type": 3,
+      "where": "Code completeness for the post-pipeline phylogenetics (C12-C16) and the Nextflow entry point (C11)",
+      "missing": "The MAFFT, RAxML/raxml-ng, TreeTime, IQ-TREE and UShER/matUtils steps exist only as copy-paste shell blocks inside '1. Nextflow pipeline/README.md', not as committed, runnable scripts; the blocks embed site-specific absolute paths ('/n/netscratch/hanage_lab/Lab/lcavalli/...', '/n/holylfs05/LABS/hanage_lab/...') and SLURM 'sbatch -p hsph' partition names that will not exist elsewhere. The README run command invokes 'Nextflow_pipeline_NEW.nf' while the repository ships 'Nextflow_pipeline.nf', so it is not determinable from prose which script produced the results. One README code block ('Get the median and average depth per position across isolates') is empty. The 3.1 Transmission directory name is misspelled ('3.1. Tranmission') relative to the README link.",
+      "how_to_close": "Commit the post-pipeline steps as parameterised scripts (or fold them into the Nextflow workflow), replace absolute cluster paths and SLURM partitions with configurable parameters, and reconcile the pipeline script name and directory names between README and repository."
+    },
+    {
+      "type": 5,
+      "where": "Reference genome, annotation and primer scheme (C4, C5, C7, C8)",
+      "missing": "The paper names the reference as MN908947.3 while the README downloads NC_045512.2 (identical sequence, different accession namespace) - the discrepancy is unexplained. The ARTIC primer scheme is stated as 'recommended primer sets (versions 3-4)' in the paper, but the repository ships only 'SARS-CoV-2.primer.tsv' described as 'Information for Artic V.4 Primers' and the README fetches only the V4 BED from the artic-network primer-schemes master branch (a moving branch, not a tagged release). Which isolates were amplified with V3 versus V4, and how the mixed schemes were handled during iVar primer trimming, is not recoverable from prose. The SnpEff annotation database name and release are never stated.",
+      "how_to_close": "State the exact reference accession used at runtime, provide the per-sample primer-scheme assignment (V3 vs V4) as a metadata column, pin the artic-network primer-schemes repository to a tagged release or commit, and name the SnpEff database and version."
+    },
+    {
+      "type": 6,
+      "where": "External databases and reference resources (C3, C7, C10, C20)",
+      "missing": "The Kraken2 database is given only as 'standard_db' with no build date or source; the Pangolin lineage assignment is version-pinned at the tool level (v 4.3) but the pangolin-data / UShER designation release that actually determines lineage calls is not recorded; the SnpEff SARS-CoV-2 database release is unstated; the dNdScv 'SARS-CoV-2 reference file developed by Tonkin-Hill, Martincorena, Amato, et al., (2021)' is cited by publication rather than by file version, URL or checksum.",
+      "how_to_close": "Record the Kraken2 database build date and download URL, the pangolin-data version reported by 'pangolin --all-versions', the SnpEff database release, and the exact dNdScv reference RData file (URL + checksum), and ship the small ones with the code."
+    },
+    {
+      "type": 8,
+      "where": "Parameter reporting split between paper and repository (C11, C13, and the pipeline generally)",
+      "missing": "The Methods delegate parameters to the repository: 'All code, along with a flowchart detailing the bioinformatic methods and a table of parameter values, is available on GitHub'. The README parameter table is genuinely detailed, but it conflicts with the paper on two tools (MAFFT v7.520 vs mafft-7.525; RAxML v8.2.12 vs raxml-ng), and neither source states which of the two was actually run. RAxML v8 and raxml-ng are different programs with different defaults and different tree-search behaviour, so this is not a cosmetic discrepancy. The paper's stated GTR + Gamma model is consistent across both, and a seed (--seed 1234) is present only in the README raxml-ng command.",
+      "how_to_close": "Make the repository parameter table the single normative source, remove the tool/version statements from the Methods that contradict it (or correct them), and state explicitly which phylogenetic program produced the published tree."
+    },
+    {
+      "type": 7,
+      "where": "Stochastic and heuristic steps without recorded seeds (C13, C15, C18)",
+      "missing": "A seed is given for the README raxml-ng run (--seed 1234) but not for the RAxML v8.2.12 run described in the paper; the IQ-TREE dating run records no seed; and the batch-contamination heuristic (C18), whose details are relegated to the supplementary text, is not described in the Methods at a level that fixes tie-breaking or ordering behaviour. The '68 phylogenetic outliers' in C17 depend on the tree, which in turn depends on the unseeded search.",
+      "how_to_close": "Record seeds for every stochastic invocation actually executed, and move the full contamination-heuristic specification (or a pointer to the exact script and its thresholds) from supplementary prose into the Methods and the repository README."
+    },
+    {
+      "type": 9,
+      "where": "Transmission-pair calling thresholds (C19)",
+      "missing": "The Methods describe how consensus SNP differences were estimated (patristic distance x 29,903 bp) and how links were drawn, but never state the numeric criterion that defines a 'likely transmission pair' - neither the SNP-distance cutoff nor the shared-iSNV requirement nor any epidemiological time-window constraint. The central claim of the paper (shared iSNVs are highly specific but insensitive markers of transmission) is a function of exactly this threshold.",
+      "how_to_close": "State the SNP-distance and shared-iSNV thresholds, plus any temporal or batch constraints, numerically in the Methods and expose them as named parameters in the transmission script."
+    },
+    {
+      "type": 11,
+      "where": "Workflow orchestration boundary (C11 vs C12-C20)",
+      "missing": "Nextflow (v23.10.0.5889) covers only the per-sample pipeline steps. Everything from MSA onward is orchestrated by hand-run sbatch commands and interactive R Markdown, with the ordering conveyed only by README section numbering and by the '# Post-pipeline steps' heading. The dependency graph from the Nextflow outputs into 2.Data_Cleaning and 3. Data Analysis is implicit, and the intermediate concatenation steps (Raw_VCF.csv, All_pango.csv, All_Gap_N.txt) are bare shell one-liners embedded in the README.",
+      "how_to_close": "Extend the Nextflow workflow (or add a second workflow / driver script) to cover the post-pipeline phylogenetics and the R analyses, so that the full path from SRA reads to published figures is a single declared dependency graph."
+    },
+    {
+      "type": 13,
+      "where": "Intermediate result artifacts",
+      "missing": "The repository does ship key intermediates - Raw_metadata.csv, Analysis_metadata.csv, Analysis_VCF.csv, a Contamination/ input-output folder, and an Outputs/ folder under the Nextflow pipeline - which is above cohort norm and allows the downstream R analyses to be re-run without reprocessing raw reads. What is not evident from prose is whether the intermediates carry checksums, a manifest, or a mapping back to the exact pipeline run that produced them, and no consensus-sequence FASTA, MSA, or tree file is named in the README file list.",
+      "how_to_close": "Add a manifest with checksums and provenance (pipeline commit + run date) for each shipped intermediate, and deposit the MSA, ML tree, and time-calibrated tree as versioned artifacts."
+    },
+    {
+      "type": 1,
+      "where": "Data availability - study-generated sequence data",
+      "missing": "No gap of substance. The Data Summary states verbatim: 'All sequence data have been deposited in the Sequence Read Archive (SRA) of the national center for biotechnology information (NCBI), under the project accession number PRJNA892225.' The BioProject resolves publicly (checked 2026-07-28) as 'SARS-CoV-2 testing at Boston University'. Residual issue: the paper does not state how the 4,295 study isolates map onto the BioProject's SRA runs, and Raw_metadata.csv in the repository is the only link between BU sample identifiers (e.g. 'bu3048', 'bu4148' in README examples) and SRA accessions; no run-accession list is given in the paper itself.",
+      "how_to_close": "Include an explicit SRR/BioSample accession list (as a supplementary table) for the 4,295 considered and 2,770 retained isolates, keyed to the internal BU identifiers used in the code."
+    },
+    {
+      "type": 10,
+      "where": "Curation-flavoured filtering decisions (C17, C18)",
+      "missing": "Two filtering decisions are asserted rather than derived: the restoration of C22792T to fixed AAF because 'it is a known artifact associated with primer binding issues' (single-locus manual override, justified by citation and Figure S6), and the exclusion of 103 isolates from 'VoCs other than Delta, BA.1, or BA.2' where the enumerated counts (100 Alpha + 1 Iota + 39 B.1.1.529 + 3 B.1 + 4 B.1.1 = 147) do not sum to the stated 103. The arithmetic inconsistency in the paper text means the exact exclusion set cannot be reconstructed from prose alone.",
+      "how_to_close": "Correct or explain the isolate-exclusion arithmetic, and expose the manual locus-level overrides (currently only C22792T) as an explicit, extensible table in the filtering script rather than as inline prose."
+    },
+    {
+      "type": 4,
+      "where": "Third-party / external data dependencies",
+      "missing": "No gap. The study consumes no controlled-access third-party cohort; all sequence input is the authors' own SRA deposition, and the only external inputs are public reference and primer resources (covered under gap types 5 and 6).",
+      "how_to_close": "n/a"
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/Leacavalli/Sars-cov-2-Intrahost-Variation - stated verbatim in the Data Summary: 'All code is open-access and available in GitHub at: https://github.com/Leacavalli/Sars-cov-2-Intrahost-Variation .' and again in Methods: 'All code, along with a flowchart detailing the bioinformatic methods and a table of parameter values, is available on GitHub at: https://github.com/Leacavalli/Sars-cov-2-Intrahost-Variation .' Status: URL-present and resolving. Top-level contents observed: README.md, 0.Raw_data (Raw_metadata.csv, SARS-CoV-2.primer.tsv), '1. Nextflow pipeline' (README.md, Scripts/, Outputs/, Bioinformatics_flowchart_SarsCov2.pdf/.pptx), 2.Data_Cleaning (1.Filter_Isolates.Rmd, 2.Filter_VCF.Rmd, Analysis_metadata.csv, Analysis_VCF.csv, Contamination/, Filtering_flowchart_SarsCov2.pdf/.pptx), '3. Data Analysis' ('3.1. Tranmission', '3.2. Selection'). No releases and no tags (GitHub API /releases returns an empty array). License: null (GitHub API 'license': null). Default branch main, created 2024-03-29, last pushed 2026-01-15T22:12:47Z, size ~419 MB.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser UA to github.com landing page, raw.githubusercontent.com/main/README.md (200), raw README of '1. Nextflow pipeline' (200), and api.github.com contents/releases endpoints"
+    },
+    {
+      "artifact": "data accession: NCBI SRA BioProject PRJNA892225. Stated verbatim on the title page ('Sequence data accession numbers: PRJNA892225') and in the Data Summary ('All sequence data have been deposited in the Sequence Read Archive (SRA) of the national center for biotechnology information (NCBI), under the project accession number PRJNA892225.'). Status: stated-in-paper, publicly resolving, title 'SARS-CoV-2 testing at Boston University'. No per-run (SRR) or per-sample (SAMN) accession list is provided in the paper for the 4,295 considered / 2,770 retained isolates.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA892225"
+    },
+    {
+      "artifact": "reference resources cited in prose without URLs or version pins: Wuhan-Hu-1 reference genome (paper: MN908947.3; README: NC_045512.2 via NCBI datasets), ARTIC primer scheme (paper: 'versions 3-4'; README: V4 BED fetched from https://raw.githubusercontent.com/artic-network/primer-schemes/refs/heads/master/nCoV-2019/V4/SARS-CoV-2.primer.bed - a moving branch, not a tagged release), Kraken2 'standard_db' (no build date), SnpEff SARS-CoV-2 database (unnamed), pangolin-data / UShER designation release (unstated), dNdScv SARS-CoV-2 reference file of Tonkin-Hill, Martincorena, Amato et al. (2021) (cited by publication only).",
+      "http_status": "n/a (not individually checked; only the primer-scheme URL is given explicitly and it points at a moving branch)",
+      "checked_at": "2026-07-28",
+      "network_context": "prose-cited resources from paper Methods and repository README"
+    },
+    {
+      "artifact": "no other artifact class present: no Zenodo deposit, no Software Heritage archive, no Docker/quay/biocontainers image, no figshare/Dryad deposit, and no supplementary code archive is claimed anywhere in the paper or the repository.",
+      "http_status": "n/a",
+      "checked_at": "2026-07-28",
+      "network_context": "absence recorded as a finding; no web search was performed to locate an unstated artifact"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "6649f53887a2516c2c836727b8431a8ab3825599b5ba569a0f7611af39d9820e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

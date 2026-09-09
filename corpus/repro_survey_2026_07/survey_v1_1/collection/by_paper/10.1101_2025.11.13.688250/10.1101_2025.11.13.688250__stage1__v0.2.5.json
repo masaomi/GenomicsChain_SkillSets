@@ -1,0 +1,431 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "b8aad3a28372f9071d09b47a738016a9b503038206433051d6d02d1608ec9097",
+  "canonical_id": {
+    "value": "10.1101/2025.11.13.688250",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.13.688250v1",
+      "biorxiv:2025.11.13.688250v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Comparative-genomics analysis of subtelomeric Y' elements across 54 S. cerevisiae telomere-to-telomere assemblies: ENA-hosted reads/assemblies (PRJEB59869 ScRAP + PRJEB89249 W303), Minimap2 remapping and manual assembly-extremity trimming, telomere/ITS detection (Telofinder), X-element detection (LRSDAY 1.7.2), construction of a high-confidence Y' element database via sliding-window self-BLAST plus S288C R64-2-1 reference BLAST, genome-wide Y' detection with BLAT, 36-mer detection/masking (Levenshtein scoring + scipy find_peaks + Logomaker), MAFFT MSA, similarity matrix, seaborn hierarchical clustering with silhouette-optimised k, ORF detection/density, and within- vs between-strain diversity. No wet-lab work is performed in this paper (the W303 sequencing/assembly is cited to prior work, Garrido et al. 2025).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation derived from the Methods sections 'Data', 'Detection of X elements, Y' elements and telomeres', '36-mer detection and masking', 'Similarity matrix and hierarchical clustering', 'ORF detection', and 'Within- vs between-strain diversity of Y' elements'. Custom in-house analyses that are described as a distinct named procedure (Y' database construction, 36-mer scoring, similarity matrix, ORF detection, diversity computation) are each counted as one step even though no script is deposited. The paper has NO Code Availability statement and NO author code repository; the only repository URL in the text is the third-party tool Telofinder. Manual assembly trimming after Tablet inspection is counted as one step (C3) because every downstream step consumes its undeposited output. W=0: no wet-lab procedure is reported in this paper.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Download of reads and telomere-to-telomere assemblies from ENA project PRJEB59869 (ScRAP, O'Donnell et al. 2023) and PRJEB89249 (W303, Garrido et al. 2025)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-download-script",
+        "accession-snapshot-undated"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Mapping of reads back onto their own assemblies with Minimap2 (Li 2018) prior to visual inspection of chromosome extremities",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-tool",
+        "no-preset-stated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Visual inspection of chromosome extremities in Tablet (Milne et al. 2013) and manual trimming of all extremities 'for which there was suspicion of overassembly or misassembly'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "manual-curation",
+        "subjective-criterion",
+        "trimmed-assemblies-not-deposited",
+        "poisons-downstream-inputs"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Terminal telomere and interstitial telomeric sequence (ITS) detection on the trimmed assemblies with Telofinder (O'Donnell et al. 2023; https://github.com/GillesFischerSorbonne/telofinder)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-tool",
+        "no-commit-pin",
+        "input-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "X element detection in the assemblies with LRSDAY 1.7.2 (Yue & Liti 2018)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-artifact",
+        "no-params-stated",
+        "input-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Telomere masking + high-confidence Y' database construction: perfect-repeat search in 25 kb sliding windows with 5 kb step over the 100 kb from each chromosome end, self-BLAST of each window, alignments of 4.0-9.5 kb with >=90% identity flagged",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-tool",
+        "custom-db-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "BLAST search of S288C reference (R64-2-1, Cherry et al. 2012) Y' sequences as queries across the assemblies; repeats matching at least partially a reference Y' and directly flanked by telomeric sequence retained as the high-confidence Y' database",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-tool",
+        "blast-params-unstated",
+        "reference-version-pinned-in-prose"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Genome-wide Y' element detection with BLAT v.37x1, parameter -maxIntron=1000, followed by trimming of extremal BLAT blocks smaller than 20 bp separated by a gap greater than 100 bp",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-artifact",
+        "post-processing-rule-in-prose-only",
+        "input-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "36-mer detection: 36-meric alignment score from Levenshtein distance between each 36 bp window and the Horowitz & Haber (1984) degenerate 36-mer set, peak calling with scipy.signal find_peaks (min_distance=30, threshold=0.85), matches of length != 36 discarded; reference-derived 36-mers reused as database across the 54 strains",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-library",
+        "python-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Consensus sequence logo of size-36 matches with Python Logomaker, and masking of the region between the first and last detection peak from the Y' sequences for downstream analyses",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-library",
+        "no-params-stated"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Multiple sequence alignment of Y' elements with MAFFT v7.490 (Katoh & Standley 2013), '-auto' option",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-artifact",
+        "input-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Similarity matrix computed from the MSA: percentage of shared nucleotides over the union-covered length for each sequence pair, shared-gap positions ignored",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-library"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Hierarchical clustering of the similarity matrix with seaborn 'clustermap' (method='average'), dendrogram cut at the k maximising the silhouette score over k=2..100; second clustering on CA-containing Y' elements after CA-rich region removal replaces their initial assignment",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-library",
+        "seaborn-scipy-versions-unstated"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "ORF detection (intervals of >=300 bases between ATG and TAA/TAG/TGA over three frames, per-element masked array) and per-cluster ORF density plots in MSA coordinates",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script-undeposited",
+        "unversioned-library",
+        "strand-handling-unstated"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Within- vs between-strain diversity: MAFFT v7.490 '-auto' alignment of Y' elements from clusters 6, 7, 8, 12, 15, 16, 17, 18, 19, 21 excluding ADI strain, restricted to the conserved 36-mer-containing region (defined only by figure colour in Fig. 2C), pairwise percentage of divergent nucleotides with shared-gap positions ignored",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "custom-script-undeposited",
+        "region-defined-by-figure-colour",
+        "input-not-deposited"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 12,
+    "n_X": 1,
+    "S": 15,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/15 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "2/15 (13%) RI ceiling (C8 BLAT, C11 MAFFT); 12/15 cap at NI and 1/15 at X even under an inference-inclusive reading. The paper carries no Code Availability statement and no author repository, so every custom analysis (Y' database construction, 36-mer scoring, similarity matrix, clustering, ORF detection, diversity computation) has code=0 and can only be re-implemented from prose. Version pins exist for a minority of tools (LRSDAY 1.7.2, BLAT v.37x1, MAFFT v7.490, reference genome R64-2-1) with no environment closure (no conda env, lockfile, container, or Python/library versions), so version cannot exceed 1. C3 (manual trimming of chromosome extremities on a subjective 'suspicion of overassembly' criterion, with the trimmed assemblies not deposited) is unrecoverable and its output is the input to every subsequent step, which is why data is capped at 1 from C4 onward. There is no author code for stage-2 to read; this paper does not become R-star-eligible via stage 2.",
+    "coverage": "15 computational steps assessed from Methods prose. Computational coverage 15/15 (100%) - no wet-lab procedure is reported in this paper (W=0); the W303 sequencing/assembly is cited to prior work (Garrido et al. 2025). Data availability is stated inline in the Methods 'Data' subsection (ENA PRJEB59869, PRJEB89249); there is no separate Data Availability or Code Availability section.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "All in-house analyses (C1, C3, C6, C7, C9, C10, C12, C13, C14, C15)",
+      "missing": "No code repository, scripts, notebooks, workflow files, or Code Availability statement appear anywhere in the paper. The sliding-window repeat search, BLAST/BLAT post-processing, 36-mer Levenshtein scoring, similarity-matrix computation, clustering/silhouette selection, ORF detection, and diversity computation are all described in prose only.",
+      "how_to_close": "Deposit the analysis code (GitHub + archived Zenodo DOI) containing the window-scan/BLAST/BLAT driver scripts, the 36-mer scoring and masking code, the similarity-matrix and clustering notebook, and the ORF/diversity scripts, and add a Code Availability statement."
+    },
+    {
+      "type": 5,
+      "where": "C6, C7 - high-confidence Y' element database; C9 - reference 36-mer database",
+      "missing": "The custom high-confidence Y' element database (the pivot artifact used to detect Y' elements genome-wide) and the reference-derived 36-mer database are not deposited as machine-readable files. Supplementary data 1 and 2 are referenced but not described as containing these artifacts.",
+      "how_to_close": "Deposit the high-confidence Y' FASTA database, the 36-mer database, the resulting Y' element coordinate tables per strain, and the MSAs used for clustering and diversity analysis."
+    },
+    {
+      "type": 1,
+      "where": "C3 and everything downstream (C4-C15)",
+      "missing": "The trimmed assemblies - produced by manual removal of chromosome extremities judged suspicious after Tablet inspection - are not deposited, and the trimming criterion is subjective ('suspicion of overassembly or misassembly'). Every downstream step consumes these undeposited inputs, so the ENA-public raw assemblies do not by themselves restore the analysis inputs.",
+      "how_to_close": "Deposit the trimmed assemblies (or a machine-readable table of trimmed coordinates per strain per chromosome end) and state an objective trimming rule (e.g. coverage/clipping thresholds) instead of visual judgement."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 15 steps",
+      "missing": "No conda environment, lockfile, container, or requirements file. Exact pins exist only for LRSDAY 1.7.2, BLAT v.37x1, MAFFT v7.490 and the S288C reference R64-2-1; Minimap2, Tablet, Telofinder, BLAST, Python, scipy, seaborn, Logomaker and the clustering/silhouette implementation are all unversioned (2a 版記載なし). No interpreter version, channel, or platform is declared, so no step reaches environment closure.",
+      "how_to_close": "Ship a conda-lock / pixi.lock or a container with a recorded digest covering the Python interpreter and scipy/seaborn/logomaker/scikit-learn versions plus the command-line tools, and state the Minimap2, BLAST and Telofinder versions (or Telofinder commit)."
+    },
+    {
+      "type": 5,
+      "where": "C2 Minimap2; C7 BLAST",
+      "missing": "No parameters are given for the Minimap2 read-to-assembly mapping (no preset such as -ax map-ont / map-pb) and none for the S288C reference BLAST search (program, e-value, identity/coverage thresholds), although the self-BLAST step C6 does state its 4.0-9.5 kb / >=90% identity criteria.",
+      "how_to_close": "State the exact Minimap2 preset and the BLAST program and thresholds for each BLAST invocation."
+    },
+    {
+      "type": 5,
+      "where": "C15 - conserved region used for diversity analysis",
+      "missing": "The region analysed is defined only by reference to a colour in Fig. 2C ('the purple 36-mer-containing region'), not by alignment coordinates, so the analysed interval cannot be reconstructed unambiguously from the text.",
+      "how_to_close": "Give the MSA coordinate interval (or a BED/coordinate table) defining the conserved region used for the within- vs between-strain diversity computation."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code): NONE - no Code Availability statement and no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage/figshare/OSF repository for the study's own code is stated anywhere in the paper",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full-text scan (biorxiv .source.xml, retrieved 200 OK) for github/gitlab/bitbucket/zenodo/figshare/osf/software heritage returned exactly one match, the third-party Telofinder tool URL below"
+    },
+    {
+      "artifact": "third-party tool repo: Telofinder - https://github.com/GillesFischerSorbonne/telofinder (stated in Methods, 'Detection of X elements, Y' elements and telomeres'); no version, tag, release or commit stated",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl HEAD-equivalent, github.com"
+    },
+    {
+      "artifact": "data accession: ENA project PRJEB59869 (stated in Methods: 'All data analyzed in this study besides data for W303 strain were downloaded from the European Nucleotide Archive (ENA), from project number PRJEB59869'; reads and assemblies)",
+      "http_status": "200 (ENA browser API XML resolves, PROJECT accession=\"PRJEB59869\" alias=\"ScRAP\")",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, https://www.ebi.ac.uk/ena/browser/api/xml/PRJEB59869"
+    },
+    {
+      "artifact": "data accession: ENA project PRJEB89249 (stated in Methods: 'The W303 strain was sequenced and assembled in a previous work (Garrido et al., 2025), and reads and assembly can be found on the ENA under project number PRJEB89249')",
+      "http_status": "200 (ENA browser API XML resolves, PROJECT accession=\"PRJEB89249\", SECONDARY_ID ERP172291, center Sorbonne University)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, https://www.ebi.ac.uk/ena/browser/api/xml/PRJEB89249"
+    },
+    {
+      "artifact": "reference resource: S. cerevisiae S288C reference genome version R64-2-1 (SGD, Cherry et al. 2012) - version stated in prose only, no URL or accession given",
+      "http_status": "n/a (no URL in paper; prose-pinned version only)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited reference version; not resolved because no locator is given in the paper"
+    },
+    {
+      "artifact": "supplementary: 'Supplementary information' (DC1) and 'Supplementary data 1 and 2' (DC2) listed in the article XML; contents not described in the Methods text",
+      "http_status": "not individually checked (bioRxiv supplementary attachments)",
+      "checked_at": "2026-07-27",
+      "network_context": "listed in JATS XML supporting-information block"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "61af771e52197cc7ad37370d6e435e62b4210102ab3520ca7ef3f42728e9362c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "de25f8ccbebdf0abd07d0d315f21cb6251057e15cb6e70ef10e462886a9eb2fb",
+  "canonical_id": {
+    "value": "10.1101/2025.10.16.682960",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.16.682960v1",
+      "biorxiv:2025.10.16.682960v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Secondary computational reanalysis of 179 previously-generated human whole-blood DNA methylation array datasets (>42,000 profiles, 450K/EPIC), producing the TranslAGE resource: hand-harmonized metadata + mean-imputed beta matrices, 41 precalculated epigenetic clock/biomarker scores via the methylCIPHER R package, age/sex residualization, and four downstream statistical pipelines — Stability (lme4 ICC + Fisher-z random-effects pooling with metafor), Treatment response (paired t-tests + effect-size scaling to an unnamed large EPICv1 reference), Associations (glm/lm/polr regressions + metafor REML meta-analysis), Risk (logistic/linear/coxph + REML meta-analysis) — and the composite STAR score (rank-normalized z-scores, Stouffer aggregation). No wet-lab step: all methylation data are pre-existing public (GEO/EMBL) or collaborator-private datasets, so W = 0.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis-invocation from the bioRxiv v1 JATS XML Methods prose (WebFetch on the .source.xml returned HTTP 403; the same XML was retrieved with curl + browser UA, 151,775 bytes, title phrase 'Systematic Validation of Epigenetic Aging Biomarkers' verified present before scoring). ROUTING BOUNDARY CALL: the paper presents itself as a platform/resource ('A Comprehensive Platform'), which would suggest the tool/methods route, but that route requires a CODE REPO as the evidence base and TranslAGE ships none — only a website (translage.io) and a dependency package (methylCIPHER). The paper's substantive claims (ICCs, effect sizes, meta-analytic pooled estimates, STAR ranks) are the outputs of a secondary computational reanalysis, so the pure-computational route (evidence = Methods prose, target = reproduce results) was used. Ten C-steps derived. Steps 1 (hand harmonization) and 2 (imputation) are described in one Methods paragraph but are separated because they differ sharply on the Code axis. Steps 6 and 9 both call metafor rma(REML) but sit in different pipelines with different inputs and transformations, so they are counted separately. Zero W-steps: no assay was performed by the authors.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Dataset curation and harmonization — screening (human whole blood, Illumina array, beta-matrix or raw .idat, >=10 samples, >=95% probe coverage) and by-hand harmonization of 179 datasets to a shared metadata schema (Sample ID, Subject ID, Sex, Age, Group, Time From Baseline); 'Datasets were harmonized by hand by our team'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Missing-value handling — mean imputation of missing beta values from the dataset at that CpG site; entirely missing probes replaced with 0; no explicit batch correction across arrays",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Clock calculation — 41 epigenetic clocks/biomarkers computed with the methylCIPHER R package v1.2.1 (https://github.com/HigginsChenLab/methylCIPHER), extended by the authors with additional clocks 'to fit our needs'; identical methylation array supplied to every clock; clock list in Supplemental Table 2",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Age residualization — each biomarker estimate regressed against chronological age to remove age-related variation; Zhang2019 epigenetic age substituted as the age proxy for the 3 datasets lacking chronological age (Zhang2019 itself excluded from validation pipelines)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Association / Risk regression models — automatic model selection by outcome type: logistic 'glm(..., family=binomial)', linear 'lm(...)', ordinal 'polr(...)', survival 'coxph(...)' (survival v3.5-7); all models include 'scale(clock)' and are adjusted for chronological age and sex; beta, SE = |beta/z| and z extracted",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Association / Risk meta-analysis — random-effects pooling across studies with metafor v4.4-0, 'rma(yi = beta, sei = se, method = \"REML\")', model beta_i = theta + u_i + eps_i; case/control group means and SDs additionally combined with meta-analytic formulas for binary disease status",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Treatment response pipeline — QC flagging (>5 subjects / 10 samples, follow-up >48 h after baseline; 101 of 129 longitudinal datasets pass), paired t-tests on pre/post clock residuals, effect sizes standardized to the age-adjusted population SD of 'a large EPICv1 dataset' (reference dataset never named)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Stability ICC estimation — intraclass correlation from mixed-effects models 'lmer(y ~ 1 + (1|SUBJ))' (lme4 v1.1-35), ICC = sigma_u^2/(sigma_u^2 + sigma_e^2), on 5 technical-replicate and 6 biological-replicate datasets (same blood draw vs same individual within 24 h)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Stability ICC pooling — Fisher z-transformation 'z = 1/2 ln((1+ICC)/(1-ICC))' with 'Var(z) = 1/(n-3)', random-effects meta-analysis 'rma(..., method = \"REML\")' (metafor v4.4-0), back-transformed as '(exp(2*theta)-1)/(exp(2*theta)+1)' to pooled technical and biological ICCs per clock",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Unified STAR composite score — per-domain z-scores (Stability from avgICC of biological+technical ICC; Treatment response from scaled estimates with optional sign negation; Associations and Risk from pooled beta/SE aggregated by Stouffer's method), rank-based normalization to 0-1 per domain, simple average over user-selected domains; drives the translage.io/recommend dashboard",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 9,
+    "n_NI": 1,
+    "n_X": 0,
+    "S": 10,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification); unexecuted, and under-claims by construction: Tier-1 cannot credit an undeclared-but-present dependency. has_validated_env_capture=false, so this per-paper ratio is reported for the funnel record only.",
+    "inference_inclusive_upper_bound": "RI ceiling on 9/10 computational steps. The paper carries an unusually complete PROSE version block — 'All analyses were performed in R (v4.3.2; packages: methylCIPHER v1.2.1, metafor v4.4-0, lme4 v1.1-35, survival v3.5-7)' — plus verbatim model calls (glm/lm/polr/coxph, lmer(y ~ 1 + (1|SUBJ)), rma(method=\"REML\"), Fisher-z formulas), which is why 9 steps clear every axis at >=1. But exact pins with no interpreter channel/platform declaration and no lockfile/container = version 1 (exact_pins_partial), so no step can exceed RI even at Stage 2 unless the authors ship an environment capture. C1 (by-hand harmonization of 179 datasets, no script) caps at NI and is not recoverable by a code check: it is manual curation, not code. The binding constraint is not versions — it is that the TranslAGE analysis pipeline itself was never deposited, and that the harmonized analysis datasets are 'available upon request' with download gated 'pending publication'.",
+    "coverage": "10/10 computational steps assessed from bioRxiv v1 Methods prose (100% computational coverage). W = 0: the authors performed no assay; all 179 methylation datasets are pre-existing public (NCBI GEO, EMBL/ArrayExpress) or collaborator-private (e.g. TruDiagnostic, Framingham Heart Study) data.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Data and Code Accessibility section — the whole TranslAGE analysis pipeline",
+      "missing": "No repository, archive, or DOI is given for the TranslAGE analysis code. The section names only the R version and four package versions; it contains no code link at all. The only code URL anywhere in the paper is the dependency package https://github.com/HigginsChenLab/methylCIPHER. The harmonization scripts, the automatic model-selection logic, the four STAR pipelines, the composite-score computation and the dashboard code are all undeposited, despite the paper describing itself as establishing 'the first standardized, reproducible framework' with 'transparent pipelines'.",
+      "how_to_close": "Deposit the TranslAGE analysis code (harmonization, residualization, the four STAR pipelines, composite scoring) in a public repository with an archived Zenodo/Software Heritage snapshot cited in Data and Code Accessibility."
+    },
+    {
+      "type": 1,
+      "where": "Dataset identity and access (Methods 'Dataset curation and harmonization'; Data and Code Accessibility)",
+      "missing": "Not a single accession identifier (GSE/E-MTAB/phs/EGA) appears anywhere in the paper text — sources are named only as 'NCBI GEO', 'EMBL', and 'private datasets shared by collaborators'; the 179-dataset list exists only in Supplemental Table 1, which was not retrievable at Stage 1. Access is further gated three ways: 'Analysis datasets are available upon request'; download from the Front Page Dashboard is 'pending publication' in a peer-reviewed journal ('To protect the work, full dataset download functionality is limited until this manuscript is accepted'); and private/protected datasets have per-dataset data-use-agreement restrictions disclosed only after a download request is made. This is accidental gating plus missing identifiers, not a documented DAC path, so Data caps at 1 on every step.",
+      "how_to_close": "Publish the per-dataset accession table (GSE/E-MTAB/phs IDs) in the manuscript itself rather than a gated supplement, remove the 'pending publication' download gate for the originally-public datasets, and document a named DAC/application route for each restricted dataset."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment (Data and Code Accessibility)",
+      "missing": "Versions ARE stated exactly — R v4.3.2, methylCIPHER v1.2.1, metafor v4.4-0, lme4 v1.1-35, survival v3.5-7 — so this is not gap 2a (no version) or 2b (floating lower bound). The gap is environment CLOSURE: no renv.lock, conda-lock, pixi.lock, Docker digest or sessionInfo() dump; no CRAN snapshot date or repository/channel; no declared platform; and the transitive dependency closure (Matrix, nlme, metadat, MASS for polr, minfi/sesame-family readers for .idat) is unpinned. Under the rubric's symmetric env-closure gate this is version=1, subtier exact_pins_partial, so R★ is unreachable at any stage without an added capture.",
+      "how_to_close": "Ship an renv.lock (or a container with a recorded image digest) pinning the R interpreter, the CRAN/Bioconductor snapshot, the platform, and the full dependency closure — not just the five named direct packages."
+    },
+    {
+      "type": 5,
+      "where": "Clock calculation (C3), harmonization (C1), residualization (C4), STAR composite (C10)",
+      "missing": "Custom, non-public components sit inside otherwise well-described steps. (a) methylCIPHER was extended by the authors — 'following the package's structure, added additional clocks and epigenetic-based biomarker algorithms to fit our needs' (Author Contributions: 'D.S.B., R.S., and J.K. expanded MethylCIPHER to include additional algorithms') — and whether those additions are in the public v1.2.1 tree is unverifiable from prose. (b) The 179 datasets were 'harmonized by hand', so the per-dataset curation decisions exist only as human judgement with no script or decision log. (c) Methods and Results disagree on the residualization model: Methods says residuals were computed 'by regressing each epigenetic biomarker estimate against chronological age', while Results/Figure 1 say scores were 'residualized for age and sex'; with no code released, this discrepancy cannot be resolved. (d) Several STAR z-score formulas appear only as display equations whose text is truncated in the prose stream ('z-scores were derived as', 'a z-score was calculated using scaled estimates, where'), so the composite formula is not fully readable from the text alone.",
+      "how_to_close": "Release the extended methylCIPHER fork at the exact commit used, publish the harmonization decisions as a machine-readable per-dataset manifest rather than manual work, state the residualization covariate set unambiguously, and give the STAR z-score formulas in the text."
+    },
+    {
+      "type": 13,
+      "where": "Treatment response effect-size scaling (C7) and the Zhang2019 age proxy (C4)",
+      "missing": "The reference resource that all Treatment-response effect sizes are divided by is described only as 'a large EPICv1 dataset' / 'a large EPICv1 study' — no accession, cohort name, sample size or version. Every reported standardized effect size in the Treatment Response Dashboard is therefore on an unidentifiable scale. Similarly, the Zhang2019 age-predictor used as a chronological-age substitute for 3 of 179 datasets is cited only by publication, with no stated coefficient source or version.",
+      "how_to_close": "Name and pin the EPICv1 reference cohort (accession + sample count + the exact age-adjusted SD values per clock) and state the source/version of the Zhang2019 coefficients."
+    },
+    {
+      "type": 11,
+      "where": "Competing Interest Statement; private dataset sources",
+      "missing": "'Three of the authors (R.S., A.H.C., J.L.S) developed and licensed some of the tools (clock models) used and showcased in the paper.' At least some of the 41 scored clock algorithms are licensed rather than openly redistributable, and their coefficients may not be obtainable by a third party through the public methylCIPHER package. Private data also enters through commercial/collaborator sources (TruDiagnostic named in Figure 1) and controlled cohorts (Framingham Heart Study, the sole source of the mortality time-to-event analysis).",
+      "how_to_close": "State per clock which algorithms are licensed and under what terms a reproducer can obtain the coefficients; state the FHS and TruDiagnostic access routes explicitly."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (dependency package only): https://github.com/HigginsChenLab/methylCIPHER — cited as the basis of the clock calculation step, v1.2.1 pinned in Data and Code Accessibility",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser UA; README landing page read via WebFetch. README installs via devtools::install_github (no version tag, no renv/conda/Docker); no lockfile or container mentioned in README prose."
+    },
+    {
+      "artifact": "resource website: https://translage.io (TranslAGE platform; dashboards /frontpage, /stable, /responsive, /associations, /risk, /recommend)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser UA"
+    },
+    {
+      "artifact": "data download route: https://translage.io/frontpage (Front Page Dashboard — the only stated route to harmonized datasets and precalculated clock scores)",
+      "http_status": "200 OK (page reachable, but the paper states full dataset download functionality is withheld until peer-reviewed acceptance)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser UA; download gate is a stated policy limitation, not an HTTP failure"
+    },
+    {
+      "artifact": "data accessions: none stated in the paper. Sources named only as 'NCBI GEO', 'EMBL', 'TruDiagnostic', 'Framingham Heart Study'; regex scan of the full JATS text for GSE/E-MTAB/SRP/phs/EGA/Zenodo/figshare/dbGaP identifiers returned zero matches.",
+      "http_status": "n/a — no accession URL to resolve",
+      "checked_at": "2026-07-28",
+      "network_context": "grep -oE over the de-tagged JATS XML (64,730 chars); 179-dataset list is in Supplemental Table 1, not retrieved at Stage 1"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/10/19/2025.10.16.682960.source.xml (JATS XML)",
+      "http_status": "403 Forbidden via WebFetch; 200 OK via curl with browser UA (151,775 bytes)",
+      "checked_at": "2026-07-28",
+      "network_context": "title phrase 'Systematic Validation of Epigenetic Aging Biomarkers' verified present in the fetched file before scoring (anti-swap check passed)"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "190acb39f1d3a488403ff7d5518454587c25526b33019b39b971c784b4dae4f7",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

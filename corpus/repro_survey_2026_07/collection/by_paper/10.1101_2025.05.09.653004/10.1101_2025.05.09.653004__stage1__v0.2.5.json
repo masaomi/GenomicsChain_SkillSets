@@ -1,0 +1,236 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.09.653004",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.09.653004v1",
+      "biorxiv:2025.05.09.653004v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Comparative-genomics / phylogenetics analysis of horizontally transferred cellulose biosynthesis gene clusters in E. coli: BLAST homolog retrieval from public NCBI + PLSDB sequences, multiple-sequence alignment, Maximum-Likelihood phylogeny (MEGA), transmembrane/domain prediction and visualization, plasmid typing (Center for Genomic Epidemiology servers), plasmid map/annotation display, and an R box plot of plasmid sizes. Wet-lab microbiology (strains, conjugation, cellulose/biofilm assays, cellulose extraction, TLC) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the 'Bioinformatic analyses' and 'Box plot calculation with R' Methods prose. GeneDoc manual curation is folded into the ClustalX alignment step; Prokka reannotation is folded into the Proksee display step; the three Center for Genomic Epidemiology typing servers (FimTypes / SerotypeFinder / PlasmidFinder 2.1) are one step. No code repository, scripts, commands, or config files are provided anywhere in the paper; every computational tool is invoked as an interactive GUI or web server with manual curation, so no executable artifact exists to read at stage-2. Wet-lab procedures counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "BLAST homolog search of BcsA1 (P37653) against NCBI microbial/complete/draft genomes + PLSDB plasmids (Altschul 1990); 'default parameters', query coverage >47% / 40%, truncated proteins removed",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "manual-curation"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Multiple-sequence alignment with ClustalX 2.1, manually curated in GeneDoc (Higgins & Sharp 1988)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-code-artifact", "manual-curation"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Identity/similarity calculation with 'Ident and Sim' (SMS2, bioinformatics.org) using aa classes GAVLI/FYW/CM/ST/KRH/DENQ/P (Stothard 2000)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C4",
+      "label": "Alignment display with ESPript 3.0 (Robert & Gouet 2014)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Maximum-Likelihood phylogenetic trees with MEGA 7.0 or MEGA 11.0, 1000 bootstrap iterations (Tamura et al. 2021)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-code-artifact", "ambiguous-version", "gui-tool"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Gene-cluster comparative visualization with Easyfig (Sullivan, Petty & Beatson 2011); gene neighborhood assessed manually",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "manual-curation"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Transmembrane-helix prediction with TMHMM (Moller, Croning & Apweiler 2001)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Transmembrane-topology prediction with TOPCONS (Tsirigos et al. 2015)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C9",
+      "label": "Domain-structure display with Illustrator for Biological Sequences IBS 2.0 (Xie et al. 2022)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-code-artifact", "gui-tool"]
+    },
+    {
+      "step_id": "C10",
+      "label": "Amino-acid-in-domain visualization with Protter (Omasits et al. 2014)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C11",
+      "label": "FimH type / serotype / origin-of-replication typing with Center for Genomic Epidemiology servers: FimTypes, SerotypeFinder, PlasmidFinder 2.1 (Carattoli & Hasman 2020)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-code-artifact", "web-server", "partial-version"]
+    },
+    {
+      "step_id": "C12",
+      "label": "Representative-plasmid display with Proksee (Grant et al. 2023), reannotated with Prokka (Seemann 2014)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["no-code-artifact", "web-server"]
+    },
+    {
+      "step_id": "C13",
+      "label": "Mean/median plasmid size + box plot (1st/3rd quartile) in RStudio version 4.4",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["no-code-artifact", "no-script"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 13,
+    "n_X": 0,
+    "S": 13,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/13 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "All 13 computational steps cap at NI even under inference-inclusive reading: no code repository, scripts, commands, or configuration are provided; every tool is an interactive GUI or web server and several key steps involve explicit manual curation (GeneDoc, manual gene-neighborhood assessment). Exact version pins exist for a minority of tools (ClustalX 2.1, ESPript 3.0, IBS 2.0, PlasmidFinder 2.1, RStudio 4.4) but with no executable artifact to attach them to. There is no stage-2 code to read; this paper does not become R★-eligible via stage2.",
+    "coverage": "13 computational steps assessed from Methods prose; 6 wet-lab steps counted (W) but out of computational-reproduction scope. No code-availability or data-availability section present in the paper.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Entire bioinformatic analysis (all 13 C-steps)",
+      "missing": "No code repository, scripts, commands, notebooks, or configuration files are provided anywhere in the paper. Every computational tool is described as an interactive GUI/web-server invocation, several with explicit manual curation. Nothing is machine-executable/re-runnable.",
+      "how_to_close": "Deposit an analysis repository (GitHub/Zenodo) containing the BLAST commands + thresholds, alignment/tree build scripts, input FASTA sets, and the R box-plot script, so the pipeline can be re-executed rather than manually re-clicked."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all named tools",
+      "missing": "No conda env, lockfile, container, or requirements. Version pins exist only for a partial subset (ClustalX 2.1, ESPript 3.0, IBS 2.0, PlasmidFinder 2.1, RStudio 4.4); BLAST, GeneDoc, Ident&Sim, Easyfig, TMHMM, TOPCONS, Protter, Proksee, Prokka are unversioned, and MEGA is ambiguous ('7.0 or 11.0').",
+      "how_to_close": "Provide a pinned environment (conda-lock/pixi.lock or container digest) for the command-line tools; record exact versions and the resolved MEGA version."
+    },
+    {
+      "type": 5,
+      "where": "C1 BLAST parameters; C5 MEGA model settings",
+      "missing": "BLAST run with 'default parameters' (which BLAST program/matrix/e-value not stated); coverage thresholds given (>47%/40%) but per-search assignment unclear. MEGA substitution model / gamma settings unstated (only 1000 bootstrap given).",
+      "how_to_close": "State the exact BLAST program and parameters, and the MEGA/ML substitution model and rate settings used per tree."
+    },
+    {
+      "type": 1,
+      "where": "Input sequence sets for alignments/trees",
+      "missing": "The exact non-redundant homolog sets retrieved (accession lists, trimming coordinates, 'homologous regions common to all proteins') are not provided as machine-readable inputs; supplementary Tables S1-S3 list plasmid/protein accessions but not the curated alignment inputs.",
+      "how_to_close": "Deposit the retrieved FASTA sets, curated alignments (with trimming coordinates), and tree files (e.g., in the analysis repo or a data archive)."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: strains/growth, triparental conjugation, aggregation/cellulose/biofilm assays, Updegraff crystalline-cellulose extraction, 1% KOH extraction, cellulase-digest TLC",
+      "missing": "Wet-lab generation/validation steps are out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the bioinformatic analysis."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — no GitHub/GitLab/Zenodo/figshare/OSF/Code Ocean repository, and no code-availability statement, found anywhere in the paper",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-23",
+      "network_context": "JATS XML full-text scan for github/gitlab/zenodo/figshare/osf/codeocean/dryad returned no matches"
+    },
+    {
+      "artifact": "data resource: PLSDB plasmid database (https://ccb-microbe.cs.uni-saarland.de/plsdb2025/) — public query source, not a deposited study accession (Galata et al. 2019)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ccb-microbe.cs.uni-saarland.de"
+    },
+    {
+      "artifact": "data resource: NCBI microbial + complete/draft genome databases (public query source); representative proteins by accession (BcsA2 WP_074014783.1, BcsA3 HDP8224287.1, BcsA4 WP_004186066.1); reference structure PDB 4HG6. No newly deposited dataset accession (GEO/SRA/ENA/BioProject) present.",
+      "http_status": "not individually checked (public NCBI/PDB identifiers cited in prose)",
+      "checked_at": "2026-07-23",
+      "network_context": "prose-cited public identifiers; no deposited study accession to resolve"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "a72597bb47dc43e0d99e08f3c2fb8064aa462692f7d0be9137fe0a0ea254c442",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

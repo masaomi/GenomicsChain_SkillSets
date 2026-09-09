@@ -1,0 +1,32 @@
+{
+  "_comment": "Frame-level exclusions applied post-hoc. Pre-registration v1.0 §3 excludes withdrawn preprints at frame level, but sampler.rb implemented no such filter, so the withdrawn work below entered the frame of 637 and was drawn. §3 requires exclusions be 'recorded as counts, not as silence': the report file is retained on disk as evidence and is removed only from the analysis denominator. Decision and its honest limitation are recorded at chain #143.",
+  "excluded": [
+    {
+      "canonical_id": "10.1101/2025.04.15.649007",
+      "draw_position": 103,
+      "reason": "withdrawn",
+      "evidence": "bioRxiv API type='withdrawn' on v2 (2025-11-14); title prefixed 'WITHDRAWN:'; abstract replaced by the withdrawal statement",
+      "preregistration_rule": "v1.0 §3 — 'Excluded at frame level (recorded as counts, not as silence): Withdrawn preprints.'",
+      "report_retained": "by_paper/10.1101_2025.04.15.649007/10.1101_2025.04.15.649007__stage1__v0.2.5.json",
+      "backfilled_by": "10.64898/2025.12.07.692843",
+      "chain_block": 143
+    }
+  ],
+  "backfill": [
+    {
+      "canonical_id": "10.64898/2025.12.07.692843",
+      "draw_position": 201,
+      "rule": "v1.0 §5 — 'take the same Random.new(SEED_DRAW) shuffle of the same frame (same window, same frame_doi_sha256) and consume the next contiguous M records after position N'",
+      "M": 1,
+      "replaces": "10.1101/2025.04.15.649007",
+      "chain_block": 143
+    }
+  ],
+  "not_drawn_withdrawn": [
+    {
+      "canonical_id": "10.1101/2025.10.15.681968",
+      "shuffled_position": 300,
+      "note": "second withdrawn work in the frame of 637; outside the N=200 prefix, so it required no action"
+    }
+  ]
+}

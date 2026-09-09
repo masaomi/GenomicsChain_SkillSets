@@ -1,0 +1,461 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "cbb14e1da82531283d5484bfcb28a07da33877632e8483766600a0310661bed6",
+  "canonical_id": {
+    "value": "10.1101/2025.09.24.678374",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.09.24.678374v2",
+      "biorxiv:2025.09.24.678374v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "De novo mitogenome reconstruction and phylogenetic placement of Niphargus dolenianensis from newly generated reads of three individuals: (a) Illumina trimming (Skewer) and nanopore basecalling (Guppy v3.8 SUP) + q-score filtering (split_qscore.py from Buttery-eel, q>=14); (b) long-read assembly (Flye v2.9.6, comparison with hifiasm v0.25.0-r726), circular mito-contig extraction in Bandage, short-read polishing (bwa mem + Polypolish), validation mapping (minimap2 + SAMtools) with visual inspection in Tablet and MANUAL homopolymer correction in AliView; (c) Illumina-only comparison assembly (NOVOPlasty, seed COI KY706720); (d) annotation (GeSeq + tRNAscan-SE v2.0.7; MITOS2 genetic code 5 / RefSeq63 Metazoa) with manual refinement and RNAfold/ViennaRNA tRNA folding; (e) figures (mtSVG, genomeCoverageBed + xmgrace/Grace-5.1.17) and nucleotide diversity (pegas + seqinR in R/RStudio 4.4.1); (f) ML phylogeny of concatenated translated PCGs (IQ-TREE2, mtInv+I+G4, -B 50000). Wet-lab steps (specimen collection, DNA extraction, Illumina and ONT library prep + sequencing) are out of the computational reproduction target.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation from the Methods prose of the bioRxiv v2 JATS XML, cross-read against the paper's own 'Command lines' section (sec-10, figure F7 = graphics 678374v2_ufig1 / ufig1a). NOTE (material, and unusual for this corpus): the paper DOES publish literal command lines, but only as two raster JPEGs inside the article body (F7/graphic-10.large.jpg, F7/graphic-11.large.jpg) - not as text, not as a script, not in any repository. Those images were fetched and read at stage1 because they are part of the paper text, not code-repo content; this is why several params axes score 2 despite the prose alone being vague. The images are cropped at the right figure margin, so at least three commands are truncated mid-line (mtSVG.py '--circular ...', write.csv '... row.names =', data.frame '... stringsAsFact'), and the R snippet contains a hardcoded Windows path 'C:/Users/Alice/Desktop/nucleotide_diversity_results.csv' (gap type 7). The command-line images also reveal tools absent from the prose Methods (bwa index / bwa mem -t 16 for Polypolish input, micromamba env 'polypolish', 'module load BWA', genomeCoverageBed/bedtools, xmgrace) - prose-vs-command-line disagreement. Raw Illumina and nanopore reads are NOT deposited anywhere (no SRA/ENA/BioProject accession, no Data Availability section in the JATS XML or the .full HTML), so every step upstream of the deposited assemblies scores data=0. Only the three finished mitogenomes (GenBank PV534570/PV534571/PV534572), the NOVOPlasty COI seed (KY706720), and the comparison mitogenomes in Table 2 are public. 4 wet-lab steps counted as W and excluded from |S|. No workflow file, no script deposit, no code-availability statement; the only repository named in the paper is the third-party tool mtSVG (https://github.com/odethier-ulb/mtSVG). Stage-1 prose-only: no code was read, no env_capture_class assigned.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Illumina adapter/quality trimming of the three libraries (Skewer, 'skewer -m pe R1_001.fastq.gz R2_001.fastq.gz'; no version stated)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Nanopore basecalling of raw fast5 (Guppy v3.8, super-high-quality mode; ONT-proprietary basecaller, model config not named)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Nanopore read filtering at mean q>=14 (split_qscore.py from the Buttery-eel package; 'split_qscore.py -q 14 -f fastq'; no package version)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Long-read assembly (Flye v2.9.6, 'flye --nano-hq reads.pass.fastq --threads 10 -o flye')",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Comparison long-read assembly (hifiasm v0.25.0-r726, 'hifiasm --ont reads.pass.fastq -t10 -o hifiasm')",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Interactive inspection of GFA assembly graphs and extraction of the circular mitochondrial contig (Bandage GUI; no version, no selection criteria, no command)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Short-read polishing of the nanopore mito contig (bwa index + 'bwa mem -t 16' all-alignment SAMs -> 'polypolish filter' -> 'polypolish polish'; commands given in figure F7, no Polypolish/bwa versions; env only as 'micromamba activate polypolish' + 'module load BWA')",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Validation mapping of nanopore (and Illumina) reads onto the assemblies (minimap2, 'minimap2 -a -t 10 -x map-ont mtgenome.fasta reads.fastq'; no version)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "SAM->BAM conversion, sorting and indexing (SAMtools view -b / sort / index; no version)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Visual inspection of read pileups for structural and base-level errors (Tablet GUI; no version, no criteria, no exportable artifact)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "MANUAL correction of the remaining homopolymer indels directly in the contig FASTA files (AliView hand editing). The published mitogenomes depend on undocumented human edits; no edit list, no diff, no script",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Illumina-only comparison assembly (NOVOPlasty seeded with GenBank COI KY706720; no version, no config file - k-mer, insert size, genome range unstated; no command in figure F7)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Organelle annotation on the GeSeq web service with tRNAscan-SE v2.0.7 for tRNAs, using Pseudoniphargus stocki and P. carpalis mitogenomes as '3rd Party References'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Second annotation with MITOS2 (invertebrate mitochondrial genetic code 5, reference dataset RefSeq63 Metazoa; web service, server version not recorded)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "MANUAL checking and refinement of all annotations (start/stop codons incl. T-/TA- partial stops, gene-tRNA overlaps) by alignment against Pseudoniphargus references; no aligner named, no rule set, no script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "tRNA secondary-structure prediction (RNAfold on the ViennaRNA web service); no version, defaults unstated, and the manual folding CONSTRAINT applied to tRNA-Val of FS_24.011 is not given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Circular mitogenome map and gene-order strips beside the tree leaves (mtSVG, https://github.com/odethier-ulb/mtSVG; 'mtSVG.py --gff FS_24.010.gff3 --size 14964 --species ... --circular ...' truncated at the figure margin; no release/commit/tag; input .gff3 files not deposited)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Per-base coverage extraction from the sorted BAMs ('genomeCoverageBed -ibam ... -d', i.e. bedtools; tool not named in prose, no version; BAMs not deposited)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Coverage-depth graphs (Fig.3) plotted with Grace-5.1.17 / xmgrace from the .cov files; plot configuration is interactive GUI work",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Nucleotide diversity (pi) of 13 PCGs + 2 rRNA genes with pegas + seqinR under R/RStudio 4.4.1; the R loop is printed verbatim in figure F7 but truncated, has a hardcoded Windows output path, and package versions are absent; per-gene input FASTAs are not deposited and the gene-extraction step is undocumented",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Extraction, translation, alignment and concatenation of the 13 protein-coding genes across all taxa into Mitogenomes_PCGs.phy - NO tool, NO aligner, NO trimming step and NO command is given anywhere in the paper; the file simply appears as the IQ-TREE input",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Maximum-likelihood phylogeny ('iqtree2 -s Mitogenomes_PCGs.phy -m mtInv+I+G4 -nt auto -B 50000'); command exact but only the major line 'IQtree2' is stated as version, and no random seed is recorded for the 50,000 ultrafast bootstrap replicates",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 17,
+    "n_X": 2,
+    "S": 22,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/22 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "Readiness upper bound (R-star + RI) = 3/22 (14%). This paper is unusually generous on the params axis - it publishes literal command lines for 11 of its 22 computational steps - and unusually poor on the data axis: the raw Illumina and nanopore reads that every assembly, polishing and coverage step consumes were never deposited (no SRA/ENA/BioProject accession, no Data Availability statement). 17 steps sit at NI, almost all of them because data=0 (steps upstream of the GenBank deposit) or because the tool version is simply absent. Only C13 (GeSeq + tRNAscan-SE v2.0.7), C14 (MITOS2 code 5 / RefSeq63) and C20 (pegas/seqinR under R 4.4.1) clear every axis, because they run on the three deposited mitogenomes. 2 steps are X: C10 (Tablet pileup inspection) and C11 (manual homopolymer correction in AliView) - the published sequences are the product of undocumented hand edits, which is the single most consequential irreproducibility in the paper since 'nanopore + Illumina polishing yields highly accurate mitogenomes' is the paper's central claim. capture_claim is 'exact_pins_partial': six tools carry genuine exact pins (Guppy v3.8, Flye v2.9.6, hifiasm v0.25.0-r726, tRNAscan-SE v2.0.7, Grace-5.1.17, R/RStudio 4.4.1) but thirteen others carry none, there is no lockfile/container/environment.yml (the only environment trace is 'micromamba activate polypolish' and 'module load BWA'), and no interpreter/channel/platform declaration - so version is capped at 1 everywhere and no stage-2 code check could raise any step to R-star. NOT a stage2 candidate under the tightened v0.2.6 gate.",
+    "coverage": "22 computational steps assessed (C1-C22) spanning read processing, assembly, polishing, manual curation, annotation, figure generation and phylogenetics. 4 wet-lab steps (W=4: specimen collection + morphological ID, NucleoSpin Tissue DNA extraction, PCR-free Illumina library prep + NovaSeq 6000 run, SQK-RPB114.24 ONT library prep + PromethION R10.4.1 run) are OOS. Computational coverage |S|/(|S|+|W|) = 22/26 = 85%. Evidence base: bioRxiv v2 JATS XML + .full HTML + the two 'Command lines' figure images (F7 graphic-10/graphic-11), which were OCR-read because they are article body content; no repository or workflow file exists to read.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Primary input data - raw Illumina and nanopore reads for FS_24.009, FS_24.010, FS_24.011 (steps C1-C12, C18, C19)",
+      "missing": "No SRA / ENA / BioProject / any raw-read accession appears anywhere in the paper, and there is no Data Availability section in the JATS XML or the .full HTML. Only the three finished mitogenomes are deposited (GenBank PV534570, PV534571, PV534572). Consequently the entire assembly-and-polishing pipeline - which is the methodological subject of the paper - cannot be re-run on its own inputs, and the Illumina-vs-nanopore comparison that motivates the paper cannot be re-checked at all. Intermediate artifacts (fast5/pod5, filtered fastq, GFA assembly graphs, Flye and hifiasm contigs, unpolished vs polished FASTAs, BAMs, .cov files, per-gene FASTAs, Mitogenomes_PCGs.phy) are likewise undeposited.",
+      "how_to_close": "Deposit the raw nanopore (pod5/fastq) and Illumina reads for all three individuals under an ENA/SRA BioProject cited in the paper, plus a Zenodo archive of the key intermediates (GFA graphs, pre-polish and post-polish FASTAs, sorted BAMs, the concatenated PCG alignment)."
+    },
+    {
+      "type": 5,
+      "where": "Manual curation steps C10, C11, C15, C16 (Tablet inspection, AliView hand correction, annotation refinement, constrained tRNA-Val folding)",
+      "missing": "The final published mitogenomes are produced by unrecorded human editing: 'The few remaining errors detected in Tablet were corrected manually in the contig FASTA files using AliView.' No list of edited positions, no before/after diff, no decision rule for what counts as an error, and no record of the folding constraint imposed on tRNA-Val of FS_24.011. These steps cannot be replayed by anyone, including the authors.",
+      "how_to_close": "Publish the pre-manual-correction assemblies alongside the final ones plus a machine-readable edit list (VCF or position/base table) and the explicit acceptance rule; record the RNAfold constraint string used for tRNA-Val."
+    },
+    {
+      "type": 12,
+      "where": "Analysis code / commands (whole pipeline)",
+      "missing": "There is no code-availability statement, no repository, no tagged release, no DOI snapshot and no license for any analysis code. The paper's 'Command lines' section exists but is shipped as two raster JPEG images inside the article body, so the commands are not copy-pastable, not diffable, not versioned - and are visibly TRUNCATED at the right figure margin (mtSVG '--circular ...', 'write.csv(..., row.names =', 'data.frame(..., stringsAsFact'). The R nucleotide-diversity script is likewise only an image. The only repository cited is the third-party tool mtSVG (github.com/odethier-ulb/mtSVG) with no commit or release pinned.",
+      "how_to_close": "Move the command lines and the R script into a licensed GitHub repository (or a Snakefile/Makefile), tag a release, mint a Zenodo DOI, and cite the exact commit in the paper; pin the mtSVG commit used."
+    },
+    {
+      "type": 2,
+      "where": "Software environment (all 22 computational steps)",
+      "missing": "No environment.yml, conda-lock, container image or renv.lock. Exact pins exist for only 6 tools (Guppy v3.8, Flye v2.9.6, hifiasm v0.25.0-r726, tRNAscan-SE v2.0.7, Grace-5.1.17, R/RStudio 4.4.1); none is stated for Skewer, Buttery-eel/split_qscore.py, Bandage, bwa, Polypolish, minimap2, SAMtools, bedtools/genomeCoverageBed, NOVOPlasty, AliView, Tablet, mtSVG, pegas, seqinr, or IQ-TREE ('IQtree2' names the major line only). The GeSeq, MITOS2 and ViennaRNA web services carry no server version or run date at all, so their behaviour is unpinnable in principle. The only environment trace is 'micromamba activate polypolish' and 'module load BWA' - an unexported local env and an unversioned site module. No interpreter, channel or platform is declared.",
+      "how_to_close": "Ship a conda-lock/pixi.lock (or a container digest) covering every tool for a declared platform, record the exact version of each unpinned tool, and record the run date and server version for each web service (or replace them with locally installable equivalents)."
+    },
+    {
+      "type": 2,
+      "where": "Nanopore basecalling version consistency (C2)",
+      "missing": "The prose states basecalling with 'Guppy v3.8 (in super-high-quality mode) ... from the raw fast5' while the sequencing was performed on an R10.4.1 PromethION flow cell. Guppy 3.8 predates R10.4.1 support and the SUP model line, so the stated version is likely a transcription error for a later Guppy/Dorado release. The basecalling model config name (the thing that actually determines the consensus accuracy claims of this paper) is never given.",
+      "how_to_close": "State the actual basecaller and its version plus the exact model config file (e.g. dna_r10.4.1_e8.2_400bps_sup@vX.Y.Z) and the input format (fast5 vs pod5)."
+    },
+    {
+      "type": 4,
+      "where": "Alignment/concatenation and phylogenetic inference (C21, C22)",
+      "missing": "The step that produces Mitogenomes_PCGs.phy is entirely undocumented - no aligner (MAFFT/MUSCLE/...), no codon-vs-amino-acid alignment procedure, no trimming/masking, no ordering or partitioning of the 13 genes. For IQ-TREE, the command is exact ('-m mtInv+I+G4 -nt auto -B 50000') but no random seed is recorded, so the 50,000 ultrafast-bootstrap supports (including the headline 99% Niphargidae+Pseudoniphargidae node) are only distributionally reproducible; '-nt auto' additionally makes the run machine-dependent.",
+      "how_to_close": "Name and version the aligner and any trimming tool, deposit the concatenated alignment (the .phy file) and any partition file, and record the IQ-TREE seed (-seed) and thread count instead of -nt auto."
+    },
+    {
+      "type": 7,
+      "where": "R nucleotide-diversity script (C20)",
+      "missing": "The script writes to the hardcoded absolute Windows path 'C:/Users/Alice/Desktop/nucleotide_diversity_results.csv' and reads bare relative filenames ('atp6.fasta', ... 'rrnS.fasta') whose provenance - how the per-gene FASTAs were cut out of the three mitogenomes and whether they were aligned - is never described. The pasted block is also visibly duplicated/out of order in the figure (the write.csv call appears before the data.frame that it writes).",
+      "how_to_close": "Parameterise the output path, ship the per-gene extraction step as code, and deposit the per-gene FASTAs used."
+    },
+    {
+      "type": 11,
+      "where": "Proprietary / service-bound dependencies (C2, C13, C14, C16)",
+      "missing": "Guppy is ONT-proprietary and old releases are not publicly redistributable, which caps C2 below R-star regardless of the version string. GeSeq, MITOS2 and ViennaRNA/RNAfold are web services whose backend versions and reference databases change without notice; only MITOS2's reference dataset (RefSeq63 Metazoa) and tRNAscan-SE (v2.0.7) are pinned, GeSeq's and ViennaRNA's are not.",
+      "how_to_close": "Record web-service run dates and reported server versions, archive the exact service outputs (GFF/GB files) alongside the paper, and prefer locally installable, version-pinned equivalents where they exist."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W=4)",
+      "missing": "Specimen collection and morphological identification, NucleoSpin Tissue DNA extraction, PCR-free Illumina library prep + NovaSeq 6000 sequencing, and SQK-RPB114.24 ONT library prep + PromethION R10.4.1 sequencing are out of scope for computational reproducibility (OOS) and are excluded from |S|.",
+      "how_to_close": "n/a (OOS) - noted for scope-split transparency only."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "GenBank accessions PV534570, PV534571, PV534572 (the three deposited Niphargus dolenianensis mitogenome sequences; cited in Methods and Table 1)",
+      "http_status": "not-checked (accessions stated in paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "Accession numbers named verbatim in the 'Mitochondrial genome annotation and analysis' section; not independently HTTP-verified at stage1"
+    },
+    {
+      "artifact": "GenBank accession KY706720 (Niphargus dolenianensis COI sequence used as the NOVOPlasty seed)",
+      "http_status": "not-checked (accession stated in paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "Accession named verbatim in Methods"
+    },
+    {
+      "artifact": "Comparison amphipod/isopod mitogenomes downloaded from GenBank for the ML tree - 'all GenBank accession numbers available in Table 2'",
+      "http_status": "not-checked (accessions stated in Table 2, which is delivered as a figure/table object)",
+      "checked_at": "2026-07-28",
+      "network_context": "Table 2 is referenced in Methods as holding the accession list; the accession strings themselves are inside the table object and were not enumerated at stage1"
+    },
+    {
+      "artifact": "raw sequencing data (Illumina NovaSeq 6000 reads and ONT PromethION R10.4.1 reads for FS_24.009/FS_24.010/FS_24.011): NONE deposited - no SRA, ENA, BioProject or other accession anywhere in the paper, and no Data Availability section exists",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-28",
+      "network_context": "bioRxiv v2 JATS XML and .full HTML both searched for PRJ/SRR/ERR/SRA/ENA/'data availab'/'deposit' - the only deposit statement found is the GenBank mitogenome deposit in Table 1"
+    },
+    {
+      "artifact": "code repository for the study's own analyses: NONE - no code-availability statement, no GitHub/GitLab/Zenodo/Software Heritage link for the authors' commands or R script",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-28",
+      "network_context": "The paper instead carries a 'Command lines' section (sec-10) rendered as two JPEG images"
+    },
+    {
+      "artifact": "third-party tool repository: https://github.com/odethier-ulb/mtSVG (cited verbatim in Methods for the mitogenome map; no commit, tag or release pinned)",
+      "http_status": "not-checked (URL present in paper prose)",
+      "checked_at": "2026-07-28",
+      "network_context": "URL stated verbatim in the 'Mitochondrial genome annotation and analysis' section; not independently HTTP-verified at stage1"
+    },
+    {
+      "artifact": "paper's own 'Command lines' figure images: https://www.biorxiv.org/content/biorxiv/early/2025/12/04/2025.09.24.678374/F7/graphic-10.large.jpg and .../F7/graphic-11.large.jpg",
+      "http_status": "200 (both fetched, 193501 and 121576 bytes, image/jpeg)",
+      "checked_at": "2026-07-28",
+      "network_context": "Fetched with a browser UA and Referer from the v2 .full page; read as article body content (not code-repo content). Commands are cropped at the right figure margin."
+    },
+    {
+      "artifact": "ONT kit product page https://store.nanoporetech.com/rapid-pcr-barcoding-kit-24-v14.html (cited for cost, not an analysis artifact)",
+      "http_status": "not-checked (URL present in paper prose)",
+      "checked_at": "2026-07-28",
+      "network_context": "Vendor URL cited in the DNA extraction and sequencing section"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "4e55f19a4c37763d031353e6f75be32c61a85953c0d05e9079da2fae7515dd07",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

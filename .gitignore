@@ -20,3 +20,11 @@ command.log
 *.gem
 
 log/
+
+# Research data, held out of the repository by the author's decision (2026-09-01).
+# NOT because it is disposable -- the opposite. docs/research/prior_art_survey_20260901/
+# is the evidence behind the "61 systems" claim in the Prototype Fund application, and it
+# exists precisely because an earlier survey left no persisted list. It is ignored here
+# only until the author decides where it should be published. Remove this rule at that
+# point; do not let the rule become the reason the data is lost a second time.
+docs/research/

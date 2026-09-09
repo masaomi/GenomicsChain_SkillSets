@@ -1,0 +1,561 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "687230e44b74df38be60dfec10754d2a9b9d962ea1f30b167413d1043099f7e3",
+  "canonical_id": {
+    "value": "10.1101/2025.11.11.687715",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.11.687715v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Reproduce the computational results: single-base-pair-resolution chemical nucleosome maps for interphase and metaphase HeLa S3 chromosomes (NCP scores, unique/redundant nucleosome maps, center-weighted occupancy) and all downstream analyses derived from them (genome-wide local correlation, 1-kb-bin ChromHMM-state enrichment, linker-length statistics, TSS/enhancer/CTCF/exon-boundary profiles, K-means clusterings, and DNAcycP2 C-score aggregation). The wet-lab layer (cell-line construction, synchronization, chemical/MNase cleavage, library prep, sequencing) is out of scope (OOS).",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file (Snakefile/CWL/Nextflow/WDL/Makefile) is referenced anywhere in the paper or in the linked repository, so steps were derived one-per-named-tool-or-analysis-invocation from the Methods prose (guide Step 1 fallback). |S| = 17 computational steps, |W| = 8 wet-lab steps. Scoring boundary applied consistently: version=1 (subtier 'floating') for steps that invoke a NAMED third-party tool without a version (STAR, numap, MACS3, ChromHMM, DNAcycP2); version=0 ('unknown') for steps where no software, package or language is identified at all and no code is deposited (bespoke statistics, binning, clustering, G-band stratification). Note that reference RESOURCES are pinned more tightly than software: the genome build is exact (Ensembl GRCh38.p13 / GCA_000001405.28 / Release 108) and the CTCF motif is exact (JASPAR MA0139.1), but these are data-side pins and do not constitute environment capture, so the paper-level capture_claim remains 'floating' and no step_subtier was raised to exact_pins_partial.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C01",
+      "label": "Read alignment of chemical-map and MNase-map paired-end libraries to Ensembl GRCh38.p13 (GCA_000001405.28, Release 108) with the STAR aligner; retain uniquely mapped reads only",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C02",
+      "label": "RNA-seq alignment to GRCh38.p13 with STAR and gene-level FPKM quantification over 19,166 protein-coding genes (15,887 non-zero)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C03",
+      "label": "NCP (nucleosome center positioning) score computation at every genomic location via the deconvolution algorithm in the R package numap (https://github.com/jipingw/numap), following Brogaard et al. 2012 / Xi et al. 2014",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C04",
+      "label": "Unique nucleosome map construction: greedy selection on NCP-score magnitude with minimum inter-dyad spacing >=120 bp, retaining the top 90% by NCP score (~14.9 M unique nucleosomes per condition)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C05",
+      "label": "Redundant nucleosome map definition: all genomic locations with NCP score >= the minimum NCP score in the unique map (126 M interphase / 125 M metaphase positions)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C06",
+      "label": "Center-weighted nucleosome occupancy computation from the redundant map using Gaussian-decaying weights (chemical map: NCP scores; MNase map: read centers)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C07",
+      "label": "Genome-wide local Pearson correlation of interphase vs metaphase nucleosome occupancy in a 501 bp sliding window with 1 bp step",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C08",
+      "label": "Genome binning (3,029,672 non-overlapping 1,000 bp bins; 2,751,637 valid), low/high-correlation classification at threshold 0.15 (127,136 low bins), ROI/BG assignment by ChromHMM state (>=500 bp majority rule), 2x2 contingency tables, log odds ratio and chi-square test (df = 1)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C09",
+      "label": "Wald test on differences in log odds ratios for short-linker (<30 bp) enrichment in interphase vs metaphase across chromatin-state groups (E1-E4, E5/E6, E9-E11, E13, E18) and across TSS / enhancer / CTCF regions vs genome background",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Assignment of 18 ChromHMM chromatin states (E1-E18) to genomic bins; segmentation reused from Ernst & Kellis 2012 / Kundaje et al. 2015 with no accession, file URL, cell-type identifier or genome-build/liftover statement",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "CTCF site definition: MACS3 peak calling on ENCODE GEO GSM733785 (CTCF) vs GSM733659 (control) yielding 74,550 peaks, then within-peak refinement by scanning both strands with the JASPAR MA0139.1 19-nt PWM and taking the maximum-scoring position",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Compilation of 19,166 TSS/TTS for protein-coding genes from the GRCh38.p13 GTF, selecting the ensembl_havana transcript as representative isoform with longest-CDS fallback",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Compilation of 164,916 non-terminal exons with exon centers (midpoint; leftmost of two central bases for even-length exons), intron-exon (5' start) and exon-intron (3' end) boundaries; overlay of published NET-seq data (GSE61332)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "K-means clusterings: 7,944 TSS occupancy profiles in [-150,+250] bp into 8 clusters; enhancer local-correlation profiles within +/-400 bp into 8 clusters; nucleosomal C-score profiles near TSS into k=14 clusters. No random seed, initialization scheme, distance metric or scaling stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Active enhancer set definition (9,173 sites) by overlapping ChromHMM E9/E10 states with the curated multi-tissue human enhancer annotation of Leung et al. 2015; no accession/URL for the curated set and no quantified overlap criterion",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Genome-wide DNA cyclizability (C-score) prediction with DNAcycP2 (50 bp window per position, hg38) and aggregation of C-scores within +/-1 kb of unique nucleosome dyads; predicted scores deposited at Zenodo record 17393602",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Stratification of nucleosomal C-scores by Giemsa G-band class (gneg, gpos25/50/75/100) and by per-band gene density (>11 genes/Mb highlighted); band coordinate source cited only as Cheung et al. 2001 / Furey & Haussler 2003 with no table or accession",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "W01",
+      "label": "HeLa S3 cell culture and synchronization to prometaphase (double thymidine block, 5 h release, 100 ng/mL nocodazole 8 h, mitotic shake-off)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W02",
+      "label": "Generation of H4S47C-expressing HeLa S3 stable lines (clone 1-2, clone 2) by PiggyBac transposition with RNAi-resistant H4S47C vector, anti-H4 shRNA and PBase; puromycin/hygromycin selection",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W03",
+      "label": "Cell-cycle analysis by propidium-iodide flow cytometry (BD LSRFortessa)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W04",
+      "label": "Total histone purification (Active Motif kit), SDS-PAGE and anti-H4 western blot",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W05",
+      "label": "TRIzol RNA purification and TruSeq Stranded Total RNA library preparation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W06",
+      "label": "Chemical mapping: formaldehyde fixation, lysophosphatidylcholine permeabilization, phenanthroline-iodoacetamide labeling, CuCl2 loading, hydroxyl-radical cleavage, neocuproine quench, DNA extraction and 100-300 bp gel purification",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W07",
+      "label": "MNase mapping: fixation, permeabilization, 100 U/mL MNase digestion 37 C 10 min, stop, proteinase K, mononucleosomal DNA gel purification",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W08",
+      "label": "Illumina TruSeq DNA PCR-Free library preparation and paired-end sequencing on HiSeq 4000 / NovaSeq 6000 (NUSeq Core Facility)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 10,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 17,
+    "W": 8,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/17 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Unexecuted; declared environment statically valid but not verified as the env that produced the results. Applied symmetrically: this zero under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency. Co-reported: n_exact_capture_unexecuted = 0, n_fetch_required = 0. Reported for completeness only; has_validated_env_capture = false, so per-paper static_readiness is NOT a publishable per-paper number under P2.",
+    "inference_inclusive_upper_bound": "(n_R-star 0 + n_RI 10)/17 = 10/17 (59%) readiness upper bound - 'documented sufficiently for a reproduction attempt', never 'reproducible'. The 7 NI steps are all downstream analyses whose code was not deposited and whose software environment is unnamed; they are recoverable in principle from the prose, which is why they are NI and not X.",
+    "coverage": "|S| = 17 computational steps scored from prose Methods; |W| = 8 wet-lab steps OOS (excluded from |S|). Computational coverage = 17/(17+8) = 68%. Paper text: full JATS XML retrieved and title-verified. Repo evidence: GitHub landing page + README prose only (Stage-1 boundary); no workflow source read.",
+    "repro_index": {
+      "value": 0.4,
+      "coverage": "17/(17+8) = 68% computational coverage; weights are guesses until Tier-2",
+      "S": 17,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Methods - 'Sequencing and read alignment', 'RNA-seq data analysis', 'NCP score calculation', 'CTCF data analysis', 'The role of intrinsic DNA bendability' (C01-C06, C10, C11, C16)",
+      "missing": "Gap 2a - no software version is stated anywhere in the paper. 'the STAR aligner', 'MACS3', 'ChromHMM', 'DNAcycP2' and 'the R package numap' are named with no version, commit, tag or DOI; R/Python interpreter versions are not stated; no requirements.txt, DESCRIPTION version constraint, conda environment, renv.lock or container is mentioned in the paper or the numap README. The numap repository shows no releases and no tags. Reference resources are pinned far better than software: Ensembl GRCh38.p13 / GCA_000001405.28 / Release 108 and JASPAR MA0139.1 are exact.",
+      "how_to_close": "State exact versions for STAR, MACS3, ChromHMM, DNAcycP2 and numap (commit SHA or tagged release), plus the R and Python versions; ship a renv.lock / conda-lock / image digest declaring the platform. Tag a numap release and cite that tag in the paper."
+    },
+    {
+      "type": 12,
+      "where": "Data and availability statement",
+      "missing": "Only the map-PROCESSING code is deposited: 'Code for processing MNase and chemical mapping data is available as an R package named numap'. No repository, script archive or notebook covers the downstream analyses that generate essentially every figure - local correlation (C07), 1-kb binning and odds-ratio/chi-square enrichment (C08), the Wald tests (C09), K-means clusterings (C14), enhancer set construction (C15), C-score aggregation (C16) or the G-band/gene-density stratification (C17).",
+      "how_to_close": "Deposit the downstream analysis scripts (with the figure-generating driver) in a versioned, DOI-minted archive (Zenodo release of a GitHub repo) and link it from the availability statement."
+    },
+    {
+      "type": 5,
+      "where": "Methods - C07, C08, C09, C14, C15, C17",
+      "missing": "The bespoke statistical and clustering code is private. These steps also name no software at all (no package, no language), so the execution environment for them is unknown rather than merely unpinned - this is what drives version=0 and the NI verdicts.",
+      "how_to_close": "Publish the scripts and name the language/package stack (e.g. R stats::kmeans, scikit-learn) used for each step."
+    },
+    {
+      "type": 4,
+      "where": "Methods / Results - K-means clustering of TSS occupancy (k=8), enhancer local correlation (k=8), nucleosomal C-score profiles (k=14) [C14]",
+      "missing": "No random seed, initialization method (Lloyd/Hartigan-Wong/k-means++), number of restarts, distance metric or profile scaling/normalization. Cluster identities (e.g. 'Clusters 2 and 6 show a -1 nucleosome absent from the MNase map') therefore cannot be reproduced exactly; only distributional agreement is available.",
+      "how_to_close": "Record the seed and the clustering call; deposit the resulting cluster assignments as a supplementary table so downstream claims are checkable even if the clustering is re-run."
+    },
+    {
+      "type": 13,
+      "where": "Methods - ChromHMM state assignment (C10), active enhancer definition (C15), G-band stratification (C17)",
+      "missing": "Three external reference annotations are cited to publications but not pinned to a retrievable artifact: (i) the 18-state ChromHMM segmentation (Ernst & Kellis 2012; Kundaje et al. 2015) - no accession, no file URL, no cell line stated, no genome build or liftover statement, although all analyses are on GRCh38; (ii) the curated multi-tissue enhancer set of Leung et al. 2015 - no accession or URL; (iii) Giemsa band coordinates (Cheung et al. 2001; Furey & Haussler 2003) - no UCSC table name or version. Under the collection protocol these would be prose-DOI-only at best; at Stage 1 no A/B/C class is assigned.",
+      "how_to_close": "Cite each annotation by accession/URL with an explicit build and download date, or redeposit the exact files used alongside the analysis code."
+    },
+    {
+      "type": 6,
+      "where": "Methods - DNA cyclizability computation (C16)",
+      "missing": "C-score generation is externalized to DNAcycP2, a separately published tool of the same group (Kendall et al. 2025). This paper cites it but gives no repository link, version, or model-weights identifier, and does not state the invocation. Only the OUTPUT (predicted hg38 C-scores) is deposited, at Zenodo record 17393602.",
+      "how_to_close": "Link the DNAcycP2 repository with a pinned version/commit and the model-weights checkpoint identifier; state the exact command used to score hg38."
+    },
+    {
+      "type": 1,
+      "where": "Data and availability statement",
+      "missing": "Six GEO series are listed (GSE296340 / GSE296337 / GSE296336 for clone 1-2; GSE264401 / GSE264399 / GSE264400 for clone 2) but the prose does not map individual samples to conditions: which GSM is interphase replicate 1 vs 2, metaphase replicate 1 vs 2, or which RNA-seq sample corresponds to which cell-cycle phase. The replicate-merging step described in Fig EV2D-F is therefore not directly addressable from the paper text.",
+      "how_to_close": "Add a sample-to-accession mapping table (GSM id -> clone, cell-cycle state, replicate, assay) to the supplement."
+    },
+    {
+      "type": 10,
+      "where": "Methods - W01 to W08",
+      "missing": "Eight wet-lab steps (cell-line construction, synchronization, flow cytometry, histone purification/western, RNA and DNA library preparation, chemical cleavage, MNase digestion, sequencing) are non-computational and are excluded from |S| as OOS. They are documented in reasonable protocol detail with a Reagents and Tools Table, but that table is a figure/table object in the XML and its contents (catalogue numbers, lot-level detail) were not machine-extractable at Stage 1.",
+      "how_to_close": "No action required for computational reproducibility. For a documentation audit, confirm the Reagents and Tools Table carries catalogue numbers and RRIDs for the antibodies and cell lines."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (stated in paper): https://github.com/jipingw/numap - 'Code for processing MNase and chemical mapping data is available as an R package named numap'",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sIL from assessor host, unauthenticated. Landing page + README read (Stage-1 boundary; no source files read). README documents an R package only (NCP_wrapper1/NCP_wrapper4, NCP1/NCP4, occupancy/parsing/plotting/TSS functions) with usage examples but NO installation instructions and NO dependency versions. Top-level: R/, man/, src/, DESCRIPTION, NAMESPACE, NEWS, README.md. No releases, no tags, 3 commits on main. No LICENSE observed. No Dockerfile, no environment.yml, no renv.lock."
+    },
+    {
+      "artifact": "data deposit: Zenodo record 17393602 (DNAcycP2-predicted hg38 DNA cyclizability C-scores) - https://zenodo.org/records/17393602",
+      "http_status": "403",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL -A Mozilla from assessor host. Recorded VERBATIM as 403. This is very likely automated-client mitigation (Zenodo fronts records with a bot challenge) rather than a dead or restricted record; NOT treated as link rot without a browser-context re-check. Flagged for the human reviewer to confirm."
+    },
+    {
+      "artifact": "data accession GEO GSE296340 (chemical mapping, clone 1-2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi. Record resolves; Status field reads 'Public on Dec 17, 2025'; Title 'Differential nucleosome organization in human interphase and metaphase chromosomes [ChemMap]'."
+    },
+    {
+      "artifact": "data accession GEO GSE296337 (MNase-seq, clone 1-2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi; record resolves."
+    },
+    {
+      "artifact": "data accession GEO GSE296336 (RNA-seq, clone 1-2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi; record resolves."
+    },
+    {
+      "artifact": "data accession GEO GSE264401 (chemical mapping, clone 2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi. Record resolves; Status 'Public on Dec 17, 2025'; Title '... [Chemical Mapping]'."
+    },
+    {
+      "artifact": "data accession GEO GSE264399 (MNase-seq, clone 2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi; record resolves."
+    },
+    {
+      "artifact": "data accession GEO GSE264400 (RNA-seq, clone 2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi; record resolves."
+    },
+    {
+      "artifact": "external input GEO GSE61332 (published NET-seq, Mayer et al. 2015)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL to ncbi.nlm.nih.gov/geo/query/acc.cgi; record resolves."
+    },
+    {
+      "artifact": "external input JASPAR matrix MA0139.1 (CTCF PWM) - https://jaspar.genereg.net/matrix/MA0139.1/",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL. Exact versioned matrix identifier given in the paper; resolves."
+    },
+    {
+      "artifact": "external inputs GEO GSM733785 (ENCODE CTCF ChIP-seq) and GSM733659 (control) - accessions stated in Methods, no URL given in paper",
+      "http_status": "not-checked (stated-in-paper, accession-only)",
+      "checked_at": "2026-07-28",
+      "network_context": "Recorded as stated-in-paper. Not resolved at Stage 1; the two GSM accessions are cited in the CTCF data analysis section without a URL."
+    },
+    {
+      "artifact": "paper full text (JATS XML) - https://www.biorxiv.org/content/early/2025/11/12/2025.11.11.687715.source.xml",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL, 216,630 bytes. Title verified verbatim against the assigned paper ('Differential nucleosome organization in human interphase and metaphase chromosomes') before scoring - no assessor cross-contamination. Full Methods, Results, and 'Data and availability' recovered."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "floating",
+  "stage2_candidate": false,
+  "supersedes_metric_version": null,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "d63d4e1046c3d6733a059dfc843a872a58f3237e42f6edc84d22d64a706d050a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

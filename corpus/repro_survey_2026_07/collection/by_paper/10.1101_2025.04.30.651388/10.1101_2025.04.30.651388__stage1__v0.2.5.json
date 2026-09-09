@@ -1,0 +1,136 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.04.30.651388",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.04.30.651388v1",
+      "biorxiv:2025.04.30.651388v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational analysis of QIAseq miRNA sequencing data: raw single-end miRNA reads run through nf-core/smrnaseq (v2.3.1, default QIAseq settings) with FastQC/fastp trimming, alignment to GRCh38, gene-count matrices, UMI deduplication and miRTrace library-complexity metrics; plus an alternative branch with manual UMI deduplication using umi_tools + seqkit prior to the same pipeline. Downstream figures/PCA are secondary.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the 'Bioinformatic analyses' paragraph of the preprint Methods. nf-core/smrnaseq is kept as a single pipeline step (its internal components fastp/FastQC/miRTrace/aligner are managed by the pipeline release, not run standalone by the authors); umi_tools and seqkit are the author-invoked manual-dedup steps. No Data availability or Code availability statement is present in the preprint; the authors' own raw reads are not deposited (no GEO/SRA/ENA/DDBJ accession) and no author code/config repository exists. The only cited repository is the third-party pipeline itself (Zenodo 10.5281/zenodo.13928318, github.com/nf-core/smrnaseq), not read at line level (stage1). Wet-lab library-prep/sequencing steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "nf-core/smrnaseq v2.3.1 pipeline run (Nextflow; default settings for QIAseq libraries; GRCh38 reference; FastQC/fastp trimming, alignment, gene-count matrices, miRTrace complexity, UMI dedup) on authors' raw miRNA reads",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["input-data-undeposited", "capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Manual UMI deduplication with umi_tools (no version) prior to nf-core/smrnaseq re-run with same settings",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["input-data-undeposited", "no-author-script"]
+    },
+    {
+      "step_id": "C3",
+      "label": "seqkit (no version; Shen et al. 2016/2024) sequence processing supporting the manual UMI-deduplication branch",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["input-data-undeposited", "no-author-script"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 3,
+    "n_X": 0,
+    "S": 3,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/3 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "All 3 computational steps cap at NI, not RI. The controlling blocker is data availability: the authors' own raw miRNA sequencing reads are not deposited (no Data availability statement, no GEO/SRA/ENA/DDBJ accession), so no pipeline step has a reachable input (data=0). Even setting that aside, only nf-core/smrnaseq carries an exact version pin (v2.3.1); the manual-dedup tools umi_tools and seqkit are unpinned and no author script/config exists. No environment lockfile or container is claimed by the authors (the nf-core release ships pinned envs, but that is a property of the third-party pipeline, not a capture claim in this paper). R star not assignable at stage1; no step could exceed RI even under stage2 without a deposited input dataset and an executed environment capture, neither of which is claimed to exist.",
+    "coverage": "3 computational steps assessed from the 'Bioinformatic analyses' Methods paragraph of the biorxiv preprint (JATS XML). 5 wet-lab library-prep/sequencing steps counted (W) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Bioinformatic analyses (input dataset) + missing Data availability statement",
+      "missing": "The authors' own raw miRNA sequencing reads (52 libraries, Illumina NovaSeqXPlus, 100 bp single-end) are the entry point to every computational step but are not deposited under any GEO/SRA/ENA/DDBJ/ArrayExpress accession, and the preprint has no Data availability statement. Without the input data, no pipeline step can be re-run.",
+      "how_to_close": "Deposit the raw FASTQ reads (and ideally a sample sheet mapping the 52 libraries to protocol/input/UMI conditions) in a public repository (GEO/SRA/ENA) and add a Data availability statement with the accession."
+    },
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (no Code availability statement)",
+      "missing": "No environment lockfile, container digest, or conda/env spec is claimed by the authors, and no author code/config repository or parameter file is shared. Reproduction relies on prose alone: 'default settings for QIAseq' for nf-core/smrnaseq v2.3.1, plus a 'manual deduplication process using umi_tools and seqkit'.",
+      "how_to_close": "Publish the exact pipeline invocation / nextflow config, and a lockfile (conda-lock/pixi) or container digest; add a Code availability statement."
+    },
+    {
+      "type": 3,
+      "where": "Manual-dedup tools and workflow engine",
+      "missing": "umi_tools and seqkit carry no version numbers, and the Nextflow version used to run nf-core/smrnaseq v2.3.1 is not stated. These steps cannot reach RI.",
+      "how_to_close": "Record exact versions (and builds) for umi_tools, seqkit, and Nextflow in a versions table or the Methods."
+    },
+    {
+      "type": 4,
+      "where": "Manual UMI-deduplication branch (C2/C3)",
+      "missing": "The manual deduplication procedure is described only as 'using umi_tools and seqkit ... with the same settings' — the exact commands, UMI extraction/collapse parameters, and ordering are not given.",
+      "how_to_close": "Provide the exact umi_tools/seqkit commands and parameters (e.g., a script) for the manual-dedup branch."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE for author pipeline/analysis — preprint has no Code availability statement and shares no scripts/config. Only third-party pipeline source cited (github.com/nf-core/smrnaseq, Zenodo 10.5281/zenodo.13928318; nf-co.re/smrnaseq/2.3.1) — not read at line level (stage1).",
+      "http_status": "n/a (no author code repository exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "code/data availability prose parsed from biorxiv JATS XML (curl)"
+    },
+    {
+      "artifact": "third-party tool source: nf-core/smrnaseq (github.com/nf-core/smrnaseq)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "third-party tool source: nf-core/smrnaseq v2.4.0 release archive (Zenodo 10.5281/zenodo.13928318)",
+      "http_status": "302 (doi.org redirect to zenodo record)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, doi.org"
+    },
+    {
+      "artifact": "data accession: NONE — authors' raw miRNA reads not deposited; no GEO/SRA/ENA/DDBJ/ArrayExpress accession and no Data availability statement in the preprint.",
+      "http_status": "n/a (no data accession exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv JATS XML full text searched for accessions (none found)"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "cfb30250f45bccb7bdb64f36bcd5f58902c186fcd4019f7ea428fa74af467ea5",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

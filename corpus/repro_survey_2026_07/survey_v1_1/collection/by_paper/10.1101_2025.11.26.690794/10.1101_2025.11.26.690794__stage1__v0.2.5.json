@@ -1,0 +1,519 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "dc8a6b84589976fb8c034a185e862cffee0d114093811bf4aa64676fe3fea5ae",
+  "canonical_id": {
+    "value": "10.1101/2025.11.26.690794",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.26.690794v1",
+      "biorxiv:2025.11.26.690794v1",
+      "Gnodes#4 document (author-hosted): http://arthropods.eugenes.org/EvidentialGene/other/gnodes/gnodesdoc/gnodes4docf/gnodes25cymdna.pdf"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "A single-author re-analysis of already-published data asking whether flow-cytometric (Cym) and DNA-sequencing genome-size estimates (GSE) measure the same quantity. Reproduction target: (a) the 1:1 log-log regression of DNA GSE on cytometric GSE across 5 species-population sets (Arabidopsis thaliana regional/Swedish ecotypes, Ar. arenosa altitudinal populations, Arctic Cochlearia populations, Brachionus asplanchnoidis rotifer clones, Zea mays inbred/NAM isolines) plus 8 reference animals and plants over 150-4000 Mb; (b) the Gnodes (Genome Depth Estimator, part of EvidentialGene) assembly-mapped depth pipeline - minimap2 / bwa-mem2 read mapping to annotated chromosome assemblies, per-bin coverage tabulation (gnodes_sam2covtabUPD2i.pl), and GSE + major-content (CDS / repeat / transposon / NOR-rRNA) summarisation (gnodes_covsum.pl) using the D.ucg and D.all depth estimators and the Cau = C.all/C.ucg bias ratio; (c) the ONT R10 Simplex comparison for Arabidopsis, tomato, maize, zebra finch and zebrafish including hifiasm-ont reassembly and NOR/rRNA copy-number recovery (Table DC6, Table DC7); (d) the k-mer critique - jellyfish k=21 counting with untruncated histograms, GenomeScope and findGSE GSE, a naive GSKap peak calculation, and the off-by-1 'error'-k-mer reallocation test (locut=25, midcut=130, 50% shift) that raises GSE-K from ~137 Mb to ~157 Mb for A. thaliana; (e) the latitude/altitude population clines (Figures DC3, DC5-DC10) and the DNA-bias coverage-depth density plots (Figures DC4A/B/Z). All inputs are public archive data; no new wet-lab measurement is reported by this paper (the Ara. arenosa cytometry values were supplied by F. Kolar from the already-published Kolar et al. 2015 study and are shipped as a supplement table).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool or named analysis invocation in the Methods-in-detail section, the three worked-example boxes (DC11 kmer-error, DC11b off-by-1, DC12 Gnodes measurement) and the figure/table methods notes. The three example boxes are rendered as figure images in the bioRxiv JATS XML (UFIG1/UFIG2/UFIG3 carry no text nodes); their command lines were read from the author-hosted PDF of the identical manuscript (gnodes25cymdna.pdf, 26-Nov-2025, 41 pp.), which is the only route to the parameter text. Gnodes is treated as three steps (annotate / covtab / covsum) because the paper itself decomposes it that way in Box DC12 and because the three stages have different parameter exposure. Steps are counted once even where they were run across many species and populations; per-population invocation is a parameter/provenance gap (see gap type 8), not extra steps.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Assemble the study input inventory: retrieve public DNA read sets from NCBI SRA and chromosome assemblies from NCBI Genomes for 5 species-population sets plus 8 reference species; per-species SRA_Reads inventories are shipped as supplement tables (gnodes4tables/*.rtab, described in Gnodes4Tables_readme.txt)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Compile published flow-cytometry (Cym) genome-size values per species and population: A. thaliana At1K (2011) Sweden N-S and regional values re-used for the 2024 ecotype set by population-ID matching, Ara. arenosa values from Kolar et al. 2015 supplied by F. Kolar, maize isoline values from three cited studies (maize_flowcytogse_bnt.txt), Cochlearia and rotifer values from the cited population studies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Determine the unique-conserved-gene (UCG) set used for the D.ucg / C.ucg depth estimator: run_BUSCO.py -l embryophyta --cpu N -m prot -i <gname>.aa, converting the BUSCO full table to the Gnodes gene-class table (<gname>.idclass); n = 300-2000 UCG per species (Table DC9)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Transposon and repeat annotation of each chromosome assembly with RepeatMasker (RepeatModeler for some cases), producing rmout/<asmid>.fa.out consumed by gnodes_annotate.pl as the TE/RPT annotation layer",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Tandem repeat annotation with Tandem Repeat Finder (TRF, Benson 1999) for some genome assemblies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "High-order / satellite repeat annotation with SRF (Zhang et al. 2023) for some genome assemblies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Extract reference CDS of the primary transcript per gene from NCBI Genomes annotation (ncbi-genomes/GCF_accession*rna.gbff), e.g. tomato24ref1cds from GCF_036512215.1_SLM_r2.1_rna.gbff.gz with Ncds = 28,485",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Build the Gnodes genome-content annotation table: gnodes_annotate.pl -ncpu N -chr <asmid>.fa -cds <gname>.fa -idclass <gname>.idclass -te rmout/<asmid>.fa.out -angff <asmid>.contam.gff -output <asmid>.anntab, using BLAST alignment of CDS / TE / repeat sequences to produce genome location tables congruent with the coverage tables",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Long-read DNA mapping to the chromosome assembly with minimap2 (default mapper for Gnodes): minimap2 -x lr:hq --secondary=yes -N 9 -p 0.80 -a -t N <asmid>.fa <reads> | samtools view -Sb, retaining all multiple and unique map locations",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Short-read DNA mapping with bwa-mem2 (and minimap2) for the Illumina read sets - At1K, the 2024 A. thaliana ecotype panel, Cochlearia, rotifer clones and maize short-read sets",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Identify and remove non-nuclear DNA (chloroplast, mitochondrion, foreign contaminants) using NCBI SRA STAT reports (Katz et al. 2021) and/or Kraken (Wood et al. 2019); build <asmid>.contam.gff, subtract contaminant amounts from GSE, and for some measures pre-filter to reads aligned to the nuclear assembly only (the '_decon' read subset used for k-mer analysis)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Gnodes coverage tabulation from the BAM: samtools view | gnodes_sam2covtabUPD2i.pl -icpu i -ncpu N -out <base>.covtab.pt$i run per CPU partition, then gnodes_sam2covtabUPD2i.pl -merge -out <base>.covtab; 100 bp bins over all assembly locations, separating unique and multi-mapping depth (the simplified UPD2i tabulator is a new addition with this report, alongside the fuller gnodes_sam2covtab.pl)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Gnodes GSE and major-content summarisation: gnodes_covsum.pl -asmid <asmid> -anntab <asmid>.anntab -idclass <gname>.idclass -sumdata asm.metad -output <base>.sum.txt <base>.covtab, computing G = LN/C with D.ucg (UCGmed) and D.all (allasm) depth estimators, the Cau = C.all/C.ucg bias ratio, xCopy copy numbers, and megabase amounts for CDSann / CDSbus / RPTann / TEann / NOann",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Coverage-depth density plots per major content class (new Gnodes addition with this report) used for the DNA-bias analysis of Figures DC4A (A. thaliana simulated and real ONT/Illumina), DC4B (pea, sorghum, cotton) and DC4Z (zebra finch ONT R10 / PacBio HiFi / Illumina)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Chromosome-ploidy correction (new Gnodes input option): halve-depth correction for the haploid W and Z sex chromosomes of the female zebra finch (10% of genome), yielding the corrected coverage of Figure DC4Z panel B and the ~6% above-assembly, Cym-matching size estimate",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Simulated-read control for the bias analysis: generate simulated DNA reads from the complete A. thaliana assembly (Figure DC4A panel A1) and produce the biased variant A2 by randomly removing 50% of simulated reads in the NOR spans of Chr2 and Chr4 (4.5 Mb of the 9 Mb NOR sequence assembled as GenBank OR453402.1 / OR453401.1), plus the alternative simulation from an assembly carrying half-length NOR spans",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "k-mer counting with jellyfish on the decontaminated read subset: jellyfish count -m 21 -s 15G -c 4 --canonical -t N -o <o>.jfish <reads>; jellyfish histo --high 9876543210 -t N -o <o>.hist <o>.jfish, explicitly avoiding the default high-copy histogram truncation that the paper argues depresses GSE-K",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "GenomeScope k-mer genome-size estimation: GenomeScope.R <o>.hist 21 <o>.gs4e, run on the original and on the error-shifted histograms and across the population sets (Ara. arenosa, A. thaliana 2024 ecotypes, maize isolines, rotifer clones, rice pangenome sets; failed for the Arctic Cochlearia Illumina sets at low depth)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "findGSE k-mer genome-size estimation: findGSE.R histo=<o>.hist, sizek=21, outdir=<o>.figse, on original and error-shifted histograms (GSKfi column of Tables DC5 and DC6)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Naive k-mer peak GSE (termed GSKap): GSKap = sum(D * Count) / D_MainPeak over the untruncated histogram, reported with MinD = 25 and MaxD = 10000 variants (121.7 / 137.5 / 157.6 Mb for A. thaliana)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Off-by-1 'error'-k-mer reallocation test: shift 50% of the low-frequency 'error' k-mer mass into the major distribution in proportion to its density mass (locut = 25, midcut = 130), regenerate the histogram (<o>.nolo50m25t130fc.hist), and re-run findGSE and GenomeScope on it (Figure DC11, GScope D.offby1 values)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Off-by-1 k-mer identification by BLAST alignment of unique (f1) k-mers against the main-mer set (f20-f130 where the main peak is f40-f60), for tomato ONT R10, two A. thaliana Illumina sets and a male finch Illumina set, producing the shifted main-mer densities of Figure DC11b",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Regression of GenomeScope GSE deviation on unique (f1) k-mer density across populations (Figure DC11c): Ara. arenosa versus Gnodes and versus Cym, A. thaliana 2024 ecotypes split by laboratory (IlluOnt vs IlluPb), and Oryza rufipogon / O. sativa indica and japonica pangenome sets",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "De novo assembly of the ONT R10 Simplex read sets with hifiasm (hifiasm-ont, Cheng 2025) for A. thaliana, tomato, maize, zebra finch and zebrafish, and alignment of the longest contig (Hifi1Long) and of all primary contigs (HifiAll) to the reference assemblies for the chromosome-size comparison of Table DC7 / Figure of Table DC7",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "NOR / rRNA gene copy-number measurement from Gnodes coverage (NOR column of Table DC6): 6-10 fold under-assembly of NOR spans, the 4x copy excess and 63/16 Mb DNA-versus-assembly amounts for A. thaliana, and the derived statement that NOR accounts for 71% of the A. thaliana Cym - Asm discrepancy down to 1% in bird and fish; includes construction of the NOR-extended 142 Mb 'complete' A. thaliana reference (NORasm) by appending the NOR assemblies to Chr2 and Chr4",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C26",
+      "label": "Statistics and figures in R from the supplement tables: the log(DNA) x log(Cym) regression with slope 0.999 (Figure DC1), the per-population difference t-tests, correlations and slope-equals-1 tests of the NDC1 quality string in Table DC5 (Diff = t.test(Cym-DNA), Cor = cor.test(DNA~Cym), Slope = regression(DNA~Cym).slope == 1), the latitude/altitude cline regressions and all DC2-DC11c plots; scripts published as gnodes4tables/gnd25cymdna_rstats.txt",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 26,
+    "n_X": 0,
+    "S": 26,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/26 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/26 (0%) RI, 26/26 NI. This paper is unusually strong on the two axes that normally sink a bioRxiv preprint and is floored by a third. Data is public throughout (data = 2 on all 26 steps): every input is a public NCBI SRA read set or NCBI Genomes assembly, per-species SRA_Reads inventories are shipped in live supplement tables, and the cytometric comparison values - the one class of input that could have been private - are themselves published in those tables rather than only cited. Code is public for 17 of 26 steps (code = 2): Gnodes is distributed inside EvidentialGene from two live URLs, the invoked third-party tools are all open source, three worked-example scripts with real command lines are published (gnd25cymdna_gnodesx12tab.txt, gnd25cymdna_gskdc11tab.txt, kmer_err_offby1_test.txt), and the R script that produces the figures and statistics is published in full (gnd25cymdna_rstats.txt, 16 kB). Parameters are given at command-line resolution for 10 steps - the minimap2 invocation carries its exact ONT flags (-x lr:hq --secondary=yes -N 9 -p 0.80 -a), the jellyfish invocation carries the deliberate anti-truncation --high 9876543210, and the off-by-1 test carries locut = 25 / midcut = 130 / 50% shift. The single binding constraint is the version axis: NOT ONE software version number appears anywhere in the 41-page manuscript. Gnodes/EvidentialGene has no version, tag, release or commit and is distributed from a mutable web directory and a SourceForge project page; minimap2, bwa-mem2, samtools, BUSCO, RepeatMasker, RepeatModeler, TRF, SRF, jellyfish, GenomeScope, findGSE, hifiasm, Kraken, BLAST and R are all cited bibliographically with no version; and there is no conda environment, lockfile, container, Dockerfile, requirements file, renv.lock or sessionInfo of any kind. Version = 0 on every step, so axis-min floors all 26 steps at NI regardless of how good the data, code and parameter disclosure are. The aggravating detail is self-inflicted: the paper states that the Gnodes version used contains this-report-specific additions (coverage-density plots, the chromosome-ploidy option, the new gnodes_sam2covupd2i.pl tabulator), so a reader downloading EvidentialGene today cannot know whether they hold the code that produced these numbers. A single Zenodo release of EvidentialGene plus the supplement folder, cited by DOI, would move a large fraction of these steps upward at essentially zero cost to the author; that is the highest-leverage fix in this record.",
+    "coverage": "26 of 26 prose-derived steps are computational and in scope (S = 26); there are no wet-lab steps (W = 0) - this is a pure re-analysis of public archive data, and the one dataset supplied by a colleague (Ara. arenosa flow cytometry from F. Kolar) is from the already-published Kolar et al. 2015 study and is shipped as a supplement table. Methods text was read in full from the bioRxiv JATS XML source (https://www.biorxiv.org/content/early/2025/11/27/2025.11.26.690794.source.xml, HTTP 200, retrieved 2026-07-28; title string verified against the assigned paper). The paper has NO 'Data availability' and NO 'Code availability' section - the strings do not occur in the manuscript; artifact statements are embedded in Methods-in-detail and in a short 'Supplemental data' note in the back matter. Three method boxes (DC11 kmer-error, DC11b off-by-1, DC12 Gnodes measurement) are rendered as figure images in the JATS XML and carry no extractable text nodes; their command lines were recovered from the author-hosted PDF of the identical manuscript (gnodes25cymdna.pdf, 26-Nov-2025, 41 pp., HTTP 200). Anyone assessing this paper from the bioRxiv XML alone would score params substantially lower and would miss the only parameter disclosure the paper has. The artifact landing page (the gnodesdoc directory index) and the supplement README (Gnodes4Tables_readme.txt) were read as prose; no analysis script was read line by line, which is stage-2 work."
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Whole manuscript - binding on all 26 computational steps (C1-C26)",
+      "missing": "Not one software version number appears anywhere in the 41-page manuscript. Gnodes itself, the instrument of the entire paper, carries no version, tag, release identifier, commit or distribution date: the Methods state only that 'Gnodes software is part of the EvidentialGene package, publicly available at http://eugenes.org/EvidentialGene/ and http://sourceforge.net/projects/evidentialgene/'. This is aggravated by the paper's own admission that the code used is not a stable release: 'Updates to Gnodes software with this report include additions of depth of coverage density plots [...]; a chromosome ploidy input option [...]; addition of a simplified depth of coverage tabulator, gnodes_sam2covupd2i.pl'. Box DC12 invokes the tabulator under a third spelling, gnodes_sam2covtabUPD2i.pl, which does not match either name given in the prose. Every third-party tool is likewise cited bibliographically only, with no version: minimap2, bwa-mem2, samtools, BUSCO, RepeatMasker, RepeatModeler, TRF, SRF, jellyfish, GenomeScope (GenomeScope.R), findGSE (findGSE.R), hifiasm, Kraken, BLAST and R. This matters concretely for at least four: hifiasm's ONT R10 Simplex support is the paper's own load-bearing novelty ('the hifiasm software has recently been improved to assemble ONT R10 Simplex DNA [Cheng 2025]'), so the assembly result of Table DC7 is version-defined; minimap2's -x lr:hq preset only exists in recent releases and its behaviour has changed; GenomeScope v1 and v2 differ in exactly the repeat-handling and truncation recommendations the paper spends two pages criticising; and findGSE's model fit determines the GSKfi column of Tables DC5/DC6.",
+      "how_to_close": "Cut a tagged EvidentialGene/Gnodes release, archive it to Zenodo, and cite the DOI plus the version string in a Code availability statement; state the exact version of every third-party tool (a single table of tool-name / version / how-obtained in the supplement would do), and reconcile the three spellings of the coverage tabulator to the one filename actually shipped."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment - all 26 computational steps",
+      "missing": "No environment closure of any kind. There is no conda or mamba environment file, no conda-lock or pixi.lock, no Dockerfile, no container image or digest, no Apptainer/Singularity definition, no requirements.txt, no renv.lock, no CRAN or Bioconductor snapshot date, and no sessionInfo() dump for the R analysis that produces every figure and statistic. Operating system, Perl version, R version, BLAS/LAPACK backend and compiler are all unstated. The example scripts are shell fragments carrying site-specific variables that are never resolved (EVGNODES=/path/to/evigene/scripts/genoasm, $NCPU, readsf/*.fastq), so they document intent rather than a runnable environment. The Methods do state that computation used shared ACCESS resources at Indiana University Jetstream, Purdue and SDSC, but no module list, no image and no allocation-level software manifest accompanies that statement.",
+      "how_to_close": "Ship a conda environment.yml plus its resolved lock for the command-line tools (minimap2, bwa-mem2, samtools, jellyfish, BUSCO, RepeatMasker, hifiasm, Kraken, BLAST) and an renv.lock or sessionInfo() for the R analysis; better still, publish a container image referenced by digest that carries the Gnodes release and all of the above, since the whole pipeline is Perl + shell + R and containerises cleanly."
+    },
+    {
+      "type": 9,
+      "where": "Code hosting - Gnodes/EvidentialGene (all Gnodes steps C8, C12, C13, C14, C15, C25) and the published example and R scripts (C20, C21, C22, C23, C26)",
+      "missing": "There is no version-controlled repository at all. No GitHub, GitLab, Bitbucket, Zenodo or Software Heritage identifier appears anywhere in the manuscript. The code is distributed only from (a) an author-run institutional web directory - http://eugenes.org/EvidentialGene/, which 302-redirects to http://arthropods.eugenes.org/EvidentialGene/ - and (b) a SourceForge project page, neither of which is cited with a release, a file name, a date or a checksum. There is consequently no commit, tag or archived snapshot that a reader or a stage-2 assessor could pin to, and no way to detect that the distributed code has changed since 26 Nov 2025. The supplement scripts and data tables share the same weakness: they are loose files in a browsable web directory with no DOI, no mirror, no manifest and no checksums, and their listed modification dates (April to September 2025) predate the manuscript, so the shipped scripts are not stamped as corresponding to the reported run.",
+      "how_to_close": "Put EvidentialGene under public version control, tag the state used for this paper, and deposit both the tag and the gnodes4tables supplement folder as a versioned Zenodo record with a DOI cited in the manuscript; a single DOI would simultaneously fix the code-pinning gap, the link-fragility gap and the supplement-provenance gap."
+    },
+    {
+      "type": 7,
+      "where": "Back matter 'Supplemental data' note and the Methods-for-figures-and-tables section - affects every step that consumes a supplement table or script (C1, C2, C20, C21, C22, C23, C25, C26)",
+      "missing": "The stated location of the supplement is wrong. The paper says, verbatim: 'Data tables in directory gnodes4tables/ of http://eugenes.org/EvidentialGene/other/gnodes/gnodesdoc/', and the Methods repeatedly refer to files as 'gnodes4tables/gnd25cymdna_rstats.txt', 'gnodes4tables/Gnodes4Tables_readme.txt' and 'gnodes4tables/gnd25cymdna_ontr10asm_tab.txt'. That path returns HTTP 404. The folder actually sits one level deeper, at .../gnodesdoc/gnodes4docf/gnodes4tables/ (HTTP 200, 28 files). A reader following the manuscript literally finds nothing; the folder is only reachable by browsing the parent index and guessing. The base URL additionally 302-redirects to a different host (arthropods.eugenes.org), which the manuscript does not mention.",
+      "how_to_close": "Correct the path in the manuscript to the full working URL (or, better, replace it with a DOI); verify every supplement path in the text against the served directory before deposit."
+    },
+    {
+      "type": 5,
+      "where": "The production analysis drivers behind C1, C2, C16, C20, C21, C22, C23, C25 - i.e. everything between the published per-example scripts and the published R plotting script",
+      "missing": "What is published is three worked examples plus the plotting layer, not the pipeline. gnd25cymdna_gnodesx12tab.txt covers Gnodes on one tomato ONT sample; gnd25cymdna_gskdc11tab.txt covers the k-mer error example on one A. thaliana sample; kmer_err_offby1_test.txt covers the off-by-1 test on four samples; gnd25cymdna_rstats.txt covers figures and statistics from the finished tables. The code that actually generated the finished tables is absent: the driver that ran the Gnodes pipeline across roughly 130+ population samples (69 A. thaliana 2024 ecotypes plus the At1K Sweden and regional sets, the Ara. arenosa altitudinal individuals, the Cochlearia populations, 21 rotifer clones and the maize isolines), the code that ran GenomeScope/findGSE/GSKap across those same sets, the code that computed the unique-k-mer-density regressions of Figure DC11c, the code that tabulated NOR/rRNA copy numbers and built the NOR-extended 142 Mb A. thaliana reference, and the simulated-read generator plus the NOR read-removal script for Figure DC4A panel A2 (the simulator is not even named). Two of the three example boxes elide their own commands with a literal '...' - Box DC12 writes 'run_repeatmasker $asmid.fa ... > rmout/$asmid.fa.out', and Box DC11b truncates steps 2-4 to '...'.",
+      "how_to_close": "Publish the per-species driver scripts (or a Makefile/Snakemake workflow) that regenerate each gnodes4tables/*.rtab from its SRA accessions, plus the read simulator and the NOR-removal script; where a box currently elides arguments with '...', print the actual command."
+    },
+    {
+      "type": 1,
+      "where": "C4, C5, C6 (repeat annotation), C10 (bwa-mem2), C11 (Kraken), C24 (hifiasm), C16 (simulation)",
+      "missing": "Invocation parameters are absent for seven steps, and for three of them the missing parameters materially change the reported numbers. hifiasm is described only as 'assembled with hifiasm' / 'hifiasm-ont' with no command line, no ONT mode flag, no purge level and no coverage cutoff, yet the whole Table DC7 claim that assembly can reach cytometric size 'when all assembly primary contigs are retained' turns on the purge/duplicate settings. RepeatMasker's invocation is literally elided ('run_repeatmasker $asmid.fa ...') and neither the repeat library (Dfam or RepBase) nor its release is named, although RPTann and TEann amounts are a headline result (Table DC3 reports repeats changing in all five species). bwa-mem2 is named with no algorithm and no flags, and no mapping-quality or secondary-alignment policy is stated, even though the long-versus-short-read discrepancy (334 Mb, 13% in maize) is one of the paper's own findings. Kraken carries no database, no version and no confidence threshold, while its output determines how much DNA is subtracted from every GSE. TRF and SRF are run 'for some genome assemblies' with neither parameters nor a list of which assemblies. The BLAST alignment inside gnodes_annotate.pl has no stated e-value or identity thresholds.",
+      "how_to_close": "Print the actual command line for each of these seven steps in a supplement methods file, name the RepeatMasker library and release and the Kraken database build, and state which assemblies received TRF and SRF."
+    },
+    {
+      "type": 4,
+      "where": "C1, C9, C10, C24, C25 - reference assemblies and annotation releases",
+      "missing": "Reference assemblies are largely unpinned. Only four identifiers appear anywhere: GCF_036512215.1 (tomato SLM_r2.1, 2024), GCA_020911765.1 (A. thaliana T2T, 2022), and GenBank OR453402.1 / OR453401.1 (the A. thaliana NOR spans). For every other mapping target the assembly is referenced only in words - 'reference assemblies', 'Maize NAM isoline assemblies', 'recent 2025 assembly and DNA sets of the Vert. Genome Project' for zebra finch, the Cochlearia, rotifer and Ara. arenosa references, and the pea/sorghum/cotton references of Figure DC4B - with no accession and no assembly version. The A. thaliana 'NOR-extended complete' 142 Mb reference (A1 in Table DC7) is a bespoke construct built by appending the NOR assemblies to Chr2 and Chr4; it is not deposited anywhere, so the row of Table DC7 that carries the paper's strongest claim cannot be regenerated. Annotation releases are equally unpinned: the BUSCO lineage is given as 'embryophyta' with no odb version and no lineage for the animal species, and reference gene sets are described only as 'ncbi-genomes/GCF_accession*rna.gbff' with the accession left as a wildcard.",
+      "how_to_close": "Add a supplement table of species / SRA accession / assembly accession+version / annotation release / BUSCO lineage dataset version, one row per analysed sample, and deposit the NOR-extended A. thaliana reference FASTA with a checksum."
+    },
+    {
+      "type": 6,
+      "where": "The whole Gnodes method definition (C8, C12, C13) and the comparative claims throughout Results",
+      "missing": "The core method is externalised to three predecessor preprints rather than described here. Methods-in-detail states that 'The major contents of genomes presented in these results are computed with Gnodes, as described in Gnodes#1', and the Results repeatedly rest on Gnodes#2 and Gnodes#3 for load-bearing claims - that ONT is the least biased technology, that the long-short read discrepancy is 334 Mb in maize, that GenomeScope truncation cuts Arabidopsis from 151 to 125 Mb and Daphnia from 242 to 137 Mb, that the ONT R10 Duplex maize set lost rRNA copies. All three are unrefereed bioRxiv preprints by the same author (10.1101/2022.05.13.491861, 10.1101/2024.10.06.616888, 10.1101/2023.12.20.572422), and none of the algorithm parameters they define (bin size beyond the stated 100 bp, UCG selection rule, multi-mapping weighting, xCopy definition) is restated here. A reproducer must therefore reconstruct the method from a chain of three further documents.",
+      "how_to_close": "Restate the Gnodes algorithm parameters that this paper's numbers depend on (bin size, UCG selection, multi-map weighting, xCopy and Cau definitions) in a self-contained supplement section, and pin the predecessor documents by DOI plus version at the point of each dependent claim."
+    },
+    {
+      "type": 8,
+      "where": "Supplement folder gnodes4tables/ and the mapping from accession to reported value (all steps)",
+      "missing": "The supplement is a working directory, not a frozen release, and it says so. Gnodes4Tables_readme.txt carries unresolved editorial notes against its own contents - 'should reformat' twice, 'drop?' five times against six 'Extra tables' that duplicate the primary tables in different formats, 'needs update' against plant_gnoasm2024sum.txt, a bare '2011?' against the At1K provenance, and a trailing to-do, '# add Key to each w/ col descripts.. see at25col0gse.rtab', which concedes that most tables have no column key. There is no run-order documentation and no explicit mapping from an SRA accession to the exact command sequence that produced its row, so per-sample provenance for the ~130+ population samples must be inferred. The manuscript itself carries two unresolved authoring placeholders in load-bearing sentences: '[cite https://doi:10.1073/pnas.2022713118]' in the Ara. arenosa altitude result and '[please cite]' in the ONT-least-biased claim, plus a '[ref, GenBank IDs OR453402.1, OR453401.1]' stub.",
+      "how_to_close": "Freeze the supplement folder as a release (remove or resolve the 'drop?' duplicates, add column keys to every table, add a manifest with checksums), document run order, and resolve the three citation placeholders before submission."
+    },
+    {
+      "type": 13,
+      "where": "All artifact hosting - code (C8-C15, C25), supplement data and scripts (C1, C2, C20-C23, C26)",
+      "missing": "Every artifact this paper contributes lives out of band relative to accession-type repositories. The only inputs in a persistent archive are third-party: the SRA reads and the NCBI Genomes assemblies. The Gnodes code, the three example scripts, the R statistics script, the cytometry value tables and every per-population GSE table exist solely on one author-run institutional web host at Indiana University, with no DOI, no mirror, no checksum, no Software Heritage capture and no stated persistence commitment. That host has already demonstrated instability with respect to this manuscript: the base URL 302-redirects to a different hostname, and the supplement path printed in the paper is one directory level off. Retrieval is by directory browsing, not by identifier.",
+      "how_to_close": "Deposit the code release and the complete gnodes4tables folder in Zenodo (or figshare) under a single versioned DOI and cite that DOI in the manuscript, keeping the web directory as a convenience mirror rather than as the sole copy."
+    },
+    {
+      "type": 1,
+      "where": "C16 (simulated bias experiment), C18/C19 (model-fitting GSE), C21 (50% error-mass reallocation)",
+      "missing": "No random seed is reported for the one explicitly stochastic step: the Figure DC4A panel A2 control is produced by 'randomly removing 50% of sim-reads in the NOR spans of Chr2,4', and neither the read simulator, nor its read-length and error model, nor its coverage depth, nor a seed is given; the alternative control ('a read set simulated from a genome assembly with 1/2 NOR spans') is equally unspecified. The reallocation of C21 is described as distributing 50% of the error-class k-mer mass 'in proportion to density mass over that distribution', which is deterministic in principle but is stated as an 'ad hoc example' with the exact rule only implicit in the example script. GenomeScope and findGSE both perform non-linear model fitting whose convergence can depend on initialisation; no seed or convergence check is reported for the population-scale runs.",
+      "how_to_close": "Name the read simulator with its version and command line, report the seed for the NOR read-removal draw, and state the reallocation rule as an equation rather than as a worked example."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Analysis software - Gnodes, distributed as part of the EvidentialGene package. Verbatim from Methods-in-detail: 'Gnodes software is part of the EvidentialGene package, publicly available at http://eugenes.org/EvidentialGene/ and http://sourceforge.net/projects/evidentialgene/'. No version, release, tag, commit or file name is given.",
+      "http_status": "URL-present; http://eugenes.org/EvidentialGene/ -> HTTP 302 -> http://arthropods.eugenes.org/EvidentialGene/ HTTP 200; https://sourceforge.net/projects/evidentialgene/ HTTP 200",
+      "checked_at": "2026-07-28",
+      "network_context": "HEAD requests only, from the assessor host. Both stated code URLs resolve. No GitHub, GitLab, Bitbucket, Zenodo or Software Heritage identifier appears anywhere in the manuscript, so there is no versioned repository landing page in the usual sense; the 'landing page' read at stage 1 was the browsable gnodesdoc directory index."
+    },
+    {
+      "artifact": "Supplement data tables and analysis scripts. Verbatim from the back-matter 'Supplemental data' note: 'Data tables in directory gnodes4tables/ of http://eugenes.org/EvidentialGene/other/gnodes/gnodesdoc/'. Contents (28 files) include Gnodes4Tables_readme.txt, the per-species GSE tables gnd25cymdna_{aaren,arctic,at24ecot,corn,rotifer,all1g,popv1f}.rtab, maize_flowcytogse_bnt.txt, gnd25cymdna_ontr10asm_tab.txt, and four script files: gnd25cymdna_rstats.txt (R scripts for figures and statistics, 16 kB), gnd25cymdna_gnodesx12tab.txt (Box DC12 example), gnd25cymdna_gskdc11tab.txt (Box DC11 example), kmer_err_offby1_test.txt (Box DC11b example).",
+      "http_status": "PATH AS PRINTED IN THE PAPER IS DEAD: .../gnodesdoc/gnodes4tables/ -> HTTP 404. Actual location .../gnodesdoc/gnodes4docf/gnodes4tables/ -> HTTP 200 (directory index, 28 files, mtimes 09-Apr-2025 to 22-Sep-2025); Gnodes4Tables_readme.txt retrieved HTTP 200.",
+      "checked_at": "2026-07-28",
+      "network_context": "The supplement is reachable but only by browsing the parent index; the manuscript's literal path fails. Files are loose in a browsable web directory with no manifest, no checksums, no DOI and no mirror. Recorded as a finding, not repaired: the working path was found by listing the parent directory named in the paper, not by web search for an unstated artifact."
+    },
+    {
+      "artifact": "DNA sequence data - NCBI SRA. No BioProject or umbrella accession is given and there is no Data availability section. Individual run accessions are quoted in figure legends, method boxes and Table DC9: ERR7919757 (A. thaliana ONT R10), ERR11436646 and ERR11436067 and ERR11436026 (A. thaliana Sha/N13 ONT and Illumina), ERR13372748 and ERR13372749 (tomato ONT R10), ERR13381137 (maize ONT R10), ERR12118113 (zebrafish ONT R10), SRR32887368 and SRR32841778 (zebra finch), ERR9980782 with SRR31015884 (pea ONT / Illumina), SRR26882277 with SRR24011165 (sorghum ONT / Illumina), SRR24575697 with SRR24575699 (cotton ONT / Illumina). Population-scale accessions are stated to be in the supplement tables' SRA_Reads columns.",
+      "http_status": "stated-in-paper (accession-level, partial in prose; full inventory delegated to the supplement tables). Not independently resolved at stage 1.",
+      "checked_at": "2026-07-28",
+      "network_context": "No accession was dereferenced; stage-1 records presence and form only. The reads are third-party public archive data, not artifacts this paper deposits - the paper deposits nothing to SRA."
+    },
+    {
+      "artifact": "Genome assemblies - NCBI Genomes / GenBank. Accessions actually quoted: GCF_036512215.1 (tomato SLM_r2.1, 2024, with the matching *_genomic.fna.gz and *_rna.gbff.gz files named), GCA_020911765.1 (A. thaliana T2T reference, 2022, 133 Mb), OR453402.1 and OR453401.1 (A. thaliana NOR spans, cited with an unresolved '[ref, ...]' placeholder). All other mapping targets - maize NAM isoline assemblies, zebra finch and zebrafish Vertebrate Genomes Project 2025 assemblies, Ara. arenosa, Cochlearia and rotifer references, and the pea/sorghum/cotton references of Figure DC4B - are named in words only.",
+      "http_status": "stated-in-paper (4 accessions); none for the remainder",
+      "checked_at": "2026-07-28",
+      "network_context": "The bespoke NOR-extended 142 Mb A. thaliana reference (Table DC7 row A1) is constructed by the author and is not deposited anywhere; it has no accession and no checksum."
+    },
+    {
+      "artifact": "Cytometry (Cym) comparison values - the second half of the paper's central comparison. Sourced from published studies (At1K 2011, Kolar et al. 2015 for Ara. arenosa supplied directly by F. Kolar per the Acknowledgements, three cited maize studies aggregated in maize_flowcytogse_bnt.txt, plus the Cochlearia and rotifer population studies). The values themselves are shipped in the live supplement tables rather than only cited.",
+      "http_status": "URL-present via the supplement folder (see entry 2); no accession-type deposit",
+      "checked_at": "2026-07-28",
+      "network_context": "Worth noting positively: the one input class that could plausibly have been withheld - the personally supplied Ara. arenosa cytometry - is published in gnd25cymdna_aaren.rtab, so the comparison is not gated on a private communication."
+    },
+    {
+      "artifact": "Data availability and Code availability statements",
+      "http_status": "none - neither section exists",
+      "checked_at": "2026-07-28",
+      "network_context": "The strings 'availability' and 'Availability' do not occur anywhere in the bioRxiv JATS XML. All artifact information is embedded inside Methods-in-detail and a two-line 'Supplemental data' note in the back matter. Recorded as a finding; no web search was performed for unstated artifacts."
+    },
+    {
+      "artifact": "Author-hosted PDF of this manuscript (used to read the three method boxes that are image-only in the JATS XML): http://arthropods.eugenes.org/EvidentialGene/other/gnodes/gnodesdoc/gnodes4docf/gnodes25cymdna.pdf, 2.5 MB, 41 pp., mtime 26-Nov-2025",
+      "http_status": "HTTP 200",
+      "checked_at": "2026-07-28",
+      "network_context": "Identical manuscript, listed on the gnodesdoc index as 'Gnodes#4 document pdf, 2025 April-' with DOI 10.1101/2025.11.26.690794. Retrieved because Box DC11, DC11b and DC12 - the only places in the paper where command lines and parameters appear - are figure graphics with no text nodes in the XML."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "ab45ece6b86a22638e7319a5269fc8c8ac02294e049556fd7ff82fff6dd0b237",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

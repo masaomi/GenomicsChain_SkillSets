@@ -1,0 +1,689 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "58d1d6741e35aff013dc4cd662aaa477422f5394cb5261949f3a6430584b9ff8",
+  "canonical_id": {
+    "value": "10.1101/2025.11.20.689509",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.20.689509v1",
+      "biorxiv:2025.11.20.689509v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Sex-chromosome expression evolution in Rumex hastatulus (XY cytotype). Computational target spans (a) a new haplotype-resolved PacBio HiFi + Omni-C genome assembly, scaffolding, manual Hi-C curation and MAKER gene annotation; (b) sex-linked SNP identification from published RNAseq (STAR + freebayes); (c) competitive mapping of 149 population DNA/RNA libraries (bwa-mem2, samtools, STAR) to a custom X+Y+PAR+autosome reference; (d) X-Y gametolog / hemizygous-gene identification (GENESPACE + Orthofinder + MCScanX, BLASTn); (e) featureCounts read counting and adapted DESeq2 analyses for mapping-bias filtering, dosage compensation normalization and gametolog-specific expression; (f) dN/dS estimation (GENESPACE orthologs, MUSCLE, hyphy pre-msa/post-msa, IQ-TREE, HYPHY MG94) and downstream R regression/model comparison. Physical PacBio/Omni-C/Illumina library prep and sequencing, and glasshouse growth + nucleic-acid extraction, are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the biorxiv JATS XML Methods prose (retrieved via curl after WebFetch returned HTTP 403). The cited code repository https://github.com/bmsacchi/rumex_XY_expression is public and live but has NO README, no description, no license, no releases and no tags, so no README prose exists for an env-capture claim; a top-level .snakemake/ directory and an expressionWorkflow/ directory indicate a Snakemake pipeline, but its content is Stage-2 territory and was not read. Repository scope (name, directory names: expressionWorkflow, hyphy, readCountsRNAeQTL_multi, scripts, figures, DNAbams) suggests coverage of the expression / dN-dS analyses but not of the assembly and annotation steps, which are described in prose only; code axis is scored accordingly. Wet-lab sequencing and sample-prep steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Hifiasm v0.16.1-r375 haplotype-resolved de novo assembly from PacBio HiFi + Omni-C reads",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "bwa v0.7.15 mapping of paired-end Omni-C reads to phased assemblies following the Arima mapping pipeline (github.com/ArimaGenomics/mapping_pipeline), MapQ>10 filtering",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "external-pipeline-floating"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Picard v2.7.1 duplicate marking on filtered Omni-C bam files",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "YAHS v1.2a.2 Hi-C scaffolding of both phased haplotypes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "pairtools v1.0.2 parse/sort/dedup/split to build pairsam (multimapping threshold 40, max gap between alignments 30)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Juicer 'pre' command to convert pairs to contact maps — no version pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Manual inspection and correction of false joins in Juicebox v1.11.08 (scaffold 1 -> X + A2, scaffold 3 -> A3 + A4, via AGP editing) — human-in-the-loop curation, no script, no recorded edit operations",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "manual-curation-step",
+        "no-recorded-operations"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "BUSCO v5.4.4 assembly completeness assessment against Eukaryota databases — database release/version not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "reference-db-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "RepeatModeler TE library generation for genome masking — no version pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "MAKER-3.01.03 gene annotation in four rounds with published RNA-Seq transcript evidence (Hough 2014; Sandler 2018) and Tartary buckwheat proteins FtChromosomeV2.IGDBv2, plus SNAP training (AED <= 0.5, length >= 50 aa) — SNAP version not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "dependency-version-partial"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Functional annotation of final gene models with BLAST v2.2.28+ and InterProScan 5.52-86.0 via MAKER package scripts — search databases not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "reference-db-unpinned"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "STAR v2.7.10a mapping of previously published leaf RNAseq from 12 population samples (Hough et al. 2014) to both haplotype assemblies — accession for that prior dataset not restated in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "upstream-accession-indirect"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "freebayes v1.3.4 variant calling plus filtering to biallelic sites with genotype quality > 20",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "upstream-accession-indirect"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Custom scripts to identify putative sex-linked SNPs (heterozygous in all six males, homozygous in all six females) and to delimit the PAR boundary — unnamed, unversioned custom code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "custom-script-unidentified"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "bwa-mem2 v2.0pre2 mapping of genomic reads for 75 male + 74 female samples to the custom X/Y/PAR/autosome competitive-mapping reference, duplicates marked with samtools v1.20",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "upstream-accession-indirect"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "STAR v2.7.10a two-pass mapping (default parameters) of RNA reads for 75 male + 74 female samples; female samples separately mapped to an X+Y reference to quantify mismapping",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "upstream-accession-indirect"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "GENESPACE v1.3.1 (dependencies Orthofinder v2.5.5, MCScanX unversioned) to identify one-to-one X-Y gametologs across both haplotypes plus outgroup R. salicifolius",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "dependency-version-partial"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "BLAST nucleotide search v2.2.31+ of putatively hemizygous X genes against the Y-bearing haplotype assembly; >50% alignment => removed, <50% => partially lost, no hit => completely lost",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "featureCounts v2.0.2 read counting on DNA and RNA alignments with parameters '-t exon -g gene_id', excluding multiply-mapping reads",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Mapping-bias filtering: removal of Y genes with mean female read count > 20 (RNA and/or DNA) and their X gametologs, plus adapted DESeq2 gametolog-specific test on male genomic DNA (FDR < 0.1, |log2FC| > 0.5) — DESeq2 / R versions not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "r-package-version-absent"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Dosage-compensation analysis: DESeq2 run per sample with and without sex-linked genes; size factors from the sex-linked-excluded run applied to normalize the full dataset — DESeq2 / R versions not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "r-package-version-absent"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Gametolog-specific expression: adapted DESeq2 with size factors fixed to 1, design ~sample + allele, Benjamini-Hochberg FDR, adjusted p < 0.1 significance threshold — DESeq2 / R versions not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "r-package-version-absent"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "GENESPACEv1.3.1 identification of 1-1-1-1 orthologs across R. bucephalophorus, R. sagittatus and both R. hastatulus haplotypes — R. sagittatus assembly cited as 'Hibbins, Pyne et al., in prep' (unpublished, no accession)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "input-genome-unpublished"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Codon alignment with MUSCLEv3.8.1551 plus hyphy standalone 'pre-msa' / 'post-msa' tools from github.com/veg/hyphy-analyses — hyphy-analyses repo cited without commit/tag",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "external-repo-floating"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "IQ-TREEv2.2.6 unrooted maximum-likelihood gene trees — substitution-model selection settings and seed not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "HYPHY version 2.5.62(MP) Standard MG94 fit for branch-specific dN and dS on X and Y gametolog branches; XY dS summed and genes with dS > 0.5 filtered out",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "external-repo-floating"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Downstream statistics and figures: linear regressions of log2(Y/X read ratio) on XY dS and on dN difference, AIC model comparison (dN difference ~ XY dS vs + log2(Y/X)), chi-squared test of XY vs XYY gene-loss proportions, sliding-window medians (100 genes step 1; 10 Mb step 1 Mb) — no R version or package versions stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "r-package-version-absent"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "PacBio SMRTbell library prep (Express Template Prep Kit 2.0 / SMRTbell Prep Kit 3.0) and sequencing on PacBio Sequel II 8M SMRT cells and Revio (25M) for male Rh15",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "n/a",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Dovetail Omni-C library construction (formaldehyde fixation, DNase I digestion, biotinylated bridge adapter proximity ligation, NEBNext Ultra, streptavidin enrichment) and Illumina HiSeqX sequencing to ~30x",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "n/a",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W3",
+      "label": "Field collection at Rosebud TX, glasshouse random mating and F1 growth at University of Toronto, DNA/RNA isolation (Qiagen Plant Mini, Sigma Aldrich Spectrum Plant Total RNA) and library prep + sequencing at Genome Quebec (10-15X DNA) for 75 male / 74 female samples",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "n/a",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 19,
+    "n_NI": 7,
+    "n_X": 1,
+    "S": 27,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/27 (0%) — stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 19/27 computational steps. Those 19 are carried by unusually dense exact prose pins (Hifiasm 0.16.1-r375, bwa 0.7.15, Picard 2.7.1, YAHS 1.2a.2, pairtools 1.0.2, BUSCO 5.4.4, MAKER 3.01.03, BLAST 2.2.28+ / 2.2.31+, InterProScan 5.52-86.0, STAR 2.7.10a, freebayes 1.3.4, bwa-mem2 2.0pre2, samtools 1.20, GENESPACE 1.3.1, Orthofinder 2.5.5, featureCounts 2.0.2, MUSCLE 3.8.1551, IQ-TREE 2.2.6, HYPHY 2.5.62(MP)), but every one of them stays at version=1 because no environment closure (lockfile, container digest, conda spec) is claimed anywhere in the paper or the repository landing page. 7/27 steps cap at NI: Juicer, RepeatModeler, SNAP and MCScanX carry no version, the custom sex-linked-SNP scripts are unidentified, and all four DESeq2 / R statistical steps name neither an R version nor package versions. 1/27 step is X: the Hi-C false-join correction was performed by manual inspection in Juicebox with no recorded edit operations, so it cannot be replayed from any artifact. Even at stage 2 no step can exceed RI without an executed environment capture, and none is claimed.",
+    "coverage": "27 computational steps assessed from the biorxiv v1 JATS-XML Methods prose (assembly, curation, annotation, mapping, gametolog identification, counting, DESeq2 analyses, dN/dS, downstream statistics). 3 wet-lab step groups (PacBio library prep + sequencing, Omni-C library prep + Illumina sequencing, field/glasshouse sampling with nucleic-acid isolation and Genome Quebec sequencing) counted in W and marked OOS, not verdicted.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (paper Methods + code repository landing page)",
+      "missing": "No environment lockfile, container digest, or conda/env specification is claimed anywhere. The repository https://github.com/bmsacchi/rumex_XY_expression has no README, no description, no license, no releases and no tags; a top-level .snakemake/ directory implies a Snakemake pipeline but no environment closure is asserted at the landing-page level. Consequently every exactly-pinned tool still stays at version=1: the pins are static claims with no captured dependency closure.",
+      "how_to_close": "Ship a conda-lock / pixi lockfile or a container image with a recorded digest covering the full stack (hifiasm, bwa, bwa-mem2, samtools, picard, YAHS, pairtools, juicer, BUSCO, RepeatModeler, MAKER + SNAP + BLAST + InterProScan, STAR, freebayes, GENESPACE + Orthofinder + MCScanX, featureCounts, R + DESeq2, MUSCLE, IQ-TREE, HYPHY), and reference it from the README."
+    },
+    {
+      "type": 3,
+      "where": "C6 (Juicer 'pre'), C9 (RepeatModeler), C10 (SNAP within MAKER), C17 (MCScanX within GENESPACE), C20-C22 (DESeq2), C27 (R statistics/figures)",
+      "missing": "Software version pins absent for Juicer, RepeatModeler, SNAP, MCScanX, DESeq2 and R itself. DESeq2 in particular drives all three central expression results (mapping-bias filtering, dosage-compensation normalization, gametolog-specific expression) and its normalization/dispersion behaviour is version-sensitive; these steps therefore cannot exceed NI.",
+      "how_to_close": "Name and pin every package version in Methods or a versions table — explicitly R x.y.z, DESeq2 x.y.z, Juicer x.y, RepeatModeler x.y, SNAP release, MCScanX release — or emit sessionInfo() with the released scripts."
+    },
+    {
+      "type": 5,
+      "where": "Code repository https://github.com/bmsacchi/rumex_XY_expression (Data Availability: 'Analysis scripts are available at ...')",
+      "missing": "The repository is public and live (HTTP 200, 144 commits, last pushed 2026-06-24) but carries no README, no description, no license and no tagged release or archival snapshot. There is therefore no prose mapping from Methods steps to scripts, no statement of which pipeline entry point reproduces which figure, and no immutable version corresponding to the manuscript — the citation points at a moving 'main' branch. Directory names also indicate the repository covers the expression / hyphy analyses only; no code is offered for the assembly, Hi-C curation or MAKER annotation steps (C1-C11).",
+      "how_to_close": "Add a README mapping Methods steps to scripts and stating run instructions, tag a release corresponding to the manuscript, deposit an archived snapshot (Zenodo DOI or Software Heritage), add a license, and either publish or explicitly reference the assembly/annotation pipeline code."
+    },
+    {
+      "type": 1,
+      "where": "C7 (Juicebox manual curation), C14 (custom sex-linked SNP scripts)",
+      "missing": "The scaffolded assembly was corrected by manual inspection in Juicebox v1.11.08 (splitting scaffold 1 into X + A2 and scaffold 3 into A3 + A4 in the maternal haplotype, scaffold 3 into A3 + A4 in the paternal haplotype) using AGP files, but the edit operations are not recorded as an artifact, so this step is not replayable from any published input. Separately, 'custom scripts' for sex-linked SNP identification and PAR delimitation are neither named nor located within the cited repository.",
+      "how_to_close": "Deposit the pre-curation and post-curation AGP files (or the Juicebox review .assembly file) as supplementary artifacts, and name/link the specific custom scripts, ideally with a driver script reproducing the sex-linked SNP set from the filtered VCF."
+    },
+    {
+      "type": 4,
+      "where": "C12-C16, C19-C22 (population DNA/RNA data), C23 (R. sagittatus assembly)",
+      "missing": "Data Availability deposits only the new haplotype-resolved reference genome (Borealis DOI 10.5683/SP3/FRHNO4; NCBI BioProjects PRJNA1367036 and PRJNA1367037). No accession is restated in this paper for the 75 male / 74 female population DNA and RNA libraries (deferred to Yuan et al. 2025) nor for the 12-sample RNAseq of Hough et al. 2014, and the R. sagittatus outgroup assembly used for the 1-1-1-1 ortholog set is cited as 'Hibbins, Pyne et al., in prep' — unpublished, with no accession at all.",
+      "how_to_close": "State the SRA/ENA accessions for the population resequencing and RNAseq libraries and for the Hough et al. 2014 RNAseq directly in this paper's Data Availability, and provide an accession or archived snapshot for the R. sagittatus assembly (or document the exact version used)."
+    },
+    {
+      "type": 6,
+      "where": "C8 (BUSCO Eukaryota database), C11 (BLAST / InterProScan search databases), C10 (Tartary buckwheat protein set FtChromosomeV2.IGDBv2)",
+      "missing": "Reference databases are named without release identifiers: the BUSCO 'Eukaryota databases' carry no odb version, and the BLAST / InterProScan databases used for functional annotation are unspecified. Only the buckwheat protein set carries a version string. Annotation and completeness outputs are therefore not byte-reproducible even with matching tool versions.",
+      "how_to_close": "Record the exact database releases (e.g. eukaryota_odb10 dated release, InterPro release number, the BLAST target database and its download date) alongside the tool versions."
+    },
+    {
+      "type": 7,
+      "where": "C2 (Arima mapping pipeline), C24/C26 (hyphy-analyses repository)",
+      "missing": "Two external code dependencies are cited by bare repository URL with no commit hash or tag: https://github.com/ArimaGenomics/mapping_pipeline for the Omni-C mapping procedure, and https://github.com/veg/hyphy-analyses for the Standard MG94 model and the pre-msa / post-msa tools. Both are live (HTTP 200) but mutable, so the code actually executed is not identified.",
+      "how_to_close": "Cite the commit SHA (or a vendored copy / submodule pinned to a commit) for both external repositories."
+    },
+    {
+      "type": 8,
+      "where": "C16 (STAR two-pass), C25 (IQ-TREE), C1 (Hifiasm)",
+      "missing": "Several steps are described as run with 'default parameters' or with no parameter statement, and no random seeds are given for the stochastic components (IQ-TREE ML search, any subsampling). Defaults are version-dependent, so 'default' is not a stable specification without the environment capture that is also absent.",
+      "how_to_close": "Publish the full command lines (or the Snakemake rules) with explicit flags and fixed seeds rather than relying on the word 'default'."
+    },
+    {
+      "type": 10,
+      "where": "W1-W3 (wet-lab step groups)",
+      "missing": "PacBio SMRTbell and Revio library preparation and sequencing, Dovetail Omni-C library construction with Illumina HiSeqX sequencing, and field collection / glasshouse propagation / nucleic-acid isolation with Genome Quebec sequencing are physical sequence-generation steps, out of scope for computational reproduction; counted in W (3), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the resulting reference genome is deposited (Borealis 10.5683/SP3/FRHNO4, BioProjects PRJNA1367036 / PRJNA1367037), which is what the computational steps need as an entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/bmsacchi/rumex_XY_expression (Data Availability: 'Analysis scripts are available at ...')",
+      "http_status": "200 OK (GitHub REST API: default_branch=main, created 2024-03-14, last push 2026-06-24, 144 commits; description=null, license=null, releases=[], tags=[]; no README at repository root; root contents: .gitattributes, .gitignore, .snakemake/, DNAbams/, data/, expressionWorkflow/, expression_03_2026/, figures/, hyphy/, logs/, readCountsRNAeQTL_multi/, scripts/, venn2bar.png)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + GitHub REST API (api.github.com/repos, /releases, /tags, /contents)"
+    },
+    {
+      "artifact": "data repository: Borealis https://doi.org/10.5683/SP3/FRHNO4 (assembled haplotype-resolved reference genome sequence and annotations)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, doi.org resolution"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1367036",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/bioproject"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1367037",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/bioproject"
+    },
+    {
+      "artifact": "external code dependency: github.com/veg/hyphy-analyses (source of the Standard MG94 model and pre-msa / post-msa tools; cited without commit or tag)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "external code dependency: github.com/ArimaGenomics/mapping_pipeline (Omni-C mapping procedure; cited without commit or tag)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "paper full text: biorxiv JATS XML www.biorxiv.org/content/early/2025/11/20/2025.11.20.689509.source.xml",
+      "http_status": "200 OK via curl with browser User-Agent (WebFetch returned HTTP 403 Forbidden)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L with browser User-Agent"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "81ad8e03e3efcdd5a96dd1e0b5b09496020ea9ef19afc7435c2126c324aefbb6",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

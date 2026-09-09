@@ -1,0 +1,329 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "1d54b2f9f9f4c15b211433ec477e5cbbf3302f57d9dbc7c159fdb5318e4ec733",
+  "canonical_id": {
+    "value": "10.64898/2025.12.07.692843",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.07.692843v1",
+      "biorxiv:2025.12.07.692843v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The CRISPR/Cas9 FACS-based pooled-screen readout analysis: demultiplexed sgRNA amplicon FASTQ -> sgRNA enrichment testing between PrP-C-low and PrP-C-high sorted fractions with MAGeCK-VISPR (primary genome-wide screens in undifferentiated and differentiated CAD5 cells; secondary validation screens analysed as paired replicates), pathway enrichment with MAGeCKFlute against KEGG / GOBP / Reactome / Complex databases, hit-list construction under stated cutoffs plus a hand-curated KEGG-pathway gene list for the secondary library, FlowJo gating and median-fluorescence-intensity computation for flow cytometry, and GraphPad Prism unpaired t-tests. All wet-lab work (CAD5/HEK293FT culture and differentiation, Cas9 monoclonal line generation, Brie library amplification, lentivirus production/titering/transduction, FACS sorting, gDNA isolation and three-round amplicon PCR, Illumina sequencing, secondary library synthesis and cloning, inhibitor treatments, surface biotinylation, PIPLC, immunoblotting, viability staining) is out of computational-reproduction scope and counted in W.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, derived from the 'Materials and Methods' subsections 'Next Generation Sequencing' (FASTQ deconvolution), 'Data Processing and Analysis' (MAGeCK-VISPR, MAGeCKFlute, hit-cutoff and hand-curation), 'Flow cytometry for surface PrP C' (FlowJo), and 'Cell viability assay' (GraphPad Prism), plus the Results subsection 'Bioinformatic analyses identify biosynthetic pathways...' which names the MAGeCKFlute database set (KEGG, GOBP, REACTOME, Complex). The primary genome-wide MAGeCK-VISPR analysis of the undifferentiated and differentiated screens is folded into one step (C2) because the prose describes a single identical procedure applied to both; the secondary validation screens are a separate step (C4) because the replicate pairing and the non-targeting-control gene-name randomisation differ. Wet-lab steps counted in W, not verdicted. Stage-1 prose-only: no code artifact exists to read, and no workflow file was available; funnel_stage is stage1-prose-only and env_capture_class is n/a throughout.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Deconvolution of Illumina runs to per-sample FASTQ ('Samples were deconvoluted to FASTQ files for subsequent analysis'), performed by the Dartmouth Genomics Shared Resource core facility across three instrument configurations (NextSeq500 high-output 75 SE for undifferentiated genome-wide + library control; NextSeq 2000 P2 1x100 for differentiated genome-wide + library control; MiniSeq high-output 1x150 for the secondary library), all with 10% PhiX spike-in",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "raw-bcl-not-deposited",
+        "no-tool-named",
+        "core-facility-blackbox",
+        "no-demux-parameters"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "sgRNA enrichment analysis of the primary genome-wide Brie screens with MAGeCK-VISPR (ref 81): undifferentiated and differentiated CAD5, three biological replicate screens each, comparing enrichment of sgRNAs between the PrP-C-low and PrP-C-high sorted subsets for each replicate",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-analysis-code-deposited",
+        "unversioned-tool",
+        "no-command-line",
+        "brie-library-reference-file-not-deposited",
+        "replicate-to-fastq-mapping-unstated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Pathway enrichment with the MAGeCKFlute pathway-analysis function (ref 82) against KEGG (refs 83-85), GOBP, Reactome and Complex databases; -log10(FDR) plotted per pathway with point size proportional to normalised enrichment score (Fig 3A)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-analysis-code-deposited",
+        "unversioned-tool",
+        "annotation-db-release-unpinned",
+        "gene-set-input-definition-unstated"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "sgRNA enrichment analysis of the secondary validation screens with MAGeCK-VISPR and MAGeCKFlute, analysed as PAIRED replicates comparing PrP-C-low vs PrP-C-high directly (3 replicate sorts undifferentiated, 5 replicate sorts differentiated); non-targeting control sgRNAs were 'randomly assigned gene names, with 10 non-targeting guides per non-targeting gene name' to balance the 8-sgRNA-per-targeted-gene design",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-analysis-code-deposited",
+        "unversioned-tool",
+        "no-command-line",
+        "random-assignment-no-seed",
+        "paired-design-specification-informal"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Hit-list construction and secondary-library gene selection: cutoffs -log10(p) >= 2 (p <= 0.01) and log fold change <= -2.9 or >= 2.9 ('outside 3 standard deviations of the mean') for the volcano-plot hits, genes with FDR <= 0.5 prioritised for validation, PLUS 'KEGG analysis was performed and a hand-curated list of genes involved in pathways exhibiting enrichment were selected for inclusion in the secondary library'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "hand-curation-unrecoverable",
+        "no-selection-script",
+        "sd-basis-population-unstated",
+        "kegg-enrichment-threshold-unstated"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Flow cytometry gating and quantification with FlowJo (BD Biosciences): sequential gating to identify single-cell populations, CD59 gate retaining the middle 90% of the CD59 fluorescence histogram, PrP-C sorting gates at the lowest and highest 20% of the PrP-C fluorescence histogram, median fluorescence intensities used to calculate percent reduction in surface PrP-C",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "fcs-files-not-deposited",
+        "no-flowjo-workspace-deposited",
+        "gui-gating-not-scriptable",
+        "unversioned-tool"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Statistical testing with GraphPad Prism version 10.2.1 for Windows: unpaired t-tests on biological replicate measurements (n=3 for the viability assay; n=2 for the 1-DNJ dose series) with significance thresholds *p<=0.05, **p<=0.01, ***p<=0.001, ****p<=0.0001",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "source-numeric-data-not-deposited",
+        "gui-tool-no-script",
+        "no-multiple-testing-correction-stated",
+        "figure-values-only"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 3,
+    "n_X": 4,
+    "S": 7,
+    "W": 17,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/7 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/7 R-star and 0/7 RI even under the most generous inference-inclusive reading; the best any step reaches is NI (C2, C3, C4). The binding constraint here is CODE, not data. Data is unusually good for a wet-lab-led paper: all six Mendeley Data DOIs cited in Methods resolve HTTP 200 on 2026-07-28 and their titles map onto the screen arms ('CAD5 Brie Library Quality Control', 'Genome-wide Brie CAD5 Surface PrPC - Undifferentiated', '- Differentiated PrPC Low', '- Differentiated PrPC High', 'Secondary Library Validation Surface PrPC - Undifferentiated', '- Differentiated'), so C2/C3/C4 score data=2. But the paper contains NO code repository of any kind - no GitHub, GitLab, Bitbucket, Zenodo or Software Heritage URL occurs anywhere in the full text, there is no 'Code availability' section, and there is no 'Data availability' section either (the deposition sentence is embedded in the Methods subsection 'Data Processing and Analysis'). Every analysis is therefore only reconstructable from prose (code=1 at best), and no version is stated for MAGeCK-VISPR, MAGeCKFlute, FlowJo, or any KEGG/GOBP/Reactome/Complex database release, so version=0 pins the whole pipeline. The single exact version pin in the paper - GraphPad Prism 10.2.1 for Windows - covers only the ancillary t-test step, whose input numbers are not deposited, so it buys nothing. Three steps are unrecoverable rather than merely under-documented: C1 (raw BCL never deposited, no demultiplexer named), C5 (a hand-curated gene list is not a recoverable procedure, although its OUTPUT is published in the Supplementary Tables 'Targeting Secondary Library' tab so downstream steps are not blocked), and C6/C7 (raw .fcs files and per-replicate source numbers are not deposited). To move this paper to RI the authors would need only to publish their MAGeCK/MAGeCKFlute invocation scripts, the Brie sgRNA-to-gene reference file, and the tool + annotation-database versions - the expensive artifact, the raw sequencing data, is already public.",
+    "coverage": "7 computational steps assessed from Methods prose (plus the MAGeCKFlute database list named only in the Results subsection 'Bioinformatic analyses identify biosynthetic pathways...'). 17 wet-lab steps counted in W (out of computational-reproduction scope): CAD5/HEK293FT culture and PFM differentiation; generation of Cas9-expressing CAD5 monoclonal lines; amplification of the pooled Brie lentiviral library; lentivirus production in HEK293FT; lentivirus titering and transduction into CAD5 at MOI 0.3; FACS for cell-surface PrP-C in the primary screens; genomic DNA isolation and three-round amplicon PCR; Illumina NextSeq500/NextSeq2000/MiniSeq sequencing; secondary library synthesis, Golden Gate cloning, packaging and transduction; secondary library FACS; CytoFLEX flow cytometry acquisition; N-glycosylation inhibitor treatments; surface protein biotinylation; PIPLC treatment; cell lysis and immunoblotting; cell viability staining; Hspa5 inhibitor treatments. Computational coverage |S|/(|S|+|W|) = 7/24 = 29%. Neither a 'Data availability' nor a 'Code availability' section exists in the article.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "All computational steps C1-C7 (MAGeCK-VISPR, MAGeCKFlute, hit selection, FlowJo gating, Prism statistics)",
+      "missing": "No analysis code is deposited or linked anywhere. A full-text scan of the JATS XML returns zero occurrences of github, gitlab, bitbucket, zenodo, figshare or software heritage. The article has no 'Code availability' section and no 'Data availability' section; the only deposition statement is a sentence at the end of the Methods subsection 'Data Processing and Analysis'. The reader is given tool names and citations ('Deconvoluted FASTQ files were analyzed using the MAGeCK-VISPR 81 and MAGeCKFlute pipelines 82') but no command lines, no configuration/design-matrix files, no count-table generation step, and no figure-generation scripts.",
+      "how_to_close": "Deposit the MAGeCK-VISPR configuration/design files and the MAGeCKFlute R script (or a Snakemake/Nextflow wrapper) in a public repository, archive a tagged release to Zenodo for a DOI, and cite that DOI in a proper Code-availability section."
+    },
+    {
+      "type": 2,
+      "where": "C2, C3, C4 (MAGeCK-VISPR, MAGeCKFlute), C6 (FlowJo)",
+      "missing": "Gap 2a - no version is stated for MAGeCK-VISPR, for MAGeCKFlute, or for FlowJo. MAGeCK/MAGeCKFlute hit rankings and the pathway-enrichment output are known to shift between releases (normalisation defaults, RRA vs MLE, gene-set backends), so an unversioned citation is not sufficient to re-derive the published hit lists. No interpreter version (R or Python), no Bioconductor release, no conda channel and no container is mentioned anywhere. The only exact version pin in the entire paper is 'GraphPad Prism version 10.2.1 for Windows' at the ancillary statistics step.",
+      "how_to_close": "State the exact MAGeCK/MAGeCK-VISPR and MAGeCKFlute versions, the R/Bioconductor release, and the FlowJo version; ship a conda-lock / renv.lock / container digest covering them."
+    },
+    {
+      "type": 5,
+      "where": "C5 secondary-library gene selection; C2/C4 sgRNA library reference",
+      "missing": "Two custom artifacts are not available in machine-readable, procedure-recoverable form. (i) The secondary-library gene set was chosen partly by a 'hand-curated list of genes involved in pathways exhibiting enrichment' - the curation rule (which pathways, which enrichment threshold, which inclusion criterion) is unstated, so the selection is not recoverable; the resulting oligo set is published in the Supplementary Tables 'Targeting Secondary Library' and 'Non-Targeting Secondary Library' tabs, which rescues downstream steps but not this step. (ii) The sgRNA-sequence-to-gene mapping file for the Brie library, which MAGeCK requires as its library reference, is not deposited; the paper cites the Brie library by reference (86) and Addgene only.",
+      "how_to_close": "Publish the exact library reference TSV actually passed to MAGeCK (both Brie and the custom secondary library), and replace the hand-curation description with an explicit, executable inclusion rule."
+    },
+    {
+      "type": 1,
+      "where": "C2, C4 - mapping of the six Mendeley Data deposits onto replicates and sort fractions",
+      "missing": "Six DOIs are listed as a bare comma-separated run (10.17632/jv32cvpn3r.1, 10.17632/5pfdty7zd6.1, 10.17632/p5t6d78zn8.1, 10.17632/vs9fwhbcvj.1, 10.17632/tmkn3zsjts.1, 10.17632/jb89dp34d8.1) with no per-DOI description in the paper. The dataset titles recovered from the DOIs do disambiguate the screen arm, but the paper itself provides no FASTQ-file-to-replicate / to-sort-fraction (PrP-low vs PrP-high) / to-library-control sample sheet, which is exactly the table MAGeCK needs to reconstruct the comparisons. The undifferentiated genome-wide deposit is a single DOI covering both sorted fractions while the differentiated screens are split into separate Low and High DOIs, so the deposit layout is not uniform.",
+      "how_to_close": "Add a sample-sheet table (Supplementary) mapping every FASTQ filename to DOI, screen, differentiation state, replicate number and sort fraction, and state which DOI holds the library-control sample."
+    },
+    {
+      "type": 4,
+      "where": "C4 secondary-screen analysis",
+      "missing": "Non-targeting control sgRNAs were 'randomly assigned gene names, with 10 non-targeting guides per non-targeting gene name'. No random seed and no assignment table generated by that randomisation is reported, so the null distribution used by MAGeCK for the secondary screens cannot be reconstructed exactly; re-running with a different assignment gives a different control-gene null.",
+      "how_to_close": "Report the seed, or simply deposit the realised non-targeting-guide-to-pseudogene assignment table that was passed to MAGeCK."
+    },
+    {
+      "type": 13,
+      "where": "C3 MAGeCKFlute pathway analysis",
+      "missing": "The annotation resources consumed by the enrichment step - KEGG (cited as references 83-85), Gene Ontology Biological Process, Reactome and 'Complex' - are named without any release identifier, download date, or version. These are rolling resources: KEGG and Reactome are re-released continuously and GO is rebuilt monthly, so pathway FDRs and the reported enrichment ranking in Fig 3A are not reconstructable from the description. No download rule exists to inspect (no code), so this cannot be classified A/B/C at stage 1; it is prose-only and unpinned.",
+      "how_to_close": "Record the exact release of each annotation database (KEGG release number, GO release date, Reactome version) or ship the gene-set files used, and obtain them through a versioned download rule in the analysis code."
+    },
+    {
+      "type": 12,
+      "where": "C6, C7 - flow cytometry and statistics source data",
+      "missing": "Raw .fcs files from the CytoFLEX runs are not deposited (only the sgRNA amplicon FASTQ went to Mendeley Data), no FlowJo workspace / gating-strategy file is provided, and the per-replicate median-fluorescence-intensity values feeding the Prism t-tests are not deposited as a machine-readable table - they exist only as plotted points in the figures. Both steps are therefore unrecoverable without repeating the wet-lab work, independent of tooling.",
+      "how_to_close": "Deposit the .fcs files (e.g. FlowRepository) plus the FlowJo workspace, and publish the per-replicate MFI source-data tables underlying every statistical comparison."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: CAD5/HEK293FT culture and PFM differentiation; Cas9-expressing CAD5 monoclonal line generation; Brie pooled lentiviral library amplification; lentivirus production in HEK293FT; lentivirus titering and transduction at MOI 0.3; primary-screen FACS for cell-surface PrP-C; genomic DNA isolation and three-round amplicon PCR; Illumina NextSeq500 / NextSeq 2000 / MiniSeq sequencing; secondary library synthesis, Golden Gate cloning, packaging and transduction; secondary-library FACS; CytoFLEX acquisition; N-glycosylation inhibitor treatments; surface protein biotinylation; PIPLC treatment; cell lysis and immunoblotting; cell viability staining; Hspa5 inhibitor treatments",
+      "missing": "Wet-lab generation and validation steps are out of scope for computational reproduction (OOS); counted in W (17), not verdicted. Documentation quality of these steps is in fact high (catalogue numbers, Addgene plasmid IDs, concentrations, incubation times, primer tables), but that does not enter the Tier-1 computational denominator.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the pooled-screen readout analysis."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE. No GitHub, GitLab, Bitbucket, Zenodo, figshare or Software Heritage URL occurs anywhere in the JATS full text. There is no 'Code availability' section. Per protocol, absence is recorded as a finding; no web search for an unstated repository was performed.",
+      "http_status": "n/a (no code artifact stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "case-insensitive full-text scan of the JATS XML for github/gitlab/bitbucket/zenodo/figshare/software-heritage: zero hits"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/jv32cvpn3r.1 - stated verbatim in Methods 'Data Processing and Analysis': 'Raw .fastq files from all screening samples have been deposited with Mendeley Data and can be found using the following DOIs: ...'. Resolves to dataset titled 'CAD5 Brie Library Quality Control'.",
+      "http_status": "200 OK (https://doi.org/10.17632/jv32cvpn3r.1, followed redirects to data.mendeley.com)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org; public landing page rendered without login"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/5pfdty7zd6.1 - 'Genome-wide Brie CAD5 Surface PrPC - Undifferentiated'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/p5t6d78zn8.1 - 'Genome-wide Brie CAD5 Surface PrPC - Differentiated PrPC Low'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/vs9fwhbcvj.1 - 'Genome-wide Brie CAD5 Surface PrPC - Differentiated PrPC High'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/tmkn3zsjts.1 - 'Secondary Library Validation Surface PrPC - Undifferentiated'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org"
+    },
+    {
+      "artifact": "data accession: Mendeley Data DOI 10.17632/jb89dp34d8.1 - 'Secondary Library Validation Surface PrPC - Differentiated'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org"
+    },
+    {
+      "artifact": "flow cytometry raw data (.fcs) and FlowJo workspace: NOT deposited, no repository stated anywhere in the paper",
+      "http_status": "n/a (no identifier stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text scan; no FlowRepository / Cytobank / ImmPort identifier occurs in the article"
+    },
+    {
+      "artifact": "external tools cited by reference only, no URL and no version: MAGeCK-VISPR (ref 81), MAGeCKFlute (ref 82), FlowJo (BD Biosciences), GraphPad Prism version 10.2.1 for Windows (only exact version pin in the paper)",
+      "http_status": "not individually checked (third-party tools cited in prose, not study artifacts)",
+      "checked_at": "2026-07-28",
+      "network_context": "prose citation only"
+    },
+    {
+      "artifact": "external annotation resources consumed via MAGeCKFlute, unversioned: KEGG (refs 83-85), Gene Ontology Biological Process, Reactome, 'Complex'",
+      "http_status": "n/a (no release identifier or URL stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "rolling public resources; no download rule available to inspect at stage 1 (no code)"
+    },
+    {
+      "artifact": "physical reagent artifacts with stable identifiers (recorded for completeness, wet-lab): Mouse Brie CRISPR knockout pooled library and lentiGuide-Puro (Addgene #52963) obtained from Addgene",
+      "http_status": "not checked (out of computational scope)",
+      "checked_at": "2026-07-28",
+      "network_context": "Addgene catalogue identifiers stated in Methods 'Plasmids' and 'Secondary Library Creation'"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "83d7e8c3609dcc4787ff3f905d403ae1e692e0a9e196eb41ae68f100dd442b14",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,712 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "ed5c971dc860811d5a31ea5b28cdafae662d0c011ad1a3690e936ce86d86fddc",
+  "canonical_id": {
+    "value": "10.64898/2025.12.08.693002",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.08.693002v2",
+      "biorxiv:2025.12.08.693002v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Population-genomic characterization of 2,018 wild Caenorhabditis briggsae strains and 16 C. nigoni inbred lines: short-read trimming/alignment/variant calling (fastp, BWA, sambamba, Picard, GATK), het-polarization and hard filtering (Andersen Lab wi-gatk), isotype definition by pairwise genetic similarity (isotype-nf), LD pruning (bcftools, PLINK), PCA (EIGENSOFT smartpca), species-wide ML tree (vcf2phylip, IQ-TREE2, ggtree, ComplexHeatmap), cosmopolitan-isotype assignment (geosphere), repeat library construction and masking (RepeatModeler/RepeatMasker, TransposonPSI, GenomeTools LTRharvest/LTRdigest, VSEARCH/QIIME2, BLASTX), population statistics (scikit-allel pi/thetaW/Tajima's D, pixy Dxy), ADMIXTURE, PacBio HiFi and ONT genome assembly plus decontamination and polishing (lima, samtools, pbmarkdup, hifiasm, DIAMOND, BlobToolKit, Canu, Flye, RagTag/MUMmer, BLAST, Pilon), gene prediction and completeness (BRAKER3, BUSCO), long-read and short-read hyper-divergent region (HDR) calling with threshold optimization (nucmer, bedtools, bcftools, mosdepth), functional domain and GO enrichment (InterProScan, AGAT, gffread, R stats, clusterProfiler), and ortholog/gene-tree introgression screening (OrthoFinder). Wet-lab work (nematode culture, DNA/HMW-DNA extraction, library preparation, Illumina/PacBio/ONT sequencing, cross-compatibility tests) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis extracted from the Methods sections 'Alignments and variant calling' through 'Functional enrichment analysis'. Multi-tool procedures that the authors describe as one pipeline are kept as one step (e.g. repeat library construction bundles RepeatModeler/TransposonPSI/LTRharvest/LTRdigest/VSEARCH/RepeatClassifier; ONT assembly bundles Canu/Flye/RagTag/MUMmer/BLAST/Pilon). Wet-lab procedures are counted in W and not verdicted. Verdicts are capped at RI by protocol: R-star requires stage-2 code verification, which was not performed. Repo landing page and README were read as prose only; no workflow source was read line-by-line.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "ONT basecalling of five C. nigoni isofemale lines on GridION with MinKNOW software v5.9.18, default parameters; 'only high-quality reads were kept for genome assembly'",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "data-not-deposited",
+        "no-code-artifact",
+        "vendor-closed-software",
+        "quality-threshold-not-numeric"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Adapter and low-quality trimming of raw short reads with fastp v0.20.0 and default parameters; reads shorter than 20 bp discarded",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repo-floating-no-commit-pin"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Short-read alignment against the C. briggsae QX1410 reference genome (project PRJNA784955) with BWA v0.7.17",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "cli-params-absent",
+        "reference-release-not-pinned"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Merging and indexing of per-strain libraries with sambamba v0.7.0; duplicate flagging with Picard v2.21.3; exclusion of strains under 10x coverage",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "cli-params-absent"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Per-strain variant calling with HaplotypeCaller and joint genotyping with GenomicsDBImport and GenotypeGVCFs, GATK v4.1.4.0",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "cli-params-absent",
+        "interval-scheme-not-stated"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Heterozygous-SNV polarization and site/sample-level hard filtering with the Andersen Lab wi-gatk pipeline (het_polarization.nim); numeric thresholds fully stated (PL ratios <= 0.5 and PL <= 200; QUAL > 30, QD > 20, SOR < 5, FS < 100, missing < 95%, het fraction < 10%, DP > 5) producing the hard-filtered VCF",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "pipeline-version-absent",
+        "repo-floating-no-commit-pin",
+        "no-env-lock"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Isotype reference strain characterization: pairwise genetic similarity from identical-allele ratio over 5,755,781 SNVs computed with 'an in-house script', then complete-linkage hierarchical agglomerative clustering at a 99.97% similarity cutoff; method stated to be available as the Nextflow pipeline isotype-nf",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "in-house-script-unversioned",
+        "pipeline-version-absent",
+        "repo-floating-no-commit-pin",
+        "no-env-lock"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Divergence-time approximation in the NIC174 cosmopolitan isotype: four-fold degenerate site annotation with degenotate v1.3 on the QX1410 reference and annotation, VCF subsetting to JU2584/NIC2096, molecular clock T ~ k/2mu with mu = 2.3e-09 and k = 198/6,690,038",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repo-floating-no-commit-pin"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "LD-pruned VCF construction: biallelic SNP extraction and normalization with 'bcftools norm -m +' in bcftools v1.14, LD pruning with PLINK v1.90b6.21 ('--indep-pairwise 50 10 0.9'), removal of missing sites",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repo-floating-no-commit-pin"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Principal component analysis with the smartpca v16000 executable from EIGENSOFT v7.2 on PLINK-produced .ped/.snp/.ind marker files; Eigenstrat values and Tracy-Widom statistics",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "smartpca-parfile-absent"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Species-wide maximum-likelihood tree: VCF-to-PHYLIP conversion with vcf2phylip.py, IQ-TREE2 v2.4.0 with GTR+F+ASC+R10 selected by BIC under a GTR-restricted model search, 1,000 UFBoot2 replicates",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "vcf2phylip-version-not-in-methods",
+        "no-random-seed"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Tree and similarity-matrix visualization in R v4.3.2 with ggtree v3.10.1 and ComplexHeatmap v2.18.0 (clustering and rendering of pairwise genetic similarity among 715 isotype reference strains)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "no-renv-lockfile",
+        "clustering-params-partial"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Assignment of cosmopolitan isotype reference strains: isotypes containing any strain pair with sampling-location distance over 2,000 km, Haversine distance computed with the geosphere v1.5-18 R package",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "no-renv-lockfile"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Repeat library construction and masking: de novo modeling with RepeatModeler from RepeatMasker v2.0.6, TransposonPSI v1.0.0, LTRharvest/LTRdigest from GenomeTools v1.6.5 with Gypsy Database v2.0 HMM profiles and Pfam v37.4 domains, gt-select filtering, merge with Rhabditid repeats from RepBase and Dfam, VSEARCH v2.22.1 clustering from QIIME2 v2024.10, RepeatClassifier, removal of repeats with BLASTX v2.16.0 hits to C. elegans/C. briggsae proteins",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repbase-dfam-release-not-pinned",
+        "cli-params-absent",
+        "repeat-library-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Genome-wide population statistics: nucleotide diversity (pi), Watterson's theta and Tajima's D with scikit-allel v1.3.5 in 10 kb windows from the hard-filtered VCF; SNV positions only, repeat regions and sites with >80% missing genotypes excluded, inaccessible sites masked via is_accessible (pi, thetaW) or genotype masking (Tajima's D)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "accessibility-mask-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Absolute divergence (Dxy) between relatedness groups with pixy v1.2.11.beta1 in 10 kb windows from the hard-filtered VCF, default handling of accessible-site denominators",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Admixture analysis with ADMIXTURE v1.3.0 on the LD-pruned PED file; K from 2 to 30, ten independent runs of ten-fold cross-validation, optimum where the CV-error curve first plateaus; non-admixed strains defined by maximum subpopulation fraction > 99.9%",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "no-random-seed",
+        "plateau-criterion-qualitative"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "PacBio HiFi read preprocessing: demultiplexing and adapter removal with lima (Duke v2.9.0, CSHL v2.2.0, UMD v2.12.0), cross-facility merging with samtools v1.20, PCR duplicate removal with pbmarkdup v1.1.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "cli-params-absent",
+        "core-facility-executed-step"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "HiFi primary assembly with hifiasm v0.24.0-r702 using '-f0' (bloom filter disabled) and '-l0' (haplotig purging disabled); per-strain selection of the assembly with the highest N50 between merged and individual-sample assemblies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "assembly-not-deposited-under-accession"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Assembly decontamination: taxonomic classification of contigs with DIAMOND 2.1.13 ('--faster', e-value 1e-10) against UniProt Release 2025_03, purging of non-Nematoda contigs with BlobToolKit v4.4.5 ('--param bestsumorder_phylum--Inv=Nematoda')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "uniprot-release-pinned-good"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "ONT assembly of five C. nigoni lines: read correction with Canu v2.2 ('-correct genomeSize=130m'), assembly with Flye v2.9.3 ('--nano-raw'), misassembly correction with RagTag 'correct' using MUMmer v4.0.0 nucmer ('--mum --mincluster 100 --maxgap 300'), scaffolding to the C. nigoni JU1421 reference with RagTag 'scaffold', bacterial scaffold removal by BLAST v2.11.0 against NCBI nt (E-value 1e-09), five rounds of Pilon v1.24 polishing with Illumina reads mapped by BWA v2.2.1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "data-not-deposited",
+        "ont-reads-no-accession",
+        "nt-database-release-not-pinned",
+        "no-env-lock"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Protein-coding gene prediction for each assembled genome with BRAKER3 v3.0.8 using a custom protein library from C. elegans N2 (WormBase WS283) and C. briggsae QX1410 (PRJNA784955)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "custom-protein-library-not-deposited",
+        "cli-params-absent"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Genome and gene-model completeness estimation with BUSCO v5.0.4 against the nematoda_odb10 database",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "odb10-release-date-not-pinned"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Long-read HDR calling in the Tropical relatedness group: alignment of 15 long-read assemblies to QX1410 with nucmer v3.1 ('--maxgap 500 --mincluster 100'), discard of alignments under 1 kb, 1 kb binning with bedtools v2.31.1 makewindows, per-bin identity from the longest covering alignment, bins under 96% identity or 60% bases covered classified hyper-divergent, gap re-classification and bin clustering",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repo-floating-no-commit-pin"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Short-read HDR calling and threshold optimization: VCF subsetting to 501 Tropical isotype reference strains with bcftools v1.21, per-bin SNV counts with bcftools v1.21 and bedtools coverage v2.31.1, per-bin coverage with mosdepth v0.3.10, sweep of variant-count (5-30 per kb, step 1) x percent-bases-covered (5-90%, step 5) thresholds, concordance by overlap/excess fraction and recall/precision/F1, consensus-optimal pair (11 SNVs, 90% bases covered) reached at N=10, then gap re-classification, bin clustering, merge of HDRs under 5 kb apart and discard of HDRs under 5 kb",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "repo-floating-no-commit-pin",
+        "seven-vs-fifteen-strain-count-ambiguity"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Per-group HDR calling for the remaining relatedness groups against their group-specific reference genomes (TD2/BRC20492, TD1/BRC20530, AD/ECA2670, KD/JU1348, Temperate/JU2536, TH/NIC1660, Tropical/QX1410) and mapping of HDR coordinates onto QX1410 with nucmer v3.1, extending unspanned boundaries to the most proximal alignment up to 50 kb or dropping the region",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "group-reference-assemblies-not-accessioned"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Functional domain and GO enrichment: InterProScan v5.75 ('--goterms --iprlookup --disable-precalc') on the longest-isoform QX1410 proteome built with agat_sp_keep_longest_isoform.pl from AGAT v1.4.1 and gffread v0.12.7; one-sided hypergeometric test with FDR adjustment using R stats v4.2.1 (domains, adj p < 0.05) and clusterProfiler v4.6.2 (GO terms, BH adj p and q < 0.05)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "interproscan-member-db-versions-absent",
+        "go-obo-release-not-pinned",
+        "two-r-versions-reported-4.3.2-and-4.2.1"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Ortholog identification with OrthoFinder v3.1.0 across C. briggsae and C. nigoni proteomes (and QX1410 vs N2 WormBase WS283 for reference orthologs), using longest isoforms only; 32,423 orthologous groups and 7,530 single-copy orthologs reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-env-lock",
+        "cli-params-absent",
+        "cnigoni-proteome-inputs-partly-ont-derived"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "Gene-tree construction from orthogroup protein sequences and introgression screening between C. briggsae and C. nigoni (2,449 gene trees examined, 850 single-copy-ortholog trees retained, 60 overlapping HDRs); Results refer to '(see Methods)' but the Methods contain no alignment program, tree-inference program, model, support scheme, or clustering criterion for this analysis",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "methods-text-absent",
+        "unversioned-tool",
+        "criterion-not-operationalized",
+        "results-methods-cross-reference-dangling"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 24,
+    "n_NI": 3,
+    "n_X": 2,
+    "S": 29,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/29 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "24/29 (83%) of computational steps reach RI at the prose level, which is the stage-1 ceiling; 3 steps are NI and 2 are X. This is an unusually well-pinned methods section: nearly every tool carries an exact version string (fastp v0.20.0, BWA v0.7.17, sambamba v0.7.0, Picard v2.21.3, GATK v4.1.4.0, bcftools v1.14 and v1.21, PLINK v1.90b6.21, EIGENSOFT v7.2/smartpca v16000, IQ-TREE2 v2.4.0, R v4.3.2 with ggtree v3.10.1 and ComplexHeatmap v2.18.0, geosphere v1.5-18, RepeatMasker v2.0.6, GenomeTools v1.6.5, VSEARCH v2.22.1, QIIME2 v2024.10, BLASTX v2.16.0, scikit-allel v1.3.5, pixy v1.2.11.beta1, ADMIXTURE v1.3.0, lima v2.9.0/v2.2.0/v2.12.0, samtools v1.20, pbmarkdup v1.1.1, hifiasm v0.24.0-r702, DIAMOND 2.1.13, BlobToolKit v4.4.5, Canu v2.2, Flye v2.9.3, MUMmer v4.0.0, nucmer v3.1, BLAST v2.11.0, Pilon v1.24, BWA v2.2.1, BRAKER3 v3.0.8, BUSCO v5.0.4, bedtools v2.31.1, mosdepth v0.3.10, InterProScan v5.75, AGAT v1.4.1, gffread v0.12.7, clusterProfiler v4.6.2, degenotate v1.3, OrthoFinder v3.1.0), and most numeric thresholds are given explicitly. What blocks the version axis from exceeding 1 is that there is no environment closure anywhere: no conda environment file, no lockfile, no renv.lock, no container image or digest, and no interpreter/OS pin, so exact pins remain exact_pins_partial. What blocks the code axis from reaching 2 is that the analysis repository (github.com/AndersenLab/CB_PopGen_HDR_MS, public, HTTP 200, default branch main, head commit aa830e316f24f74b50d6d98f20ab48b4bb66cbc7 dated 2026-07-21) carries no release, no tag and no archival DOI, and is cited by bare URL only; the two upstream Nextflow pipelines (AndersenLab/wi-gatk, andersenlab/isotype-nf) are likewise cited as floating URLs with no version. The 3 NI steps are C6 (wi-gatk het-polarization/filtering, pipeline version absent), C7 (isotype definition, an unversioned 'in-house script' plus an unversioned Nextflow pipeline) and C29 (orthogroup gene-tree/introgression analysis, whose Methods description is missing entirely despite a '(see Methods)' cross-reference in Results). The 2 X steps are C1 and C21, both ONT-dependent: the Data availability statement deposits only short reads (PRJNA1149159) and PacBio HiFi reads (PRJNA1291792), so the ONT reads for the five C. nigoni isofemale lines have no accession and that assembly branch is not data-reconstructable. Under rubric Delta-2 the correctly-classified exact_pins_partial ceiling caps version at 1, so a stage-2 code check would yield no R-star gain; this paper is not a positive-gate stage-2 candidate.",
+    "coverage": "29 computational steps assessed from Methods prose (sections 'Alignments and variant calling' through 'Functional enrichment analysis'); 5 wet-lab steps counted (W) and out of computational-reproduction scope. Both a Data availability statement and an embedded code pointer exist; there is no separate Code availability section.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment for all 29 computational steps",
+      "missing": "No environment closure of any kind. No conda environment.yml, conda-lock, pixi.lock, requirements.txt, renv.lock, Dockerfile, Singularity definition, or container digest is mentioned in the paper or on the repository landing page (README.md is two lines of prose: title plus 'Scripts, figures, processed data, and supplementary data for ... manuscript'). Interpreter and OS versions are never stated, and R appears at two different versions in the same Methods (v4.3.2 for ggtree/ComplexHeatmap, stats v4.2.1 for the hypergeometric test) with no explanation.",
+      "how_to_close": "Ship a pinned environment (conda-lock / pixi.lock plus renv.lock, or a container image referenced by digest) covering the aligner/caller stack, the Python analysis stack (scikit-allel, pixy), the R stack, and the assembly/annotation stack; state the interpreter and OS versions."
+    },
+    {
+      "type": 3,
+      "where": "All computational steps; specifically C6, C7, C24-C26 and C29",
+      "missing": "Code is public but not exactly identified. The manuscript repository is cited as a bare URL (https://github.com/AndersenLab/CB_PopGen_HDR_MS/) with no commit SHA, tag, release, or Zenodo DOI, and it carries no license file, no releases and no tags as of check. The upstream pipelines are also floating URLs: wi-gatk (cited only through a reference to a single file, env/het_polarization.nim) and isotype-nf. The isotype-similarity computation is attributed to 'an in-house script'. The HDR-calling threshold sweep and the orthogroup gene-tree/introgression analysis are complex custom procedures whose correspondence to specific repository scripts is not asserted in the text.",
+      "how_to_close": "Cite the manuscript repository by commit SHA and archive a tagged release to Zenodo with a DOI; pin wi-gatk and isotype-nf by release tag or commit; add a license; add a README mapping each Methods section to the script that implements it."
+    },
+    {
+      "type": 5,
+      "where": "C29 (orthogroup gene trees / introgression screen); C3, C4, C5, C10, C14, C18, C22, C28 (command lines); C11, C17 (stochastic components)",
+      "missing": "The Results state that gene trees were constructed from orthogroup protein sequences '(see Methods)' and that trees were assessed for haplotype clustering by species, but the Methods describe no multiple-sequence-alignment program, no tree-inference program or model, no support scheme, and no operational criterion for calling a tree 'introgressed' - only the OrthoFinder run is described. Elsewhere, exact command lines are absent for BWA, sambamba/Picard, GATK, smartpca (no parfile), the repeat-masking chain, lima, BRAKER3 and OrthoFinder. No random seeds are reported for IQ-TREE2 UFBoot2 (1,000 replicates) or for the ten ADMIXTURE cross-validation runs. C25 says thresholds were optimized across '15 strains in the Tropical relatedness group' but then selects a pair 'present among all of the seven strains in this comparison' - the denominator is internally inconsistent.",
+      "how_to_close": "Add a Methods subsection for the gene-tree/introgression analysis naming the aligner, tree program, model and the numeric criterion for an introgression call; publish exact command lines and parameter files; report random seeds; reconcile the 15-vs-7 strain-count discrepancy in the HDR threshold optimization."
+    },
+    {
+      "type": 1,
+      "where": "C1 and C21 (ONT branch); assembled genomes and gene models generally",
+      "missing": "Data availability deposits only short reads (SRA PRJNA1149159) and PacBio HiFi reads (SRA PRJNA1291792). The Oxford Nanopore reads for the five C. nigoni isofemale lines (EG5268, JU2484, JU2617, YR106, ZF1220) are given no accession, and 'only high-quality reads were kept' is not a reproducible filter. The 13+46 C. briggsae and 11 C. nigoni long-read assemblies, the seven relatedness-group reference genomes used for HDR calling, the BRAKER3 gene models, the merged repeat library and the hard-filtered/LD-pruned VCFs are not given individual accessions; they are covered only by the blanket phrase 'Scripts and related raw and processed data are available at GitHub'.",
+      "how_to_close": "Deposit the ONT reads under an SRA BioProject, submit the assemblies and gene models to GenBank/WormBase with accessions, and deposit the hard-filtered and LD-pruned VCFs and the repeat library to a versioned archive (Zenodo DOI) rather than to a mutable GitHub branch."
+    },
+    {
+      "type": 4,
+      "where": "C14 (RepBase, Dfam), C21 (NCBI nt), C23 (nematoda_odb10), C27 (InterProScan member databases, GO OBO), C3/C22 (QX1410 and WormBase releases)",
+      "missing": "Several reference databases are named without a release or access date: RepBase and Dfam (repeat libraries), the NCBI nt database used for bacterial-scaffold removal, the nematoda_odb10 BUSCO dataset release, and the InterProScan member-database and GO OBO releases behind clusterProfiler. WormBase WS283 and UniProt Release 2025_03 are correctly pinned; the QX1410 reference is cited by BioProject PRJNA784955 without an assembly version, and the C. nigoni JU1421 scaffolding reference has no accession.",
+      "how_to_close": "Pin every reference database by release identifier and access date, and cite the QX1410 assembly and annotation and the JU1421 reference by explicit assembly/annotation version."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: nematode strain rearing on NGMA at 20/25 C and cross-compatibility testing; genomic DNA extraction (DNEasy) and NEBNext Ultra II FS short-read library construction with Illumina NovaSeq sequencing; PacBio HiFi sample growth, pelleting and core-facility library preparation/sequencing; HMW DNA extraction with the Monarch kit under modified conditions; ONT library preparation (FLO-MIN114, SQK-LSK114) and GridION sequencing",
+      "missing": "Wet-lab generation steps are out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the population-genomic and assembly analysis pipeline."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/AndersenLab/CB_PopGen_HDR_MS/ - stated verbatim in Data availability: 'Scripts and related raw and processed data are available at GitHub ( https://github.com/AndersenLab/CB_PopGen_HDR_MS/ )'. Public, not archived, not a fork; description 'scripts, figures, and tables for C. briggsae PopGen and HDR manuscript'; default branch main; head commit aa830e316f24f74b50d6d98f20ab48b4bb66cbc7 (2026-07-21T20:42:43Z); releases: none; tags: none; license: null; top level: README.md, data/, figures/, processed_data/, scripts/, supplementary_data/; scripts/ contains HDRs/, NIC174_divergence/, diversity_and_divergence/, gene_enrichment/, genetic_similarity_and_admixture/, geography_trees_PCA/, introgression_analysis/, process_dataset/, utilities.R. README.md prose in full: 'Scripts, figures, processed data, and supplementary data for \"Caenorhabditis briggsae ancestral genomic hyper-diversity contrasts with globally distributed genome-wide haplotypes\" manuscript.' No environment or container instructions on the landing page.",
+      "http_status": "200 (landing page); GitHub API 200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl HEAD on landing page and gh api repos/AndersenLab/CB_PopGen_HDR_MS (+ /releases, /tags, /contents, /readme, /commits); README read as prose only, no source files opened"
+    },
+    {
+      "artifact": "pipeline repo: https://github.com/andersenlab/isotype-nf - stated verbatim in Methods: 'This method is available as a Nextflow pipeline ( https://github.com/andersenlab/isotype-nf )'. No version, tag or commit cited.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl to landing page; URL-present, floating reference"
+    },
+    {
+      "artifact": "pipeline repo: https://github.com/AndersenLab/wi-gatk - cited via reference 60 as 'Cook, D. E. AD_DP Filter. Github repo: https://github.com/AndersenLab/wi-gatk/blob/master/env/het_polarization.nim'. Cited at branch master, no commit pin.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl to landing page; URL-present, floating reference to a master-branch blob"
+    },
+    {
+      "artifact": "tool repo: https://github.com/harvardinformatics/degenotate - cited in Methods alongside 'degenotate v1.3'. Third-party tool, not a study deposit.",
+      "http_status": "not individually checked (third-party tool URL cited in prose)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited third-party tool URL"
+    },
+    {
+      "artifact": "tool repo: https://github.com/PacificBiosciences/pbmarkdup and https://lima.how - cited in Methods for pbmarkdup v1.1.1 and lima. Third-party tools, not study deposits.",
+      "http_status": "not individually checked (third-party tool URLs cited in prose)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited third-party tool URLs"
+    },
+    {
+      "artifact": "data accession (short reads): NCBI SRA BioProject PRJNA1149159 - stated verbatim: 'The raw short-read sequencing reads for the wild C. briggsae strains are publicly available from the NCBI Sequence Read Archive (project PRJNA1149159).'",
+      "http_status": "200 (NCBI BioProject page)",
+      "checked_at": "2026-07-27",
+      "network_context": "curl to https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1149159; presence check only, content not enumerated"
+    },
+    {
+      "artifact": "data accession (PacBio HiFi): NCBI SRA BioProject PRJNA1291792 - stated verbatim: 'The raw PacBio long-read data are publicly available from the NCBI Sequence Read Archive (project PRJNA1291792).'",
+      "http_status": "200 (NCBI BioProject page)",
+      "checked_at": "2026-07-27",
+      "network_context": "curl to https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1291792; presence check only, content not enumerated"
+    },
+    {
+      "artifact": "data accession (ONT reads for five C. nigoni isofemale lines): NONE. Neither the Methods nor the Data availability statement names an accession for the GridION/MinKNOW data; only short-read and PacBio BioProjects are deposited.",
+      "http_status": "n/a (no accession present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full-text scan for accession tokens; none found for the ONT branch"
+    },
+    {
+      "artifact": "strain and variation resource: CaeNDR (www.caendr.org) - stated verbatim: 'Strain information and short-read genomic variation data are available from the CaeNDR ( www.caendr.org )'. No release identifier or dataset version is cited.",
+      "http_status": "not individually checked (resource homepage cited without a versioned dataset URL)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited resource homepage; no versioned dataset handle to resolve"
+    },
+    {
+      "artifact": "reference genome: C. briggsae QX1410 cited by BioProject PRJNA784955 with no assembly version; C. nigoni JU1421 scaffolding reference cited by strain name only; C. elegans N2 proteome cited as WormBase WS283 (release pinned).",
+      "http_status": "not individually checked (public references cited in prose)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited public reference identifiers; no deposited study accession to resolve for JU1421"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "087eca47747291d2dbfa35ce0fa62fa2ba55ff5f9ca996d243745f8186a04cd5",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

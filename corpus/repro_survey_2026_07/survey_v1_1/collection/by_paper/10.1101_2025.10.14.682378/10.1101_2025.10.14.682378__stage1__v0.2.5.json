@@ -1,0 +1,332 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "01abbe466606cc57366e22dc93693d6bc17523b221ba4b7f932a44a219dc9271",
+  "canonical_id": {
+    "value": "10.1101/2025.10.14.682378",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.14.682378v1",
+      "biorxiv:2025.10.14.682378v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "GeneJEPA, a self-supervised Joint-Embedding Predictive Architecture foundation model for scRNA-seq: (a) Tahoe-100M streaming ingest + log1p / global Z-score preprocessing, (b) Perceiver-encoder JEPA pretraining with EMA teacher and VICReg collapse prevention on 4x NVIDIA H100 under PyTorch Lightning DDP, and (c) a set of frozen-encoder downstream evaluations - PBMC3k and Human Lung Cell Atlas cell-identity probes (logistic regression, cosine kNN, k-means, UMAP), sci-Plex v3 dose-response ridge regression, the NeurIPS Open Problems perturbation-prediction benchmark probe (Morgan fingerprints + multi-output ridge), multi-read test-time scaling, and a zero-shot in-silico TP53 knockout in latent space. No wet-lab component; the entire paper is a computational-reproduction target.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis extracted from sections 3 (Large-Scale Implementation Details: Dataset and Preprocessing / Efficient Data Loading / Training Configuration), 4.1-4.4 (Results with embedded protocol prose), and Appendix A (Hyperparameter Details). The paper has no separate 'Methods' block: protocol text is distributed through the Results narrative, and the hyperparameter tables (Model Configuration, Training Configuration, Data and Experiment Configuration) are supplied as figure graphics rather than machine-readable text. Architecture description subsections (Tokenization, Perceiver Encoder, Cross-attention, Latent processing, Global readout, Masking Strategy and Predictor, Teacher Network, Loss Formulation, Predictive Loss, VICReg) are model-definition prose, folded into the C2 pretraining step rather than counted as separate invocations. Baseline-backbone embedding (scGPT, UCE) is one step. The public repository https://github.com/BiostateAI/GeneJEPA contains ONLY the pretraining package (genejepa/models.py, tokenizer.py, data.py, train.py, configs.py); it contains no evaluation, benchmark, probe, figure, or knockout code, so every downstream-evaluation step (C3-C9) has code=0 at prose level.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Tahoe-100M ingest and preprocessing: Hugging Face datasets streaming from disk via a custom PyTorch Lightning DataModule with DDP-safe file sharding; log(1+x) transform then standardization by global mean/SD 'precomputed from a large subset of the training data'; large shuffle buffer for train, shuffling disabled for validation",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "env_lock_claimed",
+      "subflags": [
+        "code-in-public-repo",
+        "lockfile-claimed-unverified",
+        "no-release-tag",
+        "undeposited-intermediate"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "GeneJEPA pretraining: Perceiver encoder over unordered gene sets with gene-identity + Fourier expression tokenizer, EMA teacher, masked-target predictive loss with VICReg variance-covariance regularization; AdamW (weight decay 2e-4, 1-D params and embedding tables excluded), cosine LR schedule with linear warmup, bfloat16 mixed precision, 4x NVIDIA H100 80GB, DDP with find_unused_parameters=True; full hyperparameters in Appendix A tables",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "env_lock_claimed",
+      "subflags": [
+        "code-in-public-repo",
+        "lockfile-claimed-unverified",
+        "no-release-tag",
+        "hyperparams-as-image-tables",
+        "weights-released"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "PBMC3k cell-identity evaluation: embed ~3k cells with frozen encoders, create labels once by clustering and mapping clusters to canonical immune types with marker genes, fit UMAP on test embeddings only, then train a logistic-regression probe and a cosine kNN reader on the train split and report Macro F1 / Accuracy on the held-out split",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "split-unspecified",
+        "marker-list-absent"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Human Lung Cell Atlas evaluation: embed all cells with the frozen encoder; multiclass logistic regression with L2 regularization, split stratified by cell type 80/10/10, hyperparameters selected by five-fold CV on the training set; k-means on test embeddings with k = number of annotated types; UMAP fit on test embeddings only; Macro F1, accuracy, confusion matrix, per-class F1 vs class support (Spearman rho = 0.85)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "dataset-version-unpinned",
+        "seed-unspecified"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "sci-Plex v3 drug dose-response regression: pseudobulk aggregation of cells by context keys (cell line, compound, time), random 80/20 train/test partition shared across models, RidgeCV over a log-spaced alpha grid with five-fold CV on the training set only; metrics RMSE, MAE, MedAE, NRMSE-IQR, rRMSE vs global-median baseline, median per-context MAE + IQR, absolute mean bias",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "seed-unspecified",
+        "preprocessing-by-reference"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Baseline foundation-model embeddings: scGPT (Cui et al., 2024) and Universal Cell Embeddings / UCE (Rosen et al., 2023) used as frozen feature extractors with no fine-tuning; ridge readout alpha tuned on the same log-spaced grid by five-fold CV with an identical protocol across backbones",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-tool-unpinned",
+        "checkpoint-unspecified",
+        "no-code-artifact",
+        "citation-only-invocation"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "NeurIPS Open Problems perturbation-prediction benchmark probe: official file contracts and metrics, AnnData train/test matrices with a differential-expression layer, directional significance score S clipped to [-4, 4], gene order fixed by var_names and test row order by the provided id_map, 255 test profiles x 18,211 genes; per cell type a pseudo-expression vector formed by averaging the positive part of log fold change, Morgan fingerprint radius 2 / 2,048 bits per compound, concatenated with log dose (micromolar); multi-output ridge with the ridge parameter selected on a compound- and cell-type-grouped held-out split, followed by per-gene affine calibration and clipping; five official row-wise metrics (cosine, Pearson, Spearman, MAE, RMSE)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "fingerprint-library-unnamed",
+        "benchmark-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Multi-read test-time scaling: repeat the read over more genes while keeping latent computation fixed and aggregate the resulting embeddings, reported as directionality-metric improvement on the NeurIPS benchmark relative to the single-pass probe",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "aggregation-rule-underspecified",
+        "seed-unspecified"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Zero-shot in-silico TP53 knockout: build a per-gene perturbation vector from the frozen encoder by contrasting a wild-type-like set S_WT(g) and a mutant-like set S_MUT(g) drawn from Tahoe-100M using cell-line metadata when available, 'otherwise a conservative proxy (quantiles of log-expression or pathway activity, stratified within cell line)'; apply the direction to a new wild-type cell embedding and read out biological consequences in latent space without decoding to counts",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "eval-code-absent-from-repo",
+        "ambiguous-proxy-definition",
+        "thresholds-unspecified"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 9,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/9 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "2/9 steps (C1 Tahoe-100M ingest/preprocessing, C2 GeneJEPA pretraining) reach the stage-1 ceiling RI: the pretraining package is public at https://github.com/BiostateAI/GeneJEPA, the training corpus is CC0 on Hugging Face, the hyperparameters are tabulated in Appendix A, and a uv.lock lockfile plus a documented 'uv sync' install path constitute an environment-lock CLAIM (unverified at stage 1, so version stays at 1). The remaining 7 steps cap at NI because the repository ships only the pretraining package (models/tokenizer/data/train/configs) and contains no evaluation, benchmark, probe, figure, or knockout code; every downstream result (PBMC3k, HLCA, sci-Plex, Open Problems, test-time scaling, TP53 knockout) would have to be reimplemented from narrative prose. Stage-2 code verification could lift C1/C2 toward R-star; it cannot lift C3-C9 because there is no artifact to read.",
+    "coverage": "9 computational steps assessed from Results/Implementation prose and Appendix A; 0 wet-lab steps (pure-computational paper). No dedicated Methods or Code-availability section exists; a 'Data availability and licensing' section is present, and the code/weights links appear only in the author-note header (Code: GitHub repository; Weights: Hugging Face).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "All seven downstream-evaluation steps (C3 PBMC3k, C4 HLCA, C5 sci-Plex, C6 baseline backbones, C7 Open Problems probe, C8 test-time scaling, C9 TP53 knockout)",
+      "missing": "The public repository contains only the pretraining package (genejepa/models.py, tokenizer.py, data.py, train.py, configs.py, pyproject.toml, uv.lock). No evaluation scripts, benchmark harness, probe-fitting code, figure-generation code, or in-silico-knockout code is released, so all reported results except the pretraining run itself are prose-only.",
+      "how_to_close": "Add an eval/ or benchmarks/ subpackage (or a companion repo) with the embedding-extraction, probe-fitting, benchmark-submission, test-time-scaling, and knockout-vector scripts, plus the exact commands and configs used to produce Figures 2-6."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for the whole pipeline",
+      "missing": "No container image or digest is provided, and the paper text pins nothing: the README states only floor constraints ('Python >= 3.11, PyTorch >= 2.6'). A uv.lock is present in the repository, but at stage 1 this is an unverified CLAIM: it is not referenced from the paper, no commit SHA or release tag is cited (the repository has zero tags/releases), CUDA/driver and hardware assumptions (4x H100, bfloat16) are outside any lock, and the lock covers the pretraining package only, not the absent evaluation code.",
+      "how_to_close": "Cut a tagged release / archive to Zenodo and cite the exact commit or DOI in the paper; publish a container digest covering the CUDA stack; extend the lock to cover the evaluation dependencies (RDKit or equivalent for Morgan fingerprints, scanpy/umap-learn, scGPT and UCE)."
+    },
+    {
+      "type": 1,
+      "where": "C1 global normalization statistics; C4 HLCA snapshot; C5 sci-Plex preprocessing; C7 benchmark data",
+      "missing": "The global mean/SD used for Z-score normalization are 'precomputed from a large subset of the training data' with the subset undefined, and the resulting global_stats.json / foundation_gene_map.parquet are not deposited (the README shows only how to regenerate them). The HLCA download is cited only as 'via the Human Cell Atlas Data Portal' with no version/snapshot or cell count. sci-Plex preprocessing is deferred to 'the standard preprocessing used across our benchmarks', which is never defined. The Open Problems benchmark release/version and the PBMC3k source file are not pinned.",
+      "how_to_close": "Deposit the derived normalization statistics and gene map as fixed artifacts; cite exact dataset snapshot identifiers/versions (HLCA release, Open Problems benchmark version, PBMC3k file URL and checksum) and write down the shared preprocessing recipe explicitly."
+    },
+    {
+      "type": 5,
+      "where": "C3, C4, C5, C8, C9 protocol parameters",
+      "missing": "Random seeds are not stated anywhere despite randomized splits (PBMC3k, sci-Plex 80/20, HLCA 80/10/10), UMAP fits, k-means initialization, and a large shuffle buffer. The PBMC3k clustering algorithm, resolution, and marker-gene list used to create labels are unstated. UMAP hyperparameters (n_neighbors, min_dist, metric) are unstated. The C8 multi-read aggregation rule and the number of reads are not specified. In C9 the mutant-like/wild-type-like set definition falls back to an explicitly disjunctive proxy ('quantiles of log-expression OR pathway activity') with no thresholds, quantile cutoffs, or set sizes.",
+      "how_to_close": "Report seeds, the clustering/marker protocol, UMAP and k-means settings, the multi-read count and aggregation function, and a single determinate rule (with thresholds and set sizes) for constructing the knockout direction."
+    },
+    {
+      "type": 4,
+      "where": "C6 baseline backbones scGPT and UCE",
+      "missing": "Baselines are invoked by citation only: no version, no repository URL, no checkpoint identifier, and no gene-vocabulary/input-preparation detail for either scGPT or UCE, even though 'identical inputs (same counts matrix, gene budget, and split)' is asserted.",
+      "how_to_close": "State the exact scGPT and UCE releases and checkpoint files, and release the adapter code that maps the shared counts matrix into each baseline's expected input format."
+    },
+    {
+      "type": 7,
+      "where": "Appendix A hyperparameter tables (Model Configuration, Training Configuration, Data and Experiment Configuration)",
+      "missing": "The three hyperparameter tables are embedded as figure graphics in the JATS record rather than as machine-readable table markup, so the pretraining configuration cannot be extracted programmatically from the paper; it must be cross-read against genejepa/configs.py.",
+      "how_to_close": "Publish the hyperparameter tables as text tables and/or ship the exact config file used for the reported run in the repository."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/BiostateAI/GeneJEPA - stated in the paper author-note header verbatim as 'Code: GitHub repository' (hyperlink) and repeated in the article body as the bare URL. Public, default branch 'main', description 'A Predictive World Model of the Transcriptome', last push 2025-10-18T09:57:29Z, HEAD commit a2f4d7218b17f2f52cc5f1cc94420c8ef1ae3265, 0 tags, 0 releases, no LICENSE file. Top-level contents: .gitignore, .python-version, README.md, genejepa/, pyproject.toml, uv.lock (890,998 bytes).",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl (landing page) + gh api repos/BiostateAI/GeneJEPA (metadata, contents, commits, tags, releases)"
+    },
+    {
+      "artifact": "model weights: https://huggingface.co/elonlit/GeneJEPA - linked from the paper author-note header verbatim as 'Weights: Hugging Face' and from the README model-card badge. No revision/commit pin cited in the paper.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L, huggingface.co"
+    },
+    {
+      "artifact": "training data: Tahoe-100M, cited verbatim in Data availability as 'Tahoe-100M (Hugging Face: tahoebio/Tahoe-100M) is released under CC0 1.0 (public-domain dedication)'. URL-present via the HF dataset namespace; no revision/snapshot pin.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L, https://huggingface.co/datasets/tahoebio/Tahoe-100M"
+    },
+    {
+      "artifact": "data accession: GEO Series GSE139944 (sci-Plex v3), stated verbatim as 'sci-Plex (v3) data are publicly available from NCBI GEO under Series accession GSE139944'.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L, https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE139944"
+    },
+    {
+      "artifact": "data resource: Human Lung Cell Atlas, stated verbatim as 'HLCA data are available via the Human Cell Atlas Data Portal; downloaded and exported data are licensed under CC BY 4.0 per the HCA Data Release/Data Use policies'. Accession-free, no URL and no snapshot version given in the paper.",
+      "http_status": "n/a (no URL or accession stated in the paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-only reference; nothing to resolve"
+    },
+    {
+      "artifact": "data resource: PBMC3k, stated verbatim as 'PBMC3k (10x Genomics demonstration dataset) is distributed under CC BY 4.0; attribution is required'. No URL, file identifier, or checksum given in the paper.",
+      "http_status": "n/a (no URL or accession stated in the paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-only reference; nothing to resolve"
+    },
+    {
+      "artifact": "benchmark resource: NeurIPS Open Problems perturbation-prediction benchmark ('We adopt the official file contracts and metrics of the Open Problems benchmark'). No URL, release, or version stated in the paper.",
+      "http_status": "n/a (no URL or version stated in the paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-only reference; nothing to resolve"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "ca243ca24aa1addc008eb32b8eb727abcbd46d18ce60ebd7c9363fa2b3d5a9f7",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,603 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "547e4f909a33a05aa2f2b6f7beab49e5ac7e41e48fef065bc17bd1cd1b81a4b3",
+  "canonical_id": {
+    "value": "10.1101/2024.08.06.606834",
+    "kind": "doi",
+    "aliases": [
+      "biorxiv;2024.08.06.606834v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Reproduce, from the SCOPE messenger and decoder sequencing libraries deposited in NCBI GEO GSE313591 (BioProject PRJNA1380353), the full optics-free reconstruction analysis: fastq barcode extraction with scar-based offset detection and Levenshtein error correction for both the messenger and the poly-dA decoder libraries, UMI collapsing and knee-plot-based barcode filtering into an asymmetric bead-bead interaction count matrix, Leiden-neighbourhood doublet detection, the custom inverse-square diffusion simulator, the random-forest regression that maps normalized similarity to pairwise Euclidean distance, short-circuit edge pruning, k-core (k=100) filtering, Leiden partitioning into clusters of at most 2500 beads, within-cluster distance imputation and the k=250 kNN distance matrix, PAGA-initialized UMAP with the min_dist / repulsion_strength grid search and the erosion + Chan-Vese + chi-squared uniformity solution-selection criteria, the reconstructions of the circular array, the asymmetric array, the oligo-painted image and the large Snellen eye-chart array (3D-then-2D UMAP variant), the letter-E binned image and its optical-versus-reconstruction feature-length correlation, the downsampling and t-SNE-versus-UMAP simulation benchmarks with linear-sum-assignment registration, the 3D volume reconstructions of the bear / star / butterfly / block-E molds (UMAP n_neighbors=15, min_dist=0.4, 1000 epochs, cosine metric) with alphashape concave hulls, and the Segment Anything Model v1 fiducial segmentation and its registration to the reconstruction. Hydrogel bead fabrication, splint-ligation barcoding, array assembly, oligo printing, the SCOPE proximity reactions, 3D gel casting, FISH, library preparation and Illumina sequencing are wet-lab and out of scope (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool/analysis invocation in the Methods and Computational methods prose of the bioRxiv v2 JATS XML (https://www.biorxiv.org/content/early/2025/12/23/2024.08.06.606834.source.xml fetched with curl at HTTP 200, 223622 bytes; title-phrase check 'barcode proximity graph' matched 3 times, so the fetch is confirmed to be this paper and not a concurrently-assessed one). 24 computational steps, 9 wet-lab steps. Stage-1 prose triage only: nothing was executed and no analysis source was read line-by-line. The two cited repositories were resolved to their landing pages, README prose and top-level file listings; three declaration files (SCOPE/ofst.yml, sci-space-v2/requirements.txt, sci-space-v2/setup.py) were opened solely to classify capture_claim correctly, per the same practice used in earlier stage-1 reports. No .py or .sh file in either repository was evaluated, so the correspondence between the deposited reconstruction.py and the UMAP/PAGA algorithm described in the paper is explicitly NOT assessed here - it is a Stage-2 question, and it is the single most consequential open item (see gap type 8).",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Hydrogel bead fabrication: acrydite-modified TruSeqR1/R2 oligos (OLG_001/OLG_002, IDT) in an acrylamide/bis mix run through a Droplet Genomics generator with a DG-DM-25 chip as water-in-oil emulsion, overnight polymerization, perfluorooctanol emulsion breaking and hexane/TBSET washes",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Hydrogel bead barcoding and functionalization: four consecutive rounds of splint barcoding ligation from two 96-well plates per round (Table S1) followed by capping with one decoder species and twenty messenger species",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Bead array assembly into densely packed monolayers (circular array and asymmetric array formats) of 20 micron barcoded beads",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Oligo-painting of images onto the bead array (poly-dA hash oligos, Table S2) including the large Snellen eye-chart array used for Fig. 4",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "SCOPE proximity reaction on 2D arrays: USER-enzyme cleavage of sender oligos, diffusion-limited hybridization to receiver oligos, extension/ligation into sender-receiver chimeras, NaOH denaturation and SPRI recovery of the messenger and decoder libraries",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Indexing PCR (NEBNext High-Fidelity 2X Master Mix, TruSeq/Nextera P5-P7 primers OLG_023-OLG_028, SYBR-Green-tracked cycle counts, SPRI cleanups) and Illumina sequencing of the messenger and decoder libraries on NextSeq 2000 and NovaSeq",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Casting bead-packed 3D gel scaffolds: 100 micron barcoded bead slurry in 4-6% polyacrylamide (15:1 acrylamide:crosslinker), 0.7% APS, TEMED-coated silicone molds (teddy bear, star, butterfly, block letter E; 75-100 cubic mm, 2 mm depth)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W8",
+      "label": "SCOPE reactions for bead-embedded gel matrices: USER/rCutSmart master mix, 37C 30 min ramped to 72C over 30 min, NaOH denaturation and Tris neutralization, SPRI cleanup and indexing PCR for the 3D volume libraries",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W9",
+      "label": "Fluorescence in situ hybridization of fiducial barcode probes (OLG_029 Cy5, OLG_030 FITC, 1 microM, 37C 30 min in 6X SSC) and imaging on a Keyence BZ-X800 with EGFP and Cy5 Chroma filter sets, 10x NA 0.45 Nikon objective",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Fastq read processing of the messenger library: map each read pair to the known 4-bp scar sequences to resolve the 0-3 bp extension of the first sub-barcode and the positions of all four 10-bp sub-barcodes, then map the four extracted sub-barcodes and the annealed sender/receiver region to known sequences with Levenshtein-distance error correction (SCOPE process_chunk.py via slurms/error_correction.sh)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Fastq read processing of the poly-dA decoder library: identical four-sub-barcode extraction and Levenshtein correction on Read1, plus extraction of the poly-dA oligo barcode from the first ten bases of Read2 and UMI counting per spatial barcode",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "UMI collapsing: merge all chunked error-corrected read files and collapse interactions between identical pairs of UMIs, emitting a knee plot of the barcode interaction count distribution (SCOPE UMI_collapse.py via slurms/UMI_collapse.sh)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Barcode filtering and construction of the asymmetric bead-bead interaction count matrix: keep barcodes appearing at least x times where x is the knee-plot steepest-drop-off point, require presence in both sender and receiver reads, integer-encode barcodes and count pairwise interactions into a sparse matrix (SCOPE find_interactions.py via slurms/find_interaction.sh)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Doublet detection and removal: build an unweighted graph from non-zero interaction counts, run Leiden clustering on each node's neighbourhood, call a bead a doublet when its neighbourhood forms more than one cluster and the largest cluster is less than four times the second largest, and grid-search the clustering resolution per dataset to match the theoretical doublet count N,n formula (SCOPE doublet_detection.py)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Custom simulation of messenger oligos diffusing from beads arrayed on a hexagonal lattice: empirically derived inverse-square distance decay (Fig. 2H) combined with a binomial bead-compatibility model and multinomial read sampling parameterized by the joint row/column read-count dataframe from real data (SCOPE simulation.py; sci-space-v2 ssv2/simulation.py)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Similarity-to-distance mapping: normalize the interaction matrix by per-bead sent and received molecule totals, symmetrize by averaging with its transpose, and fit a random-forest regression from simulated normalized pairwise similarity to simulated pairwise Euclidean distance, then apply that regressor to the experimental similarity matrix",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Pruning of short-circuit edges in the bead-bead interaction graph using a previously published method cited only as reference 28; no implementation, package or parameter is named in the paper",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "k-core extraction of the filtered bead-bead interaction graph with minimum degree k=100, using the NetworkX implementation, to retain only beads with sufficient information for spatial mapping",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Leiden community detection on the filtered interaction graph to partition beads into clusters of at most 2500 beads; resolution and random seed are not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Within-cluster imputation of missing pairwise distances using the regression prediction for zero counts, followed by construction of a sparse precomputed k-nearest-neighbour distance matrix with k=250",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "PAGA-based initialization of the embedding: force-directed PAGA layout of the bead clusters supplies cluster centroid estimates, and beads within each cluster are seeded as a 2D Gaussian around their centroid; PAGA settings and the Gaussian width are not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Global 2D reconstruction with UMAP on the precomputed sparse distance matrix: an initial UMAP with unstated fixed hyperparameters from the PAGA initialization, refined by a grid search over min_dist and repulsion_strength whose ranges are not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Automated selection of the best reconstruction over the grid search: rasterize each candidate point cloud to a binary image, erode it with scikit-image, segment with the Chan-Vese algorithm and discard solutions containing more than one large object, then choose the surviving solution with the lowest chi-squared statistic between the 2D-histogram bead-density distribution and a uniform distribution",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Synthetic downsampling experiment: simulate a 40,000-bead array parameterized by the asymmetric-array counts, downsample total interaction counts from 1% to 100%, reconstruct at each level and repeat 10 times per level, reporting mean Euclidean error against mean messenger UMI counts per bead (Fig. S3)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Registration of inferred to true bead positions: fiducial point matching by the linear sum assignment / minimum-weight bipartite matching algorithm implemented in scipy, an 8-free-parameter linear transformation learned by gradient descent with re-matching at every iteration minimizing mean Euclidean error, then global re-matching and snapping of inferred positions onto the lattice; learning rate, iteration count and convergence criteria are not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "t-SNE versus UMAP accuracy benchmark: simulate rectangular hexagonal lattice arrays at several unspecified sizes, reconstruct with both algorithms without cluster partitioning, register and point-match to ground truth, and report the median and interquartile range of mean Euclidean error over 5 trials per size (Fig. S3A)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Snellen eye-chart array reconstruction variant: single-pass removal of all beads below degree k instead of full k-core (for memory reasons), initial UMAP computed in 3 dimensions rather than 2, reduced to 2D by a second UMAP on a Euclidean kNN of the 3D result with k=50, and no hyperparameter grid search; the degree threshold value used is not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Binned image of the large letter E: tile the reconstruction point cloud with equally sized squares and sum the squared captured DAPI/poly-dA oligo counts per tile to visualize the banding pattern, with horizontal and vertical line plots taken from the intersected bins (Fig. 4D); no tile size, no code and no library are stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Dimensional-fidelity quantification: measure the lengths of multiple features within the printed serif letter E, normalize each to the letter baseline length, and correlate optical against SCOPE-reconstructed measurements (Pearson r = 0.96, Spearman rho = 0.90, Fig. 4E); the optical image is not deposited, the feature set is not enumerated and no measurement code is provided",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "3D volume reconstruction of the bear, star, butterfly and block-E molds: filter to barcodes with at least 1000 UMIs, normalize each barcode to 10,000 total counts and log-transform, apply 3D UMAP with n_neighbors=15, min_dist=0.4, 1000 training epochs and the cosine distance metric, with a grid search over normalization strategy and min_dist (Figs. S8, S9) and final embeddings selected by subjective resemblance to the expected mold geometry",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Visualization of the 3D embeddings: concave hull computed with the Python package alphashape overlaid on the point cloud coloured by log10 UMI count, plus z-axis cross-sections of the inferred volume (Fig. 5C-E); the alpha parameter and plotting code are not reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Segmentation of imaged fiducials: merge acquisition channels into a single grayscale image by summing pixel intensities, subtract background, split into 36 equally sized tiles and generate masks and centroids of FITC beads with Meta AI's Segment Anything Model (v1) at default parameters, then merge centroids into a single point cloud",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "Registration of the segmented FITC fiducial centroids to the SCOPE reconstruction using the global-reconstruction registration procedure, with the learned optimal linear transformation then applied to the Cy5 probe positions as secondary validation",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 19,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 24,
+    "W": 9,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/24 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Unexecuted; under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency. The declared environment (SCOPE ofst.yml, sci-space-v2 requirements.txt/setup.py) is a bare unpinned dependency list with no interpreter version, no channel pinning beyond mutable conda-forge/defaults and no platform declaration, so it cannot reach version=2 even before the stage-2 question is asked. n_exact_capture_unexecuted = 0, n_fetch_required = 0.",
+    "inference_inclusive_upper_bound": "19/24 (79%) readiness upper bound at stage 1: (n_R + n_RI) / |S| = (0 + 19) / 24. This is an unusually high upper bound for the genre and it is driven by one fact - the data axis is 2 for 21 of 24 computational steps because GEO GSE313591 (BioProject PRJNA1380353) is fully public as of 16 Dec 2025 and covers raw and processed sequencing data, verbatim: 'the raw sequencing data and processed data can be accessed via the NCBI Gene Expression Omnibus (accession: GSE313591)'. The binding constraint is the version axis, which is 1 everywhere: neither repository pins a single package version, a Python version or a platform, and the paper's prose names no software version at all except 'Meta AI's Segment Anything Model (v1)'. The 5 NI steps split into three microscopy-dependent steps whose image acquisitions were never deposited (C20, C23, C24) and two figure-quantification steps with no deposited code and no named library (C8, C19). Two caveats bound the 79% from above at stage 2: (i) every stochastic step - random forest regression (C7), Leiden clustering (C5, C10), UMAP (C13, C18, C21), t-SNE (C17) - reports no random seed, so even a perfect stage-2 run is distributional-only; (ii) the SCOPE README describes a reconstruction algorithm (t-SNE per cluster followed by boundary-bead stitching) that is NOT the algorithm the paper describes (PAGA-initialized UMAP on a precomputed distance matrix with a min_dist/repulsion_strength grid search), so the deposited reconstruction.py may implement a superseded method. Nineteen of the 24 steps sit on that single file. If stage 2 confirms the divergence, C8 through C14, C18, C21 and C22 all fall to code=0 and the upper bound collapses toward 8/24 (33%). This is the highest-value stage-2 check for this paper.",
+    "coverage": "computational coverage |S| / (|S| + |W|) = 24 / 33 = 73%; 9 wet-lab steps (bead fabrication, splint-ligation barcoding, array assembly, oligo printing, 2D SCOPE reaction, library prep and Illumina sequencing, 3D gel casting, 3D SCOPE reaction, FISH and microscopy) scored OOS",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "every computational step C1-C24; SCOPE ofst.yml; sci-space-v2 requirements.txt and setup.py",
+      "missing": "No software version is pinned anywhere. The paper's prose names libraries without versions (NetworkX, Leiden, scikit-image, scipy, alphashape, UMAP, t-SNE, PAGA) and the only version-shaped string in the entire text is 'Meta AI's Segment Anything Model (v1)'. The declared conda environment SCOPE/ofst.yml lists eleven bare package names with no version constraint of any kind, no python version entry, and channels 'conda-forge' and 'defaults' which are mutable. sci-space-v2/requirements.txt lists six bare names; setup.py install_requires lists ten bare names and only advertises 'Programming Language :: Python :: 3.9' as a trove classifier, which is metadata rather than a runtime constraint. This is subtier 'floating' under the rubric, not exact_pins_partial: there are no pins to be partial about.",
+      "how_to_close": "Regenerate the environment with 'conda env export' or conda-lock from the machine that produced the published figures, pin the python version and the channel set, declare the target platform, and commit the resulting lock alongside ofst.yml."
+    },
+    {
+      "type": 8,
+      "where": "https://github.com/SrivatsanLab/SCOPE - README.md versus the paper's 'Clustering beads and computing global reconstruction' section; affects C8-C14, C18, C21, C22",
+      "missing": "The deposited README describes a materially different reconstruction algorithm from the one the paper describes. README verbatim: 'Next, we cluster beads based on the interaction matrix and perform t-SNE on the distance matrix of each cluster to perform local reconstruction. Finally, all bead clusters are stitched together using beads along the outer boundaries.' The paper verbatim: 'Rather, we opted to use Uniform Manifold Approximation Projection (UMAP) to compute the inferred bead positioning', initialized by PAGA and refined by a min_dist / repulsion_strength grid search, and explicitly justifies UMAP over t-SNE by simulation (Fig. S3A). The README also still refers to the project by its former name OFST and its image links point at the renamed repository github.com/SrivatsanLab/OFST. Either the repository has not been updated to the published method, or the README has not been updated to the repository; from prose and landing page alone this cannot be distinguished, and 19 of the 24 computational steps depend on which it is.",
+      "how_to_close": "Update the README to describe the published UMAP/PAGA pipeline, or state explicitly which script implements the published method; then tag a release corresponding to the manuscript."
+    },
+    {
+      "type": 12,
+      "where": "C15-C24 - the downsampling and t-SNE/UMAP benchmarks, the Snellen variant, the letter-E binned image and correlation, the 3D reconstructions, the alphashape hulls and the SAM segmentation",
+      "missing": "The deposited SCOPE repository contains exactly twelve files at top level - five analysis scripts (process_chunk.py, UMI_collapse.py, find_interactions.py, doublet_detection.py, reconstruction.py), per_tile_reg.py, simulation.py, ofst.yml, five SLURM wrappers and four small test inputs. There is no script for the 3D volume reconstruction with its stated hyperparameters, no script for the Snellen 3D-then-2D UMAP variant, no script for the downsampling or t-SNE-versus-UMAP benchmarks, no alphashape plotting code, no Segment Anything Model driver and no figure-quantification code. The sci-space-v2 repository holds four notebooks (simulation, evaluate-simulation, model-occupancy, score_configurations) and a single module ssv2/simulation.py, which covers the simulator but not the reconstruction analyses. The paper states 'Our custom reconstruction pipeline used to reconstruct the SCOPE experiments is available at https://github.com/SrivatsanLab/SCOPE' without qualifying which of the reported analyses that pipeline does and does not cover.",
+      "how_to_close": "Deposit the 3D reconstruction, Snellen-variant, benchmark, segmentation and figure-generation scripts or notebooks, and state in the availability section which figures each covers."
+    },
+    {
+      "type": 4,
+      "where": "C5, C7, C10, C13, C17, C18, C21 and C23",
+      "missing": "No random seed is reported or shown consumed for any stochastic component: the Leiden clustering used for doublet detection and for graph partitioning, the random-forest regressor that defines the similarity-to-distance mapping, every UMAP call (2D, the 3D Snellen initialization and the 3D volume embeddings), the t-SNE comparisons, and the Segment Anything Model inference. The 3D volume section additionally states that final embeddings were chosen 'based on subjective resemblance to the expected global geometry of each molded shape', which is a non-deterministic human selection step with no recorded criterion. Under the rubric this caps these steps at RI with the distributional-only subflag even if stage-2 execution succeeds.",
+      "how_to_close": "Expose and record the seeds for Leiden, the random forest, UMAP and t-SNE, and replace the subjective 3D embedding selection with the recorded hyperparameter tuple actually used for each published panel."
+    },
+    {
+      "type": 1,
+      "where": "Data and materials availability versus Figs. 2, 3, 4, 5 and S3-S10",
+      "missing": "The paper gives a single accession, GSE313591, for all of the circular array, the asymmetric array, the oligo-painted image array, the large Snellen eye-chart array and the four 3D mold experiments, with no statement mapping GEO samples to figures or to array types, and no per-experiment bead counts, sequencing depths or knee-point thresholds recorded next to the accession. A reproducer cannot tell from the paper which deposited sample regenerates which panel.",
+      "how_to_close": "Add a sample-to-figure table listing, for each GSM, the array type, bead count, sequencing run and the barcode-count threshold applied at the find_interactions step."
+    },
+    {
+      "type": 12,
+      "where": "Data and materials availability, first sentence, versus the SCOPE repository contents",
+      "missing": "The paper states verbatim 'Downsampled sequencing data for the reconstruction experiments have been deposited to Github (https://github.com/SrivatsanLab/SCOPE)'. The repository's only sequencing files are test/R1.fastq.gz, test/R2.fastq.gz plus test/SRs.txt and test/barcodes.txt, presented in the README as 'test data' for the SLURM walkthrough rather than as a downsampled version of the reconstruction experiments. Downsampled inputs for the reconstruction experiments as such are not identifiable in the repository.",
+      "how_to_close": "Either label the test fastqs explicitly as the downsampled reconstruction inputs and state which experiment they derive from, or deposit the downsampled matrices used for Fig. S3 in the GEO record."
+    },
+    {
+      "type": 12,
+      "where": "C20, C23, C24 - all microscopy-dependent computational steps",
+      "missing": "No image data is deposited anywhere. The Keyence BZ-X800 FITC and Cy5 fiducial acquisitions that are the direct input to the Segment Anything Model segmentation and to the fiducial registration, the brightfield acquisitions of the bead-embedded 3D gels and the molds, and the optical image of the printed serif letter E used for the dimensional-fidelity correlation, are all absent from GEO GSE313591, which holds sequencing data, and are not placed in any image repository. This sets the data axis to 0 for C20, C23 and C24 and is the sole reason those three steps are NI.",
+      "how_to_close": "Deposit the raw microscopy acquisitions (and the mold brightfield images) in an image repository such as BioImage Archive or Zenodo and cite the identifier in the availability statement."
+    },
+    {
+      "type": 7,
+      "where": "SCOPE/ofst.yml final line; slurms/*.sh",
+      "missing": "The environment file carries an absolute machine-local path, verbatim: 'prefix: /home/yhuang5/miniconda3/envs/ofst'. The pipeline is distributed only as five SLURM submission wrappers, so execution presumes a Slurm scheduler and a site-specific chunking configuration ('Specify the number of chunks in the script'); no plain-shell or workflow-manager entry point is provided. Whether the wrappers themselves hardcode cluster paths was not checked, because reading them is a stage-2 action.",
+      "how_to_close": "Strip the prefix line from ofst.yml, parameterize the SLURM scripts, and add a scheduler-independent entry point (a Snakefile, a Nextflow workflow or a documented CLI) so the pipeline can run outside the authors' cluster."
+    },
+    {
+      "type": 8,
+      "where": "https://github.com/SrivatsanLab/SCOPE and https://github.com/matsengrp/sci-space-v2",
+      "missing": "Both repositories are cited by bare URL pointing at the mutable default branch. Neither carries a tag or a release (GitHub releases and tags APIs both return an empty array for both repositories, checked 2026-07-28), and neither is archived in Zenodo or Software Heritage, so the exact code state behind the v2 manuscript is not recoverable. SCOPE additionally has no LICENSE file and its GitHub license field is null, leaving reuse rights undefined; sci-space-v2 declares 'License :: OSI Approved :: MIT License' only as a setup.py trove classifier with no LICENSE file in the tree.",
+      "how_to_close": "Tag the manuscript state in both repositories, mint a Zenodo DOI for each tag, cite those DOIs in the availability statement, and add explicit LICENSE files."
+    },
+    {
+      "type": 2,
+      "where": "C4, C13, C18",
+      "missing": "Three thresholds that materially change the output are described as procedures rather than as values. The barcode-count filter is 'keeping barcodes that appear at least x number of times, which was determined by where the steepest drop-off occurred in a knee plot of UMI counts' with no x given per dataset; the initial global UMAP is computed 'using fixed hyperparameters' which are never enumerated, and the subsequent grid search over min_dist and repulsion_strength has no stated range or step; the Snellen variant 'simply removed all beads with less than a degree of k in one step' without giving k. Each is a free parameter a reproducer must guess.",
+      "how_to_close": "Report the numeric threshold used for each deposited dataset, the initial UMAP hyperparameter tuple, and the grid-search ranges, ideally as a per-experiment configuration file in the repository."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "paper full text (bioRxiv v2, JATS XML)",
+      "http_status": "200 via curl with a browser user-agent, 223622 bytes; converted to plain text (117747 chars) and read in full including Abstract, Results, Discussion, Materials and Methods, Computational methods, Data and materials availability and Supplemental Text. Identity check: the phrase 'barcode proximity graph' occurs 3 times and the title string 'Optics-free reconstruction of shapes, images and volumes' is present, confirming this is the assigned paper.",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.biorxiv.org/content/early/2025/12/23/2024.08.06.606834.source.xml"
+    },
+    {
+      "artifact": "code repository - GitHub https://github.com/SrivatsanLab/SCOPE (primary; the reconstruction pipeline)",
+      "http_status": "URL-present and stated-in-paper (200). Verbatim from the paper: 'Our custom reconstruction pipeline used to reconstruct the SCOPE experiments is available at https://github.com/SrivatsanLab/SCOPE'. Public, default branch 'main', description null, license null, 2 stars, repository size 142420 KB, last push 2025-10-27T22:24:20Z. Releases API and tags API both return an empty array, so there is no tag or release to cite and the paper cites no commit SHA. Complete top-level tree: OFST-diagram.png, README.md, RNA-beads-connection.png, UMI_collapse.py, doublet_detection.py, find_interactions.py, ofst.yml, per_tile_reg.py, process_chunk.py, puzzle_solution_final.png, reconstruction.py, simulation.py, slurms/ (UMI_collapse.sh, doublet_detection.sh, error_correction.sh, find_interaction.sh, reconstruction.sh) and test/ (R1.fastq.gz, R2.fastq.gz, SRs.txt, barcodes.txt). README prose documents a five-step SLURM pipeline (error correction, UMI collapse, find interactions with a user-supplied knee threshold, optional doublet detection, reconstruction) and an environment setup step, verbatim: 'To create the conda environment for running OFST, run conda env create -f ofst.yml'. No analysis source file was read (stage1 prose-only).",
+      "checked_at": "2026-07-28",
+      "network_context": "GitHub landing page via WebFetch plus repos, git/trees?recursive=1, releases and tags REST endpoints"
+    },
+    {
+      "artifact": "code repository - GitHub https://github.com/matsengrp/sci-space-v2 (simulation)",
+      "http_status": "URL-present and stated-in-paper (200). Verbatim from the paper: 'and simulation code https://github.com/matsengrp/sci-space-v2'. Public, description 'Data analysis and simulation for optical-free spatial transcriptomics.', 2 stars, 19 commits on main, 1 open issue, tags API returns an empty array, no LICENSE file in the tree. README is three lines and points back to SCOPE as the main repository. Complete tree: .gitignore, README.md, requirements.txt, setup.py, data/ (bead.names.tsv, count.matrix.filtered.MM.npz, download_data_and_description.ipynb, filtered_matrix.npz, nextera_interactions_filtered.csv.gz, nextera_interactions_filtered_row_sums.csv, twelve_samples.csv), notebooks/ (evaluate-simulation.ipynb, model-occupancy.ipynb, score_configurations.ipynb, simulation.ipynb), ssv2/ (__init__.py, simulation.py), tests/test_simulation.py. No notebook or source file was read (stage1 prose-only).",
+      "checked_at": "2026-07-28",
+      "network_context": "GitHub landing page via WebFetch plus repos, git/trees?recursive=1 and tags REST endpoints"
+    },
+    {
+      "artifact": "environment declaration files (opened only to classify capture_claim)",
+      "http_status": "200 for https://raw.githubusercontent.com/SrivatsanLab/SCOPE/main/ofst.yml (13 lines: name ofst; channels conda-forge, defaults; dependencies alphashape, igraph, leidenalg, matplotlib, pandas, python-igraph, python-levenshtein, scikit-learn, tqdm, scikit-image, scanpy - every entry a bare name with no version specifier and no python entry; prefix: /home/yhuang5/miniconda3/envs/ofst). 200 for https://raw.githubusercontent.com/matsengrp/sci-space-v2/main/requirements.txt (matplotlib, numpy, pandas, plotnine, requests, scipy - all unpinned) and for setup.py (version 0.1.0, install_requires ten unpinned names, classifier 'Programming Language :: Python :: 3.9', classifier 'License :: OSI Approved :: MIT License'). These three files were read solely to decide capture_claim; no workflow or analysis code was evaluated.",
+      "checked_at": "2026-07-28",
+      "network_context": "raw.githubusercontent.com"
+    },
+    {
+      "artifact": "data accession - NCBI GEO GSE313591",
+      "http_status": "200, stated-in-paper as a bare accession with no URL. Verbatim from the paper: 'the raw sequencing data and processed data can be accessed via the NCBI Gene Expression Omnibus (accession: GSE313591)'. The GEO record resolves and reports Status 'Public on Dec 16, 2025', linked BioProject PRJNA1380353 with an SRA Run Selector link. Sample-level contents were not enumerated at stage 1.",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE313591"
+    },
+    {
+      "artifact": "data claim - downsampled sequencing data 'deposited to Github'",
+      "http_status": "URL-present (200) but contents do not match the claim. Verbatim from the paper: 'Downsampled sequencing data for the reconstruction experiments have been deposited to Github (https://github.com/SrivatsanLab/SCOPE)'. The only sequencing-like files in that repository are test/R1.fastq.gz, test/R2.fastq.gz, test/SRs.txt and test/barcodes.txt, presented by the README as test data for the SLURM walkthrough. No file or directory is labelled as the downsampled reconstruction data.",
+      "checked_at": "2026-07-28",
+      "network_context": "GitHub git/trees?recursive=1 for SrivatsanLab/SCOPE"
+    },
+    {
+      "artifact": "image data (microscopy acquisitions)",
+      "http_status": "none - no accession, DOI or repository is stated anywhere in the paper for the Keyence BZ-X800 FITC/Cy5 fiducial acquisitions, the brightfield acquisitions of the bead-embedded 3D gels and molds, or the optical image of the printed serif letter E.",
+      "checked_at": "2026-07-28",
+      "network_context": "searched the Data and materials availability section and the full Methods text of the fetched JATS XML; no image repository is named"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "floating",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "281da8d3424b5cd694c4bfe8295f1e079d7be8b674a76e8f58dc12666b0cc5dd",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

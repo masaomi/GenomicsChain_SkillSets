@@ -22,7 +22,7 @@ the bytes. Merging them loses whichever one you did not design for.
 **Unreachable is a finding, never a pass.** EUR-Lex, ich.org and edps.europa.eu each
 blocked automated retrieval during the survey and will sit permanently at
 `unreachable`. That is the point: a watcher that reports a blocked source as
-"unchanged" converts a blind spot into a green light. Same discipline as Tier-2
+"unchanged" converts a blind spot into a green light. Same discipline as Tier-3
 reporting `no_target_declared` as a complete result rather than quietly scoring a pass.
 
 **The scanner reports; the operator judges.** A moved digest means a page was edited,

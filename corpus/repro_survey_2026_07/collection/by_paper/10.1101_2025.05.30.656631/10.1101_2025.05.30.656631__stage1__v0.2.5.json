@@ -1,0 +1,476 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.30.656631",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.30.656631v1",
+      "biorxiv:2025.05.30.656631v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational benchmark of variant-calling performance across sequencing platforms on the GIAB HG002/Ashkenazi trio: (1) SRS processing via GenPipes v4.5.0 (Skewer QC, BWA-MEM alignment to hs37d5, Picard mark-duplicates, GATK BQSR) plus parallel hardware-accelerated alignment (Parabricks, DRAGEN, MegaBolt); (2) LRS alignment (Minimap2 for ONT, pbmm2 for PacBio); (3) depth downsampling (custom Perl script for SRS, rasusa for LRS); (4) germline SNP/InDel calling (Clair3, DeepVariant, GATK HaplotypeCaller, Pepper-Margin-DeepVariant, Nanocaller, DRAGEN/Parabricks/MegaBolt); (5) SV detection (MetaSV ensemble of delly/lumpy/manta/WHAM/breakseq2/cnvkit + DupHold filter for SRS; DRAGEN SV; CuteSV/Dysgu/pbsv/Sniffles/SVIM for LRS); (6) benchmarking against GIAB/CMRG truth sets via hap.py + RTG vcfeval (small variants) and SVbench Python API (SVs). Wet-lab cell culture, HMW DNA extraction, library preparation, and multi-platform sequencing are W-layer (out of computational-reproduction scope).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the biorxiv full-text HTML Materials and Methods prose (source XML/landing 403-blocked to WebFetch; full-text page fetched via unauthenticated curl and tag-stripped). No Code/Software availability statement exists and no author script repository (GitHub/GitLab/Zenodo) is named anywhere in the paper. Data availability statement reads 'available from the corresponding author upon request' -- no deposited accession. Notably, most bioinformatics tools DO carry exact version pins in prose (Skewer v0.2.2, BWA-MEM v7.15, Picard v2.9.0, GATK v3.8/v4.1.2.0, Minimap2 v2.26, pbmm2 v1.13.1, rasusa v2.1.0, Clair3 v1.0.4, DeepVariant v1.2.0, Nanocaller v2.0.0, MetaSV v0.5.4, DupHold v0.2.1, Dysgu v1.6.1, CuteSV v2.0.3, pbsv 2.9.0, Sniffles v2.2.2, SVIM v2.0.0, hap.py v0.3.12, RTG vcfeval v3.6.10, SVbench v1.0.0, GenPipes v4.5.0), so most steps reach the RI ceiling on the version axis; but no env lockfile/container and no code repo, so nothing exceeds RI. Two steps floor at NI (custom Perl downsampling script -- no version, script not published; Pepper-Margin-DeepVariant -- no version pin). Proprietary hardware-accelerated tools (DRAGEN, Parabricks, MegaBolt) are version-pinned but closed/non-scriptable (gap type 11). Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "SRS raw-read QC -- Skewer (v0.2.2), via GenPipes v4.5.0 GATK-Best-Practices pipeline, default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "SRS alignment to GRCh37 decoy (hs37d5) -- BWA-MEM (v7.15), via GenPipes v4.5.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Mark duplicate reads -- Picard (v2.9.0)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Base quality score recalibration -- GATK (v3.8)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "SRS parallel alignment (comparison) -- Parabricks (v2.4.0-rc3), default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "SRS parallel alignment (comparison) -- DRAGEN (v07.011.350.3.3.11), default settings -- proprietary/closed hardware, non-scriptable",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "SRS parallel alignment (comparison) -- MegaBolt (v2.2.2.1), default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "ONT LRS alignment to hs37d5 -- Minimap2 (v2.26), params -a -z 600,200 -x map-ont",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "PacBio LRS alignment to hs37d5 -- pbmm2 (v1.13.1), CCS preset",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "SRS depth downsampling (Ashkenazi trio to 11/9 coverage levels) -- custom Perl script to randomly select read pairs -- no version, script not published",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "LRS depth downsampling (PacBio PB2 62x, ONT2 52x, read-length aware) -- rasusa (v2.1.0)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Germline SNP/InDel calling -- Clair3 (v1.0.4), default settings (SRS + LRS)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Germline SNP/InDel calling -- DeepVariant (v1.2.0), default settings (SRS + LRS)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Germline SNP/InDel calling -- GATK HaplotypeCaller (v3.8 and v4.1.2.0), default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Germline SNP/InDel calling (SRS, hardware-accelerated) -- DRAGEN, Parabricks, MegaBolt, default settings -- versions per C5/C6/C7; proprietary/closed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Germline SNP/InDel calling (ONT) -- Pepper-Margin-DeepVariant -- no version pin",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Germline SNP/InDel calling (ONT) -- Nanocaller (v2.0.0)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "SV detection (SRS) -- MetaSV (v0.5.4) ensemble of delly/lumpy/manta/WHAM/breakseq2/cnvkit, --boost_ins -- MetaSV pinned but constituent callers version-floating",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "SV false-positive filtering (SRS) -- DupHold (v0.2.1), DHFFC fold-change threshold 0.7",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "SV detection (SRS) -- DRAGEN SV pipeline (Manta + Dysgu v1.6.1) -- Dysgu pinned, Manta version floating; DRAGEN proprietary/closed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "SV detection (LRS PacBio + ONT) -- CuteSV (v2.0.3), Dysgu (v1.6.1), pbsv (2.9.0, PacBio-only), Sniffles (v2.2.2), SVIM (v2.0.0), min SV size 30 bp",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Small-variant benchmarking (precision/recall/F1) -- hap.py (v0.3.12) + RTG vcfeval (v3.6.10) vs GIAB v4.2.1 and CMRG v1.0.0 truth sets",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C23",
+      "label": "SV benchmarking (precision/recall/F1, size-stratified) -- SVbench (v1.0.0) Python API vs GIAB SV truth v0.6 (Tier1/Tier1+2) and CMRG SV subset",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 21,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 23,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/23 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "21 of 23 C-layer steps reach the RI ceiling: the paper pins exact versions for nearly every bioinformatics tool (GenPipes/Skewer/BWA-MEM/Picard/GATK/Minimap2/pbmm2/rasusa/Clair3/DeepVariant/Nanocaller/MetaSV/DupHold/Dysgu/CuteSV/pbsv/Sniffles/SVIM/hap.py/vcfeval/SVbench), with tools run at default or explicit parameters. Because there is no env lockfile/container and no code/software availability statement, no step can exceed RI at stage1. 2 steps floor at NI: C10 (custom Perl downsampling script — no version, script not published) and C16 (Pepper-Margin-DeepVariant — no version pin). Even at stage2, capture_claim=exact_pins_partial with no lockfile/container means R★ would require executing pinned versions; stage2_candidate=true on the strength of the exact-pins present.",
+    "coverage": "23 computational steps assessed from biorxiv full-text Materials and Methods prose. 6 wet-lab steps (cell line culture; SageHLS HMW DNA extraction; Illumina TruSeq PCR-free library prep + HiSeq X sequencing; MGI/Lucigen library prep + DNBSEQ-G400 sequencing; 10X Genomics library prep; Nanopore HMW extraction + library prep + sequencing) counted (W) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Whole computational pipeline (no Code/Software availability statement)",
+      "missing": "No author analysis scripts, workflow definitions, or pipeline repository (GitHub/GitLab/Zenodo/Software Heritage) are provided or named. The custom SRS-downsampling Perl script, the MetaSV/DupHold SV-ensemble orchestration, and the SVbench benchmarking calls have no published code, so exact reproduction is not possible from prose alone despite the strong version pinning.",
+      "how_to_close": "Publish analysis scripts, downsampling code, caller invocation wrappers, and benchmarking notebooks in a version-tagged public repository (e.g. GitHub + Zenodo DOI)."
+    },
+    {
+      "type": 2,
+      "where": "Software environment",
+      "missing": "No conda/pixi env spec, lockfile, or container digest for the toolchain. Versions are pinned in prose but the environment closure (dependency graph, OS, model files for Clair3/DeepVariant/Nanocaller/PMDV) is not captured, so nothing can exceed RI.",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or a container image digest covering the full open toolchain (and record model-file versions for the deep-learning callers)."
+    },
+    {
+      "type": 3,
+      "where": "C10 custom Perl downsampling script; C16 Pepper-Margin-DeepVariant; MetaSV constituent callers (delly/lumpy/manta/WHAM/breakseq2/cnvkit); DRAGEN-SV Manta",
+      "missing": "These tools/scripts carry no version pin (or the constituent ensemble callers are floating), so those steps cap at NI or carry a floating sub-tier despite the surrounding pinned tools.",
+      "how_to_close": "Record exact versions for Pepper-Margin-DeepVariant, all MetaSV constituent callers and Manta, and version/publish the custom Perl downsampling script."
+    },
+    {
+      "type": 1,
+      "where": "Data availability statement + in-house sequencing data",
+      "missing": "In-house Illumina/MGI/ONT1/10X sequencing data are stated to be 'available from the corresponding author upon request' with NO deposited accession (no SRA/ENA/GEO/EGA). The underlying samples are the public GIAB HG002 Ashkenazi trio and some LRS datasets were downloaded from GIAB, but the paper's own generated reads lack a fetchable accession entry point.",
+      "how_to_close": "Deposit the in-house raw reads in SRA/ENA (or EGA if consent-restricted) and cite the accession; link the specific GIAB/public dataset URLs used."
+    },
+    {
+      "type": 11,
+      "where": "C6/C15 DRAGEN, C5/C15 Parabricks, C7/C15 MegaBolt, C20 DRAGEN-SV",
+      "missing": "DRAGEN (FPGA appliance), Parabricks (GPU), and MegaBolt are proprietary closed/hardware-accelerated platforms. Although versions are named, they are not freely scriptable/installable and results depend on specific hardware and firmware not user-controllable, so deterministic open reproduction of these paths is constrained.",
+      "how_to_close": "Provide open-tool equivalents (e.g. GATK/DeepVariant CPU paths) as a reproducible reference alongside the accelerated runs, and record firmware/appliance versions."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: cell line culture (Coriell GM24385/GM24149/GM24143); SageHLS HMW DNA extraction; Illumina TruSeq PCR-free library prep + HiSeq X sequencing; MGI/Lucigen library prep + DNBSEQ-G400 sequencing; 10X Genomics library prep (Fragmentase/Cas9); Nanopore HMW extraction + library prep + sequencing",
+      "missing": "Physical sample-processing and sequence-generation steps are out of scope for computational reproduction (OOS); counted in W (6), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the deposited/public raw reads (if deposited) are the reproducible entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — no Code/Software availability statement and no author script repository (GitHub/GitLab/Zenodo/Software Heritage) named in the paper (stage1 prose scan of biorxiv full-text HTML).",
+      "http_status": "n/a (no author code repository exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv full-text HTML fetched via unauthenticated curl (WebFetch 403-blocked); grep for github/gitlab/zenodo returned 0 hits"
+    },
+    {
+      "artifact": "data accession: NONE for in-house data — Data availability statement reads 'available from the corresponding author upon request' (no SRA/ENA/GEO/EGA/dbGaP accession).",
+      "http_status": "n/a (no accession provided)",
+      "checked_at": "2026-07-23",
+      "network_context": "Data availability statement parsed from biorxiv full-text HTML"
+    },
+    {
+      "artifact": "public reference data (not a paper-deposited accession): GIAB HG002/Ashkenazi trio, downloaded PacBio HiFi + ONT datasets from Genome in a Bottle; truth sets GIAB v4.2.1, CMRG v1.0.0, GIAB SV v0.6.",
+      "http_status": "not-checked (stage1)",
+      "checked_at": "2026-07-23",
+      "network_context": "referenced in Methods prose; GIAB is a public resource but no specific accession/URL cited by the authors"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "92647987335daa5f3dfc1276b187a06fdd04a2106e1d68199848cbf95eb121bc",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

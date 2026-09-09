@@ -8,17 +8,22 @@ module KairosMcp
   module SkillSets
     module GenomicschainCore
       module Tools
-        # gc_tier2_submit — MCP skin over SubmitCore (design v0.4.1).
-        # Synoptis-only recording; no KairosChain operational chain writes.
+        # gc_tier2_submit — MCP skin over SubmitCore for Tier-2 adjudications.
+        #
+        # The third submit tool, built on the same path as gc_tier1_submit and
+        # gc_tier3_submit: signed operator envelope, pubkey-bound Bearer,
+        # Synoptis proof on the anchor, no operational chain write. Nothing is
+        # added to the chain layer for Tier-2; only the record type is new.
         class GcTier2Submit < KairosMcp::Tools::BaseTool
           def name
             'gc_tier2_submit'
           end
 
           def description
-            'Sign and record a Tier-2 executed-R verdict as a Synoptis proof (anchor profile). ' \
-              'Requires signed operator envelope and pubkey-bound Bearer (HTTP transport). ' \
-              'Use dry_run to validate without recording.'
+            'Sign and record a Tier-2 code-reading adjudication (gc_tier2_adjudicate output) as a Synoptis ' \
+              'proof (anchor profile). The adjudication is submitted verbatim; the server recomputes its digest ' \
+              'and re-derives every signed field from it. Records a self_reported proposal — it does not apply ' \
+              'the stage transition. Use dry_run to validate and to obtain the params to sign.'
           end
 
           def category
@@ -26,28 +31,31 @@ module KairosMcp
           end
 
           def usecase_tags
-            %w[tier2 reproducibility submit verdict attestation signed synoptis]
+            %w[tier2 reproducibility submit codescan adjudication attestation signed synoptis]
           end
 
           def related_tools
-            %w[gc_tier2_execute token_manage attestation_verify]
+            %w[gc_tier2_scan gc_tier2_adjudicate gc_tier1_submit token_manage attestation_verify]
           end
 
           def input_schema
             {
               type: 'object',
               properties: {
-                verdict_result: {
-                  type: 'object',
-                  description: 'verdict_result from gc_tier2_execute (signed identity subset).'
+                adjudication: {
+                  type: %w[object string],
+                  description: 'gc_tier2_adjudicate output, verbatim (object or JSON string). Its canonical ' \
+                               'sha256 is the digest subject.'
                 },
-                jobspec_json: {
-                  type: 'string',
-                  description: 'Canonical jobspec_json; server recomputes digest.'
-                },
-                expected_output: {
+                identity: {
                   type: 'object',
-                  description: 'Full expected_output; must match signed provenance.'
+                  description: 'The signed identity params (from dry_run.signed_params). Every field is ' \
+                               're-derived from the adjudication server-side; a mismatch is rejected.'
+                },
+                repository: {
+                  type: 'object',
+                  description: 'Optional {url, commit} of the checkout that was scanned. The scanner records ' \
+                               'no commit, so this is the operator\'s statement and is signed as such.'
                 },
                 operator: {
                   type: 'object',
@@ -55,28 +63,27 @@ module KairosMcp
                 },
                 dry_run: {
                   type: 'boolean',
-                  description: 'Validate only; no admission, no Synoptis store. Default false.'
+                  description: 'Validate only; no admission, no Synoptis store. Returns signed_params. Default false.'
                 }
               },
-              required: %w[verdict_result jobspec_json expected_output operator]
+              required: %w[adjudication operator]
             }
           end
 
           def call(arguments)
             unless Config.anchor_profile?
               return text_content(
-                'Error: gc_tier2_submit requires genomicschain.anchor_profile: true ' \
-                '(anchor node only). Enable in config/genomicschain_core.yml.'
+                'Error: gc_tier2_submit requires genomicschain.anchor_profile: true (anchor node only).'
               )
             end
 
             args = arguments.transform_keys(&:to_s)
-            vr = build_verdict_result(args['verdict_result'])
-            expected_output = hashify(args['expected_output'])
-            jobspec_json = args['jobspec_json'].to_s
+            adjudication = args['adjudication']
+            identity = hashify(args['identity'])
+            repository = hashify(args['repository'])
             operator = hashify(args['operator'])
 
-            return text_content(JSON.pretty_generate(dry_run(vr, jobspec_json, expected_output, operator))) if args['dry_run']
+            return text_content(JSON.pretty_generate(dry_run(adjudication, identity, repository, operator))) if args['dry_run']
 
             bearer_pubkey_hash = resolve_bearer_pubkey_hash
             if bearer_pubkey_hash.nil?
@@ -96,12 +103,12 @@ module KairosMcp
             )
 
             result = Tier2Submit.submit(
-              verdict_result: vr, operator: operator, jobspec_json: jobspec_json,
+              adjudication: adjudication, identity: identity, repository: repository, operator: operator,
               bearer_pubkey_hash: bearer_pubkey_hash, tip_source: tip_source,
-              attestor: attestor, expected_output: expected_output, registry: registry
+              attestor: attestor, registry: registry
             )
 
-            text_content(JSON.pretty_generate(render(result, vr)))
+            text_content(JSON.pretty_generate(render(result, adjudication, repository)))
           rescue Tier2Submit::SubmitError,
                  KairosMcp::Manifest::ManifestError,
                  KairosMcp::Manifest::Signer::SignerError,
@@ -120,30 +127,49 @@ module KairosMcp
             [registry, TipSource.new(registry: registry)]
           end
 
-          def dry_run(vr, jobspec_json, expected_output, operator)
+          # Validates everything the real path validates except admission and
+          # the store, and returns the params the operator has to sign. With no
+          # identity supplied it reports what WOULD be signed; with one, it
+          # checks it field by field.
+          def dry_run(adjudication, identity, repository, operator)
             checks = {}
-            parsed = Tier2Submit.parse_jobspec(jobspec_json)
-            KairosMcp::Manifest.dos_gate!(parsed)
-            KairosMcp::Manifest.restricted_subset!(parsed)
-            KairosMcp::Manifest.dos_gate!(expected_output)
-            KairosMcp::Manifest.restricted_subset!(expected_output)
+            spec = VerdictSpec::Tier2.new(adjudication: adjudication, identity: identity, repository: repository)
+            parsed = spec.parse_digest_subject!
+            spec.apply_gates!(parsed)
             checks['gates'] = 'ok'
 
-            recomputed = KairosMcp::Manifest.canonical_json_sha256(parsed)
-            checks['jobspec_digest_recompute'] =
-              recomputed == vr.jobspec_digest ? 'ok' : "MISMATCH (claimed #{vr.jobspec_digest}, recomputed #{recomputed})"
+            recomputed = spec.recompute_digest!(parsed)
+            derived = spec.signed_identity_params
+            checks['adjudication_digest_recompute'] =
+              if identity.empty?
+                "no identity supplied; would sign digest #{recomputed}"
+              elsif recomputed == identity['adjudication_digest']
+                'ok'
+              else
+                "MISMATCH (claimed #{identity['adjudication_digest']}, recomputed #{recomputed})"
+              end
+
+            checks['identity_matches_derived'] =
+              if identity.empty?
+                'no identity supplied (see signed_params)'
+              else
+                begin
+                  spec.assert_submitted_matches_signed!
+                  'ok'
+                rescue Tier2Submit::IdentityMismatch => e
+                  "MISMATCH: #{e.message}"
+                end
+              end
 
             begin
-              Tier2Submit.assert_expected_output_matches_signed!(expected_output, vr)
-              checks['expected_output_matches_signed'] = 'ok'
-            rescue Tier2Submit::IdentityMismatch => e
-              checks['expected_output_matches_signed'] = "MISMATCH: #{e.message}"
+              spec.reject_client_server_set_fields!(parsed)
+              checks['trust_tier'] = 'ok (server-set self_reported)'
+            rescue Tier2Submit::TrustTierError => e
+              checks['trust_tier'] = "REJECTED: #{e.message}"
             end
 
             checks['operator_mode'] =
               (operator['mode'] || operator[:mode]).to_s == 'signed' ? 'ok (signed)' : 'REJECTED (must be signed)'
-            checks['trust_tier'] =
-              vr.trust_tier == 'self_reported' ? 'ok (self_reported)' : "REJECTED (#{vr.trust_tier.inspect})"
 
             pubkey = (operator['pubkey'] || operator[:pubkey]).to_s
             bearer = resolve_bearer_pubkey_hash
@@ -156,81 +182,56 @@ module KairosMcp
                 'MISMATCH'
               end
 
-            result_bundle = {
-              'backend_id' => vr.backend_id, 'backend_result_hash' => vr.backend_result_hash,
-              'local_result_hash' => vr.result_hash, 'jobspec_digest' => vr.jobspec_digest,
-              'output_files' => (vr.output_files || [])
-            }.compact
-            result_evidence_sha256 = Digest::SHA256.hexdigest(KairosMcp::Manifest.canonical_json(result_bundle))
-            eligible = Tier2Submit.leaderboard_eligible?(vr, pubkey)
-
             begin
-              record = KairosMcp::Manifest.build_tier2_verdict(
-                'subject_ref' => vr.subject_ref, 'jobspec_digest' => vr.jobspec_digest,
-                'verdict' => vr.verdict, 'trust_tier' => vr.trust_tier, 'result_hash' => vr.result_hash,
-                'backend_result_hash' => vr.backend_result_hash, 'expected_output' => expected_output,
-                'comparator_id' => vr.comparator_id, 'comparator_version' => vr.comparator_version,
-                'backend_id' => vr.backend_id, 'output_files' => vr.output_files,
-                'result_evidence_sha256' => result_evidence_sha256, 'leaderboard_eligible' => eligible,
-                'operator' => operator
+              record = spec.build_manifest(
+                operator: operator,
+                submission_key: '0' * 64, # schema requires 64 hex; a prose placeholder made every dry_run report INVALID
+                server_fields: { 'trust_tier' => 'self_reported' }
               )
-              KairosMcp::Manifest.validate_tier2!(record)
               checks['record_schema'] = 'ok'
+              checks['would_record'] = {
+                'subject_ref' => record['subject_ref'],
+                'adjudication_digest' => record['adjudication_digest'],
+                'codescan_evidence_digest' => record['codescan_evidence_digest'],
+                'levers' => record['levers'],
+                'counts' => record['counts'],
+                'claim_prefix' => "tier2:#{VerdictSpec::Tier2.lock_state(derived)}:" \
+                                  "#{derived['proposed_demotions']}:#{recomputed}:<submission_key>"
+              }
             rescue KairosMcp::Manifest::ManifestError => e
               checks['record_schema'] = "INVALID: #{e.message}"
             end
 
             checks['attestor'] = Attestation::SynoptisAttestor.available? ? 'ok (synoptis loaded)' : 'UNAVAILABLE'
 
-            {
-              'status' => 'dry_run',
-              'recorded' => false,
-              'checks' => checks,
-              'would_record' => {
-                'result_evidence_sha256' => result_evidence_sha256,
-                'claim_prefix' => "tier2:#{vr.verdict}:#{vr.result_hash}:<submission_key>",
-                'leaderboard_eligible' => eligible
-              },
-              'note' => 'No admission, no Synoptis store. Real submit uses proofs-chain tip (not operational chain).'
-            }
+            { 'status' => 'dry_run', 'recorded' => false, 'checks' => checks,
+              'signed_params' => derived,
+              'note' => 'No admission, no Synoptis store. Sign signed_params (with mcp_tool_name, nonce, ' \
+                        'chain_tip_hash) and pass them back as identity. Real submit uses proofs-chain tip.' }
+          rescue Tier2Submit::SubmitError, KairosMcp::Manifest::ManifestError => e
+            { 'status' => 'dry_run', 'recorded' => false,
+              'checks' => checks.merge('rejected' => "#{e.class.name.split('::').last}: #{e.message}") }
           end
 
-          def render(result, vr)
+          def render(result, adjudication, repository)
+            derived = VerdictSpec::Tier2.identity_for(adjudication, repository)
             base = {
-              'subject_ref' => vr.subject_ref,
-              'verdict' => vr.verdict,
-              'trust_tier' => vr.trust_tier,
+              'subject_ref' => derived['subject_ref'],
+              'adjudication_digest' => derived['adjudication_digest'],
+              'codescan_evidence_digest' => derived['codescan_evidence_digest'],
+              'lock_state' => VerdictSpec::Tier2.lock_state(derived),
+              'proposed_demotions' => derived['proposed_demotions'],
               'claim' => result[:claim],
               'submission_key' => result[:submission_key],
               'synoptis_proof_id' => result[:synoptis_proof_id],
-              'leaderboard_eligible' => result[:leaderboard_eligible],
               'idempotency_key' => result[:idempotency_key],
               'recovered' => result[:recovered] || false
             }
             base['status'] = result[:status].to_s
-            base['result_evidence_sha256'] = result[:result_evidence_sha256] if result[:result_evidence_sha256]
             base['message'] = result[:message] if result[:message]
-            base['note'] = 'Domain record is a Synoptis proof only (design v0.4.1); no operational chain write.'
+            base['note'] = 'Domain record is a Synoptis proof only; no operational chain write. ' \
+                           'The record is a self_reported proposal; stage_transition.applied stays false.'
             base
-          end
-
-          def build_verdict_result(raw)
-            require 'genomicschain_tier2/tier2_executor'
-            h = hashify(raw)
-            KairosMcp::SkillSets::GenomicschainTier2::Tier2Executor::VerdictResult.new(
-              subject_ref: h['subject_ref'], jobspec_digest: h['jobspec_digest'],
-              verdict: h['verdict'], trust_tier: h['trust_tier'],
-              result_hash: h['result_hash'], backend_result_hash: h['backend_result_hash'],
-              expected_output: h['expected_output'],
-              expected_output_sha256: h['expected_output_sha256'],
-              expected_output_source: h['expected_output_source'],
-              expected_output_validated_by: h['expected_output_validated_by'],
-              expected_output_source_citation: h['expected_output_source_citation'],
-              expected_output_target: h['expected_output_target'],
-              comparator_id: h['comparator_id'], comparator_version: h['comparator_version'],
-              backend_id: h['backend_id'], output_files: h['output_files'],
-              first_divergence: nil, receipt: nil
-            )
           end
 
           def resolve_bearer_pubkey_hash

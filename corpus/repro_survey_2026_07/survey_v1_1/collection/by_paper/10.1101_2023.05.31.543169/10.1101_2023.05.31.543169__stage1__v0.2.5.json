@@ -1,0 +1,662 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "5be25e89c7ba16666a0147bb6c774921e02e78bc978bdc7cf64d49c12fb6a955",
+  "canonical_id": {
+    "value": "10.1101/2023.05.31.543169",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2023.05.31.543169v5"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The computational evolutionary-genomics analyses: (i) identification of 66 human-specific (HS) lncRNA genes by Infernal orthologue search over 13562 GENCODE v18 human lncRNA genes in 16 mammalian genomes; (ii) LongTarget prediction of DBDs/DBSs in 5000 bp promoter regions of 179128 Ensembl release-79 transcripts; (iii) cross-species DBS mapping (liftOver, UCSC Multiz 100-vertebrate) and sequence-distance estimation (MAFFT 7, PHYLIP 3.6 dnadist, MEGA7); (iv) positive-selection scans (XP-CLR, iSAFE, VCFtools Tajima's D / Fst, VariScan Fay-Wu's H, PLINK LD, Haploview); (v) GO over-representation analysis (g:Profiler); (vi) GTEx v8 eQTL/expression analyses (scipy Spearman, KS test); (vii) HS TF analysis (CellOracle + JASPAR); (viii) eGRAM transcriptional-module identification. The CRISPR-U DBD knockouts and the RNA-seq library preparation/sequencing are wet-lab and OOS; the downstream RNA-seq processing (HISAT2/Samtools/StringTie/edgeR) is in scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Stage-1 prose triage. No workflow file (no Snakefile/CWL/Nextflow/WDL/Makefile) exists for the paper's analyses; the only deposited code is the standalone eGRAM script (github.com/LinjieCodes/eGRAMv2R1), which covers exactly one of the 29 computational steps. Steps were therefore derived as one step per named tool/analysis invocation in MATERIAL AND METHODS sections 4.1-4.14. Repeated invocations of the same tool with different inputs/purposes were kept separate where Methods describes them as distinct analyses (liftOver hg38->hg19 vs hg38->panTro5; VCFtools for vcf-consensus vs Tajima's D vs Fst vs allele frequency). |S|=29 C-steps, |W|=2 wet-lab steps.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C01",
+      "label": "Infernal orthologue search for exons of 13562 GENCODE v18 human lncRNA genes across 16 mammalian genomes -> 66 HS lncRNA genes (4.2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C02",
+      "label": "LongTarget prediction of HS lncRNA DBDs and DBSs in 5000 bp promoters of 179128 Ensembl release-79 transcripts (4.3)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C03",
+      "label": "UCSC liftOver conversion of DBS coordinates GRCh38/hg38 -> GRCh37/hg19 (4.3)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C04",
+      "label": "UCSC liftOver mapping of DBS loci hg38 -> chimpanzee panTro5, with manual verification against the human-chimpanzee pairwise alignment (4.5)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C05",
+      "label": "UCSC Multiz Alignments of 100 Vertebrates check of the 2248 unmapped DBSs to classify them as human-specific gains (4.5)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C06",
+      "label": "vcf-consensus (VCFtools) extraction of HS lncRNA DBS sequences from Altai Neanderthal, Denisovan and Vindija Neanderthal VCFs, selecting the highest-quality variant call per locus (4.5)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C07",
+      "label": "MAFFT 7 multiple alignment of DBS sequences across human, chimpanzee and three archaic human genomes (4.6)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C08",
+      "label": "dnadist (PHYLIP 3.6) sequence-distance computation under the Kimura 2-parameter model (4.6)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C09",
+      "label": "MEGA7 sequence-distance computation under the Tamura-Nei model as cross-check (4.6)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "XP-CLR six pairwise genome-wide selection scans (CEU/CHB/YRI), parameters -w1 0.001 300 100 -p0 0.95, window 0.1 cM, grid 100 bp (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "iSAFE scan of each HS lncRNA gene region plus 500 kb flanks (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "VCFtools Tajima's D for HS lncRNA genes (1500 bp windows) and for DBSs (147 bp windows), with genome-wide background (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Weighted Fst (Weir & Cockerham) per DBS computed with a 'revised VCFtools program', integrated into an 'integrated Fst' across CEU/CHB/YRI (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "PLINK pairwise LD (r^2) for common SNPs (MAF >= 0.05) in HS lncRNA genes and DBSs across CEU/CHB/YRI (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Haploview rendering of LD patterns (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "VariScan computation of Fay-Wu's H per DBS using EPO-derived human ancestral sequences as outgroup (4.7)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "g:Profiler GO over-representation analysis (Homo sapiens, unordered query, Benjamini-Hochberg FDR 0.05, 50 < term size < 1000) on strong/weak-DBS and large/small-distance gene sets (4.8, 2.2, 2.3)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "VCFtools computation of common-SNP (MAF >= 0.05) frequencies in DBSs across CEU/CHB/YRI and derived-allele-frequency assignment from human ancestral sequences (4.9)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "GTEx v8 cis-eQTL effect analysis of DBS SNPs (MAF > 0.1, |effect size| > 0.5, FDR < 0.05) and population-specificity assessment via biased DAF (4.10)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "scipy.stats.spearmanr correlation between HS lncRNA representative-transcript expression and target-transcript expression across GTEx v8 tissues (|rho| > 0.3, BH FDR < 0.05, median TPM > 0.1) (4.11)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "One-sided two-sample Kolmogorov-Smirnov test of per-tissue DBS sequence-distance distributions against the all-tissue background (BH FDR < 0.001) (4.11)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Enrichment of 13339 DeepFavored-derived favored and 244098 hitchhiking mutations across strong/weak and old/young DBS classes (4.12)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C23",
+      "label": "Identification of HS protein-coding genes from the Kirilenko et al. hg38-panTro6 'many2zero'/'one2zero' lists intersected with three published human TF lists used in SCENIC -> HS TFs (4.13)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "CellOracle (default parameters) with the JASPAR database to predict DBSs of HS TFs, then repetition of the HS lncRNA distance/GTEx analyses for HS TFs (4.13)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "eGRAM identification of transcriptional regulatory modules in human vs macaque frontal cortex (n=101/83) and anterior cingulate cortex (n=22/25), with KEGG pathway enrichment; defaults DBS affinity=60, Pearson=0.5, module size=50, FDR=0.01 (4.14)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "HISAT2 alignment of DBD-knockout RNA-seq reads to human GRCh38 (4.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C27",
+      "label": "Samtools conversion of SAM to BAM for the knockout RNA-seq alignments (4.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C28",
+      "label": "StringTie quantification of gene expression levels from the knockout RNA-seq BAMs (4.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "edgeR fold-change computation and differential-expression calling (|log2 FC| > 1, FDR < 0.1) before/after the seven DBD knockouts, plus one-sided Mann-Whitney comparison of target vs non-target |fold change| (4.4, 2.1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "W01",
+      "label": "CRISPR-U (revised CRISPR/Cas9) knockout of seven 100-200 bp DBD sequences in HeLa, RKO, SK-MES-1, HCT-116 and A549 cell lines, performed by UBIGENE (Guangzhou) (4.4)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W02",
+      "label": "RNA-seq library preparation and sequencing before and after the seven DBD knockouts, performed by Novogene (Beijing) and HaploX (Shenzhen) (4.4)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 27,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 29,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/29 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Under-claims by construction: Tier-1 cannot credit an undeclared-but-present dependency, and at stage1-prose-only the top attainable verdict is RI.",
+    "inference_inclusive_upper_bound": "27/29 (93.1%) readiness upper bound = (n_R-star + n_RI)/|S| - 'documented sufficiently to attempt a reproduction', never 'reproducible'. Unexecuted; declared environment statically valid but not verified as the environment that produced the results. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "coverage": "computational coverage |S|/(|S|+|W|) = 29/31 (93.5%). 2 wet-lab steps (CRISPR-U DBD knockouts by UBIGENE; RNA-seq library prep/sequencing by Novogene and HaploX) are OOS and excluded from |S|.",
+    "repro_index": {
+      "value": 0.6,
+      "coverage": "29/31 computational steps",
+      "S": 29,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "MATERIAL AND METHODS 4.1-4.14 (all tool invocations)",
+      "missing": "2a - no version recorded for Infernal, LongTarget, UCSC liftOver, VCFtools, XP-CLR, iSAFE, VariScan, PLINK, Haploview, g:Profiler, HISAT2, Samtools, StringTie, edgeR, scipy, CellOracle, JASPAR, or the GO/KEGG database releases. Only MAFFT 7, PHYLIP (3.6) and MEGA7 carry any version string, and two of those are major-version-only.",
+      "how_to_close": "State exact version (and build/channel) for every tool in a Methods software table, or ship a conda-lock / renv.lock / container digest covering the analysis environment."
+    },
+    {
+      "type": 2,
+      "where": "github.com/LinjieCodes/eGRAMv2R1 README",
+      "missing": "2b - dependencies are declared only as floating lower bounds (Python >=3.7.0, numpy >=1.21.6, pandas >=1.3.5, scipy >=1.7.3). No requirements.txt lock, no environment.yml, no Dockerfile, no tagged release; 'Tested on Linux' with no platform declaration mechanism.",
+      "how_to_close": "Replace >= minima with a resolved lockfile pinning interpreter, package source/channel and platform; cut a tagged release (or Zenodo DOI) for the version used in this manuscript."
+    },
+    {
+      "type": 5,
+      "where": "Methods 4.7 - integrated Fst",
+      "missing": "The weighted Fst was computed with a 'revised VCFtools program'. The revision is not deposited, not described, and not versioned; the integration of the three pairwise weighted Fst values into the 'integrated Fst' is likewise unpublished code.",
+      "how_to_close": "Deposit the modified VCFtools source (or a patch against a named upstream release) plus the integrated-Fst script."
+    },
+    {
+      "type": 12,
+      "where": "DATA AND CODE AVAILABILITY",
+      "missing": "No analysis/glue code is deposited for 28 of the 29 computational steps. The only repository (eGRAMv2R1) covers step C25 alone; 'Other programs and tests are open-source and freely available' names third-party tools but ships none of the invocation scripts, parameter files, filtering thresholds-as-code, or the ordering of steps.",
+      "how_to_close": "Deposit the driver scripts / workflow (Snakemake or shell) for the full analysis in a versioned repository with a DOI."
+    },
+    {
+      "type": 13,
+      "where": "Methods 4.8 (g:Profiler + GO), 4.13 (JASPAR), 4.14 (KEGG/WikiPathways), 4.5 (UCSC Multiz 100 Vertebrates)",
+      "missing": "Reference databases are named without a release/version or access date: GO release, KEGG release, JASPAR release, and the UCSC Multiz 100-vertebrate alignment snapshot. g:Profiler in particular is a rolling web service whose GO annotations change between releases. Class A/B/C not assigned (stage1-prose-only, no code check).",
+      "how_to_close": "Record the g:Profiler version/GO release, the JASPAR release (e.g. JASPAR2022 CORE vertebrates), the KEGG release date, and the UCSC alignment track version; better, fetch them in code by versioned URL."
+    },
+    {
+      "type": 5,
+      "where": "DATA AND CODE AVAILABILITY - favored/hitchhiking mutations",
+      "missing": "'The data on favored and hitchhiking mutations are available from the PopTradeOff database or upon request.' The 13339 favored and 244098 hitchhiking mutations used in step C22 have no accession, no DOI and no direct download URL in this paper; 'upon request' is a human-in-the-loop gate.",
+      "how_to_close": "Give the direct PopTradeOff download URL (or a Zenodo deposit) with a version/date for the exact mutation set used."
+    },
+    {
+      "type": 3,
+      "where": "DATA AND CODE AVAILABILITY - LongTarget / LongMan website http://www.gaemons.net/",
+      "missing": "The URL returns HTTP 200 but serves a JavaScript single-page application whose only no-JS content is 'We're sorry but gaemons doesn't work properly without JavaScript enabled.' The LongTarget program and the 16-mammal lncRNA orthologue set - both load-bearing inputs for C01 and C02 - could not be confirmed present or versioned at Stage 1. This is not link rot but it is an unverifiable, unversioned, non-archival distribution channel.",
+      "how_to_close": "Mirror LongTarget and the orthologue tables in an archival repository (Zenodo / Software Heritage / GitHub release) with a DOI and a version."
+    },
+    {
+      "type": 1,
+      "where": "Methods 4.4 vs DATA AND CODE AVAILABILITY (GSE213231, GSE229846)",
+      "missing": "Seven DBD knockout cases across five cell lines are split across two GEO series (three HS lncRNA cases in GSE213231, four cases in GSE229846) with no per-sample mapping in the prose from knockout coordinate/cell line to GEO sample. Which of the seven Mann-Whitney p-values in section 2.1 corresponds to which sample set is not stated.",
+      "how_to_close": "Provide a supplementary sample-to-knockout mapping table listing GSM id, cell line, knocked-out DBD coordinates, replicate and condition."
+    },
+    {
+      "type": 10,
+      "where": "Methods 4.4",
+      "missing": "CRISPR-U knockout construction (UBIGENE) and RNA-seq library preparation/sequencing (Novogene, HaploX) are non-computational and outsourced to commercial providers; CRISPR-U is a proprietary vendor variant of CRISPR/Cas9 with no published protocol in the paper. Scored OOS (W01, W02), excluded from |S|.",
+      "how_to_close": "Out of Tier-1 scope; for documentation completeness, report guide RNA sequences, clone validation results, library kit and sequencer model."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/LinjieCodes/eGRAMv2R1 (stated in DATA AND CODE AVAILABILITY: 'The eGRAM code is available on the GitHub website')",
+      "http_status": "200 (URL-present, landing page reachable; README present, MIT license, 18 commits, no tags/releases, no lockfile/Dockerfile)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from macOS host, unauthenticated public internet"
+    },
+    {
+      "artifact": "LongTarget / LongMan + 16-mammal lncRNA orthologues: http://www.gaemons.net/ (stated in DATA AND CODE AVAILABILITY)",
+      "http_status": "200 but content unverifiable - JS-only SPA, no-JS body is 'We're sorry but gaemons doesn't work properly without JavaScript enabled.'",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from macOS host, unauthenticated public internet, no JS execution"
+    },
+    {
+      "artifact": "data accession: GEO GSE213231 (RNA-seq before/after DBD KO for three HS lncRNAs), stated-in-paper with accession number",
+      "http_status": "200, resolves as 'Series GSE213231' on the GEO accession viewer",
+      "checked_at": "2026-07-28",
+      "network_context": "curl from macOS host, unauthenticated public internet"
+    },
+    {
+      "artifact": "data accession: GEO GSE229846 (RNA-seq for the other four DBD KO cases), stated-in-paper with accession number",
+      "http_status": "200, resolves as 'Series GSE229846' on the GEO accession viewer",
+      "checked_at": "2026-07-28",
+      "network_context": "curl from macOS host, unauthenticated public internet"
+    },
+    {
+      "artifact": "reference data: GENCODE human lncRNAs v18, https://www.gencodegenes.org/human/ (URL-present)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from macOS host, unauthenticated public internet"
+    },
+    {
+      "artifact": "reference data: GTEx v8 expression + eQTL, https://gtexportal.org/ (URL-present)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from macOS host, unauthenticated public internet"
+    },
+    {
+      "artifact": "reference data stated-in-paper without liveness check at Stage 1: UCSC Genome Browser (hg38/hg19/panTro5, cCRE, histone/methylation tracks, Multiz 100 Vertebrates), Ensembl release 79, Max Planck EVA archaic genomes, 1000 Genomes phase I VCFs + genetic maps, EBI ancestral_alignments FTP, GeneCards, JASPAR, PopTradeOff",
+      "http_status": "stated-in-paper (URL-present in Methods; not individually resolved at Stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "not fetched - Stage-1 triage checked only the code repo and the two primary data accessions plus two portals"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "1fe26b8d70e767c917b18184690f662818bf02f74b95163d6722a8c9763c7339",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

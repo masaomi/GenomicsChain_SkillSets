@@ -1,0 +1,468 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "1dbc4ceb09765e04495f4221877a2236502b142266fa48b24c242c215fbeb23d",
+  "canonical_id": {
+    "value": "10.64898/2025.12.09.693136",
+    "kind": "doi",
+    "aliases": [
+      "biorxiv;2025.12.09.693136v1",
+      "https://www.biorxiv.org/content/10.64898/2025.12.09.693136v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The RNA BaseCode computational chain that converts the deposited MGI G400 paired-end FASTQ (ENA PRJEB105067) into (a) 5'/3'/internal read assignments, (b) HISAT-3N G>A-aware alignments to hg38, (c) reconstructed synthetic long-read RNA molecules and their flattened consensus sequences/qualities, (d) base-conversion-rate and conversion-pattern-stability estimates, and (e) the cross-platform comparisons against Illumina Stranded mRNA (nf-core/rnaseq 3.14.0, STAR->RSEM), ONT SG-NEx and PacBio Kinnex data that constitute the figures. Cell culture, RNA extraction, RNA BaseCode / Illumina Stranded mRNA library preparation and the sequencing runs themselves are OOS (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool invocation or distinct named analysis in 'Materials and Methods' (subsections: Preprocessing and reconstruction of RNA BaseCode sequencing data; Estimation of base conversion pattern stability; Preprocessing of Illumina Stranded mRNA libraries and comparison to RNA BaseCode; Comparisons to ONT and PacBio). Two named commands are given in full (cutadapt, hisat-3n | samtools). A Snakemake workflow exists but was NOT read (Stage-1 is prose + landing page + README prose only); the workflow is distributed as a Docker image (basicgenomics/basecode) whose source repository is not deposited, so the executable step graph could not be used as step_source even in principle at this stage. The reference-file-generation Snakemake workflow (github.com/BasicGenomics/BaseCodeGenerate) is scored as one step from its README prose only. NOTE: the Code Availability section renders the first GitHub URL with a line-break hyphen as 'https://github.com/BasicGenomics/Base-CodeGenerate/tree/main'; that literal URL 404s and the intended repository is https://github.com/BasicGenomics/BaseCodeGenerate (200).",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "HEK293FT adherent culture (DMEM high-glucose + 10% FBS + 1% Pen/Strep + 1 mM sodium pyruvate, 37 C, passaged at ~90% confluency with TryplE) and total RNA extraction (RNeasy Mini Kit, Qiagen; optional DNase step NOT performed), quantified on Qubit 4 / RNA HS, QC on Agilent Bioanalyzer 2100 RNA 6000 Nano",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "RNA BaseCode library preparation using the proprietary Basic Genomics RNA BaseCode kit 'according to the manufacturer's instructions' (reverse transcription in the presence of dPTP, enzymatic clean-up, separate template-switching reactions, Zymo DNA Clean & Concentrator-5, second-stranding and amplification, 10 ng cDNA into PCR A / PCR B), pooling A:B at 75%:25%, circularization with MGIEasy Universal Library Conversion Kit (App-A), and paired-end 150+150 (8-cycle index) sequencing on MGI G400 including vendor on-instrument basecalling",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Illumina Stranded mRNA library preparation per manufacturer's instructions (25 ng total RNA for samples 1-2, 125 ng for samples 3-4), circularization, and sequencing on MGI G99 including vendor on-instrument basecalling",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Demultiplexing and read-class assignment (custom, inside the distributed Docker pipeline): index sequences within Hamming distance 1 assigned to a sample and all other reads discarded; read 1 start matched to TSO 'TCTTCTCTCCTCCTCC' within Hamming distance 4 -> 5'-reads; otherwise >=16 Ts among the first 24 bases of read 1 -> 3'-reads; otherwise moving-window TSO scan of read 1 and read 2 and scan for adapter 'AGATGTGTATAAGAGACAG' -> additional 5'/3' reads; remaining pairs assigned as internal reads; all introduced-primer sequences (TSO, T-stretch, adapter) trimmed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "env-hardcoded",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "cutadapt (v 4.6) additional adapter/quality trimming - full command line reproduced in Methods: cutadapt -j {threads} --json {log.summary} -n 2 -m 25 -q 10 -a CTGTCTCTTATACACATCT -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -g TTTTTTTTTTTTTTTTTTTT -g GGAGGAGGAGAGAAGA -g AAAAAAAAAAAAAAAAAAAA -A CTGTCTCTTATACACATCT -A AAAAAAAAAAAAAAAAAAAA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT --too-short-output {output.r1_short} --too-short-paired-output {output.r2_short} -o {output.r1} -p {output.r2} {input.r1} {input.r2}",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "HISAT-3N alignment to human hg38 with G,A base change, using splice sites extracted from the ENSEMBL gene annotation ('last updated 2018-07'), piped to samtools view -F 256 - full command line reproduced in Methods (-k 5, --max-seeds 8, --score-min L,0,-0.5, --base-change G,A, --no-temp-splicesite, --known-splicesite-infile, -x {params.genomeref}); output then split into three BAMs by the HISAT-3N-inferred strand (plus / minus / inconclusive). No version is stated for HISAT-3N or samtools; the reference-generation README installs HISAT-3N by cloning a GitHub branch and compiling",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "featureCounts (v 2.1.1) assignment of each read to genes, run separately for each strand-split BAM and against all genes for the inconclusive-strand BAM. No command line or flags (-s / -t / -g / --fracOverlap) are given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Molecule reconstruction (custom, the core novel algorithm): each overlapping portion between reads compared and combined into a reconstructed molecule when the adjusted mutual information score exceeds 0.3 (computed from the number of covered As, the shared number of mutations and the number of exclusive mutations); on multiple candidate matches an empirical false-positive rate is computed per match and the read is assigned only if one match is >=10x less likely to be a false positive than all others; unmatched read pairs seed a new molecule ID. The AMI formulation and the empirical-FPR estimator are not written out",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Flattening of reconstructed molecules into consensus synthetic long reads (custom): all sequences and PHRED qualities of one molecule pooled, per-position nucleotide chosen by a 'new likelihood score based on the combined transformed quality scores', score converted back to PHRED; reference skip (splicing) decided by consensus across reads; missing coverage emitted as the deletion CIGAR symbol. The quality-combination transform is not given as a formula",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Base-conversion-rate estimation (custom analysis, deposition status unclear): all reads compared to hg38, sequenced bases with read quality below 15 discarded, all possible mismatches counted together with the number of reference bases per canonical nucleotide (A,T,C,G); conversion rate = mismatches / coverage over the reference base",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Per-read-pair strandedness log-likelihood ratio (custom analysis, deposition status unclear): counts of G>A and C>T mismatches to the reference and counts of covered A and T nucleotides, restricted to read pairs matching a featureCounts-assigned gene; LLR formed by subtracting the summed likelihood under a negative-strand origin from that under a positive-strand origin. The likelihood model itself is described only in words",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Conversion-pattern stability estimation on the UMI-containing datasets (custom analysis, deposition status unclear): reads grouped by gene and UMI sequence, converted positions extracted per group, positions with a G>A or A>G conversion in more than one read retained, Wilson-method binomial proportion confidence interval computed with point estimate = summed observed conversions / summed covered positions across reads. Which deposited samples carry a UMI is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "nf-core/rnaseq 3.14.0 (https://nf-co.re/rnaseq/3.14.0/) processing of the Illumina Stranded mRNA reads 'using the same reference genome and gene annotation (gff3) file used for RNA BaseCode', with STAR -> RSEM selected as the alignment and quantification options. Version of the community pipeline is pinned; no nextflow.config / params.json / profile / container-engine choice is reported, and STAR and RSEM versions are only implied by the pipeline release",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Additional HISAT2 mapping of the Illumina Stranded mRNA reads with featureCounts annotation, 'for comparison with RNA BaseCode'. No version, no command line, and no statement of whether this ran inside nf-core/rnaseq or standalone",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Cross-platform expression comparison (custom analysis, deposition status unclear): RNA BaseCode fragments counted per gene by featureCounts, divided by the transcript length for that gene as obtained by RSEM from the Illumina Stranded mRNA libraries to give FPKM, then normalised per sample to TPM; the Illumina libraries processed identically; gene type (e.g. protein coding) obtained from BioMart with no release, archive date or query attributes reported",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Generation of all required genome reference and annotation files via the deposited Snakemake workflow (https://github.com/BasicGenomics/BaseCodeGenerate, public, 12 commits, no releases or tags): README prose gives three steps - install HISAT-3N by cloning a GitHub branch and compiling, fill in config.yaml from config_example/, then run 'snakemake -s /path/to/repo/generate_basecode_reference_files.smk -j {threads} --use-conda'. An envs/ directory of conda environment files is present (contents not read at Stage 1); no lockfile, no container digest, and no version pins are documented in the README",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "ONT comparison (custom analysis, deposition status unclear): 'ONT data was obtained from a recent benchmarking study' (reference 9) using samples SGNex_K562_cDNA_replicate1_run3 and SGNex_Hct116_cDNA_replicate3_run3; the number of covered positions per read is the compared quantity. No accession, URL or download date is given in this paper for the ONT data",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "PacBio Kinnex comparison (custom analysis, deposition status unclear): unmapped FLNC reads downloaded from https://downloads.pacbcloud.com/public/dataset/Kinnex-full-length-RNA/DATA-Revio-UHRR/2-FLNC/flnc-1.bam used for the length comparison (the vendor pipeline emits consensus isoforms rather than individual mapped reads, so the presented lengths are an upper bound); on the RNA BaseCode side, all reconstructed molecules with at least one 3'-read, one internal read and one 5'-read ('completed reconstructions') across all regular samples were used",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "IGV (v. 2.19.2) visual comparison of ONT sample SGNex_K562_cDNA_replicate1_run3 against all regular RNA BaseCode samples at the RFC2 locus, with mismatched bases hidden. Interactive GUI operation; no session file, track configuration or locus coordinates deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 16,
+    "n_NI": 0,
+    "n_X": 0,
+    "S": 16,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification); unexecuted; declared environment statically valid but not verified as the env that produced the results. Reported for completeness only: has_validated_env_capture=false, so this per-paper ratio is NOT a publishable descriptor (P2). n_exact_capture_unexecuted=0, n_fetch_required=0 (env_capture_class is 'n/a' for every step by Stage-1 rule, so no step is A-classified and none can be counted as fetch-required).",
+    "inference_inclusive_upper_bound": "(n_R + n_RI)/|S| = (0+16)/16 = 100% readiness upper bound (RI-inclusive; 'documented enough to attempt', never 'reproducible'). Every computational step clears the RI floor because the raw reads are public (ENA PRJEB105067, public since 2025-12-10), the processing pipeline is distributed as a runnable public Docker image, two of the three off-the-shelf command lines are reproduced verbatim, and four tools carry exact prose pins (cutadapt 4.6, featureCounts 2.1.1, nf-core/rnaseq 3.14.0, IGV 2.19.2). The binding constraint is uniform and paper-wide rather than step-specific: the container is referenced without a tag or digest, its source repository is not deposited, and HISAT-3N / HISAT2 / samtools / Snakemake carry no version at all - so no step can rise above RI at Stage 1 and the value of a Stage-2 pass is high.",
+    "coverage": "computational coverage |S|/(|S|+|W|) = 16/19 = 84% (3 wet-lab steps OOS: HEK293FT culture and RNA extraction; RNA BaseCode kit library prep and MGI G400 sequencing; Illumina Stranded mRNA library prep and MGI G99 sequencing)",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Code Availability ('can be run using the available docker container (https://hub.docker.com/r/basicgenomics/basecode)'); BaseCodeGenerate README; Methods tool mentions",
+      "missing": "No environment closure is pinned anywhere. The Docker image is cited by repository URL with no tag and no digest; the registry currently exposes three mutable tags - latest (digest sha256:4e2e48fe..., last pushed 2026-03-25), rewrite (sha256:2240b919..., last pushed 2026-07-27) and rewrite_aws (sha256:8d15d178..., last pushed 2026-07-17) - all pushed AFTER the 2025-12-11 preprint, so 'the available docker container' no longer denotes the image that produced the results. HISAT-3N, HISAT2, samtools and Snakemake carry no version anywhere; BaseCodeGenerate ships an envs/ directory for 'snakemake --use-conda' but no conda-lock/pixi lock and has no release or tag (12 commits); BaseCodeHelper has no README and no tag (4 commits). Exact prose pins exist only for cutadapt 4.6, featureCounts 2.1.1, nf-core/rnaseq 3.14.0 and IGV 2.19.2.",
+      "how_to_close": "Publish an immutable image digest (or a versioned tag) for the exact container used, cite it in Code Availability, tag the two GitHub repositories at the manuscript commit, and add a resolved conda lock alongside envs/."
+    },
+    {
+      "type": 12,
+      "where": "Code Availability - three artifacts named: the Docker image, github.com/BasicGenomics/BaseCodeGenerate (reference-file generation), github.com/BasicGenomics/BaseCodeHelper (BASH helper)",
+      "missing": "The source of 'the complete RNA BaseCode analysis pipeline' is not deposited in any repository - only a binary container image is provided, so the Snakemake rules, the adjusted-mutual-information molecule-reconstruction algorithm (C5) and the consensus-flattening likelihood transform (C6) cannot be read, diffed or cited at a commit. Separately, no code is identified for the analyses that generate the reported figures and numbers: base-conversion-rate estimation (C7), the strandedness log-likelihood ratio (C8), the Wilson-interval conversion-stability estimate (C9), the FPKM/TPM cross-platform comparison (C12), and the ONT / PacBio length comparisons (C14, C15). It is not stated whether these live inside the container or outside it.",
+      "how_to_close": "Deposit the pipeline source (Snakefile + scripts) in a tagged public repository built into the image, and deposit the figure/statistics scripts or notebooks alongside it."
+    },
+    {
+      "type": 1,
+      "where": "Data Availability ('Generated sequencing data has been uploaded and is available through the European Nucleotide Archive (PRJEB105067)') vs. Methods sample descriptions",
+      "missing": "No sample-to-accession mapping. The Methods distinguish at least four analysis groups - 'all regular RNA BaseCode samples', 'the datasets containing a UMI', Illumina Stranded mRNA samples 1-2 (25 ng total RNA) and samples 3-4 (125 ng) - and none is tied to a run accession. The single cited project is titled 'RNA BaseCode 5 ng HEK' / 'Basic Genomics HEK' with description 'RNA BaseCode libraries prepared from 5 ng of extracted HEK RNA', which does not on its face cover the Illumina Stranded mRNA libraries sequenced on the MGI G99, and no second accession is given for them. PCR A and PCR B pools are also not distinguished at the accession level.",
+      "how_to_close": "Add a per-figure sample table naming the ERR run accessions used, mark which runs carry a UMI, and deposit (or cite) the Illumina Stranded mRNA runs under a stated accession."
+    },
+    {
+      "type": 13,
+      "where": "C3 (hg38 + ENSEMBL splice sites), C10 (same genome and gff3), C12 (BioMart), C13 (BaseCodeGenerate config.yaml), C14 (ONT SG-NEx), C15 (PacBio Kinnex URL)",
+      "missing": "Every external resource is obtained out of band and none is version-pinned to a resolvable artifact. The genome is named only as 'hg38' with no source, patch level or checksum; the annotation is described as 'the ENSEMBL gene annotation (last updated 2018-07)' - a date, not a release number, and unusually old relative to the 2025 analysis; the gene-type table comes from 'BioMart' with no archive release; the PacBio input is a bare mutable download path (downloads.pacbcloud.com/.../flnc-1.bam) with no checksum or retrieval date; the ONT input is identified only through citation 9 plus two SG-NEx sample names. Which releases the BaseCodeGenerate workflow actually downloads is delegated to a config.yaml that is not published with the paper. Per Stage-1 rule, env_capture_class is left 'n/a' and no A/B/C is assigned.",
+      "how_to_close": "State the exact Ensembl release and genome build/patch, publish the config.yaml used, add checksums and retrieval dates for the PacBio and ONT downloads, and move all fetches into pinned workflow rules."
+    },
+    {
+      "type": 11,
+      "where": "W2 (library preparation), W2/W3 (sequencing), Competing interest statement",
+      "missing": "The wet-lab half is gated on a proprietary commercial product: 'RNA BaseCode libraries were prepared using Basic Genomics' RNA BaseCode kit according to the manufacturer's instructions', with the enzymology (dPTP incorporation ratio, RT conditions, cycle numbers) not disclosed. The authors state they have filed patent applications on RNA BaseCode, co-founded and are employed by Basic Genomics AB, hold equity, and that BaseCode is a company trademark. Vendor basecalling on the MGI G400 / G99 is unversioned. New data generation therefore requires purchasing the kit; the computational chain over the deposited FASTQ remains assessable.",
+      "how_to_close": "n/a for computational reproducibility - report instrument control-software / basecaller versions and disclose kit chemistry parameters sufficient for independent implementation."
+    },
+    {
+      "type": 5,
+      "where": "Between C6 (flattened consensus molecules) and C7-C9, C12, C15",
+      "missing": "No intermediate artifact is deposited. The reconstructed / flattened synthetic long-read molecules - the paper's central object, and the input to the base-conversion, stability and length comparisons - are not available as BAM/FASTQ or as a molecule table, nor is the 'completed reconstructions' subset (>=1 3'-read, >=1 internal read, >=1 5'-read) used for the PacBio comparison. An independent reader must re-run the whole container to obtain anything to check the figures against.",
+      "how_to_close": "Deposit the flattened molecule BAM/FASTQ and the per-molecule summary table (with the completed-reconstruction flag) under the same ENA project or on Zenodo."
+    },
+    {
+      "type": 10,
+      "where": "W1-W3",
+      "missing": "Three wet-lab steps (cell culture and RNA extraction; RNA BaseCode library preparation and MGI G400 sequencing; Illumina Stranded mRNA library preparation and MGI G99 sequencing) are out of scope for computational reproducibility and are excluded from |S|.",
+      "how_to_close": "n/a - OOS by NASEM 2019 scope."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo / container (stated in Code Availability, verbatim: 'can be run using the available docker container ( https://hub.docker.com/r/basicgenomics/basecode )'): Docker Hub basicgenomics/basecode",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet, unauthenticated Docker Hub v2 API. Repository public, not automated, 0 stars, pull_count 4905, date_registered 2025-07-09, last_updated 2026-07-27. Three tags, all linux/amd64: latest (sha256:4e2e48feaa530de3c5f49ce45dc52e794e9d3b1a8b9b1446c5d042e7ed2b6c2e, 2.03 GB, last pushed 2026-03-25), rewrite (sha256:2240b919d09008e0f01ea7d29c5c756e1908ddaa6553ccad0bcfefdcc42911fb, 2.65 GB, last pushed 2026-07-27), rewrite_aws (sha256:8d15d178f80b1b86b5c3f8c002d11d774512493a996de9cff14cb4d3ee97f2dc, last pushed 2026-07-17). Pusher username antonjmlarsson. NO tag and NO digest is cited in the paper; all three tags post-date the 2025-12-11 preprint."
+    },
+    {
+      "artifact": "code repo (stated in Code Availability, verbatim: 'a Snake-make pipeline to generate all the necessary genome reference and annotation files can be found on github ( https://github.com/BasicGenomics/Base-CodeGenerate/tree/main )')",
+      "http_status": "404 for the literal URL as printed; 200 for https://github.com/BasicGenomics/BaseCodeGenerate",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet, curl -L and WebFetch. The printed URL carries a line-break hyphen ('Base-CodeGenerate') and 404s; the intended repo resolves at https://github.com/BasicGenomics/BaseCodeGenerate - public, description 'Pipeline to make all required reference files for BaseCode processing', 12 commits, 0 stars/forks, 0 issues/PRs, no releases and no tags. Tree: config_example/, envs/, scripts/, generate_basecode_reference_files.smk. README prose gives the three-step install/run recipe with 'snakemake -s ... -j {threads} --use-conda'; no version pins, no lockfile, no Dockerfile documented in the README."
+    },
+    {
+      "artifact": "code repo (stated in Code Availability, verbatim: 'a small helper script written in BASH is made available to guide a user to run the docker implementation of the pipeline ( https://github.com/BasicGenomics/BaseCodeHelper )')",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet. Repo exists and is public; 'No description, website, or topics provided'; two files only (BaseCodeHelper.sh, config.yaml); 4 commits on main; 0 stars/forks/issues/PRs; no README and no releases or tags. Because it has no README, no Stage-1 prose could be read from it beyond the file listing."
+    },
+    {
+      "artifact": "data accession (stated in Data Availability, verbatim: 'Generated sequencing data has been uploaded and is available through the European Nucleotide Archive (PRJEB105067)')",
+      "http_status": "200 (ENA browser summary + XML API); 500 (ENA portal filereport run-level endpoint)",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet, unauthenticated. https://www.ebi.ac.uk/ena/browser/api/summary/PRJEB105067 and .../xml/PRJEB105067 both return 200: accession PRJEB105067, secondary ERP186272, centre 'Basic Genomics AB', NAME 'Basic Genomics HEK', TITLE 'RNA BaseCode 5 ng HEK', DESCRIPTION 'RNA BaseCode libraries prepared from 5 ng of extracted HEK RNA', ENA-STATUS PUBLIC, ENA-FIRST-PUBLIC 2025-12-10. Open (not controlled) access. The run-level filereport endpoint returned an EBI HTTP 500 error page at check time, so the run count and per-run metadata could not be enumerated; the accession itself is live and public."
+    },
+    {
+      "artifact": "external data (stated in Methods, verbatim: 'the PacBio Kinnex data was obtained from PacBio ( https://downloads.pacbcloud.com/public/dataset/Kinnex-full-length-RNA/DATA-Revio-UHRR/2-FLNC/flnc-1.bam )')",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet, HEAD request. Mutable vendor download path; no checksum, no dataset DOI and no retrieval date given in the paper."
+    },
+    {
+      "artifact": "external workflow (stated in Methods, verbatim: 'processed using nf-core/rnaseq ( https://nf-co.re/rnaseq/3.14.0/ )')",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "public internet; versioned documentation URL for the pinned community pipeline release 3.14.0."
+    },
+    {
+      "artifact": "external data (stated in Methods, verbatim: 'ONT data was obtained from a recent benchmarking study 9 ... the samples SGNex_K562_cDNA_replicate1_run3 and SGNex_Hct116_cDNA_replicate3_run3 were used')",
+      "http_status": "none - no accession, repository or URL is stated in this paper",
+      "checked_at": "2026-07-28T08:05:00Z",
+      "network_context": "n/a - recorded as a finding; the sample identifiers are given but the hosting archive is reachable only through reference 9 (Chen et al., Nat. Methods 22, 801-812, 2025). Not searched for on the open web per protocol."
+    },
+    {
+      "artifact": "paper full text (JATS XML): https://www.biorxiv.org/content/early/2025/12/11/2025.12.09.693136.source.xml",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:48:00Z",
+      "network_context": "public internet, unauthenticated curl; 65,866 bytes of JATS XML fetched into a per-paper scratch directory. Title phrase 'RNA BaseCode: Long-Read RNA Sequences with Short-Read Accuracy' verified present, DOI 10.64898/2025.12.09.693136 verified in the XML front matter; full Materials and Methods, Data Availability and Code Availability sections present."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "env_lock_claimed",
+  "stage2_candidate": true,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "106e3e560eef3881d77f1745034ac85bfae5c66674e6cf3a9d7089be65bdea8a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

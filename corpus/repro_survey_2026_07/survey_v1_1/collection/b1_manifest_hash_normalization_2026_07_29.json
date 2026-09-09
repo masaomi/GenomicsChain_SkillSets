@@ -1,0 +1,13 @@
+{
+  "normalized_at": "2026-07-29",
+  "convention": "sha256(canonical_id.value|rubric_hash|assessor_id|assessed_at)",
+  "collection": "log/repro_survey_2026_07/survey_v1_1/collection",
+  "total_reports": 201,
+  "already_canonical": 81,
+  "updated": 120,
+  "legacy_breakdown": {
+    "bare_concat": 120,
+    "pipe_delimited": 81
+  },
+  "notes": "Calibration n=40 (log/repro_survey_2026_07/collection) was already pipe-delimited. Survey chunk 2+ assessors used bare concatenation; all 120 bare reports rewritten to pipe-delimited hashes. Verification: ruby normalize_b1_manifest_hash.rb --verify => 201/201 OK."
+}

@@ -1,0 +1,497 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "b922fdad45261b4ea9254c69896973c88c0c5b2bd8fbd040efe96e1b3c4a506e",
+  "canonical_id": {
+    "value": "10.1101/2024.10.08.617260",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2024.10.08.617260v2",
+      "biorxiv:2024.10.08.617260v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Spatial single-cell mapping of 15 mouse brains (B6 male, B6 female, BTBR male; 5 animals each) using ATLAS (Atlas scale Transcriptome Localization using Aggregate Signatures), a DPNMF-encoded aggregate-signature spatial transcriptomics method, plus SCALE decoding against the Allen whole-mouse-brain reference. In-scope computational pipeline: (i) encoding-matrix design (PaintSHOP probe design + modified Discriminant Projective NMF on Allen SMART-seq data); (ii) raw-image processing, stitching and Cellpose cyto3 cell segmentation; (iii) Allen Common Coordinate Framework (CCF) registration by manual landmark clicking + radial-basis-function fit; (iv) low-quality cell filtering and cell-scalar correction; (v) igraph-leiden unsupervised clustering; (vi) SCALE Bayesian recursive decoding and harmonization with spatial priors (numpy histogramdd KDE), pynndescent KNN and sklearn logistic regression, followed by 15-NN whole-transcriptome imputation; (vii) validation by greedy pseudo-pairing against MERSCOPE/MERFISH, and by marker-gene MERFISH image analysis with PySpots (trackpy + cellpose); (viii) construction of 5D volumetric cell-type tensors and permutation-based comparative analyses (cell-type spatial distribution entropy, regional compositional correlation distance), spDEG analysis on Delaunay neighborhood graphs, in-silico simulation of ATLAS accuracy, segmentation-error perturbation analysis, and cross-technology gene-imputation concordance benchmarking. All physical steps (animal husbandry, cryosectioning, hydrogel embedding/clearing, encoding-probe and readout hybridization, fluidics operation, microscope acquisition) are out of scope and counted in W.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v2 full text. WebFetch on the .source.xml URL returned HTTP 403 and a curl fetch of that URL returned HTTP 404 (the date path 2025/12/04 does not resolve); the full text was therefore retrieved by curl with a browser User-Agent from https://www.biorxiv.org/content/10.1101/2024.10.08.617260v2.full and tag-stripped. The four cited code repositories were read at PROSE level only: README + top-level file listing (WebFetch on the GitHub landing page; raw.githubusercontent.com for README.md, requirements.txt and env_setup; the GitHub REST API was rate-limited from this host, so release/tag status was checked via the HTML releases page). No workflow source was read line-by-line. Version pins exist only in the repository setup files, never in Methods prose: the ATLAS_Mouse_Brain README and its `env_setup` script pin python=3.9.0, scanpy==1.9.3, numpy==1.23.3, scikit-image==0.19.3, cellpose==3.0.4, Shapely==1.8.2, pynrrd==0.4.2, rasterio==1.2.10, igraph==0.10.6, pynndescent==0.5.5, louvain==0.8.1, datashader==0.16.0, umap-learn==0.5.3, dill==0.3.4, ashlar==1.17.0, pytorch=1.13.0/torchvision=0.14.0/torchaudio=0.13.0/cudatoolkit=11.3 — but scipy, scikit-learn, pandas and anndata are unpinned transitive dependencies, the repo's own requirements.txt is a 0-byte empty file, and there is no conda-lock, no environment.yml, no Dockerfile and no release tag. PySpots (the MERFISH validation repo) carries a fuller pip-freeze-style requirements.txt including git commit SHAs for PyImages and PySpots, but ~25 entries are unresolvable local `@ file:///tmp/build/...` conda-build paths, so it is a partial freeze rather than a lockfile. Neither the paper nor any README claims a lockfile or container, so the capture ceiling is exact_pins_partial, not env_lock_claimed.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Encoding matrix design: potential encoding probes designed per gene with PaintSHOP (probe length 30bp); Allen SMART-seq cortex/hippocampus reference normalized to sum 100,000, genes with mean expression <1 or >100 in any cell type removed, cluster-level class balancing; encoding matrix fit with a modified Discriminant Projective Non-Negative Matrix Factorization (DPNMF, mu=50), then bitwise scaled and integerized. No version pinned for PaintSHOP and no version/commit for the modified DPNMF implementation",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Raw image processing with custom python code in https://github.com/wollmanlab/ATLAS_Mouse_Brain: binning to 0.85-0.98 um pixels, camera-constant and excitation-contamination subtraction, flat-field/emission correction, 2-pixel median low-pass and 25-pixel-sigma rolling-ball high-pass filtering, dapi cross-correlation registration of background acquisitions, background subtraction on the signal channel, registration to a reference hyb and stitching",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "input-artifact-absent"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Cell segmentation with Cellpose cyto3 model on the stitched reference dapi image (nuclei) and on a max projection of all readout images (total cell); missed cells in dense areas recovered by dapi peak calling and morphological dilation to a 5 um radius; per-cell median of segmented pixels saved per measurement together with segmentation properties and spatial coordinates. cellpose==3.0.4 pinned in the repo env_setup, not in Methods prose",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "input-artifact-absent"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Common Coordinate Framework registration: approximate CCF x assigned per section 'through visual inspection with reference MERFISH data'; z and y registration by manually clicking registration points and fitting a radial basis function model from experimental to CCF coordinates (ATLAS/Registration/execute.py)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "input-artifact-absent",
+        "human-in-the-loop-step"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Low-quality cell filtering: non-cells removed below a sum-signal threshold and beyond 50 um from a connected-component graph over all cell spatial coordinates; cells with a dapi signal decrease of more than 50% in 2 or more rounds removed (hydrogel-integrity / registration errors). Sum-signal threshold value not stated in prose but the repository ships a configuration file (ATLAS_processing_config_tree.py)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "stage1-deposit-contents-unverified"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Cell scalar correction: robust magnitude approximated by correcting outlier bits and summing the corrected cell vector, cells rescaled to a common magnitude; residual field-of-view position effects corrected by linear regression between image coordinates and each measurement. The outlier-correction rule and its thresholds are described only qualitatively",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "stage1-deposit-contents-unverified"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Unsupervised clustering: cell vectors normalized bitwise by centering on the median and scaling by the robust standard deviation of the 1st-99th percentile cells per bit; 'an igraph implementation of leiden was then performed with a high resolution parameter'; clusters within correlation 0.9 merged. The resolution value itself is never stated, and no RNG seed is given for the leiden run",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "SCALE (Single Cell Alignment Leveraging Existing data) decoding and harmonization: reference ATLAS vectors from projecting Allen scRNAseq through the DPNMF matrix into 18 dimensions; spatial priors from numpy histogramdd KDE on CCF-registered reference MERFISH cells (100 um binsize, gaussian sigma 100 um in CCF y/z and 250 um in x); section-balanced reference sampling; pynndescent KNN neuron/non-neuron classification (euclidean, 25 neighbors); recursive binary decision tree built from correlation dendrogram of reference subclass vectors with sklearn logistic-regression posterior likelihood plus spatial prior, and median/robust-std harmonization at each node. scikit-learn is not pinned in the repo env_setup",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Whole-transcriptome imputation: 15 nearest reference neighbors found with pynndescent KNN (euclidean metric) on harmonized vectors, imputed expression = average gene expression of those 15 reference cells; subclass names/identifiers/colors aligned to the Allen whole-mouse-brain reference (Supplementary Table 1). pynndescent==0.5.5 pinned in repo env_setup",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Validation by pseudo-pairing of two datasets (e.g. ATLAS-imputed vs MERSCOPE): matching sections selected by CCFx after registration, cell numbers downsampled to match, candidate pairs formed for all cells within 100 um, Pearson correlation of log expression over the 336 shared genes, greedy selection over the sorted candidate list, CDF of paired correlation scores used as the agreement metric. No script for this analysis is identified in the repository structure (Design/Processing/Registration/Decoding/Utils only)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Marker-gene MERFISH validation image analysis with custom Python code (https://github.com/wollmanlab/PySpots): hot-pixel replacement by neighbor medians, high/low-pass filtering, fiduciary-marker registration to a reference hyb, spot calling with trackpy locate, cross-round spot pairing into candidate transcripts, barcode matching within 1 error, assignment to cellpose dapi segmentation masks, removal of cells with fewer than 10 transcripts, rigid per-FOV registration between MERFISH and ATLAS segmentation with a 2 um paired-mask filter. Methods cite trackpy and cellpose as bare '(link)' with no versions; the PySpots repo requirements.txt is a partial pip freeze (cellpose==0.7.2, trackpy from a local conda-build path, PySpots pinned at commit 76447462fb5f0330db810f0def3a06e42dc75d0e)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "input-artifact-absent",
+        "unresolvable-local-path-pins"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Construction of 3D volumetric cell-type inference tensors: per animal, X/Y/Z coordinates and cell types binned with NumPy histogramdd into a 100 um grid in the section plane (CCF z, y) and 300 um along the AP axis (3x upsampling of the 200 um sectioning); voxels below 50% of the average cell count set to NaN; per-animal density correction to the cross-sample average cells-per-voxel; gaussian filter with sigma 150 um; per-animal 4D tensors stacked into a 5D tensor (sample, X, Y, Z, cell type) over 15 animals",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Comparative analysis of cell-type spatial distributions: hemispheres treated as separate samples under a brain-symmetry assumption (one flipped), per-cell-type voxel averages rescaled to a common mean, per-voxel 3D difference matrix, residual entropy as the effect statistic, significance by permutation of sample indices with an adaptive schedule (1,000 permutations initially, extended to 10,000 when p < 0.005). No RNG seed stated for the permutation procedure",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified",
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Comparative analysis of regional composition: per-condition (B6 male, B6 female, BTBR male) average 4D tensors, per-voxel correlation distance (1 - Pearson r) between condition type distributions, compared to a permutation null with the same adaptive 1,000 -> 10,000 schedule at p < 0.005",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified",
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "spDEG analysis: per coronal section, Delaunay-triangulation neighborhood graph over cells; per gene, average standard deviation between a cell and its 50 neighbors compared to the expected value from 50 randomly drawn cells; p-values assigned under normality and FDR-corrected per gene x cell-type combination; restricted to cell types with more than 1,000 cells in the section and genes expressed above zero in at least 100 cells",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Computational simulation of ATLAS performance: 8 encoding designs (published 53-bit FISHnCHIPS design plus TreeDPNMF at 3/6/12/18/24/50/100 bits) across 4 single-cell datasets; 1.4 M high-confidence subclass-labeled imputed Allen CCF-registered MERFISH cells projected through the encodings; gene perturbation at 0/25/50/100 %; decoding with SCALE against references from projected Allen 10X scRNAseq and MERSCOPE-derived spatial priors; accuracy = percentage of cells whose decoded subclass matches the imputed label",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified",
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Estimation of the effects of segmentation errors: a representative measured section subjected to perturbations of the Cellpose masks (merge with nearest neighbor, translational shift, erosion, dilation, each including neighbor overlap), perturbed masks used to re-pull ATLAS vectors from the measured images and re-decode with SCALE; triplicate perturbations over a random 5,000 cells at varying magnitudes expressed as a fraction of average cell mask; plus manual annotation of missed/split/merged masks in Extended Figure 6a",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "input-artifact-absent",
+        "human-in-the-loop-step"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Benchmarking gene imputation concordance across 6 B6 mouse-brain single-cell datasets (MERSCOPE, Zhuang MERFISH, Wollman MERFISH, ATLAS Imputation, Zhuang Imputation, 10X): cells scaled to a constant read depth of 1000, log-log Pearson correlations on the 166 genes shared by all datasets (544 genes for the four spatial datasets), spatial datasets filtered to the same ccf_x window (7.8), sequencing datasets sampled proportionally to MERSCOPE subclass abundance, regional comparison by MERSCOPE parcellation_structure",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "analysis-script-not-identified"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 11,
+    "n_NI": 2,
+    "n_X": 5,
+    "S": 18,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 11/18 computational steps (C5, C6, C8, C9, C10, C12, C13, C14, C15, C16, C18). These reach RI only because the ATLAS_Mouse_Brain README and its env_setup script pin exact versions for the core stack (python 3.9.0, scanpy 1.9.3, numpy 1.23.3, cellpose 3.0.4, igraph 0.10.6, pynndescent 0.5.5, pytorch 1.13.0, scikit-image 0.19.3); version is capped at 1 because there is no lockfile, no container and no environment closure (scipy, scikit-learn, pandas and anndata are unpinned transitive dependencies, and the repo's own requirements.txt is a 0-byte empty file). 2/18 steps cap at NI: C1 because PaintSHOP and the modified DPNMF implementation carry no version pin at all, and C7 because the leiden 'high resolution parameter' value is never stated and no RNG seed is given. 5/18 steps are X because their input artifact does not exist in any released deposit: C2, C3, C4, C11 and C17 all require the raw multi-round microscopy images, while the Zenodo record 10.5281/zenodo.13851748 contains exactly 15 per-animal processed .zarr.zip archives (~1.2-2.8 GB each, one per mouse) and no raw imaging data. Even under stage-2 execution no step could exceed RI without a newly created environment capture.",
+    "coverage": "18 computational steps assessed from the bioRxiv v2 full-text Methods prose plus the landing pages/READMEs of the four cited repositories (ATLAS_Mouse_Brain, PySpots, Scope, Fluidics). 6 physical steps counted in W and not verdicted: (1) mouse husbandry and sacrifice for the 15 animals (5 B6 male, 5 B6 female, 5 BTBR male); (2) cryosectioning of the central brain region (CCFx 4.5-9.5 mm) into 20 um coronal sections at 200 um spacing, 4 per coverslip, in technical triplicate; (3) hydrogel embedding, fixation and clearing; (4) synthesis and hybridization of the DPNMF encoding probes under the ATLAS protocol; (5) automated readout hybridization on the custom syringe-pump/multiposition-valve fluidics system (up to 30 readout hybs); (6) epifluorescent microscope image acquisition for both ATLAS (10x) and the 18-round marker-gene MERFISH validation (63x, FCS2 chambers).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "Input data for the image-level steps C2, C3, C4, C11, C17",
+      "missing": "The availability statement reads verbatim 'All data is available here ( https://doi.org/10.5281/zenodo.13851748 )', but the Zenodo record contains exactly 15 files - B6F01-05, B6M01-05, BTBRM01-05 as .zarr.zip archives of 1.16-2.85 GB each - i.e. one processed per-animal object per mouse. No raw multi-round microscopy images, no background acquisitions, no microscope_parameters flat-field/constant corrections, no stitched images and no segmentation masks are deposited. Every step upstream of the deposited object (image processing, Cellpose segmentation, CCF registration, MERFISH validation image analysis, segmentation-error perturbation) therefore has no runnable input. It was also not verified at stage 1 which intermediate layers (unfiltered cell vectors, pre-harmonization signatures) the .zarr objects contain, so C5-C9 are recorded with the subflag stage1-deposit-contents-unverified.",
+      "how_to_close": "Deposit at least one complete raw acquisition (all hybridization rounds plus background acquisitions and microscope_parameters for one section) as a runnable example, and document in the README exactly which arrays/layers each per-animal .zarr contains and at which pipeline stage each was written."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment (ATLAS_Mouse_Brain and PySpots python stacks)",
+      "missing": "No lockfile, container image or digest, and no environment.yml is claimed anywhere in the paper or in any of the four repositories. ATLAS_Mouse_Brain ships an `env_setup` shell script and a README section that pin 17 packages exactly (python=3.9.0, scanpy==1.9.3, cellpose==3.0.4, igraph==0.10.6, pynndescent==0.5.5, Shapely==1.8.2, dill==0.3.4, pynrrd==0.4.2, datashader==0.16.0, umap-learn==0.5.3, ashlar==1.17.0, rasterio==1.2.10, louvain==0.8.1, numpy==1.23.3, scikit-image==0.19.3, pytorch=1.13.0/torchvision=0.14.0/torchaudio=0.13.0/cudatoolkit=11.3), but the transitive closure is unpinned: scipy, scikit-learn (used for the SCALE logistic regression), pandas and anndata all resolve to whatever pip selects. The repository's own requirements.txt is a 0-byte empty file, which is a trap for anyone who tries `pip install -r requirements.txt`. PySpots ships a pip-freeze requirements.txt with git commit SHAs (PyImages@79ef334cdd794f503a5db193d0fb5f4da4a07ece, PySpots@76447462fb5f0330db810f0def3a06e42dc75d0e) but roughly 25 of its entries are unresolvable local conda-build paths of the form `@ file:///tmp/build/80754af9/...` or `@ file:///home/conda/feedstock_root/...`, including numpy, scikit-learn, scipy-adjacent packages, igraph and trackpy, so it cannot be installed on any other machine. Note also that PySpots pins cellpose==0.7.2 while ATLAS pins cellpose==3.0.4 - two different segmentation engines within the same manuscript.",
+      "how_to_close": "Produce a conda-lock / pixi lock (or a pip requirements file with hashes) for each of the two environments, or publish a container image with a digest; at minimum, populate the empty requirements.txt and re-export the PySpots freeze from a clean environment so no `file:///` paths remain."
+    },
+    {
+      "type": 3,
+      "where": "Methods prose, all steps",
+      "missing": "Not a single software version appears anywhere in the Methods text. Cellpose is cited as 'Cellpose 7 cyto3 model' (7 is a bibliography reference marker, not a version), trackpy and cellpose in the MERFISH analysis are cited as bare '(link)', and PaintSHOP, igraph/leiden, pynndescent, sklearn, numpy and the DPNMF implementation are all named without versions. A reader working from the paper alone, without opening the repository setup script, has zero version information.",
+      "how_to_close": "Add a versions table to Methods (or a Key Resources Table) listing the exact version of every invoked tool and the CUDA/driver stack used for the GPU segmentation, and replace the '(link)' placeholders with real citations."
+    },
+    {
+      "type": 1,
+      "where": "C7 (leiden clustering), C13/C14 (permutation tests), C16 (simulation), C6 (scalar correction)",
+      "missing": "C7 specifies only 'a high resolution parameter' for the igraph leiden run - the actual resolution value is never given, and this parameter determines the unsupervised cluster set that feeds the neuron/non-neuron classification. No RNG seed is stated anywhere: not for leiden, not for the 1,000-10,000 permutation procedures in C13/C14, not for the random 5,000-cell sampling in C17, and not for the reference sampling in the simulation. The sum-signal threshold in C5 and the outlier-bit correction rule in C6 are described qualitatively without numeric thresholds.",
+      "how_to_close": "State the leiden resolution value and all filtering thresholds numerically in Methods, and publish fixed RNG seeds with the analysis scripts."
+    },
+    {
+      "type": 6,
+      "where": "Code repositories https://github.com/wollmanlab/ATLAS_Mouse_Brain, PySpots, Scope, Fluidics",
+      "missing": "All four repositories are public and live (HTTP 200) but every one is cited as a bare URL with no release tag, no commit SHA, and no Zenodo/Software Heritage archived snapshot. ATLAS_Mouse_Brain shows 8 commits total and no releases; its README still points back at the v1 preprint URL while the assessed manuscript is v2. The version of the code corresponding to the manuscript is therefore not identifiable, and the analysis could silently drift under the reader's feet.",
+      "how_to_close": "Tag a release in each repository matching the manuscript, archive the tags to Zenodo or Software Heritage, and cite the resulting DOIs (or commit SHAs) in the data-and-code availability statement."
+    },
+    {
+      "type": 8,
+      "where": "ATLAS_Mouse_Brain README - coverage of the downstream analyses",
+      "missing": "The README is unusually good for the acquisition-to-decoding path: it gives conda setup, a raw-data directory layout, the configuration keys to edit, three explicit CLI invocations (ATLAS/Processing/execute.py, ATLAS/Registration/execute.py, ATLAS/Decoding/execute.py), the output structure, runtime expectations (<24 h per section on 8-16 cores) and memory requirements. But the documented project structure is Design/, Processing/, Registration/, Decoding/, Utils/ only - there is no analysis or figures directory, and no script is identified for the 5D tensor construction, the permutation-based cell-type and regional comparisons, the spDEG analysis, the pseudo-pairing validation, the ATLAS simulation, the segmentation-perturbation study or the cross-technology imputation benchmark. Those are exactly the analyses that produce the paper's biological claims about B6 vs BTBR and male vs female differences, and they are recorded here with the subflag analysis-script-not-identified.",
+      "how_to_close": "Add the statistical-analysis and figure-generation scripts to the repository with a figure-to-script mapping, and document how to start from the released per-animal .zarr objects rather than from raw images."
+    },
+    {
+      "type": 5,
+      "where": "Reference datasets consumed by C1, C8, C9, C16, C18",
+      "missing": "The pipeline depends on several external reference resources that are cited only by bibliography reference number, without accession, version or snapshot date: the Allen SMART-seq whole cortex and hippocampus dataset (encoding design), the Allen whole-mouse-brain 10X scRNAseq reference and its subclass taxonomy, the Allen CCF-registered MERSCOPE dataset used to build the spatial priors, the Zhuang MERFISH and Zhuang Imputation datasets, and the 1.4 M-cell imputed dataset used in the simulation. Allen reference releases are versioned and change between releases, so an unversioned citation does not identify the input.",
+      "how_to_close": "Cite each reference resource with its release version or download URL plus access date (e.g. Allen ABC Atlas release identifier), and record those identifiers in the code as constants."
+    },
+    {
+      "type": 10,
+      "where": "Physical steps (W = 6)",
+      "missing": "Mouse husbandry and sacrifice (15 animals: 5 B6 male, 5 B6 female, 5 BTBR male), cryosectioning of the CCFx 4.5-9.5 mm region into 20 um coronal sections at 200 um spacing in technical triplicate, hydrogel embedding/fixation/clearing, encoding-probe synthesis and hybridization, automated readout hybridization on the custom fluidics rig, and epifluorescent image acquisition for ATLAS (10x) and marker-gene MERFISH (63x, FCS2 chambers). These are physical data-generation steps, out of scope for computational reproduction; counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness. Note that the instrument-control code (Scope, Fluidics) is released, which is unusually good practice, but the reproducible computational entry point would still be the Zenodo per-animal objects."
+    },
+    {
+      "type": 12,
+      "where": "Cross-repository consistency (ATLAS_Mouse_Brain vs PySpots)",
+      "missing": "The manuscript uses two different Cellpose generations in the same figure comparison: ATLAS segmentation via cellpose==3.0.4 with the cyto3 model, and MERFISH validation segmentation via PySpots pinned at cellpose==0.7.2. The validation in C11 registers MERFISH masks against ATLAS masks and filters pairs by a 2 um criterion, so the two segmentation engines are compared directly, but neither the paper nor the READMEs acknowledge or justify the version difference.",
+      "how_to_close": "State explicitly which Cellpose version and model produced each mask set, and either harmonize the versions or document the effect of the difference on the mask-pairing validation."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/wollmanlab/ATLAS_Mouse_Brain/ — stated verbatim in the 'Data and code availability' statement ('code can be found here (ATLAS https://github.com/wollmanlab/ATLAS_Mouse_Brain/ ...)') and again in Methods/Image Processing ('custom python code available in the project's Github repo')",
+      "http_status": "200 OK (public, GNU GPL v3.0, 8 commits, releases page reachable but lists no release; top level: ATLAS/, .gitattributes, ATLAS_processing_config_tree.py, README.md, env_setup, gpl-3.0.txt, requirements.txt (0 bytes), setup.py)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + WebFetch on the GitHub landing page and raw.githubusercontent.com (GitHub REST API was rate-limited from this host)"
+    },
+    {
+      "artifact": "code repo: https://github.com/wollmanlab/PySpots — stated verbatim in 'Data and code availability' ('MERFISH https://github.com/wollmanlab/PySpots') and in Methods/Validation marker gene MERFISH Image Analysis ('custom Python code ( https://github.com/wollmanlab/PySpots )')",
+      "http_status": "200 OK (public, default branch master; README.md, requirements.txt and setup.py present on master, no environment.yml, no Dockerfile; requirements.txt is a partial pip freeze with ~25 unresolvable local file:/// paths)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl on raw.githubusercontent.com (master and main probed separately)"
+    },
+    {
+      "artifact": "code repo: https://github.com/wollmanlab/Scope — stated verbatim in 'Data and code availability' ('Imaging https://github.com/wollmanlab/Scope')",
+      "http_status": "200 OK (public; instrument-control code, not verdicted as a computational step)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "code repo: https://github.com/wollmanlab/Fluidics — stated verbatim in 'Data and code availability' ('Fluidics https://github.com/wollmanlab/Fluidics') and in Methods ('Custom python software ( https://github.com/wollmanlab/Fluidics ) integrates the fluidics system with ATLAS protocols')",
+      "http_status": "200 OK (public; instrument-control code, not verdicted as a computational step)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "data deposit: https://doi.org/10.5281/zenodo.13851748 — stated verbatim as 'All data is available here ( https://doi.org/10.5281/zenodo.13851748 )'",
+      "http_status": "200 OK, resolved via doi.org redirect and the Zenodo REST API (Zenodo record 13851748, title 'Spatial Single-Cell Mapping of Transcriptional Differences Across Genetic Backgrounds in Mouse Brains'; 15 files: B6F01-B6F05, B6M01-B6M05, BTBRM01-BTBRM05 as .zarr.zip, 1.16-2.85 GB each; description is one sentence, no file-level documentation, no raw imaging data)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, doi.org + zenodo.org/api/records/13851748"
+    },
+    {
+      "artifact": "reference datasets: Allen SMART-seq whole cortex and hippocampus, Allen whole-mouse-brain 10X scRNAseq, Allen CCF-registered MERSCOPE, Zhuang MERFISH / Zhuang Imputation — cited by bibliography reference number only",
+      "http_status": "none (no accession, URL, release version or access date stated in the paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-only record"
+    },
+    {
+      "artifact": "GEO / SRA / ENA / ArrayExpress / dbGaP / EGA accessions",
+      "http_status": "none (the paper states no sequence-archive accession of any kind; ATLAS is an imaging method and its primary deposit is the Zenodo record above)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-only record"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "40175aaa6ca18f7c59d1b1cb3e9785d1d712806704e0532bab0c5b6fffd00c1c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

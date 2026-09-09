@@ -1,0 +1,441 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "6cde3f4ec4eeee0d2eb717624f3e04185c261d07344ed6a01bbc13ea0704cba2",
+  "canonical_id": {
+    "value": "10.1101/2025.10.19.683276",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.19.683276v1",
+      "biorxiv:2025.10.19.683276v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Epigenomic analysis of how the antagonistic histone H2A variants H2A.Z and H2A.W shape non-CG DNA methylation (mCH) reconstitution over transposable elements in Arabidopsis thaliana. Computational target: whole-genome bisulfite sequencing (WGBS) processing of newly generated h2a.w cc / h2a.w sss / wF1 and zcc+CMT3/CMT2 libraries (Trimmomatic v0.33 trimming; Bismark v0.10.1 mapping to TAIR10 with deduplication and methylation extraction; custom Perl computation of weighted CG/CHG/CHH methylation levels per gene / TE / TE-including-fragment with a >=10-total-cytosine filter and an additional h2a.z-background coverage filter); identification of TEs with statistically changed mCHG/mCHH between genotypes with edgeR v3.32.1 following Chen et al.; ChIP-seq processing for H2A.Z, H2A.W and H3 (Trimmomatic v0.33; Bowtie v1.1.2 to TAIR10 with '-M 1 --best'; BEDTools v2.26.0 read counting over genes and TEs; Perl RPKM normalisation over 20 intra-TE segments plus 10 x 200 bp flanking segments); metaplots and heatmaps in R v4.3.1 / gplots v3.1.1; genome-browser views via bedGraph + IGV v2.8.9; Venn diagrams via BioVenn; RT-qPCR bar plots via ggplot2 v3.3.2; re-analysis of previously published WGBS and H3K9me2 ChIP-seq (GSE148753, GSE181896); T-index-based chromosomal-environment categorisation with LOESS / density / scatter analyses; and phylogenetic analysis of 202 COPIA RT-core copies from the TAIR9 TE annotation with p-distance in MEGA5. Wet-lab specimen production, crossing, transformation, RT-qPCR bench work, library preparation and Illumina sequencing are OOS.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation, built from the bioRxiv v1 JATS source XML. WebFetch of https://www.biorxiv.org/content/early/2025/10/20/2025.10.19.683276.source.xml returned HTTP 403; a direct curl of the same URL with a browser user-agent returned HTTP 200 and the complete Methods, Data availability and Code availability sections (identity of the retrieved record confirmed against the DOI 10.1101/2025.10.19.683276 and the article title in the XML front matter). No README prose could be read because the paper names NO code repository at all: the Code availability statement reads in full 'The codes used in this study are available via contacting the corresponding author.' No web search was performed to look for an unlisted repository. Version scoring rule applied here: a prose pin counts (version=1) only when the tool of the step carries at least major.minor - Trimmomatic version 0.33, Bismark version 0.10.1, Bowtie version 1.1.2, BEDTools version 2.26.0, edgeR v3.32.1, IGV v2.8.9, ggplot2 v3.3.2, gplots v3.1.1, R version 4.3.1 and Rstudio version 1.3.959 qualify; 'MEGA5' (major only), BioVenn (no version) and the unversioned custom Perl scripts do not. No lockfile, container image or digest, conda environment specification, renv.lock or release tag is claimed anywhere in the paper.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: plant materials and growth - Col-0 WT plus h2a.z (hta8 hta9 hta11), cmt2 cmt3 (cc), suvh4 suvh5 suvh6 (sss), met1-1, h2a.w-2 (hta6 hta7 hta12), zcc, mcc, msss, mF1 lines; new crosses producing wcc, wsss and wF1; growth at 22C, 16 h light / 8 h dark on MS agar with 1% sucrose then soil.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: plasmid construction and plant transformation - CMT3 and CMT2 genomic regions amplified with stated primers, cloned into a HindIII-digested pGreenII-based GFP vector with NEBuilder HiFi DNA Assembly Master Mix, electroporated into Agrobacterium tumefaciens, floral-dipped into cc / zcc / ccz, selected on Hygromycin + Carbenicillin.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: RT-qPCR - TRIzol RNA extraction from rosette leaves, DNase I treatment, SuperScript IV VILO with ezDNase reverse transcription, KAPA SYBR FAST amplification with stated CMT3 / CMT2 / ACT2 primers on a StepOnePlus system, two biological replicates, ACT2 normalisation.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: WGBS library preparation and sequencing - Nucleon PhytoPure gDNA extraction, Covaris S220 fragmentation with 300-500 bp gel selection, TruSeq DNA LT + KAPA HyperPrep libraries, MethylCode bisulfite conversion, KAPA HiFi HotStart Uracil amplification, SPRIselect purification, 150-bp paired-end HiSeq X / NovaSeq sequencing at Macrogen Japan, two biological replicates.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: ChIP-seq - rabbit anti-H2A.Z, anti-H2A.W6 and anti-H3 (ab1791); eChIP for H2A.Z as previously described; cross-linking, chromatin fragmentation, overnight antibody incubation, Dynabeads Protein G capture, stated low-salt / high-salt / wash / TE buffer series, 6-9 h elution at 65C, Monarch PCR & DNA Cleanup, ThruPLEX DNA-Seq libraries, 150-bp paired-end HiSeq X Ten / NovaSeq sequencing at Macrogen Japan, two biological replicates.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "WGBS read trimming and quality filtering with Trimmomatic version 0.33. No adapter file, no ILLUMINACLIP / LEADING / TRAILING / SLIDINGWINDOW / MINLEN settings and no invocation are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "WGBS mapping to the TAIR10 reference genome, deduplication and methylation extraction with Bismark version 0.10.1. No aligner backend, mismatch/seed settings, deduplication command or methylation-extractor options are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Per-region weighted CG/CHG/CHH methylation-level computation over genes, TEs (TEs with protein-coding genes) and TEs including TE fragments with 'a custom Perl script' cited to refs 25 and 39; filters: regions with <10 total cytosines excluded, and for h2a.z-containing mutants regions where >80% of cytosines had <5 mapped reads also excluded. The script itself is not deposited (Code availability = by request only).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Extraction of TEs with statistically lower or higher mCH in wF1 vs F1, and mCHG/mCHH in zcc+CMT3/2 vs cc+CMT3/2 (Figs 1b, 2g, S1b, S4g,h, S5g,n,o) using edgeR (v3.32.1) 'following Chen et al.'. No design matrix, dispersion method, test, FDR method or significance threshold is stated, and no analysis script is deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Genome-browser views: bedGraph files created (tool/script unnamed) and visualised with IGV (v2.8.9). No bedGraph-generation command, bin size, normalisation or IGV track/scale settings are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Venn diagrams created using BioVenn. No version, no input list definitions and no invocation (web interface vs R package) are stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "RT-qPCR bar plots for Figures S4f and S5k,l created with ggplot2 (v3.3.2). Underlying numbers are covered by 'Source data are provided with this paper'; no plotting script, no R version for this step and no error-bar / statistics definition are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "General WGBS plotting (box plots, scatter plots, density plots of methylation levels) performed in 'Rstudio version 1.3.959'. Rstudio is an IDE, not an analysis pin - no R version, no package set and no plotting script are given for this step.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "ChIP-seq read trimming and quality filtering with Trimmomatic version 0.33. Same tool pin as C1; no options or invocation given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "ChIP-seq mapping to the TAIR10 reference genome with Bowtie (version 1.1.2) using the option '-M 1 --best'. This is the only step in the paper whose invocation options are stated in full.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Counting reads overlapping each gene, TE or TE-including-fragment with BEDTools (version 2.26.0). The sub-command (intersect vs multicov vs coverage), strandedness, overlap fraction and the exact annotation files used are not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Metaplot construction: 2 kb upstream and downstream of genes/TEs divided into 10 x 200 bp segments and TE bodies into 20 segments; mapped reads per segment counted with bedtools and RPKM-normalised 'using Perl script'; averaged RPKM plotted with R version 4.3.1. The binning scheme is described but the Perl normalisation script and the plotting code are not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Heatmaps of ChIP-seq signal around and within genes and TEs created using gplots (v3.1.1). No row ordering, scaling, clustering, colour breaks or script are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Re-analysis of previously published data: WGBS and H3K9me2 ChIP-seq for WT, cc, sss and F1 (GSE148753) and WGBS for met1-1, mcc, msss and mF1 (GSE181896), used throughout Figs 1-5 as the comparison baseline. The Methods do not state whether the raw reads were re-processed with the pipeline above or the authors' published processed tracks were reused, and no version or parameter set is attached to this re-analysis.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Chromosomal-environment analysis: T-index computation (defined only in the Fig. 4d legend as 'the number of TEs divided by the sum of TEs and genes in a 100-kb bin'), categorisation of TEs into three T-index groups, distance-to-centromere and TE/gene-density calculations in 100-kb / 50-kb windows, and LOESS curves plus density and scatter plots of H2A.Z/H3, H2A.W/H3, mCG and mCHG against T-index (Figs 4, 5e-j, S7-S9). No LOESS span/degree, no bin/window code and no analysis script are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Phylogenetic analysis of COPIA copies: COPIA sequences retrieved from the TAIR9.0 TE annotation, of ~1800 annotated regions those with an RT core domain (ca. 260 aa) retained, MANUALLY aligned, sequences with >100 bp gaps discarded leaving 202 sequences, p-distance genetic distances computed, evolutionary analyses conducted by MEGA5, and TE pairs with p-distance < 0.25 that are mutual nearest neighbours selected. The manual alignment is not deposited, MEGA5 carries only a major version, and MEGA5 is GUI-driven with no session/settings file provided.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 1,
+    "n_NI": 15,
+    "n_X": 0,
+    "S": 16,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 1 of 16 computational steps (C10, Bowtie version 1.1.2 with the fully stated option '-M 1 --best') and NI on the remaining 15. The data axis is the strong side of this paper: all newly generated WGBS and ChIP-seq data are deposited under GEO GSE303147 (public since 2026-06-02, verified 2026-07-27), the two re-used datasets GSE148753 and GSE181896 are public, and TAIR10 is the stated reference, so data = 2 on every computational step. Two other constraints bind hard. First, there is no code repository of any kind: the Code availability statement reads in full 'The codes used in this study are available via contacting the corresponding author', so the two custom Perl scripts (per-region weighted methylation levels in C3, RPKM segment normalisation in C12), the edgeR differential-methylation analysis (C4), the bedGraph generation (C5), all plotting code (C7, C8, C13) and the whole T-index / LOESS analysis (C15) and COPIA phylogenetics (C16) score code = 0. Second, parameters are almost never given: only C10 states its invocation options, so 12 of 16 steps score params = 0 despite carrying exact tool pins. Ten tools do carry at least major.minor prose pins, which is why capture_claim is exact_pins_partial rather than floating, but no lockfile, container image or digest, conda environment or renv.lock is claimed, so version is capped at 1 everywhere and no step can reach R-star even under stage-2 execution of what the paper currently states.",
+    "coverage": "computational coverage |S|/(|S|+|W|) = 16/21 = 76%. 5 wet-lab steps (plant materials and crossing, plasmid construction and floral-dip transformation, RT-qPCR, WGBS library prep and sequencing, ChIP-seq and library prep and sequencing) are OOS and excluded from the denominator."
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 9,
+      "where": "Code availability - binding on C3, C4, C5, C7, C8, C12, C13, C15, C16 (9 of 16 computational steps)",
+      "missing": "The paper names no repository at all. The Code availability statement reads in full: 'The codes used in this study are available via contacting the corresponding author.' There is therefore no version-controlled artifact, no archived snapshot, no DOI and no README to read at stage 1. Concretely missing: the custom Perl script that computes weighted CG/CHG/CHH methylation levels per gene / TE / TE-including-fragment and applies the >=10-cytosine and h2a.z coverage filters (cited only as 'a custom Perl script' with refs 25 and 39); the Perl script that counts reads per metaplot segment and normalises to RPKM; the edgeR differential-methylation script; the bedGraph generation code; the T-index / LOESS / density-plot analysis code; and all figure code.",
+      "how_to_close": "Deposit the analysis code in a public repository with a tagged release archived to Zenodo (DOI), including the two Perl scripts verbatim, the edgeR script with its design matrix and thresholds, the T-index and LOESS code, and the figure scripts; replace the by-request statement with the DOI."
+    },
+    {
+      "type": 5,
+      "where": "C3, C12 - custom Perl scripts; C15 - T-index computation; C16 - manual COPIA alignment",
+      "missing": "The two custom Perl scripts are the load-bearing quantification layer of the entire paper (every methylation number and every ChIP metaplot passes through them) and neither is public. The T-index is defined only in a figure legend, not in Methods, and its computation code is absent. For C16 the alignment of the 202 COPIA RT-core sequences was performed MANUALLY and the resulting alignment file is not deposited, so the p-distance matrix cannot be regenerated even with MEGA5 in hand.",
+      "how_to_close": "Publish the Perl scripts, move the T-index definition into Methods with its window/binning code, and deposit the COPIA multiple-sequence alignment (FASTA or MEGA format) plus the MEGA session settings as supplementary files."
+    },
+    {
+      "type": "2a",
+      "where": "C6 (BioVenn), C14 (re-analysis of GSE148753 / GSE181896), C15 (T-index / LOESS), C16 (MEGA5)",
+      "missing": "No version is recorded for BioVenn; MEGA5 carries only a major version with no minor/build; the re-analysis of the two published datasets names no tool or version at all and does not say whether raw reads were re-processed or published processed tracks reused; the T-index / LOESS analysis names no software. The R ecosystem is only half-pinned - R version 4.3.1 is stated for metaplots and Rstudio version 1.3.959 (an IDE, not an analysis runtime) for WGBS plots, so it is not determinable which R version ran edgeR v3.32.1, ggplot2 v3.3.2 or gplots v3.1.1.",
+      "how_to_close": "State the exact version and invocation of every tool including BioVenn and MEGA (major.minor.patch), state the R version paired with each R package version, and state explicitly for the re-used GEO series whether raw reads were re-processed with the pipeline of this paper or published processed values were reused."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment - all 16 computational steps",
+      "missing": "No environment capture of any kind is claimed: no conda environment.yml or conda-lock, no renv.lock, no requirements.txt, no Docker/Singularity image or digest, no package channel or CRAN/Bioconductor snapshot date, no declared platform, and no interpreter pin for Perl. Ten tools carry exact prose pins (Trimmomatic 0.33, Bismark 0.10.1, Bowtie 1.1.2, BEDTools 2.26.0, edgeR 3.32.1, IGV 2.8.9, ggplot2 3.3.2, gplots 3.1.1, R 4.3.1, Rstudio 1.3.959) but scattered prose pins without interpreter + channel + platform do not constitute environment closure, so version is capped at 1 on every step under the symmetric env-closure gate.",
+      "how_to_close": "Ship a conda-lock or renv.lock (or a container image referenced by digest) covering the declared platform, pinning the Perl and R interpreters and the package sources, alongside the existing prose pins."
+    },
+    {
+      "type": 3,
+      "where": "C1, C2, C4, C5, C6, C7, C8, C9, C11, C13, C14 - parameter/invocation layer (12 of 16 steps score params = 0)",
+      "missing": "Only C10 (Bowtie '-M 1 --best') states its invocation. Missing: Trimmomatic adapter file and trimming settings (used twice, for WGBS and for ChIP-seq); Bismark alignment backend, mismatch/seed settings, deduplication command and methylation-extractor options; the BEDTools sub-command, strandedness and overlap criteria; the edgeR design matrix, dispersion estimation, test and FDR threshold behind every 'statistically significant' TE count in Figs 1b, 2g, S1b, S4g,h, S5g,n,o; the bedGraph bin size and normalisation; the LOESS span and degree; the exact TAIR10 annotation release and the TE / TE-including-fragment interval definitions; and the heatmap ordering/scaling. The genome build is named (TAIR10) but no annotation release or checksum accompanies it.",
+      "how_to_close": "Publish the per-step command lines (or the workflow file) with the exact annotation files used, and state the statistical thresholds for every 'statistically significant' claim."
+    },
+    {
+      "type": 4,
+      "where": "C4 (edgeR), C15 (LOESS)",
+      "missing": "No random seed is recorded for any step. edgeR's dispersion estimation and the LOESS smoothing used in Figs 4-5 and S7-S9 are not seeded in the description; with only two biological replicates per genotype, the edgeR-derived TE counts (843 TEs mCHG, 1067 TEs mCHH, and the pie-chart proportions) are sensitive to the unstated dispersion and FDR settings. This is a minor gap relative to the missing-code gap - these steps are largely deterministic once parameters are fixed - but no seed statement exists to confirm it.",
+      "how_to_close": "State seeds where any stochastic component exists, or state explicitly that the analysis is deterministic given the published parameters."
+    },
+    {
+      "type": 12,
+      "where": "Figure-level reproduction - all main and supplementary figures",
+      "missing": "'Source data are provided with this paper' is stated but no figure-to-source-data mapping and no figure-generation code are deposited, so the path from the GEO-deposited raw reads to each published panel is not traceable. The supplementary bundle is listed only as 'DC1 Supplemental_Figs_Table_Reference'.",
+      "how_to_close": "Deposit per-figure source data with an explicit panel mapping plus the scripts that turn the processed tables into each panel."
+    },
+    {
+      "type": 13,
+      "where": "C2, C10 (TAIR10 reference), C16 (TAIR9.0 TE annotation)",
+      "missing": "TAIR10 is named with only the institutional URL https://www.arabidopsis.org and a citation; no release/version string, no file name and no checksum for the FASTA or for the gene/TE GFF are given, and the TE and 'TE including fragments' interval sets that define every per-region number in the paper are not deposited. C16 additionally consumes the TAIR9.0 TE annotation - a different, older release than the TAIR10 used for mapping - again without a versioned URL. Because no workflow code exists, the fetch class cannot be determined at stage 1 (env_capture_class = n/a throughout); on prose alone this reads as a prose-only pin.",
+      "how_to_close": "Cite the reference and annotation by versioned, resolvable URL or DOI with checksums, deposit the derived TE / TE-including-fragment BED files, and state why TAIR9.0 rather than TAIR10 annotation was used for the COPIA analysis."
+    },
+    {
+      "type": 10,
+      "where": "Upstream physical steps (W = 5)",
+      "missing": "Plant materials and crossing, plasmid construction and floral-dip transformation, RT-qPCR, WGBS library preparation and sequencing, and ChIP-seq with library preparation and sequencing are non-computational and out of scope for Tier-1. They are well documented in prose (primers, kits, instruments, buffer series and replicate counts are given) but they are excluded from |S| and are not scored for reproducibility.",
+      "how_to_close": "n/a - out of scope for computational reproducibility. Mutant line availability (wcc, wsss, wF1 and the zcc+CMT3/CMT2 transgenic lines created in this study) would be the wet-lab-side equivalent of an accession and is not stated."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo - NONE STATED. Code availability statement verbatim: 'The codes used in this study are available via contacting the corresponding author.'",
+      "http_status": "n/a - no URL is given in the paper",
+      "checked_at": "2026-07-27",
+      "network_context": "No GitHub, GitLab, Bitbucket, Zenodo or Software Heritage identifier appears anywhere in the article XML (searched the full text for github/gitlab/zenodo/code availability). No web search was performed to locate an unlisted repository; the absence is recorded as a finding, not remedied."
+    },
+    {
+      "artifact": "data accession (study-generated), verbatim from Data availability: 'WGBS and ChIP-seq data generated in this study were deposited in the GEO with the accession number GSE303147.'",
+      "http_status": "200 (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE303147); GEO record header reads 'Status: Public on Jun 02, 2026' and 'Title: Antagonistic histone H2A variants and autonomous heterochromatin formation shape epigenomic patterns in Arabidopsis'",
+      "checked_at": "2026-07-27",
+      "network_context": "Resolved directly against NCBI GEO with a browser user-agent. The series is public as of the assessment date. Sample-level and SRA-run-level completeness was not audited at stage 1."
+    },
+    {
+      "artifact": "data accession (re-used), verbatim from Data availability: 'WGBS data and ChIP-seq data (H3K9me2) for WT, cc, sss, and F1 is available in the GEO with the accession number GSE148753.'",
+      "http_status": "200 (GEO acc.cgi); 'Status: Public on Sep 30, 2020', 'Title: RNA interference-independent reprogramming of DNA methylation in Arabidopsis', organism Arabidopsis thaliana",
+      "checked_at": "2026-07-27",
+      "network_context": "Resolved directly against NCBI GEO. Public."
+    },
+    {
+      "artifact": "data accession (re-used), verbatim from Data availability: 'WGBS data for met1-1, mcc, msss and mF1 is available in the GEO with the accession number GSE181896.'",
+      "http_status": "200 (GEO acc.cgi); 'Status: Public on Jan 15, 2022', 'Title: Local and global crosstalk among heterochromatin marks drives epigenome patterning in Arabidopsis'",
+      "checked_at": "2026-07-27",
+      "network_context": "Resolved directly against NCBI GEO. Public."
+    },
+    {
+      "artifact": "reference genome, verbatim from Data availability: 'TAIR10 (https://www.arabidopsis.org) was used as the Arabidopsis reference genome.' Also consumed: 'TE annotation of TAIR9.0' (Methods, COPIA phylogenetic analysis).",
+      "http_status": "not resolved at stage 1 - the stated URL is the TAIR institutional landing page, not a versioned file or DOI; no file name or checksum is given",
+      "checked_at": "2026-07-27",
+      "network_context": "TAIR requires registration for bulk downloads and the paper points only at the site root, so neither the exact TAIR10 FASTA nor the TAIR9.0 TE annotation file used can be identified from the paper. Recorded as gap type 13; fetch class not assignable at stage 1 (no workflow code exists to inspect)."
+    },
+    {
+      "artifact": "source data / supplementary, verbatim: 'Source data are provided with this paper.' Supporting information listed as 'DC1 Supplemental_Figs_Table_Reference'.",
+      "http_status": "not separately resolved at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "Referenced from the bioRxiv v1 record; no per-figure mapping is given in the text."
+    },
+    {
+      "artifact": "paper full text (JATS XML source): https://www.biorxiv.org/content/early/2025/10/20/2025.10.19.683276.source.xml",
+      "http_status": "403 via WebFetch; 200 via direct curl with a browser user-agent (147,610 bytes)",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv blocks the default fetch agent. Retrieved record identity was verified against the DOI and title in the XML front matter before scoring, because a shared /tmp scratch path had been overwritten by a concurrent job during an earlier fetch; the assessment was redone into an isolated directory and re-verified."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "616469bc7fc2a4f2e4e10c3defb06a658d19a76cb591c26b4d55b04d31109841",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

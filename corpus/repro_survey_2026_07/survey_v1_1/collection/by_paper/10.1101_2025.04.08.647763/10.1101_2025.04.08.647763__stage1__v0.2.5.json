@@ -1,0 +1,947 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "d6edd1e6df3c0e9a9cd9e4f05e7e585cad0b3d01c5d92100d6f025a861af912c",
+  "canonical_id": {
+    "value": "10.1101/2025.04.08.647763",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.04.08.647763v2",
+      "biorxiv:2025.04.08.647763v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational half of a wet-lab-anchored genome/population-genomics study of the leishmaniasis vector Lutzomyia longipalpis. Two coupled arms: (a) de novo chromosome-level assembly and annotation of separate female and male Colombian sandfly genomes (wtdbg2 contigging of pooled PacBio HiFi -> Juicer/BWA/samtools/Picard/YaHS Hi-C scaffolding -> manual Juicebox curation -> SRY k-mer-based Y-read selection + wtdbg2 + RagTag + minimap2 -> RepeatModeler/TransposonClassifier-RFS/RepeatMasker with a custom DFAM 3.4 + RepBase 25.05 + in-house library -> Braker 3.0.8 annotation using OrthoDB v11, VectorBase 67, diptera_odb10 and public RNA-seq SRR535756-SRR535778); (b) population genomics on 63 newly resequenced Colombian sandflies plus published Brazilian resequencing (BBMap -> BWA -> Picard/GATK 4.1.9.0 best-practice variant calling -> vcftools filtering -> pixy pi/FST/Dxy, VCFtools Tajima's D, PLINK 1.90b6.21 LD and ROH, angsd/pcangsd PCA + ancestry, vcf2phylip/IQ-TREE 2.2.2.7/ASTRAL 5.7.8 window and BUSCO gene trees, IQ-TREE gene-concordance factors, Dsuite Dtrios/Fbranch introgression, msmc-tools + MSMC2 demography, PLINK 2.0 sex GWAS). Reproduction target = the assemblies/annotations reported in Table 1 and Figures 1-6 plus the population statistics they support. Field collection, morphological species identification, gDNA/Hi-C extraction, PacBio and Illumina library prep and sequencing are wet-lab (W, OOS for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation, derived from the bioRxiv v2 JATS full text (fetched by curl; WebFetch returned HTTP 403 for the .source.xml endpoint). Title-phrase check passed ('Sex differentiation, divergence, and introgression' and 'Lutzomyia longipalpis' both present in the fetched XML), so this is the correct paper. The code repository https://github.com/AdamStuckert/Lu_longipalpis is public but contains no workflow file (no Snakefile/Nextflow/CWL/Makefile visible on the landing page) and its README is two lines, so granularity is anchored on prose, not on code. Consolidations made to stay coarse: wtdbg2 assembly and its 'wtpoa-cns' polish are one step (C1); the whole Braker 3.0.8 wrapper (miniprot + GeneMark-ETP + ProtHint + Augustus + TSEBRA) is one step (C19) because Braker3 is invoked as a single pipeline; Juicer 'splits'/'pre'/'post' are one step (C2). Splits kept separate where the prose names distinct tools with distinct version pins (samtools 1.17 vs Picard 2.27.5; vcftools filtering vs VCFtools Tajima's D; PLINK LD vs PLINK ROH; IQ-TREE tree inference vs IQ-TREE gCF). The Colombian and continent-wide variant-calling passes use the same tools with the same pins and are counted once (C20-C24), as the paper itself states 'we then followed the same protocol'. Per rubric v0.2.5 line 44, a NAMED public tool with no version stated scores version=1 with subtier 'floating' (not 0); version=0 is reserved for software of unknown identity, of which this paper has none.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "De novo contig assembly of pooled PacBio HiFi reads for the female and male genomes with wtdbg2 (chosen after HiFiasm failed on pooled haplotype diversity), polished with the 'wtpoa-cns' command; no wtdbg2 version, no -x preset, no genome-size or read-depth parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Hi-C read-split calculation and contact-map generation with Juicer version 1.6 ('splits', 'pre' to build the contact map, 'post' to write the curated assembly back); subcommands named, no flags given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Mapping of Arima Hi-C reads to the draft contig assemblies with BWA version 0.7.17; no subcommand (mem/aln), no -5SP/-T style Hi-C flags stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Sorting of Hi-C alignments and 'faidx' indexing of the contig assembly with Samtools version 1.17; defaults implied",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Duplicate marking of Hi-C alignments with Picard 'MarkDuplicates' version 2.27.5; defaults implied",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Hi-C scaffolding with the YaHS pipeline at a MAPQ score of 30; no YaHS version, no restriction-enzyme/resolution settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Manual curation of each scaffolded assembly in Juicebox Assembly Tools: 'fixing one major translocation (female assembly) and splitting a chromosome that had an incorrect telomere-to-telomere join (male assembly)'; a human GUI operation with no recorded .assembly/.review edit file, no coordinates, and no scriptable equivalent",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "manual-gui-step",
+        "edits-not-recorded",
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Identification of sex-limited-chromosome reads with the software SRY: female vs male Illumina WGS reads used to build sex-specific k-mers, which are then mapped to raw male-only PacBio HiFi reads; no SRY version, no k-mer length, no abundance/presence thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Assembly of the putative Y chromosome with wtdbg2 from the HiFi reads flagged by sex-limited k-mers; no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Scaffolding of the male Y assembly with RagTag using the male X chromosome (chromosome 1) as backbone; no RagTag version, no subcommand (scaffold/correct) or flags stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Alignment of the Y scaffold to the male 'X' chromosome with minimap2 assuming ~0.1% sequence divergence ('-cx asm5'); preset flag stated, no minimap2 version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Visualisation of the X/Y PAF alignment with the R package 'pafr'; no pafr version, no R version stated for this step",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "De novo repeat-family modelling in each assembly with Repeat Modeler version 2.0.4; no -engine/-LTRStruct or database flags stated, defaults implied",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Classification of the RepeatModeler-unclassified repeat families with Transposon Classifier RFS; no version, no model/threshold parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Construction of a custom dipteran + Lu. longipalpis repeat library: DFAM database version 3.4 combined with RepBase version 25.05 inside RepeatMasker version 4.1.2-p1, dipteran sequences extracted with 'famdb.py', then the sex-specific sandfly repeat databases appended. The resulting library is not deposited anywhere, and RepBase 25.05 is a subscription-licensed resource",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "custom-db-undistributed",
+        "proprietary-dependency",
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Identification and soft-masking of repeats genome-wide with RepeatMasker version 4.1.2-p1 using the custom library from C15; the library is undistributed, and the prose describes it inconsistently as 'our curated vertebrate and Lu. longipalpis repeat library' where dipteran is meant",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "custom-db-undistributed",
+        "prose-inconsistency",
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Download of public Lu. longipalpis RNA-seq (accessions SRR535756-SRR535778) with the SRA toolkit for annotation evidence; accession range stated, no toolkit version, no fasterq-dump/prefetch flags",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Mapping of the downloaded RNA-seq reads to the female and male assemblies with HISAT2 and sorting/manipulation with samtools; no HISAT2 version, no samtools version for this step, no index-build or alignment flags stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Protein-coding gene annotation with Braker version 3.0.8 run as a single pipeline: miniprot alignment of OrthoDB v11 and VectorBase 67 proteins, GeneMark-ETP prediction from RNA-seq evidence, ProtHint homology mapping, Augustus prediction with the diptera_odb10 database, and TSEBRA merging of the Augustus and GeneMark-ETP gene sets. Braker is pinned; miniprot, GeneMark-ETP, ProtHint, Augustus and TSEBRA carry no versions; the masked-genome input inherits the undistributed library of C15/C16",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "subtool-versions-unstated",
+        "upstream-input-not-distributed"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Adapter trimming of the whole-genome resequencing reads (63 Colombian + published Brazilian samples) with BBMap version 38.87; no bbduk subcommand, no adapter reference file, no ktrim/qtrim/minlen values stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Mapping of trimmed resequencing reads to the female reference genome with BWA version 0.7.17; no subcommand or alignment flags stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Merging of per-lane BAM files for multi-lane samples with the 'merge' tool in samtools version 1.14; defaults implied",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Read-group assignment with GATK 'AddOrReplaceReadGroups' and alignment cleaning/sorting/duplicate marking with Picard 'CleanSam', 'SortSam' and 'MarkDuplicates' (Picard version 2.23.4); commands named, no per-command flags or read-group values stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Variant calling following GATK best practices with GATK version 4.1.9.0: per-sample HaplotypeCaller then joint GenotypeGVCFs, plus an all-sites run using the '-all-sites' flag required by pixy; ploidy, -ERC mode, interval lists and hard-filtering expressions not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Site filtering of the gVCF with vcftools 0.1.15 using '--max-missing 0.9', '--min-meanDP 3' and '--max-meanDP 40'; version and all three thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Tajima's D calculated in 1,000 bp windows with VCFtools (0.1.15 as pinned above); window size stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Generation of a Beagle file of genotype probabilities with angsd version 0.921-11-g20b0655 (run genome-wide and on chromosome-1-only and autosome-only BAM subsets); no -GL model, -doGlf/-doMajorMinor/-doMaf codes, -minMapQ/-minQ or -SNP_pval thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Principal-component and ancestry/STRUCTURE-style estimation with the script 'pcangsd.py' (described in the paper as an angsd script; PCAngsd is a separate program); no PCAngsd version, no -e, -admix, -admix_alpha or K range stated even though the text says the program 'permutes iteratively across a range of ancestry possibilities'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated",
+        "tool-misattributed"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "Extraction of eigenvalues, percent-variance calculation, PCA and STRUCTURE plotting in R version 4.1.1 ('Kick Things') with ggplot2, plus the linear model 'lm' with per-window pi as outcome and sex, chromosome and their interaction as fixed effects; R pinned, ggplot2 unpinned, model formula described in prose",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "package-versions-unstated"
+      ]
+    },
+    {
+      "step_id": "C30",
+      "label": "Nucleotide diversity (pi), FST (Weir-Cockerham) and Dxy in 1,000 bp windows with pixy on the all-sites VCF, computed female-vs-male within Colombia and between continent-wide populations; window size and estimator stated, no pixy version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "Linkage-disequilibrium calculation with PLINK 1.90b6.21; version pinned but no --r2/--ld-window/--ld-window-kb/--ld-window-r2 parameters stated, and the LD extent that is said to justify the 1,000 bp window size is never reported (the justifying sentence is garbled: 'The window size was chosen five the extent of LD in Lu. longipalpis')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "no-parameters-stated",
+        "prose-garbled"
+      ]
+    },
+    {
+      "step_id": "C32",
+      "label": "Runs-of-homozygosity detection with PLINK 1.90b6.21 using '--allow-extra-chr' and '--homozyg-kb 5', run separately for Colombia and the five Brazilian populations, with a sensitivity sweep over minimum ROH lengths of 5, 10, 25, 50 and 100 kb; version and parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "Splitting of VCFs into 100,000 bp regions and conversion to PHYLIP with the python script 'vcf2phylp.py' (vcf2phylip); window size stated, no script version/commit, no minimum-sample or missing-data flags stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C34",
+      "label": "Maximum-likelihood tree inference per 100 kb window (chromosome-1-only, autosome-only, and continent-wide all-chromosome sets) with IQ-TREE version 2.2.2.7 using '-st DNA' and 1000 bootstraps ('-bb 1000'); the substitution model / ModelFinder setting is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "model-unspecified"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "Genome-wide consensus species tree from the per-window trees with ASTRAL version 5.7.8, including a population-constrained run; version stated, no ASTRAL options (-t, -q, mapping file) given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C36",
+      "label": "Gene-concordance-factor calculation between each BUSCO gene tree and the ASTRAL consensus tree with IQ-TREE version 2.2.2.7; version stated, the --gcf/--scf invocation and options are not",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C37",
+      "label": "Extraction of the complete single-copy dipteran BUSCO genes (diptera_odb10) assembled in the male assembly, to define the genomic regions converted to PHYLIP for gene trees; the BUSCO run itself is never described - no BUSCO version, no mode (genome/protein), no completeness thresholds - only the odb10 lineage database is named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C38",
+      "label": "Introgression testing with Dsuite: 'Dtrios' over all trios and 'Fbranch' on the output, using the ASTRAL consensus population tree and the VCF, with Colombia as outgroup and focus on Brazilian populations; no Dsuite version, no jackknife block size (-k) or significance handling stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C39",
+      "label": "Generation of MSMC2 input with msmc-tools 'generate_multihetsep.py' per chromosome per sample, requiring a per-individual covered-site mask and a genomic mappability mask. The covered-site masks were 'created in three steps' with Samtools 1.21, BCFtools and msmc-tools - the three steps are never enumerated - and the mappability mask was made with genmap with no k-mer length or error tolerance given; only samtools carries a version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "steps-not-enumerated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C40",
+      "label": "Demographic-history inference with MSMC2 run per individual sample on unphased genotypes with one thread and ten time segments ('-t 1 -p 1-6+8-1+1-4'); parameters fully stated, no MSMC2 version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C41",
+      "label": "Scaling and plotting of MSMC2 output in R with mutation rate mu = 1.25e-8, generation time 49 days, time in years as 'time_boundary / mu / gen' and Ne as (1/lambda)/(2*mu); constants and formulas stated, but R version and plotting packages are not restated for this step",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-version-stated"
+      ]
+    },
+    {
+      "step_id": "C42",
+      "label": "Genome-wide association study of sex as a binary phenotype across 133 samples (113 females, 20 males) with plink 2.0 using a generalized linear model, input restricted to the four chromosomes and MAF 0.05, with '--geno 0.2' and '--maf 0.05'; parameters stated, but 'plink 2.0' is a rolling alpha with dated builds and no build date/commit is given (and the citation given is the PLINK 1.9 reference)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "rolling-alpha-version",
+        "citation-mismatch"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 25,
+    "n_NI": 17,
+    "n_X": 0,
+    "S": 42,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/42 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 25/42 computational steps; the remaining 17/42 cap at NI. This paper is unusually strong on the two axes Tier-1 can see cheaply - data and code presence - and unusually weak on environment closure and parameter recording. Data: all raw reads and both genome assemblies are public under NCBI BioProject PRJNA1110158 (verified live, HTTP 200), the annotation RNA-seq is public (SRR535756-SRR535778), and the re-used Brazilian resequencing accessions are listed in Table S1, so data=2 on 40/42 steps. Code: a public repository exists (https://github.com/AdamStuckert/Lu_longipalpis, HTTP 200, 106 commits) organised by analysis (Genome_assembly, Genome_annotation, alignment, angsd, pi, roh, trees, msmc2, GWAS, Manuscript_figures), so code=2 on most steps - but with no release, no tag, no commit hash cited in the paper and only a two-line README, the pointer is floating, and the promised Zenodo deposit is conditional ('will be deposited in Zenodo upon acceptance'). The two zeros that drive NI are (i) params=0 on 14 steps where the tool's behaviour is materially parameter-dependent (wtdbg2 assembly, BWA mapping x2, BBMap trimming, HISAT2, angsd, PCAngsd, PLINK LD, RagTag, SRY, TransposonClassifier, BUSCO, msmc-tools mask construction, Juicebox), and (ii) data=0 on the two repeat-library steps, where the custom DFAM 3.4 + RepBase 25.05 + in-house sandfly library is never deposited and RepBase 25.05 is subscription-licensed (proprietary ceiling). Version is capped at 1 on every single step: exact prose pins exist for 17 tools (Juicer 1.6, BWA 0.7.17, samtools 1.17/1.14/1.21, Picard 2.27.5/2.23.4, RepeatModeler 2.0.4, RepeatMasker 4.1.2-p1, DFAM 3.4, RepBase 25.05, Braker 3.0.8, BBMap 38.87, GATK 4.1.9.0, angsd 0.921-11-g20b0655, vcftools 0.1.15, PLINK 1.90b6.21, IQ-TREE 2.2.2.7, ASTRAL 5.7.8, R 4.1.1) but no lockfile, container digest or conda environment is claimed anywhere, and no interpreter/channel/platform is declared - capture_claim = exact_pins_partial. A further 19 named tools carry no version at all (wtdbg2, YaHS, SRY, RagTag, minimap2, pafr, TransposonClassifier RFS, SRA toolkit, HISAT2, miniprot, GeneMark-ETP, ProtHint, Augustus, TSEBRA, PCAngsd, pixy, vcf2phylip, BUSCO, Dsuite, msmc-tools, MSMC2, genmap, bcftools, ggplot2). Because version is 1 everywhere by construction, no Stage-2 code check could lift any step to R-star without a new environment capture, which is why stage2_candidate is false.",
+    "coverage": "42 computational analysis steps assessed from the bioRxiv v2 JATS full-text Methods prose plus the public repository landing page and README. 6 wet-lab steps (field collection of sandflies by mechanical aspiration with morphological species identification under taxonomic keys; pooled phenol-chloroform gDNA extraction of 9 females / 10 males; PacBio ultra-low-input HiFi library prep and Sequel IIe sequencing at Mount Sinai; Arima Hi-C library prep on 25 females / 25 males with NovaSeq sequencing; individual gDNA extraction with the Zymo Genomic DNA Clean and Concentrator kit plus Qubit quantification for 63 resequencing samples; ThruPLEX library prep and NovaSeq 6000 SP sequencing at UNC-Chapel Hill) counted in W but out of computational-reproduction scope. Computational coverage = 42/48 (87.5%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 7,
+      "where": "Whole computational environment (all 42 C-steps)",
+      "missing": "No environment lockfile, container image or digest, conda/mamba environment YAML, pixi.lock, renv.lock or sessionInfo() is claimed anywhere in the paper, and none is visible on the repository landing page (top level is GWAS, Genome_annotation, Genome_assembly, Manuscript_figures, alignment, angsd, msmc2, pi, roh, trees, README.md). Exact versions exist for 17 tools as scattered prose pins, but no interpreter (only R 4.1.1, no Python version), no channel/index, and no platform is declared, so there is no environment closure. capture_claim = exact_pins_partial and version is capped at 1 for every step.",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or a container digest covering the assembly chain (wtdbg2, Juicer 1.6, BWA 0.7.17, samtools 1.17, Picard 2.27.5, YaHS, RagTag, minimap2), the annotation chain (RepeatModeler 2.0.4, RepeatMasker 4.1.2-p1, Braker 3.0.8 with its bundled Augustus/GeneMark-ETP/ProtHint/TSEBRA/miniprot) and the population-genomics chain (BBMap 38.87, GATK 4.1.9.0, vcftools 0.1.15, angsd 0.921-11-g20b0655, PCAngsd, pixy, PLINK 1.90b6.21 and 2.0, IQ-TREE 2.2.2.7, ASTRAL 5.7.8, Dsuite, MSMC2, genmap, R 4.1.1 + ggplot2 + pafr), with the declared platform."
+    },
+    {
+      "type": "2a",
+      "where": "19+ tools across the assembly, annotation, phylogenetics and demography steps (C1, C6, C8-C12, C14, C17, C18, C19 sub-tools, C28, C30, C33, C37-C41)",
+      "missing": "No version is stated for wtdbg2, YaHS, SRY, RagTag, minimap2, pafr, Transposon Classifier RFS, SRA toolkit, HISAT2, miniprot, GeneMark-ETP, ProtHint, Augustus, TSEBRA, PCAngsd, pixy, vcf2phylip, BUSCO, Dsuite, msmc-tools, MSMC2, genmap, bcftools or ggplot2. Several of these are behaviour-changing across releases (wtdbg2 assembly graph, YaHS scaffolding, pixy FST estimator handling of invariant sites, Dsuite Fbranch, MSMC2 time-segment handling). 'plink 2.0' (C42) is a rolling alpha with dated builds and no build date is given.",
+      "how_to_close": "State an exact version or commit for every tool, including sub-tools invoked inside Braker3 and the PLINK 2.0 build date, ideally by shipping the environment capture requested under gap type 7."
+    },
+    {
+      "type": 12,
+      "where": "Data availability statement: 'Code can be found at https://github.com/AdamStuckert/Lu_longipalpis ; and will be deposited in Zenodo upon acceptance.'",
+      "missing": "The repository is genuinely public and organised by analysis (106 commits), which is well above the field norm, but the paper cites a bare branch-tip URL: no commit hash, no tag and no release exist (GitHub releases and tags API both return an empty array as of 2026-07-28), so the cited code is a moving target. The archival Zenodo deposit is conditional on acceptance and does not yet exist, so there is no DOI-stable snapshot. The README is two lines ('Lutzomyia longipalpis genomics and population genomics' / 'Code repository for our manuscript.') with no run instructions, no directory-to-figure mapping, no execution order and no workflow file (no Snakefile/Nextflow/CWL/Makefile visible at the top level). Intermediate artefacts that the downstream steps consume - the filtered VCF/gVCF, the all-sites VCF, the 100 kb PHYLIP windows, the per-window and per-gene trees, the ASTRAL consensus tree, the MSMC2 coverage and mappability masks, and the custom repeat library - are not deposited.",
+      "how_to_close": "Tag a release, cite the tag or commit hash in the Data availability statement, complete the Zenodo deposit now rather than at acceptance, expand the README into an execution order mapping each directory to the figures/tables it produces, and deposit the key intermediates (filtered VCF, consensus trees, masks)."
+    },
+    {
+      "type": 5,
+      "where": "Custom repeat library construction and masking (C15, C16)",
+      "missing": "The curated repeat library - DFAM 3.4 plus RepBase 25.05 dipteran sequences extracted with famdb.py, plus the RepeatModeler/TransposonClassifier-derived sex-specific Lu. longipalpis families - is never deposited, given an accession, or checksummed. Every masked-genome-dependent downstream result (the Braker3 annotation of C19, and the 3,611 gene identifications in the chromosome-1 differentiated region) therefore rests on an input that cannot be rebuilt identically. The prose also describes the library inconsistently as 'our curated vertebrate and Lu. longipalpis repeat library' where dipteran is clearly meant.",
+      "how_to_close": "Deposit the final repeat library FASTA (or the famdb.py extraction commands plus the RepeatModeler output and a checksum) alongside the code, and correct 'vertebrate' to 'dipteran'."
+    },
+    {
+      "type": 11,
+      "where": "RepBase version 25.05 inside RepeatMasker 4.1.2-p1 (C15, C16)",
+      "missing": "RepBase is a subscription-licensed resource (GIRI). A reproducer without an institutional RepBase licence cannot rebuild the repeat library even if all code is published, which applies the rubric's proprietary ceiling to these two steps. The version is pinned (25.05), which is the mitigating factor, but access is not free.",
+      "how_to_close": "Provide a Dfam-only (open) variant of the library and report how much the masking and annotation change without RepBase, or deposit the derived library under whatever redistribution terms the licence permits."
+    },
+    {
+      "type": 1,
+      "where": "Parameter recording across 14 steps (C1, C3, C7, C8, C10, C14, C18, C20, C21, C27, C28, C31, C37, C39)",
+      "missing": "For the following, no parameters at all are given even though the tool's output is strongly parameter-dependent: wtdbg2 (no -x preset, no genome size); BWA for both Hi-C and resequencing mapping (no subcommand, no flags); BBMap adapter trimming (no adapter reference, no ktrim/qtrim/minlen); HISAT2 RNA-seq mapping (no index or alignment flags); angsd Beagle generation (no -GL, -doGlf, -doMajorMinor, -minMapQ/-minQ, -SNP_pval); PCAngsd (no -e, -admix, no K range despite the text asserting an iterative permutation across ancestry possibilities); PLINK LD (no --r2/--ld-window settings, and the LD extent that is said to justify the 1,000 bp window size is never reported because the sentence is garbled: 'The window size was chosen five the extent of LD in Lu. longipalpis'); RagTag, SRY and Transposon Classifier RFS (no flags at all); BUSCO (the run is never described, only the diptera_odb10 lineage named); msmc-tools mask construction ('created in three steps' with the three steps never enumerated, and genmap invoked with no k-mer length or error tolerance). IQ-TREE (C34) states '-st DNA -bb 1000' but never the substitution model or whether ModelFinder was used.",
+      "how_to_close": "Publish the actual command lines (they exist in the repository directories) in the Methods or a supplementary command log, and state the IQ-TREE model, the genmap k/e values and the three mask-construction steps explicitly."
+    },
+    {
+      "type": 9,
+      "where": "Manual assembly curation in Juicebox Assembly Tools (C7)",
+      "missing": "Two assembly-defining edits - 'fixing one major translocation (female assembly) and splitting a chromosome that had an incorrect telomere-to-telomere join (male assembly)' - were performed by hand in a GUI. No .assembly/.review file, no breakpoint coordinates and no edit log are deposited, so this step has no code representation at all and cannot be replayed. Since both published chromosome-level assemblies pass through it, it is the single hardest-to-reproduce step in the paper (mitigated only by the fact that the final assemblies themselves are deposited on PRJNA1110158, so downstream work can start from the deposited product).",
+      "how_to_close": "Deposit the Juicebox .assembly/.review files (or the JBAT edit list with coordinates) so the curation can be replayed from the pre-curation scaffolds."
+    },
+    {
+      "type": 13,
+      "where": "External reference resources consumed by the annotation and BUSCO steps (C19, C37, and the databases in C15)",
+      "missing": "OrthoDB v11, VectorBase release 67, diptera_odb10, DFAM 3.4 and RepBase 25.05 are all version-pinned in prose - which is better than most papers - but no download URL, no accession and no checksum is given for any of them, and Stage 1 cannot inspect whether the repository's scripts fetch a pinned artefact (class A), consume a user-supplied local path (class B) or pull a rolling 'latest' (class C). env_capture_class is therefore 'n/a' on every step and n_fetch_required is 0 by protocol, not by finding.",
+      "how_to_close": "Add download rules that fetch each database at its stated version by versioned URL/DOI with a recorded checksum, so the pins live in the workflow rather than only in prose. This is also the check a Stage-2 audit would perform."
+    },
+    {
+      "type": 1,
+      "where": "Sample-to-accession mapping (Table S1) and derived sample metadata",
+      "missing": "All sample-level metadata for this study - the accession numbers for the newly generated Colombian assemblies and resequencing, and the accession numbers of the previously published Brazilian reads re-used from reference 31 - live only in supplementary Table S1, which is distributed as a supplement rather than as a machine-readable table in the repository or the BioProject. The main text gives only the BioProject umbrella accession PRJNA1110158, the sex counts (37 female, 26 male out of 63 passing QC from 68 sequenced) and the population labels (Colombia plus five Brazilian localities including the a-priori Sobral 1S/2S split), with no per-sample mapping from run accession to sex, locality or population label.",
+      "how_to_close": "Deposit Table S1 as a machine-readable sample sheet (run accession, sex, locality, population label, QC status) in the code repository so the population assignments used by pixy, ASTRAL, Dsuite and the GWAS can be reconstructed without parsing a PDF supplement."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 6)",
+      "missing": "Field collection of sandflies by mechanical aspiration outside Ricaurte, Cundinamarca (Nov 2021 and Oct 2022) with morphological species identification under taxonomic keys; pooled phenol-chloroform gDNA extraction from 9 females and 10 males; PacBio ultra-low-input HiFi library prep and Sequel IIe sequencing at the Icahn School of Medicine Genomics Core; Arima Hi-C library prep and NovaSeq sequencing on 25 females and 25 males; individual gDNA extraction with a modified Zymo Genomic DNA Clean and Concentrator protocol plus Qubit quantification for the 63 resequencing samples; ThruPLEX library prep and NovaSeq 6000 SP sequencing at UNC-Chapel Hill. These are physical steps, out of scope for computational reproduction; counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the reproducible computational entry point is the public raw-read deposition under BioProject PRJNA1110158."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: https://github.com/AdamStuckert/Lu_longipalpis (stated verbatim in Data availability: 'Code can be found at https://github.com/AdamStuckert/Lu_longipalpis ; and will be deposited in Zenodo upon acceptance.')",
+      "http_status": "200 OK, public, 106 commits; releases API returns [] and tags API returns [] (no release, no tag, no cited commit hash); README.md is two lines verbatim: '# _Lutzomyia longipalpis_ genomics and population genomics' / 'Code repository for our manuscript.'; top level = GWAS, Genome_annotation, Genome_assembly, Manuscript_figures, alignment, angsd, msmc2, pi, roh, trees, README.md; no environment.yml, Dockerfile, conda-lock, renv.lock, requirements.txt, Snakefile or nextflow config visible on the landing page",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of the repo landing page and of api.github.com/repos/AdamStuckert/Lu_longipalpis/{releases,tags}; raw.githubusercontent.com README fetched at HTTP 200. Landing page + README prose only, per Stage-1 protocol; no source files opened."
+    },
+    {
+      "artifact": "archival snapshot: Zenodo deposit of the analysis code",
+      "http_status": "none — stated in the paper only as a future intent ('will be deposited in Zenodo upon acceptance'); no DOI given",
+      "checked_at": "2026-07-28",
+      "network_context": "paper prose only; no Zenodo DOI appears anywhere in the full text"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1110158 (all raw sequence data and both genome assemblies)",
+      "http_status": "200 OK, public — title resolves to 'Lutzomyia longipalpis strain:Ricuarte, Colombia (ID 1110158)' with the matching project description",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of ncbi.nlm.nih.gov/bioproject/PRJNA1110158"
+    },
+    {
+      "artifact": "data accession: public Lu. longipalpis RNA-seq SRR535756-SRR535778 (annotation evidence for Braker3)",
+      "http_status": "200 OK on SRA query for SRR535756 (accession range stated verbatim in Methods: 'We downloaded samples with accession numbers SRR535756-SRR535778')",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of ncbi.nlm.nih.gov/sra/?term=SRR535756; the remaining runs in the range were not individually resolved"
+    },
+    {
+      "artifact": "data accession: previously published Brazilian whole-genome resequencing reads (reference 31), downloaded with the SRA toolkit",
+      "http_status": "stated-in-paper — no accessions in the main text; verbatim: 'Table S1 lists the accession numbers of the previously published reads used in this study'",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose; supplementary Table S1 not parsed at Stage 1"
+    },
+    {
+      "artifact": "reference resource: OrthoDB v11 (protein evidence for Braker3)",
+      "http_status": "stated-in-paper (version pinned in prose; no URL, accession or checksum given)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level version pin only"
+    },
+    {
+      "artifact": "reference resource: VectorBase release 67 (protein evidence for Braker3)",
+      "http_status": "stated-in-paper (version pinned in prose; no URL, accession or checksum given)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level version pin only"
+    },
+    {
+      "artifact": "reference resource: BUSCO diptera_odb10 lineage database (Augustus gene prediction and BUSCO gene-tree extraction)",
+      "http_status": "stated-in-paper (lineage/version named in prose; no URL or checksum, and no BUSCO software version)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level version pin only"
+    },
+    {
+      "artifact": "reference resource: DFAM database version 3.4 (repeat library construction)",
+      "http_status": "stated-in-paper (version pinned in prose; no URL or checksum given)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level version pin only"
+    },
+    {
+      "artifact": "reference resource: RepBase version 25.05 inside RepeatMasker 4.1.2-p1 (repeat library construction)",
+      "http_status": "stated-in-paper, license-gated — RepBase is a subscription resource (GIRI); version pinned in prose, no URL or checksum given",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level version pin with a proprietary-access flag"
+    },
+    {
+      "artifact": "derived resource: the curated dipteran + Lu. longipalpis repeat library used for soft-masking",
+      "http_status": "none — in-house derivative, not deposited, no URL, accession or checksum stated anywhere",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose only"
+    },
+    {
+      "artifact": "full text: bioRxiv JATS XML, https://www.biorxiv.org/content/early/2025/11/04/2025.04.08.647763.source.xml",
+      "http_status": "200 OK via curl, 219,590 bytes (WebFetch on the same URL returned HTTP 403); title-phrase verification passed",
+      "checked_at": "2026-07-28",
+      "network_context": "curl with a browser User-Agent into /tmp/stage1_10.1101_2025.04.08.647763/paper.xml; the fetched XML contains both 'Sex differentiation, divergence, and introgression' and 'Lutzomyia longipalpis', confirming no cross-assessor scratch collision"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "4ada8833c5ca26f20cb682219a925b03671d412017ef9c9799f664d1aeecd818",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

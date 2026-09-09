@@ -1,0 +1,617 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "5229b2312c5a38fdab8e8de4fa522cf625232f215b38898d7f6d839d4c2990e3",
+  "canonical_id": {
+    "value": "10.1101/2025.10.09.681516",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.09.681516v1",
+      "biorxiv:2025.10.09.681516v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Genome-wide mapping of telomeric chromatin interactions in six human cell lines (BJ, IMR-90, WI38, WI38-VA13, U2-OS, HeLa S3) by a new probe-capture assay (Telomere-C), plus Hi-C and reanalysed Micro-C. Computational target: the Telomere-C Snakemake pipeline (UMI extraction with UMI-tools 1.1.1, Cutadapt trimming, GATK4 4.2.2.0 adapter marking, BWA-MEM 0.7.17 alignment to CHM13v2, UMI deduplication, BEDtools 2.30.0 / SAMtools 1.13 filtering against T2T.excluderanges with telomere-region rescue, in-house GC/depth/input normalisation and RGT 1.0.0 peak calling), the Hi-C / Micro-C Snakemake pipeline (KMC 3.2.4 telomere-read filtering, BWA-MEM -5SP -T0, pairtools 1.1.2 parse/select/dedup/split, samtools sort, deepTools 3.5.4 bamCoverage), and the downstream analyses that produce the paper's claims: peak size / telomere-distance distributions, cross-cell-line UpSet intersections, RepeatMasker-family enrichment of Telomere-C peaks against a BEDtools-shuffled background (Fisher's exact test + FDR), Z-scored coverage heatmaps over ITS / TAR1 / D20S16 loci, metagene coverage profiles, and bivariate Ripley's K spatial statistics on 3D-FISH foci. Wet-lab work (cell culture, dual crosslinking, Telomere-C and Arima Hi-C library preparation and NovaSeq X sequencing, 3C PCR, Southern blotting, 3D-FISH hybridisation and image acquisition) is W and out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: cell culture of BJ, IMR-90, WI38, WI38-VA13, U2-OS and HeLa S3 (EMEM or McCoy's 5A + 10% FBS, ATCC subculturing procedures; STR authentication of BJ and IMR90)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: cell harvesting and dual crosslinking (1.5 mM EGS 30 min then 1% formaldehyde 10 min, 200 mM glycine quench, snap-frozen 3M-cell pellets)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: Telomere-C assay - lysis, Covaris E220 sonication, biotinylated CCCTAA PNA probe capture on streptavidin beads, AluI digestion, TruSeq UDI-UMI KAPA HyperPrep library, Illumina NovaSeq X sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: Hi-C library preparation (Arima High Coverage HiC Kit + Library Prep Kit v2, Covaris E220, AMPure size selection) and NovaSeq X 10B 151x151 sequencing at ~25x coverage",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: chromatin conformation capture (3C) with AluI digestion, T4 ligation, phenol-chloroform purification and PCR with tel1 / ITS18 / ITS19 primer pairs, agarose gel readout",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Wet-lab: Southern blotting of 3C PCR products (constant-field electrophoresis, in-gel denaturing hybridisation with 32P telomeric C-probe, PhosphorImager / Typhoon readout)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Wet-lab: 3D-FISH with pan-telomere PNA-Cy3 probe co-hybridised with ITS19 / D20S16 BAC oligo probes; image acquisition on Nikon Eclipse Ti-2 and Zeiss LSM 880",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Telomere-C pipeline: UMI barcode extraction with UMI-tools (v1.1.1) [Snakemake pipeline, github.com/barthel-lab/Telomere-C]",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Telomere-C pipeline: adapter trimming with Cutadapt (paper prose says v4.8; repository README Dependencies says 'cutadapt 3.4' - unresolved version conflict)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Telomere-C pipeline: Illumina adapter marking with GATK4 (v4.2.2.0)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Telomere-C pipeline: alignment of processed reads to human reference CHM13v2 with BWA-MEM (v0.7.17); reference fasta + BWA/GATK indexes supplied by the user via a hardcoded path in workflow/rules/common.smk",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Telomere-C pipeline: UMI grouping and deduplication with UMI-tools (v1.1.1), producing *.realn.mdup.MQ30.bam",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Telomere-C pipeline: read filtering with BEDtools (v2.30.0) and SAMtools (v1.13) - discard reads in T2T.excluderanges except those in chm13v2.0_telomere.bed (T2T consortium)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Telomere-C pipeline: normalisation of probe-captured reads for GC content, sequencing depth and input control with an in-house Python script (SES scaling via the Regulatory Genomics Toolbox); no thresholds or scaling constants given in prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Telomere-C pipeline: peak calling on normalised data with RGT (v1.0.0), binomial model filtered on p-value and a 'dynamic coverage threshold' (scripts/primary_peak_call.py; requires a user-built ~/rgtdata CHM13v2 GenomeData configuration)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Visualisation of normalised signal and called peaks with karyoploteR (v1.28.0) or IGV (no version stated); plotting code not present in either deposited pipeline",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Peak size distribution box plot with the R package ggplot2 (v3.5.2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Computation of the distance between Telomere-C peaks and the nearest telomere or centromere from T2T Consortium annotations, visualised as a density plot and as proportions in a pie chart; no tool, no version and no script named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Cross-cell-line peak intersection with the BEDtools merge function (v2.30.0), visualised as an UpSet plot with the R package UpSetR (v1.4.0)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Hi-C / Micro-C pipeline: retention of reads containing at least one 60-mer of (TTAGGG)10 in read 1 or read 2 with KMC (v3.2.4) [github.com/barthel-lab/micro-C_data_processing; Micro-C input is GEO GSM7661134, Hi-C input is this study's unaccessioned data]",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Hi-C / Micro-C pipeline: alignment of filtered reads to CHM13v2 with BWA-MEM (v0.7.17) using -5SP -T0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Hi-C / Micro-C pipeline: ligation-junction parsing with pairtools parse (v1.1.2), --walks-policy all, --add-columns mapq",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Hi-C / Micro-C pipeline: pairtools select with filter '(mapq1 >= 40) or (mapq2 >= 40)' to rescue telomere-containing pairs with one poorly mapped mate",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Hi-C / Micro-C pipeline: sorting and deduplication with pairtools dedup --output-unmapped (retains pairsam records for unmappable telomeric mates)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Hi-C / Micro-C pipeline: conversion of pairsam to BAM with pairtools split --output-sam followed by samtools sort (no samtools version stated for this pipeline; the micro-C README lists no versions at all)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Hi-C / Micro-C pipeline: conversion of sorted BAM to bigWig coverage tracks with bamCoverage from deepTools (v3.5.4)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Enrichment of Telomere-C peaks in RepeatMasker families (v4.1.2p1.2022Apr14 annotation, 5,590,282 repeats / 15,528 families): per-family overlap bases L vs a single BEDtools-shuffle background LB, log2(L/LB) enrichment, Fisher's exact test and FDR across all families; performed by unpublished 'in-house scripts'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Visualisation of repeat-family enrichment as a bubble plot across six cell lines and a volcano plot for BJ Telomere-C; no plotting tool, library or version named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Coverage of normalised Telomere-C reads within ITS, TAR1 and D20S16 repeat loci computed with the multiBigwigSummary function from deepTools (v3.5.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Density distribution of Telomere-C coverages visualised as a ridgeline plot with the R package ggridges (v0.5.6)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "Cross-cell-line comparison: log2 transformation of non-zero coverages, per-locus Z-scoring, heatmap with the R package pheatmap (v1.0.13), hierarchical clustering with six clusters defined by manually cutting the dendrogram with cutree",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "Genomic distribution of analysed repeat elements and their cluster group visualised with a PhenoGram Plot; no version, no invocation parameters and no script given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C26",
+      "label": "Proximal-region coverage analysis: matrix over 20,192 protein-coding genes, 388 ITS, 202 TAR1 and 329 D20S16 loci +/-3 kb built with computeMatrix and visualised with plotHeatmap, both from deepTools (v3.5.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "3D-FISH image analysis in Imaris (v10.2.0, Oxford Instruments): Gaussian filter 0.107 um, background subtraction filter width 61.8 um, >=30 nuclei per slide, co-localisation scored by manual examination; 3D rendering also in Imaris",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C28",
+      "label": "Spatial statistics on FISH foci: centroid-normalised coordinates, pooled bivariate Ripley's K-function with median observed curve and min/max envelope, complete-spatial-randomness test against a Poisson null, p-value and D statistic by Kolmogorov-Smirnov; in-house R script with the spatstat package (no version)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 23,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 28,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/28 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification); unexecuted; no environment closure is claimed anywhere, so no step could reach R-star even under stage-2 execution. n_exact_capture_unexecuted=0, n_fetch_required=0. Under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency (e.g. conda environment files that may exist inside the repositories but are not surfaced in the paper or README prose).",
+    "inference_inclusive_upper_bound": "RI ceiling on 23/28 computational steps (C1-C10, C12-C20, C22-C24, C26). These carry exact prose version pins - UMI-tools 1.1.1, GATK4 4.2.2.0, BWA-MEM 0.7.17, BEDtools 2.30.0, SAMtools 1.13, RGT 1.0.0, karyoploteR 1.28.0, ggplot2 3.5.2, UpSetR 1.4.0, KMC 3.2.4, pairtools 1.1.2, deepTools 3.5.4, ggridges 0.5.6, pheatmap 1.0.13, RepeatMasker 4.1.2p1.2022Apr14 - and two public Snakemake pipelines, but there is no lockfile, no container digest and no exported conda environment, so the version axis is capped at 1 (subtier exact_pins_partial). The remaining 5/28 steps cap at NI: C11 (telomere/centromere distance computation - no tool or version named), C21 (bubble and volcano plots - no library named), C25 (PhenoGram plot - no version), C27 (Imaris v10.2.0, proprietary GUI with manual co-localisation scoring, source images not deposited - proprietary ceiling), C28 (bivariate Ripley's K in an unpublished R script with an unversioned spatstat, foci coordinates not deposited). Two additional structural limits bear on the whole paper: (i) the raw sequencing reads generated in this study are not deposited under any INSDC accession and the Synapse project's Telomere-C BAM folder is empty, so every read-level step (C1-C8, C13-C19) is data=1; (ii) C20's background is a single un-seeded BEDtools shuffle, a stochastic step without a seed, which caps that step at RI as distributional-only even if everything else were closed.",
+    "coverage": "28 computational analysis steps assessed from the bioRxiv v1 full text (Material and Methods, Data Availability) plus the landing pages and README prose of the two deposited repositories. 7 wet-lab steps (cell culture, dual crosslinking, Telomere-C assay and sequencing, Arima Hi-C library preparation and sequencing, 3C, Southern blotting, 3D-FISH hybridisation and imaging) counted in W and out of computational-reproduction scope. Coverage = 35/35 (100%) of enumerated steps. Not separately enumerated: the general micro-C pipeline's contact-matrix and Circos rules (juicer_tools pre, cooler, circos), which are documented in the repository README but are not described in the paper's Methods prose as a step producing a figure in this manuscript.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 28 computational steps); Data Availability, Methods, and both repository READMEs",
+      "missing": "No environment lockfile, container image or digest, conda/mamba environment export, requirements.txt or renv.lock is claimed in the paper or in either README. The Telomere-C README's Dependencies section is a bulleted list of tool names with versions (Snakemake 8.14.0, cutadapt 3.4, gatk4 4.2.2.0, bwa 0.7.17, samtools 1.13, telseq 0.0.2, bedtools 2.30.0, deepTools 3.5.4, fastQC 0.12.0, umi_tools 1.1.1) plus unpinned 'numpy', 'scipy', 'RGT' and 'Python 3.11 (recommended)'; the recommended Snakemake profile sets 'use-conda: true' but no environment YAML is referenced. The micro-C README lists 'Required Conda Environments - micro-C ... telomereC.py3.1' by NAME only, with no exported specification and no versions for any of BWA, pairtools, SAMtools, pairix, cooler, deepTools, Circos, Juicer Tools, KMC or seqtk. This is exact_pins_partial: exact pins without interpreter/channel/platform closure, so version is capped at 1 for every step.",
+      "how_to_close": "Export and commit a conda-lock / pixi lockfile (or publish container image digests) for each Snakemake environment, declare the interpreter and platform, and cite them from Data Availability."
+    },
+    {
+      "type": 2,
+      "where": "Cutadapt version - Methods ('adapter trimming using Cutadapt (v4.8)') vs Telomere-C README Dependencies ('cutadapt 3.4')",
+      "missing": "The two authoritative sources disagree by a major version on the trimming tool. A reproducer cannot tell which version produced the published peaks.",
+      "how_to_close": "Reconcile the paper text and the README, and pin the version in the workflow environment specification rather than in prose."
+    },
+    {
+      "type": 12,
+      "where": "Downstream analysis and figure code - Data Availability states 'Code needed to replicate the analyses performed in this manuscript can be accessed at https://github.com/barthel-lab/Telomere-C and https://github.com/barthel-lab/micro-C_data_processing'",
+      "missing": "Both repositories are FASTQ-to-peaks / FASTQ-to-contact-matrix Snakemake pipelines. Their READMEs document outputs ending at deduplicated BAM, bigWig and merged peak BED. The Methods repeatedly attribute downstream analyses to 'our in-house scripts' or 'our in-house R script' - repeat-family enrichment with the shuffled background and Fisher/FDR testing (C20), the bubble and volcano plots (C21), the Z-score/pheatmap/cutree clustering (C24), the PhenoGram plot (C25), and the bivariate Ripley's K spatial analysis (C28) - and no separate deposit or DOI is given for them. The statistics and figures carrying the paper's central claims therefore have no located implementation at Stage-1 prose level.",
+      "how_to_close": "Deposit the analysis and figure scripts (or add them to one of the existing repositories under a documented directory), and name them explicitly in Data Availability."
+    },
+    {
+      "type": 1,
+      "where": "Data Availability - 'Project data has been deposited at https://www.synapse.org/Synapse:syn64463432'",
+      "missing": "No raw sequencing reads are deposited and no INSDC (SRA/ENA/GEO) accession is given for the Telomere-C or Hi-C data generated in this study. Anonymous listing of the Synapse project on 2026-07-27 returned: Supp_table1-3.xlsx, common_reference/, 'Telomere-C'/ {BAM (0 children), Norm_BigWig (6 files, one per cell line), peaks_BED (6 files)}, and 'Micro-C and HiC'/ {BAM, Filtered_BAM_n_BW, Norm_BigWig}. The Telomere-C BAM folder is empty, so neither FASTQ nor alignments exist for the assay the paper introduces; only the normalised bigWig and the merged peak BED are public. Every read-level step (C1-C8, C13-C19) is therefore data=1 - the deposited artefacts start downstream of the pipeline the authors published.",
+      "how_to_close": "Deposit the raw Telomere-C and Hi-C FASTQ under an INSDC accession (or populate the Synapse BAM folder) and cite the accession in Data Availability; state the access conditions of the Synapse project explicitly."
+    },
+    {
+      "type": 4,
+      "where": "Enrichment of Telomere-C peaks in repeat families (C20) - 'the Telomere-C peaks were shuffled once using the shuffle function from BEDtools'",
+      "missing": "The null distribution is a SINGLE randomisation with no random seed reported and no repetition count, yet log2(L/LB) enrichment, the Fisher p-value and the genome-wide FDR - the basis of the paper's repeat-hub claim - are computed against it. Re-running yields a different background. This caps the step at RI as distributional-only.",
+      "how_to_close": "Report the seed (and show it is consumed), or replace the single shuffle with a many-permutation background and report the empirical null."
+    },
+    {
+      "type": 5,
+      "where": "Both repositories: github.com/barthel-lab/Telomere-C (last pushed 2025-10-24, no releases) and github.com/barthel-lab/micro-C_data_processing (last pushed 2026-03-06, no releases)",
+      "missing": "Neither repository has a release tag, a Zenodo software DOI, or a commit hash cited from the paper, and both have been pushed to AFTER the 2025-10-09 preprint - the micro-C repository nearly five months after. The code a reader clones today is not demonstrably the code that produced the figures. Neither repository carries a licence.",
+      "how_to_close": "Tag a release corresponding to the manuscript, archive it to Zenodo for a DOI, cite the DOI or commit hash in Data Availability, and add a licence."
+    },
+    {
+      "type": 7,
+      "where": "Telomere-C repository configuration (README 'Configures', 'config/config.yaml', 'workflow/rules/common.smk', '~/rgtdata/data.config.user')",
+      "missing": "The documented configuration is institution-bound: the example config.yaml carries absolute FASTQ paths under /tgen_labs/barthel/fastq_DoNotTouch/..., the RGT genome configuration points at /tgen_labs/barthel/references/CHM13v2/, the reference fasta path is edited into common.smk line 7, and the example Snakemake profile hardcodes 'executor: slurm' with 'slurm_account: tgen-332000'. Peak calling additionally depends on a manually built ~/rgtdata/CHM13v2 GenomeData directory (annotation GTF and gene-region BED) that is not shipped.",
+      "how_to_close": "Move paths into configuration with documented defaults, ship a fetch rule or checksummed archive for the rgtdata CHM13v2 assets, and provide a non-SLURM execution profile."
+    },
+    {
+      "type": 13,
+      "where": "External reference resources: CHM13v2 fasta plus BWA/GATK indexes (C4, C14), T2T.excluderanges and chm13v2.0_telomere.bed (C6), RepeatMasker v4.1.2p1.2022Apr14 annotation (C20), CHM13v2 GTF / gene-region BED for RGT (C8)",
+      "missing": "All reference resources are obtained out of band. The workflow consumes a user-supplied local path; the paper pins the RepeatMasker annotation string in prose only and gives no URL, accession, release identifier or checksum for the CHM13v2 fasta, the T2T excluderanges BED or the telomere BED. Whether the workflow itself pins any of these (class A) or only reads local paths (class B) or fetches rolling resources (class C) cannot be decided from prose - class assignment requires Stage-2 code verification.",
+      "how_to_close": "Add download rules that fetch each reference from a versioned URL or accession with a recorded checksum, and record the exact source in the workflow rather than in prose."
+    },
+    {
+      "type": 11,
+      "where": "3D-FISH image analysis (C27) - 'Imaris software (v10.2.0, Oxford Instruments)'",
+      "missing": "Image processing, 3D rendering and co-localisation counting depend on a commercial GUI application, and co-localisation is scored 'by manual examination'. The version is pinned (license-gated), but the analysis is not scriptable from the description and the source microscopy images are not deposited, so the step is capped below RI.",
+      "how_to_close": "Deposit the raw image stacks and the Imaris session/parameter files, and provide an open-source (e.g. Fiji/CellProfiler) equivalent of the co-localisation scoring with an explicit, non-manual criterion."
+    },
+    {
+      "type": 2,
+      "where": "Steps C11, C21, C25, C28 and the IGV usage in C9",
+      "missing": "Tools named with no version anywhere in the paper or the repositories: IGV (C9), the telomere/centromere distance computation (C11 - no tool named at all), the bubble and volcano plotting library (C21), PhenoGram (C25), and the spatstat R package plus the R interpreter itself (C28). These are the direct cause of the four NI verdicts on the downstream/statistical layer.",
+      "how_to_close": "State exact versions for every named tool and library, including the R and Python interpreters, and prefer a machine-readable environment specification over prose."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/barthel-lab/Telomere-C (Data Availability: 'Code needed to replicate the analyses performed in this manuscript can be accessed at https://github.com/barthel-lab/Telomere-C'; Methods: 'Sequencing data were processed using our Telomere-C Snakemake pipeline, available on our GitHub')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated GitHub API + curl -L: description 'Telomere interaction analysis', default branch master, no licence, last pushed 2025-10-24T16:21:09Z, no releases; root contains .gitignore, README.md, Telomere-C_igv_snapshot.png/.svg, config/, dag.svg, data/, workflow/. README titled 'Telomere-C ver 3.0' with Installation, Quick Start (snakemake --configfile config/config.yaml --profile profile), Dependencies (pinned tool list, no lockfile), Configures and Output files sections."
+    },
+    {
+      "artifact": "code repo: github.com/barthel-lab/micro-C_data_processing (Data Availability and Methods: 'Both Hi-C and Micro-C data were processed using our Snakemake pipeline (https://github.com/barthel-lab/micro-C_data_processing), which is adapted from the Dovetail Genomics pipeline')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated GitHub API + curl -L: description 'A pipeline to process micro data and output hic, mcool, and bam files.', default branch master, no licence, last pushed 2026-03-06T17:28:34Z (about five months after the preprint), no releases; root contains Snakefile, README.md, config/, data/, scripts/, workflow/, fastqList.txt, snakemake-run.sh, snakemake-dry-run.sh, kmc_tmp/, temp/, dag.rule.svg, dag.rule.TeloC.svg. README documents two modes switched by commenting the 'include' line in the Snakefile, and lists required software and two conda environment NAMES with no versions."
+    },
+    {
+      "artifact": "data: Synapse project syn64463432 (Data Availability: 'Project data has been deposited at https://www.synapse.org/Synapse:syn64463432')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -L of the web page returned 200; anonymous Synapse REST GET /repo/v1/entity/syn64463432 returned {'name':'Telomere-C','id':'syn64463432', concreteType Project, createdOn 2024-12-26, modifiedOn 2024-12-30} and anonymous POST /repo/v1/entity/children listed: 'Micro-C and HiC' (folder), Supp_table1.xlsx, Supp_table2.xlsx, Supp_table3.xlsx, 'Telomere-C' (folder), 'common_reference' (folder). Telomere-C/ contains BAM (0 children), Norm_BigWig (6 files: BJP14/HeLa/IMR90/U2OS/WI38/WI38VA13-capture.realn.mdup.MQ30.run_signal.bw) and peaks_BED (6 matching *.run_peaks.merge.bed). 'Micro-C and HiC'/ contains BAM, Filtered_BAM_n_BW, Norm_BigWig. Metadata is anonymously readable; per-file download conditions were not tested."
+    },
+    {
+      "artifact": "data: GEO GSM7661134 (Methods: 'Micro-C data was obtained from the NCBI Gene Expression Omnibus (GEO) with accession number GSM7661134')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L of https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM7661134"
+    },
+    {
+      "artifact": "documentation: micro-c.readthedocs.io/en/latest/fastq_to_bam.html (Methods: pipeline 'adapted from the Dovetail Genomics pipeline')",
+      "http_status": "not fetched",
+      "checked_at": "2026-07-27",
+      "network_context": "third-party documentation reference, cited as the origin of the adapted workflow; not an artefact of this study and not liveness-checked. Note that the URL is a rolling '/en/latest/' path, not a versioned one."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "dbdcb1401fa7ac3195e284b1b9989e038e54d85e17eaf22f32c1653387838a1f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -5,20 +5,44 @@
   "description": "v0.2.6 extends v0.2.5 with required assessor_stack (machine-parseable assessor identity for submit) and optional report_content_hash (server-recomputed completed-report digest; omit until submit). All v0.2.5 semantics unchanged.",
   "type": "object",
   "required": [
-    "rubric_version", "metric_semantics_version", "rubric_hash", "canonical_id", "paper_type",
-    "assessor_id", "assessed_at", "funnel_stage",
-    "steps", "counts", "headline", "levers", "gaps", "liveness",
-    "human_signoff", "manifest", "assessor_stack"
+    "rubric_version",
+    "metric_semantics_version",
+    "rubric_hash",
+    "canonical_id",
+    "paper_type",
+    "assessor_id",
+    "assessed_at",
+    "funnel_stage",
+    "steps",
+    "counts",
+    "headline",
+    "levers",
+    "gaps",
+    "liveness",
+    "human_signoff",
+    "manifest",
+    "assessor_stack"
   ],
   "properties": {
-    "rubric_version": { "type": "string", "const": "0.2.5" },
+    "rubric_version": {
+      "type": "string",
+      "const": "0.2.5"
+    },
     "metric_semantics_version": {
-      "type": "string", "const": "0.2.5",
+      "type": "string",
+      "const": "0.2.5",
       "description": "Δ6 — static_readiness/env_capture_class semantics. Pooling MUST refuse to mix with v0.2.1 'strict'."
     },
-    "rubric_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "assessor_id": { "type": "string" },
-    "assessed_at": { "type": "string" },
+    "rubric_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "assessor_id": {
+      "type": "string"
+    },
+    "assessed_at": {
+      "type": "string"
+    },
     "report_content_hash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$",
@@ -26,129 +50,337 @@
     },
     "assessor_stack": {
       "type": "object",
-      "required": ["operator_id", "llm", "stage"],
+      "required": [
+        "operator_id",
+        "llm",
+        "stage"
+      ],
       "properties": {
-        "operator_id": { "type": "string" },
+        "operator_id": {
+          "type": "string"
+        },
         "stage": {
-          "enum": ["stage1-prose-only", "stage2-code-verified"]
+          "enum": [
+            "stage1-prose-only",
+            "stage2-code-verified"
+          ]
         },
         "llm": {
           "type": "object",
-          "required": ["provider", "model", "invoked_at"],
+          "required": [
+            "provider",
+            "model",
+            "invoked_at"
+          ],
           "properties": {
-            "provider": { "type": "string" },
-            "model": { "type": "string" },
-            "invoked_at": { "type": "string", "description": "ISO8601 timestamp of LLM invocation." }
+            "provider": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "invoked_at": {
+              "type": "string",
+              "description": "ISO8601 timestamp of LLM invocation."
+            }
           }
         }
       }
     },
     "canonical_id": {
       "type": "object",
-      "required": ["value", "kind"],
+      "required": [
+        "value",
+        "kind"
+      ],
       "properties": {
-        "value": { "type": "string" },
-        "kind": { "enum": ["doi", "pmid", "pdf_sha256", "repo_url"] },
-        "aliases": { "type": "array", "items": { "type": "string" } }
+        "value": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "doi",
+            "pmid",
+            "pdf_sha256",
+            "repo_url"
+          ]
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
-    "paper_type": { "enum": ["pure-computational", "mixed", "pure-wet-lab", "tool-methods", "hybrid"] },
-    "reproduction_target": { "type": "string" },
-    "step_source": { "enum": ["snakefile", "cwl", "nextflow", "wdl", "makefile", "prose-methods", "shared-canonical"] },
-    "granularity_note": { "type": "string" },
+    "paper_type": {
+      "enum": [
+        "pure-computational",
+        "mixed",
+        "pure-wet-lab",
+        "tool-methods",
+        "hybrid"
+      ]
+    },
+    "reproduction_target": {
+      "type": "string"
+    },
+    "step_source": {
+      "enum": [
+        "snakefile",
+        "cwl",
+        "nextflow",
+        "wdl",
+        "makefile",
+        "prose-methods",
+        "shared-canonical"
+      ]
+    },
+    "granularity_note": {
+      "type": "string"
+    },
     "funnel_stage": {
-      "enum": ["stage1-prose-only", "stage2-code-verified"]
+      "enum": [
+        "stage1-prose-only",
+        "stage2-code-verified"
+      ]
     },
     "steps": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["step_id", "layer", "axes", "verdict"],
+        "required": [
+          "step_id",
+          "layer",
+          "axes",
+          "verdict"
+        ],
         "properties": {
-          "step_id": { "type": "string" },
-          "label": { "type": "string" },
-          "layer": { "enum": ["C", "W"] },
+          "step_id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "code_rule_hint": {
+            "type": "string",
+            "description": "OPTIONAL. The name of the workflow rule that implements this step, exactly as it appears in the code (a Snakemake `rule`, a Nextflow `process`). Emit it when the step maps to one; omit it otherwise, and never guess. This is the machine-readable link Tier-2 uses to attach a per-step capture class. Without it Tier-2 must recover the rule name from `label` prose, which measured 7 links across 562 steps (2026-09-08). Write the identifier only -- not a path, not a sentence: `run_prioritisation`, not \"the prioritisation rule in workflow/rules/\"."
+          },
+          "layer": {
+            "enum": [
+              "C",
+              "W"
+            ]
+          },
           "axes": {
             "type": "object",
-            "required": ["data", "code", "version", "params"],
+            "required": [
+              "data",
+              "code",
+              "version",
+              "params"
+            ],
             "properties": {
-              "data": { "type": "integer", "minimum": 0, "maximum": 2 },
-              "code": { "type": "integer", "minimum": 0, "maximum": 2 },
-              "version": { "type": "integer", "minimum": 0, "maximum": 2 },
-              "params": { "type": "integer", "minimum": 0, "maximum": 2 }
+              "data": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "code": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              },
+              "params": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2
+              }
             }
           },
-          "verdict": { "enum": ["R", "RI", "NI", "X", "OOS"] },
+          "verdict": {
+            "enum": [
+              "R",
+              "RI",
+              "NI",
+              "X",
+              "OOS"
+            ]
+          },
           "env_capture_class": {
-            "enum": ["A_verified_in_code", "B_pin_prose_only", "C_mutable_latest", "n/a"]
+            "enum": [
+              "A_verified_in_code",
+              "B_pin_prose_only",
+              "C_mutable_latest",
+              "n/a"
+            ]
           },
           "version_subtier": {
-            "enum": ["release_snapshot", "exact_pins_partial", "floating"]
+            "enum": [
+              "release_snapshot",
+              "exact_pins_partial",
+              "floating"
+            ]
           },
           "subflags": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
     },
     "counts": {
       "type": "object",
-      "required": ["n_R", "n_RI", "n_NI", "n_X", "S", "W"],
+      "required": [
+        "n_R",
+        "n_RI",
+        "n_NI",
+        "n_X",
+        "S",
+        "W"
+      ],
       "properties": {
-        "n_R": { "type": "integer" },
-        "n_RI": { "type": "integer" },
-        "n_NI": { "type": "integer" },
-        "n_X": { "type": "integer" },
-        "S": { "type": "integer" },
-        "W": { "type": "integer" },
-        "n_fetch_required": { "type": "integer" },
-        "n_exact_capture_unexecuted": { "type": "integer" }
+        "n_R": {
+          "type": "integer"
+        },
+        "n_RI": {
+          "type": "integer"
+        },
+        "n_NI": {
+          "type": "integer"
+        },
+        "n_X": {
+          "type": "integer"
+        },
+        "S": {
+          "type": "integer"
+        },
+        "W": {
+          "type": "integer"
+        },
+        "n_fetch_required": {
+          "type": "integer"
+        },
+        "n_exact_capture_unexecuted": {
+          "type": "integer"
+        }
       }
     },
     "headline": {
       "type": "object",
-      "required": ["static_readiness", "inference_inclusive_upper_bound", "coverage"],
+      "required": [
+        "static_readiness",
+        "inference_inclusive_upper_bound",
+        "coverage"
+      ],
       "properties": {
-        "static_readiness": { "type": "string" },
-        "inference_inclusive_upper_bound": { "type": "string" },
-        "coverage": { "type": "string" },
-        "repro_index": { "type": ["object", "null"] }
+        "static_readiness": {
+          "type": "string"
+        },
+        "inference_inclusive_upper_bound": {
+          "type": "string"
+        },
+        "coverage": {
+          "type": "string"
+        },
+        "repro_index": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
       }
     },
     "levers": {
       "type": "object",
-      "required": ["software_env_lock", "in_code_db_pin_classA", "has_validated_env_capture"],
+      "required": [
+        "software_env_lock",
+        "in_code_db_pin_classA",
+        "has_validated_env_capture"
+      ],
       "properties": {
-        "software_env_lock": { "type": "boolean" },
-        "in_code_db_pin_classA": { "type": "boolean" },
-        "has_validated_env_capture": { "type": "boolean" },
-        "software_env_platform_coverage": { "type": "string" }
+        "software_env_lock": {
+          "type": "boolean"
+        },
+        "in_code_db_pin_classA": {
+          "type": "boolean"
+        },
+        "has_validated_env_capture": {
+          "type": "boolean"
+        },
+        "software_env_platform_coverage": {
+          "type": "string"
+        }
       }
     },
-    "gaps": { "type": "array" },
-    "liveness": { "type": "array" },
-    "assessable": { "type": "object" },
-    "contested_corrected": { "type": "array" },
-    "capture_claim": { "type": "string" },
-    "stage2_candidate": { "type": "boolean" },
-    "supersedes_metric_version": { "type": ["string", "null"] },
+    "gaps": {
+      "type": "array"
+    },
+    "liveness": {
+      "type": "array"
+    },
+    "assessable": {
+      "type": "object"
+    },
+    "contested_corrected": {
+      "type": "array"
+    },
+    "capture_claim": {
+      "type": "string"
+    },
+    "stage2_candidate": {
+      "type": "boolean"
+    },
+    "supersedes_metric_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "human_signoff": {
       "type": "object",
-      "required": ["signed", "reviewer_id"],
+      "required": [
+        "signed",
+        "reviewer_id"
+      ],
       "properties": {
-        "signed": { "type": "boolean" },
-        "reviewer_id": { "type": "string" },
-        "signed_at": { "type": "string" }
+        "signed": {
+          "type": "boolean"
+        },
+        "reviewer_id": {
+          "type": "string"
+        },
+        "signed_at": {
+          "type": "string"
+        }
       }
     },
     "manifest": {
       "type": "object",
-      "required": ["b1_manifest_hash"],
+      "required": [
+        "b1_manifest_hash"
+      ],
       "properties": {
-        "b1_manifest_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "chain_record": { "type": "string" },
-        "supersedes": { "type": ["string", "null"] }
+        "b1_manifest_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "chain_record": {
+          "type": "string"
+        },
+        "supersedes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     }
   }

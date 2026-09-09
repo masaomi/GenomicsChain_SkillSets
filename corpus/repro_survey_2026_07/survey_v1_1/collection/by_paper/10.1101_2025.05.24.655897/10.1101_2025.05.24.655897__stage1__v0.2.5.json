@@ -1,0 +1,492 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "88fb805ec40c4b6c8490f8a2a898ae26ed3fd3e7b72b2ddac2770c94835ea704",
+  "canonical_id": {
+    "value": "10.1101/2025.05.24.655897",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.24.655897v2",
+      "biorxiv:2025.05.24.655897v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The computational half of a clinical-isolate transcriptomics study of Plasmodium falciparum: (a) in-silico consolidation of an 886-gene mitochondria-associated gene list from four localization-prediction web tools (TargetP, Cello2GO, MitoFate, PFMpred) plus PlasmoDB annotation and literature curation; (b) microarray analysis of 22 individually hybridized custom Agilent 8x60K sense/antisense arrays - Agilent Feature Extraction, GeneSpring GX 75th-percentile-shift normalization, detection and probe-correlation filtering, and differential expression of CM vs UNC and HD vs UNC at |log2FC| >= 0.8; (c) validation by pooled strand-specific paired-end RNA-seq - quality/adapter trimming, HISAT2 alignment first to human GRCh38.p13 then of the unaligned remainder to P. falciparum 3D7 v64, featureCounts quantification run twice with reversed strandedness to capture antisense, DESeq2 size-factor normalization and fold change, StringTie v2.1.2 assembly compared to the v64 annotation with GFFcompare, and HMMSplicer antisense splice-junction detection; (d) DAVID v6.8 GO/KEGG functional enrichment against the custom 886-gene background. The wet-lab half (patient recruitment and blood processing, RNA labelling and array hybridization, directional library preparation and HiSeq X Ten sequencing) is out of scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse prose-level step list built from the 'Materials and Methods' section (subsections: Consolidating genes with potential mitochondrial localization; Blood sample processing; Microarray Hybridization; Microarray design; Microarray Data Analysis; Strand-specific RNA Sequencing; RNA Sequencing Data Analysis; Functional enrichment by Gene Ontology). One step per named tool invocation. The four localization predictors are kept as separate steps because the prose names each tool and reports a separate gene count per tool (TargetP 47, Cello2GO 463, MitoFate 187, PFMpred 401, PlasmoDB 398); their merge under the '>= 2 tools' consensus rule is scored as its own step. The two HISAT2 alignments are kept separate because they are sequential invocations against different references (human GRCh38.p13, then P. falciparum 3D7 v64) with a filtering step between them. Wet-lab bench work is collapsed into three W-steps. No workflow file, no scripts, and no repository exist for this paper, so no finer granularity is recoverable at Stage 1.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Patient recruitment and blood sample processing: venous blood from P. falciparum-infected adults at S.P. Medical College Bikaner, Histopaque density-gradient enrichment of infected erythrocytes, microscopy + RDT diagnosis, PCR confirmation of mono-infection, WHO-guideline clinical grouping into UNC (n=6), HD (n=12), CM (n=4)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Microarray wet-lab: RNA extraction and QC (Nanodrop ND-1000/2000, Qubit, Agilent TapeStation), Agilent Quick-Amp labeling kit p/n 5190-0442, oligo-dT/T7 reverse transcription at 40C, cRNA in-vitro transcription with Cy3-CTP, RNeasy cleanup (Qiagen 74106), fragmentation at 60C, hybridization on custom Agilent P. falciparum 8x60K array in SureHyb chambers 65C/16h (kit 5190-0404), washing (5188-5327), scanning on Agilent G2600D - performed at Genotypic Technology Pvt. Ltd., Bengaluru",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Strand-specific RNA-seq wet-lab: 500 ng pooled total RNA (one uncomplicated pool, one complicated pool, members marked with * in Table S1), NEBNext Ultra II Directional RNA Library Prep, JetSeq bead purification (Bioline BIO-68031), USER second-strand excision 37C/15 min, 11-cycle indexing PCR, Qubit quantification, paired-end 150-cycle sequencing on Illumina HiSeq X Ten - performed at Genotypic Technology Pvt. Ltd., Bangalore",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C1",
+      "label": "TargetP prediction of nuclear-encoded, mitochondria-targeted P. falciparum proteins from mitochondrial transit peptides (mTp) enriched in arginine/leucine/serine; reported as yielding 47 genes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "web-server",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Cello2GO subcellular-localization prediction using BLAST homology searching; reported as yielding 463 genes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "web-server",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params",
+        "unversioned-reference-db"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "MitoFate prediction of the mitochondrial proteome from pre-sequence motifs and classical targeting factors; reported as yielding 187 genes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "web-server",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "PFMpred prediction of Plasmodium mitochondrial proteins from amino-acid and dipeptide composition; reported as yielding 401 genes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "web-server",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Consolidation of the 886-gene mitochondria-associated list: PlasmoDB query for genes carrying a mitochondrial targeting domain (398 genes), union under the stated consensus rule 'predicted by at least two of the tools', plus manual literature screening of experimentally validated mitochondrial-proteome genes (refs 31-35); final list = 42 mitochondrial-genome-encoded + 18 apicoplast-encoded + 826 nuclear-encoded, of which 581 have published experimental evidence and 305 are prediction-only. Output deposited as Supplementary Sheet 1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-artifact",
+        "manual-curation-step",
+        "needs-supplement",
+        "unversioned-reference-db"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Agilent Feature Extraction software: raw image data extraction from the scanned 8x60K arrays, retaining features 'two-fold above background intensity'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-artifact",
+        "proprietary-software",
+        "no-tool-version"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Agilent GeneSpring GX microarray analysis of 22 individually hybridized samples: 75th-percentile-shift normalization; retain only probes detecting a transcript in >= 40% of samples per condition; drop probes showing uncorrelated expression for the same transcript (Pearson correlation coefficient cutoff >= 0.8); average fold expression per gene per group; differential expression CM vs UNC and HD vs UNC with up >= 0.8 and down <= -0.8 in log2 fold change (Figure 1 additionally applies p < 0.05, test unnamed)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-artifact",
+        "proprietary-software",
+        "no-tool-version",
+        "unnamed-statistical-test",
+        "no-multiple-testing-correction-stated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "RNA-seq read preprocessing: removal of low-quality bases (< Q30) and adapter sequences from the raw paired-end data. No tool is named for this step",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "tool-unnamed",
+        "no-tool-version"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "HISAT2 alignment of high-quality reads to the human reference genome Homo sapiens GRCh38.p13, in order to identify and subtract host-derived reads",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "HISAT2 alignment of the human-unaligned read remainder to the Plasmodium falciparum 3D7 reference genome v64",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "featureCounts read-abundance summarization over the aligned P. falciparum reads, run twice on the same dataset with the strand setting reversed (per Bao et al.) to recover antisense reads; confident antisense signal requires >= 20 antisense reads in at least one of the two sequencing pools",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "DESeq2 removal of library size/depth bias by size-factor calculation, then fold-change computation on normalized expression values with a differential-expression cutoff of log2 fold change +/- 0.8 between the complicated and uncomplicated pools (n=1 pool per group, so no DESeq2 dispersion-based test is possible or reported)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-replicates-pooled-design"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "StringTie (v2.1.2) transcript assembly for each gene locus, used because featureCounts summarizes NATs only at read level",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "GFFcompare comparison of the StringTie assembly against the existing P. falciparum genome annotation (v64) to summarize natural antisense transcripts at gene level",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "HMMSplicer identification of antisense splicing junctions, run with the fully stated flag set '-p 4 -j 10 -k 3000 -w 4 -e 2 -m 500 -n 700 -d True' as suggested for Plasmodium",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "no-code-artifact",
+        "no-tool-version"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "DAVID (DAVIDv6.8, http://david.ncifcrf.gov/) functional enrichment of the differentially expressed sense and antisense transcripts of the CM and HD cohorts, run separately per cohort, against a background list of the consolidated 886-gene mitochondrial list; GO terms split into BP/CC/MF plus KEGG pathways, significance at EASE score p < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "web-server",
+        "no-code-artifact",
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 16,
+    "n_X": 0,
+    "S": 16,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/16 (0%) for R-star and 0/16 (0%) for RI. Every one of the 16 computational steps holds code = 0, so no step can reach RI (which requires all four axes >= 1) even under the most generous inference-inclusive reading. The paper contains no code repository of any kind: a case-insensitive scan of the full JATS XML for github / gitlab / bitbucket / zenodo / figshare / software-heritage / 'code availability' / 'source code' / conda / docker / singularity / snakemake / nextflow returns zero hits. The only availability statement is for data. Three named analysis environments are moreover closed or hosted (Agilent Feature Extraction, Agilent GeneSpring GX, DAVID web server), which independently caps those steps at NI under the proprietary-software rule. Because no source artifact exists to inspect, Stage 2 has nothing to read and this paper cannot become R-star-eligible via Stage 2.",
+    "coverage": "16 computational steps assessed (S=16) plus 3 wet-lab steps recorded as OOS (W=3). Steps were derived from the eight Materials-and-Methods subsections of the v2 preprint; the Methods narrate the analysis at tool-invocation level but never at command level, and no workflow file, script, notebook, or configuration is deposited. Data availability was verified: microarray results are public in GEO (GSE272963, 'Public on Feb 25, 2026'), while the raw sequencing data is controlled-access at IBDC (INRP000336 / PRJEB90534), so RNA-seq steps score data = 1 and microarray/annotation steps score data = 2.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "All 16 computational steps (C1-C16)",
+      "missing": "No analysis code is deposited or linked. The paper has no Code Availability section, and the full text contains no GitHub / GitLab / Bitbucket / Zenodo / figshare / Software Heritage / OSF / Code Ocean URL. Every processing decision - the consensus merge of five prediction-tool outputs into the 886-gene list, the GeneSpring filtering chain, the double-run featureCounts antisense recovery, the DESeq2 normalization and fold-change computation, the StringTie/GFFcompare NAT gene-level summarization, the sense-antisense pair correlation analysis - exists only as prose. The 'Availability of data and materials' statement covers data only: 'All microarray results have been deposited in the Gene Expression Omnibus database (GSE272963). Raw sequencing data has been uploaded on IBDC database under controlled access with accession no. INRP000336 (Bioproject Accession: PRJEB90534) along with metadata. The INSDC sample accession IDs are ERS25049603 and ERS25049604 for complicated and uncomplicated sequencing experiments, respectively. All patient metadata are included in Supplementary Sheet1 (Table S1).'",
+      "how_to_close": "Deposit the analysis scripts (the RNA-seq shell/R pipeline, the featureCounts strand-reversal driver, the DESeq2 and correlation R code, and the gene-list consolidation script) in a public repository with an archived tagged release (e.g. a Zenodo DOI), and add a Code Availability statement pointing at it."
+    },
+    {
+      "type": 2,
+      "where": "Software environment of C1-C15 (all steps except DAVID)",
+      "missing": "Gap 2a - no version for almost every tool. StringTie (v2.1.2) and DAVID (v6.8) are the only two pinned tools in the entire Methods. TargetP, Cello2GO, MitoFate, PFMpred, Agilent Feature Extraction, Agilent GeneSpring GX, HISAT2, featureCounts, DESeq2, GFFcompare and HMMSplicer are all named without a version, and the read-trimming tool in C8 is not even named. There is no conda environment file, no lockfile, no renv.lock, no requirements file, no container image or digest, and no statement of R/Bioconductor version for the DESeq2 step. TargetP, Cello2GO, MitoFate and PFMpred are web services whose backing models and databases have changed since publication, so those four steps are unpinned in both software and reference data.",
+      "how_to_close": "Publish a resolvable environment specification (conda-lock or a container digest) covering the RNA-seq chain, state the exact version and access date of each web-based predictor, and record the R and Bioconductor versions used for DESeq2."
+    },
+    {
+      "type": 11,
+      "where": "C6, C7 (microarray branch) and C1-C4, C16 (hosted web tools)",
+      "missing": "The entire microarray analysis - which produces the paper's primary result, the CM vs UNC and HD vs UNC differential expression in Figures 1-3 - runs inside two closed commercial Agilent products (Feature Extraction and GeneSpring GX). No exported settings file, protocol export, or GeneSpring project is deposited, so the normalization, detection filtering, probe-correlation filtering and fold-change chain cannot be re-executed outside a licensed installation of an unstated version. Similarly, five of the annotation/enrichment steps are hosted web services (TargetP, Cello2GO, MitoFate, PFMpred, DAVID) with no local reimplementation.",
+      "how_to_close": "Provide an open-source equivalent path for the array analysis (e.g. limma on the deposited GEO raw feature-extraction files) alongside the GeneSpring workflow, and export the GeneSpring parameter set; download and archive the web-tool outputs used, with query date and tool version."
+    },
+    {
+      "type": 13,
+      "where": "C8-C15 (the entire RNA-seq validation branch)",
+      "missing": "The raw sequencing reads are not openly downloadable. They are lodged at the Indian Biological Data Centre under explicit controlled access (INRP000336; brokered to ENA as PRJEB90534 / ERP173537 with samples ERS25049603 and ERS25049604). The ENA project metadata record resolves (HTTP 200) but no FASTQ files are served through the ENA file-report endpoint, and the IBDC host did not respond to an unauthenticated request from this environment (connection failure, HTTP 000). Obtaining the reads therefore requires an access application rather than an accession-type public download, which caps the data axis at 1 for all eight RNA-seq steps.",
+      "how_to_close": "State the controlled-access application procedure, the responsible data access committee, and the expected turnaround in the availability statement, and - if patient consent permits - additionally deposit the parasite-mapped, host-depleted reads or the gene-level count matrices as an open supplement so the downstream analysis (C11-C15) becomes independently checkable."
+    },
+    {
+      "type": 5,
+      "where": "C7 microarray probe layout / custom array design",
+      "missing": "The custom sense-antisense Agilent 8x60K array design is described in prose (60-mer probes, roughly five probes per ORF per orientation, human cross-hybridization screening, probes inherited from the earlier 244K array) but the paper states no GPL platform accession and no probe-sequence-to-gene mapping file. Since the analysis filters probes by within-transcript Pearson correlation and then averages to gene level, the probe-to-gene map is a required intermediate artifact and it is not referenced from the paper.",
+      "how_to_close": "Cite the GEO platform (GPL) accession for the custom 60K design in the paper and deposit the probe-to-gene mapping table used for the correlation filter and gene-level averaging."
+    },
+    {
+      "type": 2,
+      "where": "Reference-resource releases across C1-C5, C9, C10, C14, C16",
+      "missing": "Gap 2b - reference resources are only partially pinned and inconsistently so. PlasmoDB is cited as v57 for the array design, as v64 for the RNA-seq alignment and annotation comparison, and as v65 for the Figure 3 product descriptions, while the PlasmoDB release used for the mitochondrial-targeting-domain query in C5 is not stated at all. The human reference is pinned (GRCh38.p13). The GO and KEGG database snapshots behind the DAVID v6.8 enrichment are not stated. No checksum or download date is given for any reference file.",
+      "how_to_close": "State one PlasmoDB release per analysis with the download date and file checksums, and record the GO/KEGG annotation snapshot date used by the enrichment run."
+    },
+    {
+      "type": 10,
+      "where": "W1-W3",
+      "missing": "Three wet-lab steps (patient recruitment and Histopaque enrichment; RNA labelling and array hybridization at Genotypic Technology; directional library preparation and HiSeq X Ten sequencing) are non-computational and are recorded as OOS. They are excluded from the S=16 denominator. Note that they are also the origin of a sample-availability constraint: the clinical isolates are finite and not redistributable, so the wet-lab layer is not repeatable by a third party even in principle.",
+      "how_to_close": "Not closable by the authors; recorded so that the denominator is auditable."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: NONE stated. Verbatim, the paper's only availability statement is 'Availability of data and materials: All microarray results have been deposited in the Gene Expression Omnibus database (GSE272963). Raw sequencing data has been uploaded on IBDC database under controlled access with accession no. INRP000336 (Bioproject Accession: PRJEB90534) along with metadata. The INSDC sample accession IDs are ERS25049603 and ERS25049604 for complicated and uncomplicated sequencing experiments, respectively. All patient metadata are included in Supplementary Sheet1 (Table S1).' There is no Code Availability section.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "case-insensitive scan of the fetched JATS XML (151,683 bytes, v2, posted 2025-11-15) for github/gitlab/bitbucket/zenodo/figshare/software-heritage/'code availab'/'source code'/dockerfile/conda/singularity/snakemake/nextflow returned no genuine hit (the single case-insensitive 'conda' match was the substring inside 'secondary'). Per protocol, no external web search for an unstated repository was performed."
+    },
+    {
+      "artifact": "data accession stated in paper: GEO GSE272963 (microarray results)",
+      "http_status": "200 OK - record resolves and is released; title 'Differential Expression of Mitochondrial Natural Antisense Transcripts in Clinical Samples of Plasmodium falciparum Across Multiple Disease Phenotypes', Status 'Public on Feb 25, 2026', Organism Plasmodium falciparum, Experiment type 'Expression profiling by array'",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser user-agent against https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE272963 . Note the GEO record title and summary mention a thrombocytopenia cohort that is not analysed in this preprint version, i.e. the deposit is broader than the paper."
+    },
+    {
+      "artifact": "data accession stated in paper: Bioproject PRJEB90534 (raw strand-specific RNA-seq), brokered by the Indian Biological Data Centre",
+      "http_status": "200 OK for the metadata record (ENA XML returns PROJECT PRJEB90534, secondary ERP173537, broker_name 'Indian Biological Data Centre', title 'Strand specific RNA sequencing of Plasmodium falciparum clinical isolates'); no FASTQ or submitted-file URLs are served - the ENA read_run file-report endpoint returned an HTML error page rather than a run table, consistent with the paper's 'under controlled access' declaration",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl against https://www.ebi.ac.uk/ena/browser/api/xml/PRJEB90534 and https://www.ebi.ac.uk/ena/portal/api/filereport?accession=PRJEB90534&result=read_run"
+    },
+    {
+      "artifact": "data accession stated in paper: IBDC INRP000336 (controlled access) and INSDC sample accessions ERS25049603 (complicated pool) / ERS25049604 (uncomplicated pool)",
+      "http_status": "000 (no response) for the IBDC host from this environment; no accession-specific IBDC landing URL is given in the paper",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser user-agent against https://ibdc.rcb.res.in/ , 25 s timeout, following redirects; the failure may be network-context specific (geo-restriction or transient outage) and is recorded as observed, not interpreted as link rot"
+    },
+    {
+      "artifact": "analysis web services named in Methods: TargetP, Cello2GO, MitoFate, PFMpred, PlasmoDB (www.plasmodb.org), DAVID v6.8 (http://david.ncifcrf.gov/)",
+      "http_status": "not checked (hosted services, not deposited artifacts; their liveness does not restore the missing code or version pins)",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "b96cad8f4371972ad2f9b92828d422ca66b2913e6f112115d438ed29714b7b1e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

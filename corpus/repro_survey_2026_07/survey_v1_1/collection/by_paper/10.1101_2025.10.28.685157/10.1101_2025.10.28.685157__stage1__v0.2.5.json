@@ -1,0 +1,875 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "b96e26e9bcba9c6704b2353a97952e5d8eba25ddef556030503c6034ad19b84c",
+  "canonical_id": {
+    "value": "10.1101/2025.10.28.685157",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.28.685157v1",
+      "biorxiv:2025.10.28.685157v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational half of a wet-lab-anchored single-cell multi-omics study (SMaHT consortium, donor NC0). Wet lab generates iPSC lines from four biopsy sites (fibroblast/urine/blood), PTA and standard/modified ResolveOme single-cell whole-genome+transcriptome amplification, Strand-seq libraries, and Illumina sequencing. The computational target is: (a) WGS pre-processing (BWA-MEM -> samtools -> GATK indel realignment -> GATK BQSR); (b) amplification QC via the SCELLECTOR pipeline; (c) Strand-seq processing with MosaiCatcher v2 / StrandPhaseR / strandtools for haplotype phasing and SV calling; (d) focal CNV / V(D)J detection with Manta + CNVpytor; (e) somatic SNV calling by three-caller consensus (Mutect2 INTERSECT GATK HaplotypeCaller+VQSR INTERSECT Strelka2) with AF>=0.30 cutoff; (f) mutational-signature decomposition with SigProfilerAssignment against COSMIC v3.4 plus cosine-similarity clustering; (g) RNA-seq alignment/quantification (STAR -> RSEM) with Seurat clustering and tximport/DESeq2 differential expression; (h) developmental lineage reconstruction from 51,111 somatic mutations (Sentieon TNhaplotyper2 + Strelka2 all-pairs -> CNVpytor allele-dropout masking -> All2 ADA -> binomial artefact filter -> gnomAD v2.1.1 filter -> distance-metric scaffolding -> MPBoot maximum parsimony). Reproduction target = Figs 1-5, Figs S1-S6 and Tables S1-S2. Cell derivation/reprogramming, nuclei extraction, FACS/FANS sorting, PTA and ResolveOme bench protocols, 4-loci PCR QC, library preparation and sequencing, and the Strand-seq bench assay are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation, derived from the bioRxiv v1 JATS full text (curl of the .source.xml, HTTP 200, 165,315 bytes; title phrase 'somatic mutations to cell identity and ancestry' verified present before scoring). The paper states NO code repository of any kind - no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears anywhere in the article, and the 'Data and code availability' statement says only 'All original code is provided in this paper's supplemental information'. The two supplemental tables that are described (Table S1 metadata/variants, Table S2 RNA yields/DE genes/GSEA) contain results, not code. There is therefore no repository landing page, no README prose and no workflow file to anchor granularity on; |S| is set entirely by named prose invocations. Strelka2 is counted twice (C13 single-cell-vs-bulk-blood somatic calling; C24 all-pairs entity-vs-entity calling in the lineage arm) because Methods describes them as two separate runs with different sample pairings. CNVpytor is likewise counted twice (C10 focal CNV at 10 kb bins for the TCR-locus analysis; C25 germline deletion/LOH + single_cell_allelic_dropout_2 at 5 kb bins for lineage masking). Custom, unnamed in-house analyses that are nevertheless distinct described invocations (three-caller intersection + AF cutoff, binomial artefact filter, gnomAD population filter, distance-metric tree scaffolding + likely-germline rescue query, manual expansion of the previously published tree) are each counted as one step. GSEA appears only in the Table S2 legend and never in Methods prose, so it is NOT counted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "WGS read alignment of paired-end FASTQ to GRCh38_noALT with BWA-MEM v0.7.17; read-group tags stated verbatim (ID/SM/PL:ILLUMINA/LB:lib1/PU:unit1), no other flags given, reference build named but not pinned to a URL/checksum",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "SAM->BAM conversion, coordinate sort and index with Samtools v1.9 (samtools view -b, samtools sort, samtools index); subcommands stated explicitly",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Local indel realignment with GATK v3.8 RealignerTargetCreator + IndelRealigner using known-indel resources (Mills and 1000G gold standard indels VCF, 1000G phase1 indels VCF); resource bundle release not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Base quality score recalibration with GATK v4.1.9.0 BaseRecalibrator + ApplyBQSR using known sites (dbSNP build 138, Mills and 1000G gold standard indels, 1000G phase1 indels); resource file versions/URLs not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Single-cell amplification QC with the SCELLECTOR pipeline (allelic balance at germline SNVs; pass criteria stated as VAF histogram SD <= 0.23 and allele-drop rate < 8%); no version, no citation, no URL for SCELLECTOR anywhere in the paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Strand-seq raw data processing with MosaiCatcher v2 (alignment to GRCh38, binning, multi-step read-count normalization, heterozygous SNV calling with freebayes); 'v2' is a product/major-version name, not an exact pin; no configuration/profile stated; freebayes unversioned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Chromosome-wide haplotype block (H1/H2) construction from Strand-seq directional reads with StrandPhaseR; no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "SV / aneuploidy / complex-rearrangement calling with the in-house python tool 'strandtools' (1 Mb bin merging, per-bin copy-number state prediction, W/C-ratio segmentation) followed by MANUAL inspection and classification of segments as germline vs mosaic; tool cited (ref 30) but not deposited or linked, no version, and the manual classification criteria are narrative only",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Somatic SV detection with Manta v1.6.0 in matched tumour-normal mode (single-cell genome as test, matched bulk blood DNA as control), stated as run with default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Focal copy-number analysis in T-cell receptor loci with CNVpytor v1.3.2 (bin size 10,000 bp, read-depth signal from BAM, B-allele frequency from bulk-blood heterozygous SNPs)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Per-site read counting for BAF computation with samtools mpileup on single-cell alignments at bulk-blood heterozygous SNP positions; no mpileup flags (base/mapping-quality thresholds, max depth) stated, samtools version not restated for this step",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Somatic SNV/indel calling with Mutect2 (GATK v4.1.9.0) in tumour-normal mode (single-cell BAM as --tumor, bulk blood WGS as normal) against GRCh38_noALT with gnomAD as --germline-resource and a --panel-of-normals, then gatk FilterMutectCalls with default contamination + read-orientation models; the gnomAD/dbSNP release used and the PoN composition are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Somatic SNV/indel calling with Strelka2 v2.9.10 in tumour-normal mode via configureStrelkaSomaticWorkflow.py (single cells as tumour, bulk blood as normal, GRCh38_noALT); PASS calls kept with no additional post-filtering",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Germline variant calling with GATK HaplotypeCaller in cohort mode plus VariantRecalibrator/ApplyVQSR against GRCh38_noALT, truth/training sets named (HapMap, Omni, Mills, 1000G), tranche sensitivities stated (99.5% SNV, 99.0% indel); GATK version not restated for this step and resource-bundle releases not given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Germline subtraction with the BSMN germlinefilter.py script (removes any variant present in the VQSR-filtered call set at the same position and allele); script named and rule fully described, but no URL, commit or version is given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Three-caller consensus intersection (Mutect2 INTERSECT Strelka2 INTERSECT GATK, matched on chrom/pos/ref/alt) and sSNV selection at allele fraction >= 0.30, with the cutoff justified by a Gaussian fit to the AF histogram; thresholds fully stated but the intersection/fitting code is not provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Trinucleotide motif counting and mutational-signature decomposition with SigProfilerAssignment against COSMIC database v3.4; COSMIC release pinned, SigProfilerAssignment version and run options (fitting mode, thresholds) not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "Pairwise cosine similarity of reconstructed 96-channel spectra with lsa::cosine, hierarchical clustering of the similarity matrix and heatmap rendering with ComplexHeatmap, plus post-hoc aggregation of SBS7 subtypes and an 'Unknown_etiology' bin; no versions for lsa/ComplexHeatmap, and the clustering distance/linkage method is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "RNA-seq alignment with STAR v2.7.3a in two-pass mode with default settings to human GRCh38 / GENCODE v34, producing coordinate-sorted BAM",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "Transcript/gene abundance quantification with RSEM v1.3.3 (rsem-calculate-expression --paired-end --bam) and merging of per-sample expected-count tables by gene identifier into a unified matrix per cohort; the 'external datasets' merged alongside the ResolveOme cohort are never named or accessioned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "Single-cell expression analysis in R v4.1.2 with Seurat v4.1: QC filter (< 200 detected genes excluded), log-normalization (scale.factor = 1e4), top 3,000 variable genes by 'vst', scaling, RunPCA and UMAP embedding; the number of PCs / neighbours / resolution used for UMAP and clustering is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Differential expression (nuclei vs cells) with tximport (type = 'rsem', tx2gene from Ensembl annotations) into DESeq2 (betaPrior = FALSE, condition design, Benjamini-Hochberg adjustment, baseMean > 1 filter) with volcano and baseMean plots; tximport/DESeq2 versions and the Ensembl annotation release used for tx2gene are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C23",
+      "label": "All-pairs somatic calling for lineage reconstruction with Sentieon TNhaplotyper2 (202308.01) in tumour-normal mode across every pair of entities, followed by Sentieon TNfilter; Sentieon is commercial licensed software, exactly pinned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "All-pairs somatic calling with Strelka2 v2.9.10 in tumour-normal mode between every pair of entities; PASS-tagged SNVs/indels intersected with the Sentieon TNfilter PASS set as the lineage candidate list",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C25",
+      "label": "Masking of large deletions/LOH and allele-dropout regions with CNVpytor: 10 kb-bin RD+BAF copy-number calling with NC0 bulk-blood germline SNPs imported, delta_BAF > 0.4 removal, and the single_cell_allelic_dropout_2 function at 5 kb bins to emit an excluded-region BED; CNVpytor version not restated in this section",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C26",
+      "label": "All-to-all pairwise mosaic/germline scoring with the All2 pipeline in allele-dropout-analysis (ADA) mode, retaining candidates with (mosaic score)^2 + (germline score)^2 > 0.75^2 and admitting dropout-region calls at VAF > 50%; All2 is a published tool (ref 17) but no version, commit or repository URL is given in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C27",
+      "label": "Removal of low-frequency amplification artefacts by combining alternate-allele and total-depth counts across all entities carrying a shared mutation and applying an exact binomial test against an expected 50% VAF, discarding p <= 0.05; thresholds stated, no code provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C28",
+      "label": "Population-frequency filtering against gnomAD v2.1.1 (retain gnomAD AF < 0.1% and gnomAD filter = 'PASS') plus removal of mutations present in all entities but one; database release pinned, filter script not provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C29",
+      "label": "Initial tree scaffolding from 51,109 shared mosaic candidates using Jaccard, Dice, Ochiai and Kulczynski2 distances, then iterative node-wise querying of the 524 likely-germline calls against each scaffold with out-branch threshold = 0 and in-branch threshold = 80% to rescue 2 mutations; metrics and thresholds fully stated, but the scaffolding/query implementation is custom and not provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C30",
+      "label": "Final developmental lineage reconstruction from the 51,111-mutation call set with MPBoot (maximum parsimony with bootstrap approximation); no MPBoot version, no command line, no bootstrap replicate count, no seed and no substitution/parsimony settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "Manual expansion of the previously published NC0 tree (Fasching et al. 2021) for comparison with the de novo reconstruction: gnomAD AF >= 0.1% sites removed, unfiltered all-to-all calls without allele-dropout mode used, cells assigned to early branches by genotyping early mutations, later branching resolved MANUALLY by number of shared calls; no code, no version, and the manual assignment rule is narrative only",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W1",
+      "label": "Skin-biopsy fibroblast isolation by explant and episomal (Epi5) reprogramming to iPSC lines from four sites (LA1, RA1, LT, RT); iPSC propagation in mTESR plus on Geltrex",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "Urine cell isolation (midstream clean catch), expansion and episomal reprogramming with ReproTeSR + Epi5 to urinary-tract iPSC lines",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "PBMC isolation on Histopaque 1077 and Sendai (CytoTune 2.0) reprogramming to blood-derived iPSC lines",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "Nuclei extraction from LT fibroblasts using the 10x Genomics CG000124 demonstrated protocol, with Luna-FL viability counting of the paired cell and nuclei aliquots",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "FACS single-cell/single-nucleus deposition for PTA (PI staining, 100 um nozzle, one event per well) from LT fibroblasts and PBMC lymphocytes/monocytes",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W6",
+      "label": "Standard ResolveOme FACS sorting on a SONY SH-800 (130 um nozzle, Calcein AM + PI dual stain, 3 ul cell buffer per well, cell-cycle singlet gating)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W7",
+      "label": "Modified ResolveOme FACS sorting into 2 ul cell buffer with cold-chain handling (pre-cooled platform, 4 C spins, 8 C thermomixer)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W8",
+      "label": "Primary Template-Directed Amplification (PTA) with BioSkryb ResolveDNA reagents, bead purification, Qubit HS dsDNA and TapeStation HS D5000 QC",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W9",
+      "label": "Standard BioSkryb ResolveOme v1 protocol (TAS-036.3): RT, OM2 nuclear lysis, scWGA 30 C 10 h, bead-based genome/transcriptome fraction split, 24-cycle on-bead cDNA amplification, Qubit/Bioanalyzer QC",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W10",
+      "label": "Modified ResolveOme protocol (2 ul collection buffer + 1 ul post-thaw addition, cold-chain RT, air-dried bead pellets) to capture intra-nuclear transcripts",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W11",
+      "label": "Multiplex 4-loci PCR amplification QC of each scWGA product (HotStarTaq, stated thermocycling programme, 1.5% agarose electrophoresis) as QC tier 1",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W12",
+      "label": "Library preparation and sequencing: KAPA HyperPlus PCR-free libraries for PTA (NovaSeq X Plus, 150 bp PE, ~30x target) and BioSkryb libraries for ResolveOme (19:1 DNA:cDNA pooling, NovaSeq 6000 S4, 2x150 bp)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W13",
+      "label": "Strand-seq bench assay: BrdU incorporation for one division, crosslinking, bulk MNase digestion, Hoechst/BrdU-quench-based single-nucleus sorting, Biomek i7 library construction with iTru dual indexing, UV removal of BrdU strands, NextSeq500 75 bp PE sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 23,
+    "n_NI": 8,
+    "n_X": 0,
+    "S": 31,
+    "W": 13,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/31 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "23/31 (74%) readiness upper bound (n_R-star + n_RI) / |S| - and this upper bound is unreachable in practice because it is an artefact of the Stage-1 prose read, not of any published artifact. Two paper-level facts cap the whole study. (i) NO code repository exists: the 'Data and code availability' statement says only 'All original code is provided in this paper's supplemental information', and the described supplemental items (Table S1 metadata/variants, Table S2 RNA yields/DE genes/GSEA) are results tables, not code. Every RI step therefore reaches RI only through 'reconstructable from prose' (code=1), never through a published script. (ii) NO environment capture of any kind is claimed - no lockfile, no container, no conda/renv environment, no session_info - so version is capped at 1 for every step and capture_claim is exact_pins_partial. The 8 NI steps are driven by two distinct zeros: unpublished/unversioned in-house software (C5 SCELLECTOR - no version, no citation, no URL; C8 strandtools - in-house, cited but not deposited; C15 BSMN germlinefilter.py - named script, no version or URL) and custom analysis code that exists only as narrative (C16 three-caller intersection + AF>=0.30, C27 binomial artefact filter, C28 gnomAD filter, C29 distance-metric scaffolding + likely-germline rescue query, C31 manual tree expansion). The lineage-reconstruction arm - the paper's principal novel result (51,111 mutations, Fig. 4G) - is exactly where the custom, unpublished code is concentrated, so the headline result is the least reproducible part of the study. Note that C30 (MPBoot) has no stated seed or bootstrap replicate count, giving it a distributional-only ceiling even if code appeared. A Stage-2 code check cannot raise any step above RI while no repository and no environment capture exist.",
+    "coverage": "31 computational steps assessed from the bioRxiv v1 JATS full-text Methods prose; 13 wet-lab steps (iPSC derivation from three tissue sources, nuclei extraction, three FACS/FANS sorting protocols, PTA amplification, standard and modified ResolveOme bench protocols, 4-loci PCR QC, library prep + Illumina sequencing, Strand-seq bench assay) counted in W but out of computational-reproduction scope. Computational coverage = 31/44 (70%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "'Data and code availability' section (Resource Availability)",
+      "missing": "No analysis code is deposited or linked anywhere in the paper. Verbatim: 'All original code is provided in this paper's supplemental information. Any additional information required to reanalyze the data reported in this paper will be available from the lead contact upon request.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears anywhere in the article (full-text string search over the JATS XML found zero hits). The only supplemental items described are Table S1 (sample metadata, SCELLECTOR QC results, sequencing metrics, mutation counts) and Table S2 (RNA yields, DE gene list, GSEA), i.e. results, not code. The alignment/BQSR driver scripts, the three-caller consensus code, the All2 driver, the lineage-scaffolding and rescue-query implementation, and all figure code are unavailable.",
+      "how_to_close": "Deposit the WGS pre-processing, variant-consensus, lineage-reconstruction and figure code in a public repository with an archived (Zenodo DOI or Software Heritage) snapshot, and cite it in a Code availability statement rather than pointing to 'supplemental information'."
+    },
+    {
+      "type": 1,
+      "where": "'Data and code availability' - this study's own sequencing data (PTA, ResolveOme, iPSC WGS, Strand-seq, bulk blood)",
+      "missing": "No accession number exists at assessment time. Verbatim: 'De-identified human genomic sequence data will be deposited at dbGaP (accession number to be communicated) and will be made available under controlled access as of the date of publication. ... In addition, processed datasets derived from these data will be available at dbGAP as of the date of publication.' The repository (dbGaP), the consortium data portal (data.smaht.org, HTTP 200) and the controlled-access rationale/DAC path are documented, but the identifier is missing, so no reproducer can retrieve any input. There is also no sample-to-file mapping for the 48 scWGA samples / 39 QC-pass samples, and the 'external datasets' merged into the RNA-seq count matrices (C20/C21) are never named or accessioned at all.",
+      "how_to_close": "Publish the dbGaP phs accession (and the corresponding data.smaht.org identifiers) together with a sample table mapping every FASTQ/BAM to donor, biopsy site, amplification method (PTA / standard ResolveOme / modified ResolveOme) and cell vs nucleus; name and accession the external RNA-seq datasets used for the integrated UMAP."
+    },
+    {
+      "type": 7,
+      "where": "Whole computational environment",
+      "missing": "No environment lockfile, container image or digest, conda/mamba environment YAML, renv.lock or session_info is claimed anywhere. Exact prose pins exist for about half the tools (BWA-MEM 0.7.17, Samtools 1.9, GATK 3.8 and 4.1.9.0, Manta 1.6.0, CNVpytor 1.3.2, Strelka2 2.9.10, Sentieon TNhaplotyper2 202308.01, STAR 2.7.3a, RSEM 1.3.3, R 4.1.2, Seurat 4.1) but no interpreter set, no channel/index, no platform declaration and no coverage of the R/Bioconductor stack - so there is no environment closure. capture_claim = exact_pins_partial and version is capped at 1 for every step.",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or a container digest pinning the aligners, GATK, Sentieon, Strelka2, CNVpytor, Manta, STAR/RSEM and the full R 4.1.2 + Bioconductor stack (Seurat, DESeq2, tximport, ComplexHeatmap, lsa), together with the declared platform."
+    },
+    {
+      "type": 9,
+      "where": "C5 (SCELLECTOR), C8 (strandtools), C15 (BSMN germlinefilter.py)",
+      "missing": "Three named pieces of software are load-bearing but not public from this paper. SCELLECTOR - the entire QC tier that selects 39/48 samples for all downstream analysis - has no version, no citation, no URL anywhere in the text or figure legends. strandtools is described as 'the in-house data postprocessing and visualisation python-based tool' with a citation (ref 30) but no repository, version or availability statement, and its SV calls are finalised by MANUAL inspection whose classification criteria are narrative only. germlinefilter.py is named as a BSMN script with no version, commit or URL.",
+      "how_to_close": "Publish SCELLECTOR and strandtools (or cite an existing public repository with an exact version/commit), state the manual SV classification criteria as explicit rules, and pin the BSMN germlinefilter.py to a repository + commit."
+    },
+    {
+      "type": 5,
+      "where": "C16, C27, C28, C29, C31 - the somatic-consensus and lineage-reconstruction custom analyses",
+      "missing": "The steps that produce the paper's headline result (51,111 somatic mutations and the NC0 developmental lineage tree, Fig. 4G / S5-S6) are implemented in custom code that is not provided: the three-caller intersection and AF>=0.30 selection with its Gaussian AF fit, the combined-VAF exact binomial artefact filter, the gnomAD population filter, the Jaccard/Dice/Ochiai/Kulczynski2 scaffolding with the iterative likely-germline rescue query (out-branch = 0, in-branch = 80%), and the manual expansion of the Fasching et al. tree. Thresholds are stated numerically but the implementations, tie-breaking and iteration order are not, and the reported cascade (128,318 -> 52,175 -> 51,102 -> 51,111) cannot be checked.",
+      "how_to_close": "Release the filtering and tree-scaffolding scripts with the intermediate call sets at each of the four reported cascade stages, so the counts can be regenerated."
+    },
+    {
+      "type": "2a",
+      "where": "C5, C7, C8, C15, C16, C17, C18, C22, C26, C27, C29, C30, C31",
+      "missing": "No version identifier is given for SCELLECTOR, StrandPhaseR, strandtools, BSMN germlinefilter.py, SigProfilerAssignment, lsa, ComplexHeatmap, tximport, DESeq2, All2, freebayes or MPBoot. MosaiCatcher is given only as 'v2', a product/major-version name rather than an exact release. CNVpytor and GATK versions are stated once and then not restated for their later invocations (C14, C25), leaving it implicit that the same build was used.",
+      "how_to_close": "State an exact release or commit for every tool at every invocation, including the R/Bioconductor package versions and the MosaiCatcher release tag."
+    },
+    {
+      "type": 13,
+      "where": "C1/C3/C4/C12/C14 (reference genome and known-site resources), C17 (COSMIC), C19 (GENCODE), C28 (gnomAD)",
+      "missing": "External reference resources are consumed with mixed and mostly prose-only pinning. GRCh38_noALT is named without a source URL, release or checksum. The GATK known-site bundle (Mills and 1000G gold standard indels, 1000G phase1 indels, dbSNP build 138 for BQSR; HapMap, Omni, Mills, 1000G for VQSR) has no bundle release. Mutect2's --germline-resource gnomAD and its panel-of-normals are named with no release and no composition. Only COSMIC v3.4, GENCODE v34 and gnomAD v2.1.1 (in C28) carry explicit releases, and all of these are prose pins with no download rule. Because no workflow code exists, none of these can be classified A/B/C - env_capture_class stays 'n/a' at Stage 1.",
+      "how_to_close": "Publish a download/setup rule that fetches each reference and known-site resource by versioned URL or checksum, and state the gnomAD release and PoN composition used by Mutect2."
+    },
+    {
+      "type": 4,
+      "where": "C30 (MPBoot maximum-parsimony lineage reconstruction)",
+      "missing": "MPBoot performs bootstrap approximation, but no random seed, no bootstrap replicate count and no command line are given, so the branch supports and the resolution of the two 'ambiguous branches' cannot be reproduced exactly. Distributional (topology-level) agreement is the most a reproducer could target. The same applies to the Seurat UMAP embedding (C21), where no seed and no PC/neighbour settings are stated.",
+      "how_to_close": "Record the MPBoot command line including seed and replicate count, and the Seurat RunPCA/RunUMAP dimensions plus set.seed value."
+    },
+    {
+      "type": 11,
+      "where": "C23 (Sentieon TNhaplotyper2 202308.01 + TNfilter)",
+      "missing": "Sentieon is commercial licensed software. It is exactly version-pinned (202308.01), which keeps the step at version=1 (license-gated) rather than 0, but a reproducer without a Sentieon licence cannot execute the all-pairs somatic calling that seeds the entire lineage reconstruction. The paper does not state whether an open-source equivalent (e.g. Mutect2) produces the same candidate set.",
+      "how_to_close": "Provide the Sentieon TNhaplotyper2/TNfilter output VCFs as a deposited intermediate, or document an open-source equivalent path with a concordance comparison."
+    },
+    {
+      "type": 1,
+      "where": "C8 (strandtools SV classification) and C31 (manual tree expansion)",
+      "missing": "Two steps end in a human judgement that is described only narratively: 'Manual inspection of segments was done to identify and classify both germline and mosaic SVs' (C8) and 'Reconstruction of later branching was conducted manually based on the number of shared calls' (C31). No decision rules, thresholds or reviewer-agreement procedure are given, so these steps are not mechanically reproducible even with the data and code in hand.",
+      "how_to_close": "Publish the manual curation decisions as an explicit call table with the criteria applied per call, or replace the manual step with a rule-based implementation."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 13)",
+      "missing": "iPSC derivation from fibroblasts/urine/blood, nuclei extraction, three FACS/FANS sorting protocols, PTA amplification, the standard and modified BioSkryb ResolveOme bench protocols, 4-loci PCR QC, library preparation and Illumina sequencing, and the Strand-seq bench assay are physical steps, out of scope for computational reproduction; counted in W, not verdicted. Note that the modified ResolveOme protocol - one of the paper's methodological contributions - is a wet-lab deliverable and its reproduction is a wet-lab, not computational, question.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the computational entry point would be the (pending) dbGaP deposition of the resulting FASTQ/BAM files."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository (any host)",
+      "http_status": "none - no repository URL is stated anywhere in the paper",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text JATS XML read in full (curl of https://www.biorxiv.org/content/early/2025/10/29/2025.10.28.685157.source.xml, HTTP 200, 165,315 bytes; title phrase verified present). String search for github/gitlab/bitbucket/zenodo/softwareheritage returned zero hits across Methods, Resource Availability, Author Contributions, figure legends and the reference list. No web search performed - absence is the finding. Verbatim code statement: 'All original code is provided in this paper's supplemental information.'"
+    },
+    {
+      "artifact": "data accession: this study's own genomic sequence data (PTA, ResolveOme, iPSC WGS, Strand-seq, bulk blood NC0)",
+      "http_status": "none - stated in paper as dbGaP deposition with 'accession number to be communicated'",
+      "checked_at": "2026-07-28",
+      "network_context": "Resource Availability, verbatim: 'De-identified human genomic sequence data will be deposited at dbGaP (accession number to be communicated) and will be made available under controlled access as of the date of publication. For reasons of subjects' privacy, as specified in our consent form, we only allow for controlled access to genomic sequence data. In addition, processed datasets derived from these data will be available at dbGAP as of the date of publication.' Nothing to resolve - no phs identifier given."
+    },
+    {
+      "artifact": "consortium portal: SMaHT Network site (https://smaht.org)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, final URL https://smaht.org/. Named in the availability statement as the general data-sharing information page; carries no per-dataset identifier for this paper."
+    },
+    {
+      "artifact": "consortium portal: SMaHT data portal (https://data.smaht.org)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, final URL https://data.smaht.org/. Named in the availability statement; the portal root resolves but the paper gives no dataset/file identifier that would let a reproducer locate this study's submissions."
+    },
+    {
+      "artifact": "data accession: 'external datasets' merged with the ResolveOme RNA-seq count matrices (C20, C21)",
+      "http_status": "none - datasets are referred to only as 'external datasets', never named or accessioned",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose, verbatim: 'For each cohort (ResolveOme and external datasets), we merged individual RSEM count tables by gene identifier into a unified count matrix.' The integrated UMAP (Fig. 2E) referring to keratinocytes and melanocytes implies public reference transcriptomes, but no accession is given."
+    },
+    {
+      "artifact": "reference resource: GRCh38_noALT human reference (C1, C12, C13, C14) and GRCh38 for MosaiCatcher (C6)",
+      "http_status": "stated-in-paper (build named; no URL, release identifier or checksum given)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as a prose-level build name only"
+    },
+    {
+      "artifact": "reference resource: GATK known-site bundle (Mills and 1000G gold standard indels, 1000G phase1 indels, dbSNP build 138; HapMap/Omni/Mills/1000G truth-training sets for VQSR)",
+      "http_status": "stated-in-paper (files named, dbSNP pinned to build 138; no bundle release, URL or checksum)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; prose-level naming only"
+    },
+    {
+      "artifact": "reference resource: gnomAD (Mutect2 --germline-resource, C12) and gnomAD v2.1.1 (population filter, C28)",
+      "http_status": "stated-in-paper (unversioned at C12; v2.1.1 pinned at C28; no URL or checksum in either case)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; prose-level pin only. The Mutect2 panel-of-normals is mentioned but its composition is never described."
+    },
+    {
+      "artifact": "reference resource: COSMIC mutational-signature database v3.4 (C17)",
+      "http_status": "stated-in-paper (release pinned; no URL or checksum)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; prose-level pin only"
+    },
+    {
+      "artifact": "reference resource: GENCODE v34 annotation on GRCh38 for STAR/RSEM (C19, C20)",
+      "http_status": "stated-in-paper (release pinned; no URL or checksum)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; prose-level pin only. The Ensembl annotation used for the tximport tx2gene mapping (C22) is named without a release."
+    },
+    {
+      "artifact": "commercial software: Sentieon TNhaplotyper2 / TNfilter 202308.01 (C23)",
+      "http_status": "stated-in-paper (exact version pinned; commercial licence required, no distribution URL given)",
+      "checked_at": "2026-07-28",
+      "network_context": "not independently fetched; recorded as license-gated per rubric Step 4"
+    },
+    {
+      "artifact": "software: SCELLECTOR amplification-QC pipeline (C5)",
+      "http_status": "none - no version, no citation and no URL anywhere in the paper",
+      "checked_at": "2026-07-28",
+      "network_context": "named three times (Methods QC prose, Fig. 3A legend, Fig. S2 legend and Table S1 T2) with no availability information; no web search performed - absence is the finding"
+    },
+    {
+      "artifact": "software: strandtools in-house SV postprocessing tool (C8)",
+      "http_status": "none - cited as ref 30 (Cosenza et al.) but no repository, version or availability statement",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose, verbatim: 'SV calling was done using the in-house data postprocessing and visualisation python-based tool strandtools'"
+    },
+    {
+      "artifact": "software: BSMN germlinefilter.py (C15)",
+      "http_status": "none - script named, no URL, commit or version",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose, verbatim: 'Germline filtering using the BSMN germlinefilter.py script to remove any variant present in the VQSR-filtered calls at the same genomic position and allele'"
+    },
+    {
+      "artifact": "wet-lab protocol reference: 10x Genomics nuclei isolation CG000124 Rev F PDF (W4)",
+      "http_status": "stated-in-paper (full CDN URL given in Methods; not fetched - wet-lab step, OOS)",
+      "checked_at": "2026-07-28",
+      "network_context": "recorded for completeness; the only external URL in the Methods besides the two SMaHT portals"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "de605fc77ea8c7d900c2132ae61ef870a33623b8ea0b3f77adf740bf81c0a7e4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,766 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "59cfeb11e7d09f74ddec317eeedbae20a408aaad7aaf767b387686b033026e14",
+  "canonical_id": {
+    "value": "10.1101/2025.10.31.685756",
+    "kind": "doi",
+    "aliases": [
+      "biorxiv;2025.10.31.685756v1",
+      "https://www.biorxiv.org/content/10.1101/2025.10.31.685756v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The de novo PacBio HiFi genome assembly of Melo melo (2.29 Gb, N50 18.6 Mb, BUSCO 92.4% metazoa_odb10), its repeat/gene annotation, and the downstream comparative-genomic claims: the early-branching phylogenomic placement of Volutidae within Neogastropoda (IQ-TREE2 supermatrix tree, Figure 4), the CAFE5 gene-family expansion/contraction counts (2443 expansions / 219 contractions on the M. melo lineage, Figure 5), and the reported expansions of metallopeptidase, conotoxin-like, ion-channel, CYP450, ABC-transporter, C1q and LRR families plus the absence of nacre-related genes.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse prose-derived step list: one step per named tool / analysis invocation in MATERIALS AND METHODS, plus CAFE5 which is named only in RESULTS (no Methods subsection). Params scoring policy applied uniformly: 2 = all thresholds/flags explicitly given; 1 = 'default parameters' stated, or partial flags given, or a single domain-standard default invocation that is reconstructable by inference; 0 = invocation underdetermined (tool alternatives unresolved, procedure not described, or a critical input such as the ultrametric input tree for CAFE5 never specified). Version axis is capped at 1 for every step by the Stage-1 protocol (exact prose pins without environment closure = 1); tools with no version token at all score 0. Wet-lab steps (W) are OOS and carry no verdict weight.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Raw PacBio HiFi read QC - FastQC v0.11.9 on raw HiFi reads",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C2",
+      "label": "De novo genome assembly - Hifiasm v0.19.9-r616, 'default parameters'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C3",
+      "label": "Reference-guided scaffolding/correction/merging - RagTag v2.1.0 against Stramonita haemastoma GCA_030674155.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C4",
+      "label": "Assembly summary + SnailPlot - BlobToolKit v4.4.2",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C5",
+      "label": "Mitochondrial genome assembly - MitoHiFi (no version, no reference/params stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Mitogenome annotation - MITOS2 (no version, no genetic-code/reference setting stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Circular mitogenome visualisation - Proksee web server (hosted service, no version/access date)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Iso-Seq read processing to high-quality isoforms - PacBio Iso-Seq v4.0.0 pipeline, 'default parameters'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C9",
+      "label": "Genome completeness - BUSCO v5.7.1, metazoa_odb10 lineage set (odb10 release/date not pinned)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "Assembly statistics (N50/L50/length/GC) - QUAST v5.3.0",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C11",
+      "label": "Homology-based repeat masking - RepeatMasker v4.1.7-p1 with Repbase libraries (Repbase release not pinned; subscription-gated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "De novo repeat discovery/modeling - RepeatModeler v2.0.6 (no flags stated; -LTRStruct status unknown)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Structural gene prediction - BRAKER2 v2.1.6 with GeneMark-ETP + AUGUSTUS (component versions and training config unstated; GeneMark is license-key gated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Iso-Seq transcript alignment to repeat-masked assembly - Minimap2 v2.17, -ax splice",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C15",
+      "label": "Protein redundancy clustering + length filter - CD-HIT v4.8.1, 95% identity, sequences <150 aa excluded",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C16",
+      "label": "Domain/functional annotation - InterProScan v5.59-91.0 (Pfam/SMART/PANTHER member-DB releases not stated), e-value 1e-5",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Homology annotation - BLASTp (BLAST+ v2.13.0) vs Swiss-Prot UniProtKB 2023_03 release, e-value 1e-5",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "KEGG pathway assignment via KAAS web server (no KAAS/KEGG release, no BBH/SBH method or gene-set choice stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "license-gated",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Conotoxin candidate search - tblastn of literature-derived conotoxin references + Pfam PF02950 against the M. melo genome (query set not deposited as an identified artifact; BLAST version not restated for this step)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Conotoxin candidate filtering - HMMER v3.3, e-value threshold 1e-5",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C21",
+      "label": "Conotoxin validation - HHpred + cross-check against ConoServer (both hosted resources; no version, no DB release, no thresholds, 'high-confidence matches' criterion undefined)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Public transcriptome read QC/adapter trimming - 'standard protocols (e.g., Trimmomatic or fastp)'; the tool actually used is not resolved",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "De novo transcriptome assembly of transcriptome-based taxa - Trinity, 'default parameters' (no version)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Gene-model prediction on transcriptome taxa + header standardisation - 'Gene models were predicted as required'; no tool named, no procedure described",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "Orthogroup inference across 22 molluscan taxa - OrthoFinder v2.5.4, MCL inflation 2.1 (taxon accessions only in Supplementary Table 3; no MCL/OrthoFinder seed)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Orthogroup filtering - uniqHaplo.pl (undeposited helper script, no version) + <100 aa removal + 75% taxon-occupancy cutoff",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "Orthogroup multiple alignment - MAFFT v7.520, --auto --maxiterate 1000",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C28",
+      "label": "Alignment error filtering - HmmCleaner (no version, no cost/threshold settings)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C29",
+      "label": "Ambiguous-block trimming - BMGE v1.12 (entropy/gap-rate/matrix settings not stated; defaults implied)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C30",
+      "label": "Per-orthogroup gene-tree inference - FastTreeMP with gamma rate variation and -slow (no version, no seed, thread-count nondeterminism unaddressed)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "Paralog pruning + contamination exclusion + supermatrix construction - PhyloPyPruner (no version; all six flags given)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C32",
+      "label": "Maximum-likelihood species tree - IQ-TREE2, -T AUTO -B 1000 --wbtl, ModelFinder ('MPF'), 1000 UFBoot replicates (no version, no seed, -T AUTO makes thread count host-dependent)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "Ten-species orthology panel - OrthoFinder v2.5.4 + UpSet plot and five-neogastropod Venn diagram (plotting tool/library not named)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C34",
+      "label": "Gene family expansion/contraction - CAFE5 on orthogroup counts across ten gastropod genomes (named only in RESULTS; no Methods subsection, no version, no lambda/error model, and the required ultrametric input tree is never described)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "Expansion validation - MAFFT re-alignment of gene families + Pfam conserved-domain confirmation against reference sequences (no version restated, no thresholds, family-grouping criterion undefined)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W1",
+      "label": "Sample collection - adult Melo melo, Bay of Bengal (Chandipur, Odisha, India), six tissues dissected into RNAlater, -80 C",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "HMW gDNA extraction and QC - Qiagen kit, Qubit 4.0 DNA HS, NanoDrop 2000, 1% agarose, Agilent FEMTO Pulse",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "PacBio SMRTbell library prep (Express Template Prep Kit 3.0, >5 kb size selection, Sequel IIe Binding Kit 3.2) and HiFi/CCS sequencing on one 8M SMRT Cell",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Total RNA extraction and QC - TRIzol, NucleoSpin RNA Cleanup, Qubit RNA HS, NanoDrop 2000, Bioanalyzer 2100 RNA 6000 Nano (RIN)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Iso-Seq full-length cDNA synthesis (NEBNext Single Cell/Low Input), SMRTbell library (Binding Kit 3.1) and Sequel IIe CCS/HiFi sequencing of pooled six-tissue library",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 20,
+    "n_NI": 15,
+    "n_X": 0,
+    "S": 35,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/35 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "20/35 (57.1%) - inference-inclusive READINESS UPPER BOUND (n_R + n_RI)/|S|; RI credit is an untested assumption, never read as 'reproducible'",
+    "coverage": "computational coverage 35/40 (87.5%) - 35 C-steps, 5 W-steps (OOS wet-lab: collection, gDNA/RNA extraction, PacBio library prep and sequencing)",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "whole paper - no Code Availability statement anywhere; Supplementary Data names only https://doi.org/10.5281/zenodo.17490824 holding 'All FASTA sequences, Pfam annotation files, genome statistics, repeat counts, and the taxa list'",
+      "missing": "No analysis code repository of any kind (no GitHub/GitLab/Bitbucket/Software Heritage). The Zenodo deposit is described by the authors as data and annotation products only, not scripts or workflow definitions. Every one of the 35 C-steps is therefore prose-only, capping the Code axis at 1 (reconstructable) for well-described steps and 0 where the procedure is not described.",
+      "how_to_close": "Deposit the driver scripts / command lines for assembly, annotation, orthology and phylogenomics in a public repository with a tagged release, and cite it in a Code Availability section."
+    },
+    {
+      "type": 2,
+      "where": "C5 MitoHiFi, C6 MITOS2, C7 Proksee, C18 KAAS, C21 HHpred/ConoServer, C22 Trimmomatic-or-fastp, C23 Trinity, C26 uniqHaplo.pl, C28 HmmCleaner, C30 FastTreeMP, C31 PhyloPyPruner, C32 IQ-TREE2, C34 CAFE5",
+      "missing": "2a - no version token at all for 13 of the 35 computational steps, including the two tools that produce the paper's headline evolutionary claims (IQ-TREE2 for the phylogenomic placement in Figure 4, CAFE5 for the 2443/219 expansion-contraction counts in Figure 5). This is the single largest driver of NI verdicts here: the remaining 22 steps do carry exact prose pins.",
+      "how_to_close": "State the exact version (and build) of every tool, especially IQ-TREE2, CAFE5, PhyloPyPruner, FastTreeMP, MitoHiFi, MITOS2 and HmmCleaner."
+    },
+    {
+      "type": 6,
+      "where": "C34 CAFE5 (described only in RESULTS 'Gene Family Evolution in Melo melo'); C22/C23/C24 transcriptome preprocessing of the 22-taxon panel",
+      "missing": "Sub-pipelines externalised out of Methods. CAFE5 has no Methods subsection: the ultrametric/time-calibrated input tree it requires is never described anywhere in the paper (no MCMCtree/r8s/TimeTree step exists in the step list), nor is the lambda/error model. The transcriptome branch is compressed into 'raw reads were quality filtered and adapter-trimmed using standard protocols (e.g., Trimmomatic or fastp)' and 'Gene models were predicted as required'.",
+      "how_to_close": "Add a Methods subsection for CAFE5 giving the input tree, how it was made ultrametric/calibrated, the lambda model and the significance cutoff; name the actual trimming and gene-prediction tools used per taxon."
+    },
+    {
+      "type": 5,
+      "where": "C19 conotoxin reference query set; C26 uniqHaplo.pl",
+      "missing": "Custom artefacts not deposited as identified objects. The conotoxin query set was assembled from three prior studies plus Pfam PF02950 but is not given as a versioned FASTA with per-sequence provenance (the Zenodo record claims 'All FASTA sequences' but its contents could not be verified - see liveness). uniqHaplo.pl is a helper script used for orthogroup filtering with no source, version or link.",
+      "how_to_close": "Deposit the exact conotoxin query FASTA and the uniqHaplo.pl source used, both versioned."
+    },
+    {
+      "type": 4,
+      "where": "C25 OrthoFinder/MCL, C30 FastTreeMP, C32 IQ-TREE2 (-T AUTO -B 1000 UFBoot)",
+      "missing": "Stochastic steps with no random seed recorded. IQ-TREE2 ultrafast bootstrap and ModelFinder are seed-dependent, and '-T AUTO' additionally makes the thread count host-dependent, so support values and possibly topology cannot be reproduced exactly; best achievable is distributional agreement.",
+      "how_to_close": "Record the seed (IQ-TREE2 -seed), fix the thread count instead of -T AUTO, and report the ModelFinder-selected model per partition."
+    },
+    {
+      "type": 1,
+      "where": "C25, C33, C34, C22, C23 - the 21 comparative taxa and the 10-species CAFE5 panel",
+      "missing": "Species-to-accession correspondence lives only in Supplementary Table 3 ('retrieved from NCBI and other public repositories'); the main text names no accession for the comparative panel, and the panel composition differs between the 22-taxon phylogenomic analysis and the 10-species orthology/CAFE5 analyses without an explicit membership list in the running text.",
+      "how_to_close": "Give per-taxon accession + assembly/annotation version in a machine-readable table, and state explicitly which taxa enter each of the two panels."
+    },
+    {
+      "type": 11,
+      "where": "C11 RepeatMasker/Repbase, C13 BRAKER2/GeneMark-ETP, C18 KEGG KAAS",
+      "missing": "Registration-, subscription- or licence-gated resources on the annotation path. Repbase requires a paid subscription and its release is not pinned; GeneMark requires a licence key; KEGG/KAAS is a hosted service with restricted redistribution. None is fatal for an academically licensed reproducer, but each blocks a clean-room rerun.",
+      "how_to_close": "Pin the Repbase release used (or switch to Dfam), record the GeneMark version/licence date, and record the KEGG release and KAAS method (BBH/SBH) plus the access date."
+    },
+    {
+      "type": 3,
+      "where": "https://doi.org/10.5281/zenodo.17490824",
+      "missing": "Liveness of the only supplementary artefact repository could not be confirmed from this network: both the DOI redirect and the Zenodo REST API returned HTTP 403 'unusual traffic from your network' (a network-side block, NOT evidence of a dead record). All NCBI accessions resolved (verified via eutils, Count=1 each), so this is an isolated unverified artefact.",
+      "how_to_close": "Re-check the Zenodo record from an unblocked network at Stage 2 and confirm whether it contains only data products (as the paper states) or also scripts."
+    },
+    {
+      "type": 10,
+      "where": "W1-W5",
+      "missing": "Five wet-lab steps (specimen collection from a single wild individual, HMW gDNA and total RNA extraction, PacBio SMRTbell library prep, Sequel IIe HiFi and Iso-Seq sequencing) are out of scope for computational reproduction. The single wild-caught specimen is not re-obtainable, so these steps are reproducible only downstream of the deposited SRA reads.",
+      "how_to_close": "N/A - OOS by construction; the deposited SRA reads are the correct computational entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository (any host) - NONE STATED IN PAPER",
+      "http_status": "none",
+      "checked_at": "2026-07-28",
+      "network_context": "No Code Availability section exists. No GitHub/GitLab/Bitbucket/Software Heritage URL appears anywhere in the JATS full text. Recorded as a finding; no web search was performed to locate an unstated repository."
+    },
+    {
+      "artifact": "https://doi.org/10.5281/zenodo.17490824 (supplementary data: FASTA sequences, Pfam annotation files, genome statistics, repeat counts, taxa list)",
+      "http_status": "URL-present / 403 (unverified)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to doi.org resolved to https://zenodo.org/doi/10.5281/zenodo.17490824 and returned HTTP 403 'Access to this resource has been restricted due to unusual traffic from your network'; the REST endpoint https://zenodo.org/api/records/17490824 also returned 403. Network-side block, not a dead-record signal. Contents unverified at Stage 1."
+    },
+    {
+      "artifact": "SRA SRR30898481 (genome sequencing reads, PacBio HiFi)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/sra/SRR30898481 returned 200; independently confirmed via eutils esearch db=sra (Count=1)."
+    },
+    {
+      "artifact": "SRA SRR30899298 (transcriptome / Iso-Seq reads)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/sra/SRR30899298 returned 200."
+    },
+    {
+      "artifact": "BioProject PRJNA1153738",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1153738 returned 200; eutils esearch db=bioproject Count=1."
+    },
+    {
+      "artifact": "BioSample SAMN43402451",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/biosample/SAMN43402451 returned 200."
+    },
+    {
+      "artifact": "GenBank assembly JBGTYI000000000 (assembled M. melo genome)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/nuccore/JBGTYI000000000 returned 200; eutils esearch db=nuccore Count=1."
+    },
+    {
+      "artifact": "GCA_030674155.1 (Stramonita haemastoma reference used for RagTag scaffolding)",
+      "http_status": "stated-in-paper",
+      "checked_at": "2026-07-28",
+      "network_context": "Accession stated verbatim in Methods; not independently fetched at Stage 1."
+    },
+    {
+      "artifact": "https://www.biorxiv.org/content/10.1101/2025.10.31.685756v1 (landing page) and .source.xml (JATS full text)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "JATS XML fetched successfully (219443 bytes); title-phrase check for 'Melo melo' matched (3 hits in raw XML), confirming no cross-assessor fetch swap."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "cad51bbafe9617d75bec25f1eed3bf5ecdd784668c813de1ca6078caacd56305",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

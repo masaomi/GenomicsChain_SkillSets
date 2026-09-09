@@ -1,0 +1,434 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "aa8ff5a36318739eca5544b62761d73ed9bbc9875fe32609e3785c5a235c1c2b",
+  "canonical_id": {
+    "value": "10.1101/2025.10.08.681110",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.08.681110v1",
+      "biorxiv:2025.10.08.681110v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Re-analysis of public circulating cell-free DNA (cirDNA) fragment coordinate data downloaded from FinaleDB (Cristiano, Jiang and Sun cohorts, hg38 BED) to build a well-positioned-nucleosome atlas (WPNA): coverage and fragment U/D end computation, Savitzky-Golay smoothing, custom C++ Windowed Protection Score (WPS) implementation and nucleosome calling, genome-annotation and codon-usage intersections, nucleosome DNA sequence signature (PWM / spectral) analysis, per-sample occupancy normalization, PRIMME-based PCA, SVM + ROC/AUC classification of cancer vs healthy, TSS-occupancy versus GSE74246 RNA-seq correlation, and JASPAR TFBS occupancy comparison with KEGG / ChEA3 enrichment. No wet-lab work is reported; the entire study is a computational re-analysis of already-public sequencing-derived data.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis derived from the METHODS section (subsections: CirDNA sequence data; Software; Genome cirDNA coverage, fragment U/D ends; WPS computations and putative well-positioned nucleosome positions; Genome annotation intersection; CirDNA fragment protection bias; Codons usage bias; Nucleosome DNA sequence signatures; Nucleosome occupancy and normalization in individual samples; Principal component analyses; Model construction, and AUC, sensitivity and specificity computations; Nucleosome occupancy at TSS) plus two analyses described only in RESULTS (Hilbert-curve mapping; JASPAR TFBS comparison, KEGG/ChEA3 enrichment). The paper explicitly declines to describe implementation: 'For this study, a number of Python, R, and Perl scripts as well as C and C++ codes were written. These programs will be available at GitHub upon publication. Accordingly, here, we only describe the computation principles and not their implementation.' There is therefore no code artifact at all at this time, and no repository URL is given anywhere in the text. Every step is scored code=0 and caps at NI. No wet-lab steps (W=0).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Download cirDNA fragment coordinates (hg38 BED) from FinaleDB (Zheng et al. 2021) for the Cristiano, Jiang and Sun cohorts; retain fragments with alignment quality score > 30; exclude non-chromosome assemblies (contigs)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "code-promised-upon-publication",
+        "no-per-sample-manifest"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Genome cirDNA coverage: count fragments 120-180 bp overlapping each genome position; normalized coverage by scaling 0-1 in a 601 bp sliding window",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "custom-in-house-code"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Savitzky-Golay smoothing of coverage and of normalized fragment U/D end curves (201 bp for coverage; 401 bp for U/D ends; 13 bp for the low-smoothing variant; 4th-degree polynomials throughout)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unnamed-library-implementation"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Spectral density estimation of U/D end positions using the Welch method (R library bspec, no version stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-r-library"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "De novo C++ Windowed Protection Score (WPS) implementation following Snyder et al.; Savitzky-Golay smoothing in 101 bp windows (4th degree); putative well-positioned nucleosomes = local maxima of smoothed WPS > 0.15 with a smoothed U-end local maximum 25-120 bp upstream and a D-end local maximum 25-120 bp downstream (WPNA atlas construction)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "custom-cpp-code",
+        "central-derived-artifact-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Genome annotation intersection: download genomic annotations from Vu & Ernst (2022) universal annotation; for top and bottom 20% occupancy nucleosomes compute overlapping nucleotides per annotation zone, normalized by zone length and expressed as a percentage",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-download-url",
+        "no-annotation-release-pin"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Hilbert space-filling-curve 2D mapping of chromosomal cirDNA coverage and WPNA occupancy (average every 1,000 bp), per Anders (2009)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "described-only-in-results",
+        "no-tool-named"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "CirDNA fragment protection bias: matched randomized nucleosome positions (uniform offset in [-500,000, +500,000], avoiding centromeres/chromosome ends); collect fragments in +/-100 bp windows with <= 20 bp non-included tolerance; difference of original vs randomized fragment-length relative frequencies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "randomization-no-seed"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Codon usage bias: download coding-sequence positions from Ensembl (Homo_sapiens.GRCh38.109.gtf); intersect with top/bottom 20% occupancy nucleosomes; retrieve sequences, shift to ORF frame, split into codons, compute relative frequencies and base-2 log-odds",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "db-release-pinned-Ensembl-109",
+        "no-software-version"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Nucleosome DNA sequence signatures: retrieve 167 bp sequences at k-stack positions (k = 0 randomized, 1, 4, 8; 20-stacks used to filter repeat-driven outliers); nucleotide and dinucleotide (AA/AT/TA/TT, CC/CG/GC/GG) PWMs with 0.25 background and base-2 log-odds; Welch-method spectral analysis (R library bspec)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-r-library",
+        "k-stack-definition-in-prose-only"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Per-individual nucleosome occupancy read-out and normalization: read smoothed coverage at each WPNA position; exclude chrY; divide autosome + chrX PAR1/PAR2 occupancy by the individual total and multiply by the median of totals; normalize non-PAR chrX separately by its own totals and median",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "custom-normalization"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Principal component analysis on ~5-million-dimensional normalized WPNA occupancy vectors using the optimized Lanczos algorithm in the R PRIMME library (eigs_sym) with matrixStats for row means/SDs; positions with zero standard deviation discarded",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-r-library",
+        "n-components-unstated"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Classification models and performance: SVM with R library e1071; ROC curves and AUC with pROC; balanced Se/Sp at the ROC point farthest from the diagonal; 95% CI by basic bootstrap with the R boot package (100 balanced re-samplings); AUC 95% CI from pROC",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unversioned-r-library",
+        "svm-kernel-and-cv-scheme-underspecified",
+        "no-random-seed"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Nucleosome occupancy at TSS: download refTSS annotations; select nucleosomes intersecting >= 1 TSS; sum occupancy over all Cristiano healthy samples at nucleosome centers; obtain hematopoietic RNA-Seq from GEO GSE74246, convert counts to log2 TPM, and correlate with mean per-gene nucleosome occupancy (Pearson)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "refTSS-release-unpinned",
+        "tpm-conversion-method-unstated"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "TFBS occupancy analysis: download JASPAR (2024) TFBSs for 644 human TFs; select TFBSs overlapping WPNA positions; Wilcoxon test of occupancy cancer-vs-healthy per TFBS; Pearson correlation of total cirDNA coverage in +/-100 bp windows across the seven Cristiano cancer cohorts versus healthy; short-fragment TF-footprint inference adapted from Ulz et al. / Jacob et al.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "described-mainly-in-results",
+        "multiple-testing-correction-unstated"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Functional enrichment of correlated TFs: KEGG pathway enrichment of the 250 negatively and 97 positively correlated TFs; extraction of KEGG NET-formation pathway genes; ChEA3 TF inference; hypergeometric test of the intersection (P = 0.037)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "web-server",
+        "kegg-release-unpinned",
+        "enrichment-tool-and-background-unstated"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 16,
+    "n_X": 0,
+    "S": 16,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "All 16 computational steps cap at NI even under the most generous inference-inclusive reading. The paper states that Python, R, Perl, C and C++ code was written for the study and that it 'will be available at GitHub upon publication' - no repository URL, organisation, DOI or archive is given, so no code artifact exists to inspect now. The authors explicitly decline to describe implementation details, deferring them to the unreleased software. No software version is pinned anywhere (bspec, PRIMME, matrixStats, e1071, pROC, boot are all unversioned; no R/Python/Perl/compiler versions; no conda env, lockfile or container). Input data are public and well identified (FinaleDB cohorts, GEO GSE74246, Ensembl GRCh38.109, refTSS, JASPAR 2024, Vu & Ernst annotations), and many numeric parameters are given precisely, but with code=0 on every step the axis-min forces NI throughout. There is no stage-2 code to read; this paper is not R-star-eligible via stage 2 in its current preprint state.",
+    "coverage": "16 computational steps assessed from Methods prose (12 Methods subsections) plus two analyses described only in Results (Hilbert-curve mapping; JASPAR TFBS / KEGG / ChEA3). 0 wet-lab steps - the study is a pure re-analysis of public data. There is no formal 'Data availability' or 'Code availability' section; the only code statement is inside the Methods 'Software' subsection.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Entire analysis (all 16 C-steps); Methods 'Software' subsection",
+      "missing": "No code is available. Verbatim: 'For this study, a number of Python, R, and Perl scripts as well as C and C++ codes were written. These programs will be available at GitHub upon publication. Accordingly, here, we only describe the computation principles and not their implementation.' No repository URL, no organisation/user name, no DOI, no archive snapshot. The custom C++ WPS implementation, the WPNA calling logic, the normalization scheme and the PCA/SVM pipeline exist only as prose descriptions.",
+      "how_to_close": "Publish the GitHub repository now (or a Zenodo/Software Heritage snapshot with a DOI) containing the C/C++ WPS sources with build instructions, the Python/Perl preprocessing scripts, and the R analysis scripts, and cite it by URL + commit/tag in the paper."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 16 steps",
+      "missing": "No version is pinned for any software component: R libraries bspec, PRIMME, matrixStats, e1071, pROC and boot are all named without versions; no R, Python, Perl, C/C++ compiler or Savitzky-Golay implementation is versioned; there is no conda environment, requirements/lockfile, renv.lock, Dockerfile or container digest. The paper also notes large memory/disk requirements without stating the hardware or OS used.",
+      "how_to_close": "Ship a pinned environment (renv.lock or conda-lock/pixi.lock plus a container image referenced by digest), record the compiler/toolchain used for the C/C++ code, and state the compute environment (OS, cores, RAM) under which the reported runs were performed."
+    },
+    {
+      "type": 1,
+      "where": "C1 FinaleDB input; C5 WPNA atlas; C6 Vu & Ernst annotations; C14 refTSS",
+      "missing": "Input data are public but not resolved to an exact, machine-readable manifest: no FinaleDB sample identifier list or download date/release for the Cristiano/Jiang/Sun cohorts, no per-cohort sample counts in the Methods, no download URL or release version for the Vu & Ernst universal annotation or for refTSS. The central derived artifact - the WPNA nucleosome atlas itself - is not deposited anywhere, so downstream steps cannot be started without re-running the unavailable code.",
+      "how_to_close": "Deposit the WPNA atlas (BED/parquet) plus a sample manifest listing FinaleDB sample IDs, cohort assignment and download date, and pin the exact release/URL of each downloaded annotation resource."
+    },
+    {
+      "type": 5,
+      "where": "C12 PCA; C13 SVM/ROC; C15 TFBS testing; C16 enrichment",
+      "missing": "Several analysis parameters are unstated: the number of principal components retained; the SVM kernel, cost/gamma and the cross-validation scheme (only 'For a given CV' is mentioned); random seeds for the SVM/bootstrap and for the position randomization in C8; multiple-testing correction for the per-TFBS Wilcoxon tests and for the per-TF Pearson correlations; the enrichment tool, gene-set background and KEGG release used in C16.",
+      "how_to_close": "State the retained component count, full SVM hyperparameters and CV design, all random seeds, the multiple-testing correction applied, and the enrichment tool/version/background/KEGG release."
+    },
+    {
+      "type": 4,
+      "where": "C9 Ensembl; C15 JASPAR; C16 KEGG; C14 refTSS; C6 Vu & Ernst",
+      "missing": "Reference database releases are only partly pinned. Ensembl is pinned exactly by filename (Homo_sapiens.GRCh38.109.gtf) and JASPAR by year (2024), but refTSS, KEGG, ChEA3 and the Vu & Ernst annotation have no release or access date, so those steps will drift as the resources are updated.",
+      "how_to_close": "Record release version and access date for every external database, and archive the exact downloaded files alongside the code."
+    },
+    {
+      "type": 12,
+      "where": "Whole paper - artifact statements",
+      "missing": "There is no dedicated 'Data availability' or 'Code availability' statement. Data sources are named only inside Methods prose, and the code statement is a future promise conditional on journal publication rather than a citable artifact.",
+      "how_to_close": "Add explicit Data availability and Code availability sections listing every accession (FinaleDB cohorts, GEO GSE74246) and a resolvable, versioned code URL/DOI."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE resolvable. Verbatim from Methods 'Software': 'These programs will be available at GitHub upon publication.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL, user, organisation or DOI appears anywhere in the full text.",
+      "http_status": "n/a (no URL present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full text scanned for github/gitlab/bitbucket/zenodo/figshare/osf/codeocean/dryad/software heritage; only the bare word 'GitHub' in the promissory sentence above was found. Per protocol, no web search was performed to guess a repository."
+    },
+    {
+      "artifact": "data accession: GEO GSE74246 (RNA-Seq of healthy hematopoietic cells, Corces et al. 2016) - stated-in-paper as an accession, no URL given",
+      "http_status": "not fetched (stage1 prose triage; accession stated in paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "accession recorded verbatim from Methods 'Nucleosome occupancy at TSS'; public GEO series"
+    },
+    {
+      "artifact": "data source: FinaleDB (Zheng, Zhu & Liu 2021) - hg38 BED cirDNA fragment coordinates for the Cristiano et al. (2019), Jiang et al. (2015) and Sun et al. (2019) cohorts. Stated-in-paper by database name and citation only; no URL, no accession list, no download date, no sample manifest.",
+      "http_status": "n/a (no URL present in paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "recorded verbatim from Methods 'CirDNA sequence data'; the Acknowledgments additionally thank the FinaleDB developer for help with 'data downloading and formats'"
+    },
+    {
+      "artifact": "reference resources cited by name in prose without URLs: Ensembl Homo_sapiens.GRCh38.109.gtf; refTSS; JASPAR (2024, 644 human TFs); Vu & Ernst (2022) universal genome annotation; KEGG; ChEA3 web tool",
+      "http_status": "n/a (public resources named in prose, no deposited study accession)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited public resources; only Ensembl is release-pinned (109) and JASPAR year-pinned (2024)"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "202e18b9dec47420e69bc492f5f7cb8b67bd4899c652565b41c3d754489e4401",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

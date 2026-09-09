@@ -1,0 +1,313 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage2 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2023.10.08.561401",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2023.10.08.561401v2",
+      "biorxiv:2023.10.08.561401v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational analysis of the CLAMP heat-stress 3D-chromatin study: SLAM-seq nascent-RNA differential expression (nf-core/slamseq -> DESeq2), Micro-C differential chromatin interactions (HiC-Pro -> HiCcompare), HiChIP loop calling (BWA/pairtools/cooler -> FitHiChIP/MACS2/edgeR), APA (coolpup.py), and cross-assay integration of Micro-C/HiChIP/SLAM-seq (bedtools + custom Python), plus reuse of public ChIP-seq (deeptools).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods 'Computational analysis' (a) SLAM-seq, (b) Micro-C, (c) HiChIP, (d) integration, (e) ChIP-seq. Stage-2 code-check read the two claim-bearing third-party repos at line level: nf-core/slamseq @tag 1.0.0 (environment.yml, Dockerfile, nextflow.config, conf/base.config) and ay-lab/FitHiChIP (Dockerfile, Singularity, Imp_Scripts/DiffAnalysisHiChIP.r, Differential_Analysis_Script.sh). No author-owned repository and no Code Availability statement exist, so C13/C14 remain undeposited. Wet-lab library generation counted in W, not verdicted.",
+  "funnel_stage": "stage2-code-verified",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "nf-core/slamseq v1.0.0 pipeline (-profile singularity; internally Trim Galore 0.6.5 + SlamDunk 0.4.3; full params: --genome BDGP6 --read_length 150 --trim5 12 --polyA 4 --multimappers true --min_coverage 2 --var_fraction 0.2 --conversions 1 --base_quality 27 --pvalue 0.05) — SLAM-seq processing",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest", "env-yml-no-build-strings", "genome-via-igenomes-mutable", "data-embargoed"]
+    },
+    {
+      "step_id": "C2",
+      "label": "DESeq2 (1.22.1) — SLAM-seq differential expression (padj <= 0.05, fold change >= 1.5)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C3",
+      "label": "HiC-Pro toolkit (3.1.0, default params) + cooler-format conversion utils (nservant/HiC-Pro/bin/utils) — Micro-C mapping and normalized contact maps",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed", "default-params-only"]
+    },
+    {
+      "step_id": "C4",
+      "label": "HiCcompare (1.24.0) in Bioconductor (3.18) — Micro-C differential chromatin interactions (P < 0.01)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Burrows-Wheeler Aligner (0.7.17) mem — HiChIP (and ChIP-seq) alignment to dm6 (args -5 -S -P -T0 for HiChIP; default for ChIP)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C6",
+      "label": "pairtools (0.3.0) parse/dedup/split — HiChIP valid ligation events (--min-mapq 40 --walks-policy 5unique --max-inter-align-gap 30)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C7",
+      "label": "samtools (1.17) sort — HiChIP BAM sorting",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C8",
+      "label": "cooler suite (0.9.3) — HiChIP/Micro-C contact-map generation from pair files",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C9",
+      "label": "FitHiChIP (10.0) — HiChIP loop calling (ay-lab/FitHiChIP; resolution-adjustable interaction categories)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "container-tag-not-digest", "docker-deps-unpinned", "data-embargoed"]
+    },
+    {
+      "step_id": "C10",
+      "label": "MACS2 (2.2.9.1) — 1D peak calling on HiChIP data (required input for FitHiChIP)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C11",
+      "label": "edgeR (no version given) differential-loop analysis — code-check finding: this is FitHiChIP's OWN built-in tool (ay-lab/FitHiChIP Imp_Scripts/DiffAnalysisHiChIP.r + Differential_Analysis_Script.sh), a PUBLIC third-party feature, NOT an undeposited author custom script; edgeR remains version-floating (BiocManager::install('edgeR') with no version pin in FitHiChIP's own Dockerfile)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "C_mutable_latest",
+      "version_subtier": "floating",
+      "subflags": ["version-unpinned", "edgeR-biocmanager-latest", "fithichip-builtin-tool-public", "data-embargoed"]
+    },
+    {
+      "step_id": "C12",
+      "label": "coolpup.py suite (1.0.0) — APA plots over differential loop focal points (central bin 2.5 kb)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "data-embargoed"]
+    },
+    {
+      "step_id": "C13",
+      "label": "bedtools suite (2.31.0, pairtobed) + custom Python annotation script — Micro-C/HiChIP loop-anchor & loop-span gene annotation and SLAM-seq integration (custom script NOT deposited; confirmed undeposited at stage-2 — not in FitHiChIP, no author repo, no Code Availability statement)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["custom-script-undeposited", "no-code-availability-statement", "stage2-confirmed-undeposited"]
+    },
+    {
+      "step_id": "C14",
+      "label": "matplotlib-venn (0.11.9) Python package + Fisher's Exact test with FDR correction — cross-assay gene-list overlap significance (custom analysis, NOT deposited; confirmed undeposited at stage-2)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["custom-script-undeposited", "no-code-availability-statement", "stage2-confirmed-undeposited"]
+    },
+    {
+      "step_id": "C15",
+      "label": "deeptools suite (3.2.1) bamCoverage — public ChIP-seq BigWig tracks (--binSize 50 --normalizeUsing CPM --extendReads 200 --exactScaling --centerReads --blackListFileName dm6-blacklist.bed)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "public-reuse-data"]
+    },
+    {
+      "step_id": "C16",
+      "label": "Trim Galore (0.5.0) — public ChIP-seq adapter/quality trimming (GSE118047, GSE30740, GSE36374, GSE36393, GSE54529, GSE63518, GSE80702, GSE89244)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "public-reuse-data"]
+    },
+    {
+      "step_id": "C17",
+      "label": "coolbox API (0.3.9) — visualization of contact maps, bigwig/ChIP/nascent-RNA tracks and cross-dataset comparison over regions of interest",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "viz-region-dependent"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 14,
+    "n_NI": 3,
+    "n_X": 0,
+    "S": 17,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/17 (0%) — unexecuted; declared environment statically valid but not verified as the env that produced the results. Code-check DEMOTES the C1 env_lock claim: the ONLY environment claim in the study (nf-core/slamseq -profile singularity) does NOT resolve to a static container lock, so no step reaches R★.",
+    "inference_inclusive_upper_bound": "RI ceiling on 14/17 computational steps; 3/17 cap at NI (C11 edgeR version-floating, C13 & C14 undeposited custom integration scripts). Stage-2 confirms software_env_lock=FALSE: nf-core/slamseq pins its image only by mutable tag ('nfcore/slamseq:1.0.0', base 'nfcore/base:1.9') with NO @sha256 digest, and ships only a bare environment.yml with top-level version pins and NO build strings / NO transitive closure — so even C1 cannot be promoted to version=2. Data axis independently blocks R★: the study's own GEO series (GSE297379/GSE253644/GSE253645) remain PRIVATE/embargoed.",
+    "coverage": "17 computational steps assessed; two claim-bearing third-party repos (nf-core/slamseq @1.0.0, ay-lab/FitHiChIP) read at line level. 4 wet-lab library-generation procedures counted (W) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "n/a — no static lock exists. nf-core/slamseq container is tag-only (no digest); environment.yml is a conda spec without build strings (not platform-resolved). FitHiChIP Dockerfile FROM r-base:4.1.0 (tag), Singularity From aylab/fithichip:latest (mutable), edgeR/deps installed unpinned."
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Newly generated primary data: SLAM-seq (GSE297379), HiChIP (GSE253644), and the poly(T)/nascent series (GSE253645)",
+      "missing": "All three GEO Series are still PRIVATE/embargoed (reviewer-token access only) at assessment time; raw/processed files are not publicly downloadable, so the SLAM-seq, Micro-C, and HiChIP computational steps cannot be executed on the study's own data yet.",
+      "how_to_close": "Release the GEO Series to public (or provide reviewer tokens) and confirm processed-file availability (contact maps, .cool/.hic, counts) plus a run-to-sample sheet."
+    },
+    {
+      "type": 2,
+      "where": "Software environment capture — the C1 env_lock claim resolved at line level",
+      "missing": "Stage-2 code-check: nf-core/slamseq v1.0.0 does NOT ship a static lock. nextflow.config sets process.container='nfcore/slamseq:1.0.0' (mutable tag, no @sha256 digest); Dockerfile is FROM nfcore/base:1.9 (tag); environment.yml lists only top-level version pins (trim-galore=0.6.5, slamdunk=0.4.3, bioconductor-deseq2=1.22.1, ...) with NO build strings and NO transitive closure. The 'conda env export ... for posterity' happens at image build time and is NOT committed to the repo. The genome (--genome BDGP6) is fetched via igenomes (s3://ngi-igenomes) by name with no checksum. All other Micro-C/HiChIP/ChIP tools are exact-version-pinned in prose only, with no lockfile/container.",
+      "how_to_close": "Publish the built image by digest (@sha256) or ship a conda-lock/pixi.lock with build strings for a declared platform, covering nf-core/slamseq AND the non-nf-core tools (HiC-Pro, cooler, HiCcompare/Bioconductor, BWA, pairtools, FitHiChIP+edgeR, MACS2, coolpup.py, deeptools)."
+    },
+    {
+      "type": 3,
+      "where": "Author analysis code / Code Availability statement",
+      "missing": "No Code Availability statement and no author-owned repository (confirmed at stage-2). CORRECTION vs stage-1: the edgeR differential-loop analysis (C11) is NOT an undeposited author custom script — it is FitHiChIP's OWN public built-in tool (Imp_Scripts/DiffAnalysisHiChIP.r, driven by Differential_Analysis_Script.sh), so that specific step's code is deposited (third-party). However the cross-assay integration/annotation (C13: custom Python + bedtools) and overlap-significance (C14: matplotlib-venn + Fisher/FDR) scripts are genuinely NOT deposited anywhere — not present in FitHiChIP and no author repo exists.",
+      "how_to_close": "Deposit the custom Python/R integration and figure scripts (Zenodo/GitHub with a release tag), add an explicit Code Availability statement, and pin the edgeR version actually used (FitHiChIP installs it unpinned)."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab generation: RNAi/Kc-cell culture, SLAM-seq 4SU labeling + Lexogen library prep, Micro-C, Dovetail HiChIP MNase library prep + anti-CLAMP IP",
+      "missing": "Wet-lab steps are out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the downstream bioinformatic analysis."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (third-party tool): nf-core/slamseq @tag 1.0.0 — github.com/nf-core/slamseq. Read at line level: environment.yml, Dockerfile, nextflow.config, conf/base.config. Env-lock claim (-profile singularity) resolves to container 'nfcore/slamseq:1.0.0' by MUTABLE TAG only (no @sha256 digest); environment.yml has top-level pins, no build strings.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "gh api, public GitHub (tag 1.0.0 -> commit 855583252166ca5ff739b40a6762837534a99c36)"
+    },
+    {
+      "artifact": "code repo (third-party tool): ay-lab/FitHiChIP — github.com/ay-lab/FitHiChIP. Read at line level: Dockerfile (FROM r-base:4.1.0; edgeR via BiocManager::install unpinned), Singularity (From aylab/fithichip:latest), Imp_Scripts/DiffAnalysisHiChIP.r (edgeR built-in differential-loop tool), Differential_Analysis_Script.sh. Confirms C11 edgeR is a PUBLIC FitHiChIP feature, version-floating; no static lock.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "gh api, public GitHub"
+    },
+    {
+      "artifact": "code repo (third-party tool): dovetail-genomics/HiChiP — github.com/dovetail-genomics/HiChiP (Dovetail QC scripts; no author env lock expected; not the source of the study's env claim)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated, public GitHub"
+    },
+    {
+      "artifact": "code repo (third-party tool): nservant/HiC-Pro — github.com/nservant/HiC-Pro/tree/master/bin/utils (cooler-format conversion utilities; no author env lock expected)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated, public GitHub"
+    },
+    {
+      "artifact": "data accession (new, SLAM-seq nascent RNA): GEO GSE297379",
+      "http_status": "200 OK (record exists) — Series marked PRIVATE/embargoed",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov GEO acc.cgi"
+    },
+    {
+      "artifact": "data accession (new, HiChIP): GEO GSE253644",
+      "http_status": "200 OK (record exists) — Series marked PRIVATE/embargoed",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov GEO acc.cgi"
+    },
+    {
+      "artifact": "data accession (new): GEO GSE253645",
+      "http_status": "200 OK (record exists) — Series marked PRIVATE/embargoed",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov GEO acc.cgi"
+    },
+    {
+      "artifact": "data accession (reused public ChIP-seq): GEO GSE118047, GSE30740, GSE36374, GSE36393, GSE54529, GSE63518, GSE80702, GSE89244",
+      "http_status": "public (previously published series, cited refs 12,26-33)",
+      "checked_at": "2026-07-23",
+      "network_context": "named in Methods (e) ChIP-seq Analysis"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [
+    {
+      "step_id": "C11",
+      "stage1_claim": "edgeR 'custom scripts' for differential loops were described as the authors' custom scripts located in the FitHiChIP repository (framed alongside the undeposited-custom-script gap).",
+      "stage2_correction": "Line-level read of ay-lab/FitHiChIP shows the edgeR differential-loop analysis is FitHiChIP's OWN public built-in tool (Imp_Scripts/DiffAnalysisHiChIP.r + Differential_Analysis_Script.sh), not an author-authored undeposited script. C11 code axis therefore legitimately stays 2 (public deposited tool), but the step still caps at NI because edgeR is version-floating: FitHiChIP's Dockerfile installs it via BiocManager::install('edgeR') with no version pin (env_capture_class C_mutable_latest).",
+      "effect_on_verdict": "No verdict change (NI -> NI); reclassifies the cause from 'undeposited custom code' to 'public third-party tool with unpinned dependency version'."
+    },
+    {
+      "step_id": "C1",
+      "stage1_claim": "capture_claim=env_lock_claimed via nf-core/slamseq -profile singularity (subflag 'container-claim-unvalidated'); Lever 1 status unverified.",
+      "stage2_correction": "Env-lock claim validated at line level and DEMOTED: nextflow.config pins the image only by mutable tag ('nfcore/slamseq:1.0.0'), Dockerfile FROM 'nfcore/base:1.9' (tag), and environment.yml carries top-level version pins with NO build strings / NO transitive closure. This is NOT a static software_env_lock. software_env_lock=FALSE.",
+      "effect_on_verdict": "No verdict change (RI -> RI, capped by data axis anyway) but confirms no step can be promoted to R★; version axis for C1 stays 1."
+    }
+  ],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage2 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "b661627b2113c521a765cfcf105395c70db613570b901929558c4c2d5f183905",
+    "chain_record": "not-yet-recorded",
+    "supersedes": "f301cde827ccce636a447aa75541883a915fb9b450ac2a427ba8182725dadb88"
+  }
+}

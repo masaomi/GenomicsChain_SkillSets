@@ -1,0 +1,513 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "412868cd1b898578dd9a0e091cc3ed3aafa94e3703e76081bf841479aa58bcc1",
+  "canonical_id": {
+    "value": "10.1101/2025.10.23.684100",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.23.684100v1",
+      "biorxiv:2025.10.23.684100v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "An observational cohort analysis, not a shipped tool. The paper measures 7,288 SOMAmer reagents (6,385 serum proteins) on serum from 3,093 AGES-Reykjavik participants at two visits about five years apart (baseline 2002-2006, follow-up 2007-2011), and asks which proteins are temporally stable. The computational target is the statistical pipeline downstream of the assay: SOMAmer filtering plus Box-Cox transformation and standardization; TOPMed-imputed genotypes; a pQTL GWAS in PLINK 2.0 with GCTA-COJO conditional refinement; per-protein Spearman temporal correlation (temporal SCC) with stability groups cut at SCC > 0.75 (stable, n = 729) and SCC < 0.40 (variable, n = 681); delta/IQR comparisons; dilution-corrected RFU abundance comparison against Human Protein Atlas v23.0 concentrations; technical-variability exclusion using ARIC percentile-variation reference values (191 proteins removed); g:Profiler g:GOST functional enrichment against a custom 7,097-protein background; Fisher's exact enrichment over HPA protein classes, tissue-enriched genes, InWeb PPI hub status, the serum co-regulatory network and pLI scores; pQTL-residual re-computation of temporal SCC; logistic glm() and Cox coxph() association of baseline protein levels with 23 prevalent/incident phenotypes; WGCNA co-regulatory modules at beta = 5; module-level disease scores; and a 10,000-permutation pairwise test of temporal SCC across four disease-timeline groups. Two wet-lab steps (the SomaScan v4.1 assay and Illumina array genotyping) are out of scope. The paper contains NO Data Availability statement, NO Code Availability statement, and no repository or accession of any kind.",
+  "step_source": "prose-methods",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Serum protein measurement at both AGES visits on the SomaLogic SomaScan v4.1 (7k) platform: 7,569 proteins assayed, 7,288 SOMAmer reagents retained after excluding 281 mouse-human chimera reagents; samples from both visits randomized and run as a single set to minimize between-visit batch effects; RFU readout by SOMAmer fluorescence intensity",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "wet-lab-oos",
+        "proprietary-assay",
+        "excluded-from-denominator"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Genotyping of 5,661 AGES participants on the Illumina Infinium Global Screening Array (n = 2,710) and the Illumina hu370CNV array (n = 2,951), 'as previously described' (ref 6)",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "wet-lab-oos",
+        "as-previously-described",
+        "excluded-from-denominator"
+      ]
+    },
+    {
+      "step_id": "C1",
+      "label": "Protein data preprocessing: exclude the 281 mouse-human chimera SOMAmers, apply a Box-Cox transformation to mitigate skewness, then standardize each protein to mean 0 and standard deviation 1",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "no-software-named",
+        "boxcox-lambda-unspecified",
+        "proprietary-upstream-normalization"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Genotype imputation against the TOPMed reference panel (ref 54) and merging of the two genotyping platforms, yielding 11,919,579 variants after quality control; procedure delegated to prior work (ref 6, 'as previously described')",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "sub-pipeline-externalized",
+        "imputation-software-unnamed",
+        "qc-thresholds-unstated",
+        "topmed-panel-release-unstated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Protein quantitative trait locus discovery: each of the 7,288 SOMAmers tested against 11,919,579 variants by linear regression in PLINK 2.0, adjusting for sex, age, 10 genetic principal components and genotyping platform",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-code-repository",
+        "plink2-major-line-only",
+        "covariates-fully-stated",
+        "results-externalized-to-in-preparation-manuscript"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Stepwise conditional analysis with GCTA-COJO to identify conditionally independent pQTLs per SOMAmer: lowest-p variant taken as lead at each step, variants in strong LD (r^2 > 0.9) with the lead excluded from joint analysis, independent signals validated by joint model testing on individual-level AGES data, cis defined as a lead variant within +/- 500 kb of the protein-coding gene and trans otherwise",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "gcta-version-unstated",
+        "study-wide-significance-threshold-unstated",
+        "cojo-window-and-p-threshold-unstated"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Temporal stability per protein: Spearman correlation coefficient between baseline and follow-up measurements (temporal SCC) computed in RStudio with R version 4.3.2; proteins classified as temporally stable at SCC > 0.75 (n = 729, near the 90th percentile 0.754), temporally variable at SCC < 0.40 (n = 681, near the 10th percentile 0.406), and medium in between",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "r-interpreter-pinned-4.3.2",
+        "no-package-manifest",
+        "thresholds-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Delta and inter-individual variability comparison: per-participant per-protein absolute between-visit difference (delta), median delta per protein correlated against temporal SCC by Spearman; inter-quartile range per protein at each visit computed and compared with temporal SCC",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "r-interpreter-pinned-4.3.2",
+        "delta-formula-in-display-equation-only"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Relative abundance versus temporal stability: raw untransformed RFU values, median per protein at baseline, corrected by SomaScan dilution set (20% multiplied by 1/20, 0.5% multiplied by 1/0.5; a third 0.005% set exists), distributions compared across temporal stability groups by two-sided pairwise Wilcoxon test; additionally correlated by Spearman against immunoassay concentrations (pg/mL) from the Human Protein Atlas version 23.0 for 569 of the 7,288 proteins",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "hpa-v23.0-pinned",
+        "dilution-factor-for-0.005-percent-set-omitted",
+        "wilcoxon-multiple-testing-correction-unstated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Technical variability classification using external ARIC reference values: percentile variation (PV) estimates from 102 duplicate samples on the same 7k SomaScan v4.1 platform (ref 32); proteins with PV more than two standard deviations above the mean flagged as technically variable (191 proteins) and excluded from downstream pathway and functional enrichment, leaving 7,097",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "somascan-v4.1-pinned",
+        "aric-pv-table-cited-by-reference-not-accession",
+        "cross-cohort-technical-variability-transfer"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Pathway and functional enrichment with g:Profiler (g:GOST module): stable and variable protein lists as input, the 7,097 technically stable measured proteins as custom background, Benjamini-Hochberg FDR < 0.05; data sources Gene Ontology, KEGG, Reactome and WikiPathways; for proteins with multiple GO annotations under the same Ensembl ID the annotation set with the most associated GO terms prioritized; plus a multi-query analysis running both lists simultaneously against the same background",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "gprofiler-version-unstated",
+        "go-kegg-reactome-wikipathways-releases-unstated",
+        "hosted-mutable-web-service"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Protein class and tissue enrichment: Human Protein Atlas version 23.0 protein-class annotations for the 5,894 proteins overlapping the SomaScan 7k set, Fisher's exact test for over-representation in the temporally stable versus variable groups with FDR-adjusted p < 0.05; the same test applied to tissue-enriched genes (ref 66) and tissue protein expression (ref 67)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "hpa-v23.0-pinned",
+        "tissue-atlas-releases-cited-by-reference-only"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Protein interaction and constraint comparison: hub status in the InWeb protein-protein interaction network (data for 1,443 of 3,012 proteins after excluding the medium group) and in the serum protein co-regulatory network (1,940 of 3,012), tested by Fisher's exact test at FDR < 0.05; loss-of-function intolerance (pLI) scores (ref 68, data for 2,924 of 3,012) compared by two-sided Wilcoxon rank-sum test",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "inweb-release-unstated",
+        "pli-score-release-unstated",
+        "hub-definition-and-threshold-unstated"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Gene expression variance comparison: SD-based gene expression variance ranks derived from 57 publicly available RNA-sequencing datasets in prior work (ref 34), available for 4,367 of the AGES SOMAmers, compared across temporal SCC groups by two-sided Wilcoxon rank-sum test",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "external-rank-table-version-unstated",
+        "somamer-to-gene-mapping-rule-unstated",
+        "sub-pipeline-externalized"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Genetic effect adjustment: linear regression of each protein on all conditionally independent pQTLs reaching p < 5e-8 as covariates, residuals taken as adjusted protein values, original values retained for the 716 SOMAmers with no genetic signal; temporal SCC recomputed on adjusted values and compared with the original estimates (two-sided paired t-test)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "r-interpreter-pinned-4.3.2",
+        "depends-on-unpublished-pqtl-set-ref-35"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Phenotype association of baseline protein levels: each protein tested against each of 23 phenotypes in the full cohort adjusted for age and sex; logistic regression via glm() for prevalent phenotypes (and for type 2 diabetes and chronic kidney disease, defined from the AGES-II visit rather than as time-to-event); Cox regression via coxph() from the survival R package for incident phenotypes; FDR correction with significance at FDR < 0.05; phenotype definitions, models and covariates in Supplementary Table 2",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "survival-package-version-unstated",
+        "phenotype-definitions-in-supplement-only"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Weighted gene co-expression network analysis with the WGCNA R package, run separately on baseline and follow-up protein levels, soft-thresholding power beta set to 5 for both (chosen to match previously generated 5k modules, ref 9), modules identified by dynamic tree cutting; enrichment per baseline module performed with g:Profiler against the full 7k platform background",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "wgcna-version-unstated",
+        "network-type-and-correlation-unstated",
+        "minmodulesize-deepsplit-mergecutheight-unstated"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Module-level enrichment and disease scoring: baseline modules tested for temporal SCC group enrichment by two-sided Wilcoxon rank-sum test; tested for enrichment of protein associations with 23 diseases or phenotypes (12 prevalent, 11 incident) by Fisher's exact test at FDR < 0.05; per-module disease score computed as the number of significantly enriched diseases multiplied by the median odds ratio of those enrichments; disease scores compared across stability-enrichment strata by Kruskal-Wallis test",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-repository",
+        "gprofiler-version-unstated",
+        "derived-composite-metric-no-reference-implementation"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Disease-timeline stratified stability: for seven phenotypes (myocardial infarction, coronary heart disease, congestive heart failure, atrial fibrillation, Alzheimer's disease, dementia, stroke), participants assigned to one of four timeline groups (diagnosed before baseline, between baseline and follow-up, after follow-up, never); temporal SCC recomputed within each group for module proteins significantly associated with that phenotype; pairwise permutation test with 10,000 permutations shuffling timeline group labels; empirical p-values Benjamini-Hochberg corrected at FDR < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-repository",
+        "r-interpreter-pinned-4.3.2",
+        "stochastic-no-seed",
+        "distributional-only"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 8,
+    "n_NI": 9,
+    "n_X": 0,
+    "S": 17,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/17 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 8 of 17 computational steps, NI on 9, X on 0; readiness upper bound (n(R-star)+n(RI))/|S| = 8/17 (47%). Read that 47% as a prose-quality figure, not a reproducibility figure, because the two structural artifacts a reader would need are both entirely absent: this manuscript contains NO Code Availability statement and NO Data Availability statement of any kind. There is no repository - no GitHub, GitLab, Bitbucket, Zenodo or Software Heritage link anywhere in the JATS XML or on the bioRxiv landing page - and there is no accession - no GEO, SRA, ENA, ArrayExpress, dbGaP, EGA, figshare or Zenodo deposit, and no documented data access committee route for the AGES-Reykjavik individual-level serum proteomic and genotype data. The only external hyperlinks in the entire XML are ORCID identifiers, a CC-BY-NC-ND licence, the CRAN landing page for the survival package, somalogic.com and flybase.bio.indiana.edu, all of which arrive through the reference list rather than through an availability statement. Under the rubric's Data axis this is scored 1 (accidental gating / missing identifier) rather than 0, because AGES-Reykjavik is a live, named, institutionally held cohort whose data is not lost - but nothing in the paper tells a reader how to request it, so every one of the 17 computational steps carries data=1 and no step can exceed RI on that axis alone. What the paper does well is parameters: thresholds are stated numerically and repeatedly (temporal SCC cuts at 0.75 and 0.40 with their matching 90th/10th percentiles 0.754 and 0.406, technical variability at 2 SD above the mean PV giving exactly 191 excluded proteins, WGCNA beta = 5, FDR < 0.05 throughout, 10,000 permutations, the pQTL inclusion threshold p < 5e-8, the cis window +/- 500 kb, the COJO LD exclusion r^2 > 0.9, the GWAS covariate set sex + age + 10 PCs + genotyping platform, and the custom enrichment background of 7,097 proteins), and 13 of 17 steps score params=2 or 1 with the full model specification available. The dividing line between the 8 RI steps and the 9 NI steps is almost entirely the version axis. R itself is pinned exactly ('R version 4.3.2'), and two external reference resources are pinned to a release (Human Protein Atlas version 23.0, SomaScan v4.1), which is what lifts C5, C6, C7, C8, C10, C13 and C17 to RI, with C3 reaching RI on a weaker 'PLINK 2.0' major-line claim. The nine NI steps all fail on version=0: GCTA-COJO (C4), g:Profiler (C9, C16), the InWeb PPI network and the pLI score release (C11), the external gene-expression-variance rank table (C12), the survival package (C14) and the WGCNA package (C15) are named with no version at all, and C1's Box-Cox and standardization step names no software whatsoever. C2 fails on three axes at once because genotype imputation is delegated to prior work with the imputation software unnamed, the TOPMed panel release unstated and the QC thresholds unstated. Two further structural risks do not change any verdict but bear on any future attempt: the pQTL set actually consumed by C13 comes from reference 35, 'Bjarnadottir et al., In preparation' - an unpublished manuscript, so the analysis rests on a private intermediate that no reader can obtain; and the entire measurement layer is a proprietary SomaLogic assay whose normalization and calibration are performed by the vendor, so the RFU matrix is not regenerable outside SomaLogic even with the serum in hand. There is no Stage-2 upside here in the ordinary sense: with no repository there is nothing to inspect, so the version axis cannot rise and the readiness upper bound of 8/17 is also the ceiling. The honest one-line characterization is a methodologically careful, parameter-rich observational study with zero artifact deposition.",
+    "coverage": "17 computational steps in the denominator (|S| = 17) out of 19 total prose steps; 2 wet-lab steps out of scope (|W| = 2, the SomaScan v4.1 serum assay and the Illumina GSA / hu370CNV genotyping). Computational coverage |S|/(|S|+|W|) = 17/19 = 89%. Step list derived from named tool and analysis invocations in the Methods section (step_source = prose-methods); no workflow file exists because no repository exists, so the granularity anchor is the prose subsection plus each distinct named statistical procedure."
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "C1-C17 (every computational step in the paper)",
+      "missing": "No analysis code is deposited, linked or referenced. The manuscript has no Code Availability section. A full-text search of the JATS XML for 'github', 'gitlab', 'bitbucket', 'zenodo', 'software heritage', 'code availab' and 'data availab' returns zero hits, and the only xlink:href values in the entire document are ORCID identifiers, the CC-BY-NC-ND licence, figure and supplement asset paths, https://cran.r-project.org/web/packages/survival/index.html (reference 69), https://www.somalogic.com (reference 53) and http://www.flybase.bio.indiana.edu (reference 61). The bioRxiv landing page likewise carries no availability statement. Every score on the Code axis in this report is therefore 'reconstructable from prose' (1), never 'public and exact' (2), and no step in the paper is eligible for R-star at any stage.",
+      "how_to_close": "Deposit the R analysis scripts - the temporal SCC computation and group cutting, the delta/IQR comparison, the dilution-corrected abundance analysis, the pQTL residual adjustment, the glm/coxph phenotype association loop, the WGCNA call with its full argument list, the module disease-score computation and the permutation test - in a public repository with a tagged release and a Zenodo DOI, and cite that DOI in a Code Availability statement."
+    },
+    {
+      "type": 5,
+      "where": "C1-C17 (the AGES-Reykjavik individual-level serum proteomic matrix and imputed genotypes underlie every computational step)",
+      "missing": "There is no Data Availability statement. The individual-level data - 7,288 SOMAmer RFU measurements at two visits for 3,093 participants, 11,919,579 imputed variants for 5,661 participants, and the linked medical-record phenotypes summarized in Supplementary Table 2 - is held by the Icelandic Heart Association and is not deposited in any repository. No accession, no DOI, no controlled-access identifier and no data access committee procedure is given. The paper states the ethics approvals (National Bioethics Committee in Iceland VSN-00-063, the NIA Intramural IRB, and the Icelandic Data Protection Authority) but an ethics approval number is not an access route. Under the rubric this is scored data=1 (accidental gating / missing identifier) rather than 0, since the cohort is live and institutionally held rather than lost, but it caps every one of the 17 computational steps at RI regardless of how well the method is described.",
+      "how_to_close": "Add a Data Availability statement naming the responsible body, the application procedure and a contact or portal for the AGES-Reykjavik data, ideally with a controlled-access accession (EGA or an equivalent) that resolves; alternatively deposit the derived per-protein summary statistics - the 7,288 temporal SCC values, the median deltas, the IQRs, the pQTL-adjusted SCCs and the phenotype association effect sizes - which would make most of the downstream analysis independently checkable without releasing participant-level data."
+    },
+    {
+      "type": 2,
+      "where": "C4 (GCTA-COJO), C9 and C16 (g:Profiler), C11 (InWeb PPI network, pLI scores), C12 (external gene-expression-variance rank table), C14 (survival R package), C15 (WGCNA R package), C1 (no software named for Box-Cox / standardization)",
+      "missing": "Nine steps name a tool or resource with no version at all (gap subtype 2a). The R interpreter is pinned exactly ('Statistical analyses were performed in RStudio software (R version 4.3.2)') but not one R package is versioned: survival is cited only by its CRAN landing page and WGCNA only by its 2008 methods paper. GCTA is cited by its 2011 paper with no release. g:Profiler is cited by its 2007 paper with no version string and no database snapshot date. InWeb, the pLI score set and the reference-34 variance rank table are cited by publication only. Because a named tool with no version cannot be pinned by a reader, these steps score version=0 and drop from RI to NI - this single axis accounts for the entire RI/NI split in this paper.",
+      "how_to_close": "State the package version for survival, WGCNA and any other R packages used (sessionInfo() output is sufficient), the GCTA release, and the g:Profiler version string together with the Ensembl/GO/KEGG/Reactome/WikiPathways snapshot dates that g:Profiler reports with every query."
+    },
+    {
+      "type": 2,
+      "where": "C3 (PLINK 2.0)",
+      "missing": "Gap subtype 2b, floating lower bound. 'PLINK 2.0' names a major development line, not a build. plink2 is distributed as dated alpha builds whose association-testing defaults, missingness handling and covariate treatment have changed across builds within the 2.0 line, so the string does not pin behaviour. This is the weakest of the eight RI steps: it clears version=1 only because a version designation is present at all.",
+      "how_to_close": "Report the plink2 build date and platform as printed in the program's own log header, for example 'PLINK v2.00a5.10LM 64-bit Intel (5 Jan 2024)'."
+    },
+    {
+      "type": 13,
+      "where": "C9 and C16 (g:Profiler with GO, KEGG, Reactome, WikiPathways), C10 (Human Protein Atlas, tissue-enriched genes, tissue protein expression), C11 (InWeb PPI network, pLI scores), C12 (gene expression variance ranks)",
+      "missing": "Out-of-band, largely unpinned external reference resources. The functional enrichment results depend on annotation databases that change monthly, and neither the g:Profiler version nor the underlying GO / KEGG / Reactome / WikiPathways releases are recorded, so the enrichment tables in Figures 2 and 6 cannot be regenerated to the same content even with identical input lists. This is the classic mutable-resource pattern that becomes env_capture_class C at Stage 2. The Human Protein Atlas is the exception and the model the rest should follow: it is pinned twice, explicitly, to 'version 23.0'. InWeb and the pLI score set have no release identifier, and the reference-34 variance rank table is described only as derived from 57 public RNA-seq datasets, with no deposited copy of the rank table the authors actually joined against.",
+      "how_to_close": "Record the g:Profiler version and its reported database snapshot dates alongside the results (g:Profiler emits both), pin InWeb and the pLI source to a release or DOI, and deposit the exact joined rank table used in C12 as a supplementary file so the 4,367-protein overlap can be reconstructed."
+    },
+    {
+      "type": 11,
+      "where": "W1 (SomaScan v4.1 assay), C1 (transformation of vendor-normalized RFU values), C7 (raw RFU dilution-set correction), C8 (ARIC percentile-variation transfer)",
+      "missing": "Proprietary dependency. The entire measurement layer is a closed commercial platform: SOMAmer reagent composition, the assay's hybridization and median-signal normalization, calibration and the ANML-style pre-analytical processing (reference 57) are performed by SomaLogic and are not open. The dilution-set assignment used in C7 is a vendor property of each SOMAmer, and the dilution factor for the third set (0.005%, 1:20,000) is not given in the text although the factors for the 20% and 0.5% sets are. Consequently the RFU matrix cannot be regenerated from serum by an independent party even with full access to the samples, and the technical-variability threshold in C8 is transferred from a different cohort (ARIC) run on the same platform, which the authors themselves flag as a limitation ('technical variability may differ between the two cohorts due to differences in sample handling or processing protocols').",
+      "how_to_close": "Report the SomaScan normalization pipeline version and the normalization steps actually applied (hybridization control normalization, median signal normalization, plate-scale, calibration, ANML) with their software version, state the third dilution factor explicitly, and deposit the per-SOMAmer dilution-set assignment table."
+    },
+    {
+      "type": 4,
+      "where": "C17 (pairwise permutation test across disease-timeline groups)",
+      "missing": "Stochastic procedure with no seed. The test uses 10,000 permutations of the timeline-group labels and reports empirical p-values that are then Benjamini-Hochberg corrected at FDR < 0.05. No random seed and no random number generator kind are stated, and no code exists to inspect for a set.seed() call. With 10,000 permutations the empirical p-value resolution is 1e-4, so results near the FDR boundary can flip between runs. This step is capped at distributional agreement rather than exact reproduction.",
+      "how_to_close": "State the seed and the RNG kind (or ship the script containing set.seed()), and report the number of permutations together with the resulting p-value granularity."
+    },
+    {
+      "type": 6,
+      "where": "C2 (genotype imputation and QC), C3 and C4 (the 7k pQTL set actually consumed), C12 (external variance ranks)",
+      "missing": "Sub-pipelines externalized to other manuscripts, one of which is unpublished. Genotyping, imputation and QC are delegated to reference 6 with the phrase 'as previously described'. More seriously, the pQTL set that C13's entire genetic-adjustment analysis consumes is attributed to reference 35, 'Bjarnadottir, H. et al. The impact of low-frequency variants on serum protein levels. In preparation.' - an unpublished manuscript. Methods do describe the discovery procedure (PLINK 2.0 plus GCTA-COJO), which is why C3 still reaches RI, but the specific list of conditionally independent pQTLs used as covariates, and the 716 SOMAmers declared to have no genetic signal, exist only inside a manuscript the reader cannot obtain. The headline claim that 'genetic effects are a major contributor to protein temporal stability' therefore rests on an unavailable intermediate.",
+      "how_to_close": "Deposit the conditionally independent pQTL table (SOMAmer, lead variant, chromosome, position, alleles, effect size, p-value, cis/trans class) as a supplementary file or in the GWAS Catalog, so that C13 becomes checkable without waiting for reference 35 to appear."
+    },
+    {
+      "type": 10,
+      "where": "W1 (SomaScan v4.1 serum proteomics on both visits), W2 (Illumina Infinium GSA and hu370CNV genotyping)",
+      "missing": "Two non-computational steps, correctly out of scope and excluded from the |S| = 17 denominator. Recorded for completeness of the coverage figure (17/19 = 89%) and because W2 in particular is described only as 'as previously described' with no array version, calling protocol or QC detail in this manuscript.",
+      "how_to_close": "Not a reproducibility defect at Tier 1; noted so the denominator is auditable."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: NONE. The manuscript contains no Code Availability section and no repository link. Verbatim: no sentence in the article body, back matter, acknowledgements or author-contributions block mentions code, scripts, a repository or a container. The Acknowledgements name funders and the Icelandic Heart Association staff; the Author contributions block lists 'Formal Analysis: H.K.I., H.R.B., E.A.F., E.J., K.A.' with no artifact pointer.",
+      "http_status": "none (no URL exists to check)",
+      "checked_at": "2026-07-28",
+      "network_context": "JATS XML fetched from https://www.biorxiv.org/content/early/2025/10/24/2025.10.23.684100.source.xml (HTTP 200, 146,843 bytes) into a per-paper scratch directory; title match verified by grepping 'temporal stability of circulating proteins' (2 hits) and by reading article-title verbatim: 'Long-term temporal stability of circulating proteins in older adults'. Case-insensitive searches for 'github', 'gitlab', 'bitbucket', 'zenodo', 'software heritage', 'code availab' and 'data availab' all returned zero hits. The complete set of unique xlink:href values in the document was enumerated: figure/PDF asset paths, one CC-BY-NC-ND licence URL, eleven ORCID identifiers, https://cran.r-project.org/web/packages/survival/index.html, https://www.somalogic.com, http://www.flybase.bio.indiana.edu, and two supplement paths (supplements/684100_file09.xlsx, supplements/684100_file10.pdf). The bioRxiv landing page https://www.biorxiv.org/content/10.1101/2025.10.23.684100v1 was also fetched (HTTP 200) and searched for the same terms with zero hits. No web search for an unstated repository was performed - per protocol, an absent repository is a finding, not a prompt to go looking."
+    },
+    {
+      "artifact": "data accession: NONE. No GEO, SRA, ENA, ArrayExpress, dbGaP, EGA, figshare or Zenodo accession appears anywhere. The underlying resource is described verbatim as: 'The AGES-Reykjavik study, conducted by the Icelandic Heart Association (IHA), is a population-based, prospective cohort study initiated in 2002 and with examinations completed in 2006. The cohort comprises 5,764 Icelandic individuals aged 66 to 93, with a mean age of 76. Of these, 3,316 participants returned for a follow-up visit approximately five years later (2007-2011). Genotypic and proteomic data at two time points were available for 3,093 individuals.' The nearest thing to an access statement is the ethics paragraph: 'The AGES study was approved by the National Bioethics Committee in Iceland (approval number VSN-00-063), the National Institute on Aging Intramural Institutional Review Board, and the Data Protection Authority in Iceland. All participants provided informed consent before study enrollment.' No application route, portal, contact address or DAC procedure for obtaining the data is stated.",
+      "http_status": "none (no accession or access URL exists to check)",
+      "checked_at": "2026-07-28",
+      "network_context": "Determined from the Methods 'Study cohort' and 'Protein data' and 'Genetic data and protein quantitative trait loci (pQTLs)' subsections of the fetched JATS XML, plus the absence of any availability section. Scored data=1 (accidental gating / missing identifier) rather than data=0 because AGES-Reykjavik is a live named institutional cohort whose data is held rather than lost."
+    },
+    {
+      "artifact": "supplementary material: two files declared in the XML - 'DC1 Supplementary Tables' (supplements/684100_file09.xlsx) and 'DC2 Supplementary Materials' (supplements/684100_file10.pdf). The Methods refer readers to Supplementary Table 2 for 'a summary of the phenotypes, abbreviations, regression models, and covariates used' and to Supplementary Table 9 for 'further information about the characteristics of each baseline module'.",
+      "http_status": "URL-present (relative supplement paths declared in the JATS XML alongside the article; not fetched)",
+      "checked_at": "2026-07-28",
+      "network_context": "Declared-only; supplement contents were NOT downloaded or read, consistent with Stage-1 prose-only scope. These are result tables and a methods supplement, not deposited input data and not code; their existence does not change any Data or Code axis score. Noted because the phenotype model specifications that carry C14's params=2 score live in Supplementary Table 2 rather than in the article text."
+    },
+    {
+      "artifact": "external reference resources cited in Methods but reached only through the reference list, not through an availability statement: Human Protein Atlas 'version 23.0' (cited twice, the only externally pinned resource in the paper); SomaScan Assay v4.1 (reference 53, https://www.somalogic.com); TOPMed reference panel (reference 54); the ARIC 7k SomaScan percentile-variation table (reference 32); the InWeb protein-protein interaction network (reference 33); pLI scores from ExAC (reference 68); the gene expression variance rank set from 57 public RNA-seq datasets (reference 34); GO (reference 61), KEGG (reference 62), Reactome (reference 63), WikiPathways (reference 64); g:Profiler (reference 59); the survival R package (reference 69, https://cran.r-project.org/web/packages/survival/index.html); the WGCNA R package (reference 70); GCTA (reference 55); R (reference 56).",
+      "http_status": "URL-present for two of these (somalogic.com and the CRAN survival landing page, both bare landing pages carrying no version); all others are literature citations with no resolvable artifact identifier",
+      "checked_at": "2026-07-28",
+      "network_context": "Enumerated from the reference list and Methods text of the fetched XML. No external resource URL was fetched or version-resolved; Stage 1 records presence and pinning status only. Of sixteen external resources, exactly one (Human Protein Atlas v23.0) carries a release identifier and one (SomaScan v4.1) carries a platform version; the remaining fourteen carry none."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "79d175ba169a14f4ae96abcc9ad44cdcff8938c5c2a42791d41bc368d43cf8f7",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

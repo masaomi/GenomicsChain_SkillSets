@@ -44,8 +44,8 @@ else
   echo "warning: mmp not found under $gem_dir/templates/skillsets -- submit will fail closed" >&2
 fi
 
-# Dependency order: tier1 and tier2 both declare genomicschain_core.
-packages="genomicschain_core genomicschain_tier1 genomicschain_tier2"
+# Dependency order: tier1 and tier3 both declare genomicschain_core; tier2 declares nothing.
+packages="genomicschain_core genomicschain_tier1 genomicschain_tier2 genomicschain_tier3"
 for pkg in $packages; do
   echo "==> $pkg"
   kairos-chain skillset install "$here/$pkg" $force
@@ -70,6 +70,6 @@ fi
 echo "ok: $(echo "$packages" | wc -w | tr -d ' ') packages + mmp installed into ${KAIROS_DATA_DIR:-./.kairos}"
 echo
 echo "genomicschain_core ships anchor_profile: false, so gc_tier1_submit and"
-echo "gc_tier2_submit are not registered on this node. To make this node the"
+echo "gc_tier3_submit are not registered on this node. To make this node the"
 echo "anchor, copy config/genomicschain_core.anchor.yml.example over"
 echo "config/genomicschain_core.yml in the INSTALLED copy and restart."

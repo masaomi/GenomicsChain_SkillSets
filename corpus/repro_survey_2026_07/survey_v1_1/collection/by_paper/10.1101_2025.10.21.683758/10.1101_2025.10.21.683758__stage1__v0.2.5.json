@@ -1,0 +1,326 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "0a651b885da13f165a846323bd4b0fdd0386715ba59db64145b664da8403cefb",
+  "canonical_id": {
+    "value": "10.1101/2025.10.21.683758",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.21.683758v1",
+      "biorxiv:2025.10.21.683758v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The custom 'Hi-C SMRT' informatics pipeline for detecting HBV integrated-DNA (iDNA) cis/trans contacts from PacBio HiFi long reads: in silico HindIII vs DpnII restriction digestion of hg38 + HBV NC_003977.2 with the R package DECIPHER; FastQC / SMRT Link run quality assessment; minimap2 alignment to a custom merged hg38 + HBV reference; samtools sorting/filtering/indexing; extraction and counting of mapped, HBV-containing and double-restriction-site (dRE) reads; IGV coverage visualization; BAM-to-BED conversion and ggplot chimeric-read plotting colored by human chromosome partner; and reference-to-query coordinate conversion for read-structure visualization. Cell culture, Proximo Hi-C library construction with HindIII-HF, adaptor ligation and amplification, Twist HBV hybridization capture, SMRT library construction and PacBio Sequel IIe sequencing are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 full text (retrieved by curl of the .full HTML page; WebFetch of the .source.xml returned HTTP 403). The paper has a 'Sequencing and analysis' Methods subsection plus tool usage described inline in the Results. The Methods list a tool inventory verbatim — 'Tools utilized on our Linux platform for sequence processing included: FastQC; minimap2; samtools; bedtools; seqkit; seqtk; and GATK' and 'Tools and packages utilized in R included: pacman, CRAN, cli, devtools, tidyverse, ggraph, igraph, RColorBrewer, tidyr, knitr, ggpmisc, gggenes, BiocManager, and DECIPHER' — without stating which step each tool served. bedtools, seqkit, seqtk and GATK are therefore never tied to a described invocation and are not scored as separate steps; this is recorded as a gap (type 1). No version number is given for ANY software anywhere in the paper. There is no Code availability statement and no repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage) is cited; the only stated code artifact is 'Detailed scripts for these conversions are included in the Supplementary File under Section Read structure visualization'. The paper's own sequencing data are NOT yet deposited: DATA ACCESS states verbatim 'have been submitted to the NCBI BioProject database (https://www.ncbi.nlm.nih.gov/bioproject/) under accession number PRJNA# (in prep.)' — the accession is a literal placeholder. Every step that consumes the paper's own Hi-C SMRT reads therefore scores data=0 and is blocked (X). The only public input datasets are the NCBI reference genomes (GRCh38/hg38, HBV NC_003977.2) and the external PLC WGS control (SRA Run SRR14087064, BioProject PRJNA717995). Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "In silico restriction digestion of hg38 and HBV NC_003977.2 with HindIII vs DpnII using the R package DECIPHER, counting restriction sites and digested-fragment lengths (Table 1) — no DECIPHER version, no R version, no script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Preparation of the custom merged alignment reference (HBV RefSeq NC_003977.2 added to GRCh38/hg38 as an additional chromosome) — no script, no naming/coordinate convention, merged FASTA not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Download of the PacBio WGS control dataset for the PLC cell line from NCBI SRA (Run SRR14087064; BioProject PRJNA717995) used as the non-Hi-C reference dataset — accession stated verbatim, no download/conversion command",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Basic sequencing quality assessment of the Hi-C SMRT runs with FastQC — operates on the paper's own unreleased reads; no version, no parameters, no report deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Sequencing-run quality metrics (P1 = 76.8%, movie time 30 h, Sequel IIe) obtained with PacBio SMRT Link — no SMRT Link version, no analysis application/parameters, vendor-closed step",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Alignment of HiFi/CCS reads to the merged hg38 + HBV reference with minimap2 — no version, no preset (e.g. -x map-hifi/map-pb) and no other parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "BAM sorting, filtering and indexing with samtools in preparation for downstream analyses — no version, no filtering flags/MAPQ thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Extraction of mapped reads and of the HBV-mapped read subset from the BAM, and per-library read-type counting/summarization (Tables 2 and 3), including percentage of HBV-containing reads — no script, no tool named for the extraction/counting logic",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Counting of double-restriction-site (dRE) reads by 'simple text search' because the restriction site is <10 bp — the exact dRE query string, allowed mismatches, and search implementation are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Visualization of HBV genome sequencing coverage across WGS, UA1, UA2 and HepAD38 datasets with IGV (Figure 5) — no IGV version, no track/normalization settings, session file not provided",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Conversion of extracted HBV-containing (and dRE-filtered) reads from BAM to BED format for chimeric-partner analysis — no tool named for this conversion (bedtools/seqkit/seqtk are listed only in the global tool inventory), no version, no parameters",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Plotting of chimeric reads along the HBV genome color-coded by their human chromosome partner with the R package ggplot (Figures 6-11) — plotting script not provided, no R/ggplot2 version, chimeric-partner assignment rule (supplementary-alignment selection, minimum segment length) not stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Conversion of BAM/BED reference-based coordinates into query/read-based coordinates for read-structure visualization (Figure 12); scripts stated to be in the Supplementary File, Section 'Read structure visualization' — supplement-embedded code, no version, no repository",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 2,
+    "n_X": 11,
+    "S": 13,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/13 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification); unexecuted; declared environment statically valid but not verified as the env that produced the results. n_exact_capture_unexecuted=0, n_fetch_required=0",
+    "inference_inclusive_upper_bound": "NI ceiling on 2/13 computational steps (C1 in silico DECIPHER digestion of the public NCBI reference genomes; C3 download of the public PLC WGS control SRR14087064) — these run on public inputs but pin no software version. The remaining 11/13 steps are blocked (X): 10 of them because the paper's own Hi-C SMRT sequencing data are not deposited (DATA ACCESS gives the literal placeholder 'accession number PRJNA# (in prep.)'), and C2 because the merged hg38+HBV reference construction has no script or convention. No step anywhere in the paper reaches RI, because not a single software version number is stated in the entire manuscript and there is no analysis-code repository; capture_claim is therefore 'none' and even a Stage-2 code read could not lift any step above NI without new artifacts.",
+    "coverage": "13 computational steps assessed from the bioRxiv v1 full text (Methods 'Sequencing and analysis' plus tool invocations described inline in Results). 7 wet-lab steps (PLC and HepAD38 cell culture and cryopreservation; Proximo Hi-C library construction with HindIII-HF substitution; adaptor ligation and amplification adapted from PacBio xGen Lockdown protocol; Twist Bioscience custom HBV hybridization capture using probes designed on the 42 McNaughton et al. 2020 genotype references; PacBio HiFi express template prep 2.0/3.0 SMRT library construction; pre-sequencing QC by Qubit/TapeStation/Femto Pulse; PacBio Sequel IIe sequencing with 30 h movie time) counted in W and out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "DATA ACCESS statement — the paper's own Hi-C SMRT sequencing datasets (UA1, UA2, HepAD38 libraries)",
+      "missing": "The deposition accession is an unfilled placeholder: 'The demultiplexed sequencing data that support the establishment of this study have been submitted to the NCBI BioProject database (https://www.ncbi.nlm.nih.gov/bioproject/) under accession number PRJNA# (in prep.).' No BioProject/SRA identifier is resolvable, so the entry point for 10 of the 13 computational steps does not exist. Intermediate artifacts (BAM, BED, filtered dRE read sets) are likewise not deposited.",
+      "how_to_close": "Release the BioProject and substitute the real accession in the manuscript, and deposit the derived BED/dRE read tables underlying Tables 2-4 and Figures 5-12."
+    },
+    {
+      "type": 5,
+      "where": "Whole paper — no Code availability statement",
+      "missing": "The paper describes a 'custom-developed informatics pipeline' as a central claim of the work, but cites no code repository of any kind (no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage). The only stated code artifact is prose-referenced supplementary text: 'Detailed scripts for these conversions are included in the Supplementary File under Section Read structure visualization', which covers only the coordinate-conversion/visualization step. No driver script, no read-extraction/counting code, no dRE text-search code, and no ggplot plotting code are provided.",
+      "how_to_close": "Publish the full Hi-C SMRT pipeline (alignment driver, read classification/counting, dRE search, BAM-to-BED conversion, plotting) in a public repository with a tagged release archived to Zenodo, and add a Code availability statement citing the DOI."
+    },
+    {
+      "type": 3,
+      "where": "All computational steps (C1-C13)",
+      "missing": "No version number is stated for any software in the entire manuscript: minimap2, samtools, FastQC, bedtools, seqkit, seqtk, GATK, IGV, SMRT Link, R, RStudio, DECIPHER, ggplot2 and the remaining R packages (pacman, cli, devtools, tidyverse, ggraph, igraph, RColorBrewer, tidyr, knitr, ggpmisc, gggenes, BiocManager) are all named without versions. The reference genome builds are identified (GRCh38/hg38, NC_003977.2) but no RefSeq assembly accession or patch level is given for hg38 and no download date is recorded.",
+      "how_to_close": "State an exact version (or release/commit) for every tool and R package, give the precise GRCh38 assembly accession/patch and download date, and ship a lockfile or container digest for the whole toolchain."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment",
+      "missing": "No environment lockfile, container image or digest, conda/renv specification, or even a pinned tool list is claimed anywhere. The environment is described only as 'our Linux platform' plus 'R and RStudio'; capture_claim is therefore 'none'.",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or a container digest pinning minimap2, samtools, bedtools, seqkit, seqtk, GATK, FastQC, IGV and the full R/Bioconductor stack (DECIPHER, tidyverse, ggplot2, gggenes, ggpmisc, ...), together with the declared platform."
+    },
+    {
+      "type": 1,
+      "where": "Steps C6, C7, C9, C11, C12 (and the untethered tool inventory)",
+      "missing": "Parameter under-specification at every analytic decision point: minimap2 is named with no preset or flags (critical for HiFi/PacBio and for supplementary-alignment behaviour, on which the whole chimeric-partner analysis depends); samtools filtering criteria and MAPQ thresholds are not given; the dRE 'simple text search' does not state the query sequence, orientation handling, or mismatch tolerance; the BAM-to-BED conversion tool and options are not named; the rule for assigning a read's 'chimeric partner' chromosome is not defined. In addition, bedtools, seqkit, seqtk and GATK appear only in a verbatim tool inventory and are never tied to any described step, so their role is unrecoverable.",
+      "how_to_close": "State every command line with its flags (or publish the scripts), define the dRE search string and matching rule explicitly, define the chimeric-partner assignment criterion, and map each listed tool to the step that used it."
+    },
+    {
+      "type": 6,
+      "where": "Steps C8-C12 — read classification, dRE identification and figure generation",
+      "missing": "The Results are written partly in the first person singular ('I filtered HBV-mapped reads with dRE and generated BED files'), indicating hand-driven, interactive analysis rather than a scripted pipeline; combined with the absent code this makes the chimeric-partner counts of Tables 3-4 and Figures 6-11 non-machine-reproducible.",
+      "how_to_close": "Convert the interactive analysis into a scripted, re-runnable workflow and publish it alongside the intermediate outputs."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 7)",
+      "missing": "PLC/PRF/5 and HepAD38 cell culture and cryopreservation; Proximo Hi-C (human) kit library construction with HindIII-HF substituted for DpnII; adaptor ligation and amplification adapted from PacBio 'Multiplex Genomic DNA Target Capture Using IDT xGen Lockdown Probes' (KAPA Hyper Prep, Dynabeads M-270, TaKaRa LA Taq); Twist Bioscience custom HBV hybridization capture (probes designed on the 42 HBV genotypic references of McNaughton et al. 2020); PacBio HiFi express template prep 2.0/3.0 SMRT library construction; pre-sequencing QC (Qubit dsDNA HS, TapeStation Genomic DNA ScreenTape, Agilent Femto Pulse); PacBio Sequel IIe sequencing with a 30 h movie. These are physical steps, out of scope for computational reproduction; counted in W and not verdicted. Note the capture probe sequences themselves are proprietary (Twist custom design) and are not deposited, which also limits wet-lab replication.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the reproducible entry point would be the deposited demultiplexed reads once the BioProject accession is real. Depositing the custom HBV probe sequences (Supplementary) would additionally aid wet-lab replication."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code / 'custom-developed informatics pipeline')",
+      "http_status": "none — no code repository is stated anywhere in the paper; there is no Code availability statement",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text search of the bioRxiv v1 .full HTML for github/gitlab/bitbucket/zenodo/software-heritage URLs; the only 'GitHub' string in the document is inside a bibliography entry for a cited tool, not an author artifact"
+    },
+    {
+      "artifact": "code artifact (supplement): 'Detailed scripts for these conversions are included in the Supplementary File under Section Read structure visualization'",
+      "http_status": "stated-in-paper (supplementary file not retrieved at stage 1); no URL, no DOI, no version",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "data accession (this study's own Hi-C SMRT sequencing data) — verbatim: 'submitted to the NCBI BioProject database (https://www.ncbi.nlm.nih.gov/bioproject/) under accession number PRJNA# (in prep.)'",
+      "http_status": "none — placeholder accession, not resolvable",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 full text, DATA ACCESS section"
+    },
+    {
+      "artifact": "data accession (external control): NCBI SRA Run SRR14087064, BioProject PRJNA717995 — PacBio WGS of the PLC cell line",
+      "http_status": "stated-in-paper (accession given verbatim; not fetched at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "reference genomes: human GRCh38/hg38 RefSeq and HBV RefSeq NC_003977.2, both stated as downloaded from NCBI (no accession for the human build, no download date for either)",
+      "http_status": "stated-in-paper (URL-absent; NC_003977.2 is an exact accession, hg38 is named by build only)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "capture probe design source: 42 HBV genotypic reference sequences published by McNaughton et al. 2020 (probes themselves proprietary to Twist Bioscience)",
+      "http_status": "stated-in-paper (citation only; probe sequences not deposited)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "8dbc858e354ca4397ecec84e8fdc0a6714a45a2e808c6c28ee379ad1efc3ce2a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,482 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "3addfaced6e8c1eb0292c4a570eca475ee0e03645c5ce928870ac4a915b652d7",
+  "canonical_id": {
+    "value": "10.64898/2025.12.16.694519",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.16.694519v1",
+      "biorxiv:2025.12.16.694519v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Assembly-based analysis of de novo mutation and meiotic recombination on the short arms of the five human acrocentric chromosomes (SAACs) in a four-generation CEPH/Utah pedigree (Platinum Pedigree). The computational reproduction target is: Verkko2 phased telomere-to-telomere assembly of 23 samples from HiFi + ultra-long ONT + Hi-C; assembly QC (Merqury/Meryl k-mer QV, Compleasm gene completeness, NucFreq and HMM-Flagger structural error detection); CpG methylation from Dorado basecalling plus Modkit pileup; centromere annotation with CenMAP and CDR-Finder; identification of acrocentric 'pq-scatigs' by minimap2 alignment to T2T-CHM13; segmental-duplication detection (TRF + RepeatMasker + WindowMasker masking, then SEDEF); satellite/repeat annotation by flipped minimap2 mapping against a curated target-sequence set; short-arm structure evaluation (ModDotPlot); distal-junction graph construction (minigraph + Bandage); all-vs-all allelic vs nonallelic sequence-identity quantification (minimap2 + rustybam sliding aligner + BEDTools); parent-to-offspring transmitted-base identification (wfmash) and recombination detection plus read-coverage validation (deepTools2); breakpoint refinement (rustybam sliding aligner, MashMap, MSA with paralog-specific variants); permutation tests of recombination enrichment (BEDTools shuffle/intersect against the published family-wide T2T-CHM13 recombination map); PRDM9 motif association (MEME FIMO); de novo SNV/SV calling from haplotype-to-haplotype alignments (wgatools) with read-based validation (minimap2, Delly, Sniffles2, Truvari) and manual IGV curation; and de novo SNV rate estimation over callable bases. Wet-lab steps (lymphoblastoid cell-line culture/EBV transformation, PacBio Revio HiFi library prep and sequencing, ultra-long ONT library prep and PromethION sequencing, Dovetail Micro-C Hi-C library prep and NovaSeq X sequencing) are counted in W and are out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS XML Methods section (retrieved with curl and a browser User-Agent; WebFetch of the .source.xml returned HTTP 403, and a first curl retry was rate-limited with Cloudflare error 1015 before succeeding). Methods subsections used: Ethics declarations; Genome sequencing (Cell lines, Long-read sequencing data generation, PacBio HiFi, Ultra-long ONT, Hi-C data generation); Genome assembly; Assembly evaluation; CpG methylation analysis; Centromere analysis; Short arm sequence annotation and quality control (Identification of short arm pq-scatigs, Segmental duplications, Satellite and other repeats, Evaluation of short arm structure); Short arm sequence variation analysis (Distal junction sequence variation, Short arm variation and allelic diversity); Transmission and recombination analysis (Identification of parent to children transmitted bases, Recombination detection and validation, Recombination breakpoint refinement, Test the significance of recombinations, PRDM9 motif and breakpoint association); De novo mutations (De novo variants calling and validation, Mutation rate calculation). The Code availability statement names one public repository (https://github.com/Platinum-Pedigree-Consortium/AcroMutRecomb); its landing page, file tree and README were read at PROSE level only (folder/pipeline-to-analysis mapping and the literal command lines the README itself quotes) - no Snakemake rule bodies or Python script source were read, which is Stage 2. Two ancillary repositories are also named in Methods prose (https://github.com/EichlerLab/assembly_qc for assembly QC and https://github.com/arangrhie/Scratch/blob/master/Acro/src/annotate.sh for the satellite annotation source), plus tool-home URLs for compleasm, NucFreq, flagger, dorado, modkit, CenMAP, NucFlag, HumAS-HMMER_for_AnVIL, CDR-Finder, rustybam, seqtk, wgatools and SVbyEye. The AcroMutRecomb repository has 0 releases and 0 tags. Two artifacts visible in the repository file tree were inspected because they bear directly on the capture_claim decision: mutation/envs/env.yaml is a conda spec listing nine dependencies (samtools, numpy, pandas, pysam, liftover, pybedtools, tqdm, scipy, biopython) with NO version constraints on any of them - a floating spec, not a lock - and snakemakes/liftover.yaml hardcodes an institution-internal absolute path (/net/eichler/vol28/eee_shared/assemblies/CHM13/T2T/v2.0/T2T-CHM13v2.fasta) as the reference. The mutation-spectrum pipeline present in the repository (mutation/spectrum/Snakefile, MutFigs.py figure6d) has only a truncated counterpart in the retrievable Methods prose and is therefore not counted as a separate step.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: cell lines - 10 G2-G3 samples obtained from the Coriell Institute CEPH collection; G3 spouse and G4 lines generated in-house as EBV-transformed lymphoblastoid cell lines; grown for Hi-C and UL-ONT input (200105 excluded for lack of a cell line)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: PacBio HiFi - Flexigene (Qiagen 51206) whole-blood DNA extraction for G3 spouses, libraries as in Porubsky et al., sequencing on PacBio Revio, Revio SMRT Cells (102-202-200), Revio SPRQ chemistry (102-817-600), 30 h movies, SMRT Link version 13.3",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: ultra-long ONT - UHMW gDNA by phenol-chloroform or NEB Monarch HMW kit (T3050L, 6e6 cells, 600 rpm lysis), Ultra-Long DNA Sequencing Kit V14 (SQK-ULK114), FRA/FDB 10 min RT + 10 min 75 C, RAP 1 h RT, 450 uL EB elution, 75 uL loaded on FLO-PRO114M R10.4.1, PromethION with two nuclease washes/reloads at 24 h and 48 h",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: Hi-C - Dovetail Micro-C kit (MNase digestion) on lymphoblastoid cell lines, sequenced on NovaSeq X, paired-end 150 bp, up to 30x coverage of valid pairs",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Phased diploid genome assembly of 23 samples with Verkko2 (v2.2.1) combining HiFi, UL-ONT and Hi-C for proximity-ligation phasing and scaffolding - version pinned in both Methods and README, but no config, no resource/parameter settings and no per-sample input manifest in prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Assembly base quality and completeness QC via the in-house pipeline https://github.com/EichlerLab/assembly_qc: Meryl (v1.0) 21-mer counting from Illumina reads, Merqury (v1.1) QV/error k-mer flagging, Compleasm (v0.2.4) gene completeness - pipeline repository is public but unversioned (0 releases, 0 tags) and no BUSCO lineage or command line is given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Structural accuracy assessment: sample HiFi reads aligned to matched phased assemblies with minimap2 (v2.28) '-I 10G -Y -y 100 --eqx -L --cs', then NucFreq (v0.1) collapse/misassembly detection (second-highest nucleotide count > 5; all-zero) and HMM-Flagger (v1.1.0) HMM coverage-anomaly classification into erroneous / false-duplication / collapsed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "CpG methylation per pq-scatig: Dorado (v0.7.2) basecalling of raw R10 UL-ONT data (basecalling model not named; R9-era methylation reused for G2/G3), minimap2 (v2.28) '-ax -Y --DM --eqx -y -I 15G' to each sample's own diploid assembly, Modkit (v0.4.4) pileup '--preset traditional' modBAM to bedMethyl, averaged in 10 kbp bins from BEDTools 'makewindows -w 10000'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Centromere location/size/repeat composition with CenMAP (v0.3.1), which internally runs NucFlag (no version stated), RepeatMasker (no version stated in this subsection) and HumAS-SD / HumAS-HMMER_for_AnVIL (no version stated) for HOR organization; centromeric methylation via minimap2 (v2.28) alignment of methylation-tagged ONT reads; CDR identification and CDR-shift calculation with CDR-Finder (v1.0.0) at default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Identification of acrocentric 'pq-scatigs' following Guarracino et al.: assemblies aligned to T2T-CHM13 with minimap2 (v2.28) '-x asm20 --secondary=no -s 25000 -K 8G -c --eqx --cs'; alignments < 100 kbp or < 90% identity excluded; q-arm anchor required > 1 Mbp and > 1 Mbp from the centromere; pq-scatig spans p-arm + centromere + 5 Mbp of q-arm. Implemented in the released pipeline snakemakes/acro_parm.smk with config snakemakes/liftover.yaml, roi.bed and master_asm.tab",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Segmental duplication detection: repeat softmasking by Tandem Repeats Finder (v4.1.0) 'trf {asm.fa} 2 7 7 80 10 50 2000 -l 30 -h -ngs', RepeatMasker (v4.1.5) '-s -e ncbi -xsmall -species human', WindowMasker (v2.2.22) two-stage counts+mask with full argument strings; merged BED intervals softmask the assemblies; SEDEF (v1.1) then called, retaining SDs > 90% identity, > 1 kbp, < 70% satellite content",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Satellite and other repeat annotation of short arms against a curated target set (Table S4) derived from CenSat v2.0/v2.1 for T2T-CHM13v2.0 (chm13v2.0_censat_v2.1.bed at the human-pangenomics S3 URL), Altemose HSatReview consensus fastas for HSat1A/HSat3_A5/HSat3_B3, and rDNA reference KY962518 rotated upstream of the 45S TSS; flipped minimap2 (v2.28) mapping (assembly as query, target repeat as reference), PAF coordinates inverted with rustybam (v0.1.33), merged within 500 bp with BEDTools (v2.31.1), filtered to > 2 kbp or 7-8 kbp; telomeres and gaps with Seqtk (v1.4) 'tel -d5000' and 'gap -l 1'. Command lines appear only as figure-embedded images in the JATS (UFIG1/UFIG2), with full source at github.com/arangrhie/Scratch/blob/master/Acro/src/annotate.sh (personal scratch repo, master branch, 0 releases, 0 tags)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Evaluation of short-arm structural completeness: per-pq-scatig sequence dotplot with ModDotPlot (v0.9.8) plus NucFreq/Flagger and ACRO/DJ/PJ satellite annotation panels (Data S2); distal sequence required to contain the subtelomeric ACRO repeat and the distal-junction flank of the rDNA array. Assessment is visual/manual with no stated dotplot parameters or scoring rule",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Distal-junction sequence variation: error-free DJ sequences extracted from the annotation, graph built with minigraph (v0.21) '-cxggs -t16 {sample}_DJ.fa ...', visualized with Bandage (v0.8.1), chr22 DJ of G2 NA12877 used as graph reference, per-sequence paths called with '-cxasm --call -t16 graph.gfa {sample}_DJ.fa'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Short-arm variation and allelic diversity: per-chromosome all-vs-all alignment with minimap2 (v2.28) '-x asm20 -c --eqx -D -P --dual=no', SVbyEye plots (no version pinned); within-individual allelic vs nonallelic comparison for NA12877/NA12878; 10 kbp sliding-window identity with rustybam (v0.1.33) 'liftover --bed' + 'stats --paf', windows assigned to SD/satellite/SEQ classes, merged into blocks with BEDTools (v2.30.0) 'merge -c -o collapse' to avoid overcounting overlapping alignments",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Identification of parent-to-child transmitted bases across 13 transmissions: wfmash (v0.13.0) '-s 50k -l 150k -p 90 -n 1 -H 0.001' aligning each offspring pq-scatig to parental sequences, then retaining alignment blocks > 1 Mbp with > 99% identity; validated by minimap2 (v2.28) all-vs-all '-x asm20 -c --eqx -D -P --dual=no' and manual inspection with SVbyEye (no version). Implemented in transmission/AcroMain.py and transmission/CreateFig.py figure3a in the released repository",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Recombination detection and validation: split alignment of an offspring contig to both parental homologs on the wfmash alignments; validation step 1 = minimap2 (v2.28) all-vs-all '-x asm20 -c --eqx -D -P --dual=no' visualized with SVbyEye; validation step 2 = offspring HiFi reads aligned to the parental haplotypes and coverage computed with deepTools2 (v3.5.5) 'bamCoverage --minMappingQuality 30 --binSize 10000' (README variant adds '-of bg -bs 10000'); recombination accepted when the coverage pattern matches the SVbyEye view. Two named false-discovery causes (haplotype switch; split alignment to incorrectly scaffolded distal sequence) are described qualitatively only",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Recombination breakpoint approximation and refinement: 10 kbp sliding aligner with rustybam (v0.1.33) 'rb liftover --bed <(bedtools makewindows -w 10000 ...) {input.paf} | rb stats -q --paf'; transition position of exact 10 kbp matches gives the approximate breakpoint; MashMap (v3.1.3) '-s 10000' to find child segments aligning to both parental haplotypes; 30 kbp flanks extracted and a multiple sequence alignment built with an UNNAMED tool given only as '(v7.525)' at default parameters (v7.525 is the MAFFT version scheme, but the tool name is absent from the prose); breakpoint refined to the interval between the two nearest paralog-specific variants in the MSA",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Permutation test of recombination enrichment: family recombination map taken from the published Nature 2025 supplementary xlsx (41586_2025_8922_MOESM10_ESM.xlsx, tabs 'G3_refined' and 'G4'); null built by BEDTools (v2.30.0) 'bedtools shuffle -excl {excluded.bed} -i {input.bed} -g {t2t_chm13.txt}' over 5,000 iterations of five 5 Mbp regions (q-arm test) and 36 Mbp on metacentric p-arms (p-arm test), counted with 'bedtools intersect -c'; empirical p-value against the observed 18 q-arm recombinations. Released as transmission/TestRC.py test_rc_bp(). No RNG seed is stated and the prose (36 Mbp) and README (38 Mbp) disagree on the p-arm shuffle size",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "PRDM9 motif detection and breakpoint association: FIMO from the MEME Suite (v5.5.5), motif definitions and procedure referred to an external third-party repository (https://github.com/AndreaGuarracino/readcombination/tree/master/prdm9_binding_motifs, no version/tag/commit given); first 14 PRDM9 motifs retained; occurrences counted in 20 kb windows with 'bedtools intersect -c -a 20kb_window.bed -b fimo_output.bed'; best hits taken from FIMO narrow peaks and distance measured to the refined breakpoint. No FIMO p-value/q-value threshold or background model is stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "De novo variant calling from transmitted haplotype-to-haplotype alignments: wgatools (v1.0.0) 'call -f paf -s -r' on the wfmash parent-offspring PAFs to emit SNVs, insertions, deletions and inversions. Implemented in snakemakes/var_detect.smk in the released repository",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Read-based validation of candidate de novo SNVs: all DNMs required outside assembly-error regions on both parental and child haplotypes; offspring and parental HiFi aligned with minimap2 (v2.28) '-a -x map-hifi --eqx' and UL-ONT with '-a -x map-ont --eqx' (README adds '-y --cs -I8g'); a valid de novo SNV requires >= 3 supporting offspring HiFi and UL-ONT reads and absence from both parents' HiFi and UL-ONT reads. Implemented in mutation/Snakefile with mutation/config.json and mutation/validate_var.tab manifests",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Read-based validation of candidate de novo SVs: Delly (v1.3.3) and Sniffles2 (v2.6.1) run at default parameters on the same HiFi and UL-ONT alignments, then Truvari (v5.2.0) 'collapse --pctseq 0.8 --pctsize 0.8 --refdist 1000 --sizemin 50 --sizemax 100000 --gt het -k maxqual --intra'; SV support decoded from the Truvari SUPP column; a true de novo SV must be called only in the child's reads and absent from both parents' reads",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Manual IGV curation of every candidate de novo SV and SNV: 'We finally viewed the IGV screenshots of each candidate de novo SV and SNV to confirm the true DNMs and only report those that pass manual inspections (Data S3).' No IGV version, no acceptance criteria, no number of curators, no adjudication rule - this human-judgement filter determines the paper's headline DNM callset and mutation rate",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "De novo SNV mutation-rate calculation: callable bases = transmitted bases (>= 1 Mbp blocks, > 99% identity) minus misaligned and misassembled regions; misalignment found by a 10 kbp sliding aligner (BEDTools v2.30.0 + rustybam v0.1.33) flagging windows below 99.9% parent-offspring identity; assembly errors = union of NucFreq and Flagger masked regions merged with BEDTools; q-arm bases right of the right-most aSat position excluded; rate = de novo SNVs / callable bases per haplotype. Released annotation BEDs (annotation/flagger_nucfreq_merged.bed, pq_flagger_regions.bed, pq_nucfreq_regions.bed) correspond to this step",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 20,
+    "n_NI": 0,
+    "n_X": 1,
+    "S": 21,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/21 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 20/21 computational steps (C1-C19, C21). This paper is unusually well pinned at prose level: essentially every named tool carries an exact version string in Methods (Verkko2 2.2.1, Meryl 1.0, Merqury 1.1, Compleasm 0.2.4, minimap2 2.28, NucFreq 0.1, HMM-Flagger 1.1.0, Dorado 0.7.2, Modkit 0.4.4, CenMAP 0.3.1, CDR-Finder 1.0.0, TRF 4.1.0, RepeatMasker 4.1.5, WindowMasker 2.2.22, SEDEF 1.1, BEDTools 2.30.0/2.31.1, rustybam 0.1.33, Seqtk 1.4, ModDotPlot 0.9.8, minigraph 0.21, Bandage 0.8.1, wfmash 0.13.0, deepTools2 3.5.5, MashMap 3.1.3, MEME 5.5.5, wgatools 1.0.0, Delly 1.3.3, Sniffles2 2.6.1, Truvari 5.2.0), and most steps quote literal command lines with full argument strings. Version is nevertheless capped at 1 on every step because there is no environment closure anywhere: the one environment artifact in the repository (mutation/envs/env.yaml) lists nine conda dependencies with zero version constraints, there is no lockfile, no container, no Dockerfile, no image digest, and the AcroMutRecomb repository has 0 releases and 0 tags, so no citable code state corresponds to the manuscript. Exactly 1/21 step is blocked (X): C20, the manual IGV curation that produces the reported de novo mutation callset, has code = version = params = 0 and no acceptance criteria of any kind - it is the single largest reproducibility discontinuity in an otherwise well-specified pipeline. Data is capped at 1 on 20/21 computational steps because 4 of the 23 assembled family members (G3-NA12883, G3-NA12884, G3-NA12887, G4-200103) did not consent to open access and their sequencing data and assemblies are only at dbGaP (phs003793), so no fully public route reproduces the 23-sample cohort; only C15 reaches data = 2 because its input is the published Nature supplementary recombination map plus T2T-CHM13. Even under Stage 2 execution no step could exceed RI without an executed environment capture, since none is claimed.",
+    "coverage": "21 computational analysis steps assessed from the bioRxiv v1 JATS Methods plus the Code availability repository landing page and README prose. 4 wet-lab steps (Coriell/in-house EBV-transformed lymphoblastoid cell lines, PacBio Revio HiFi library prep and sequencing, ultra-long ONT SQK-ULK114 library prep and PromethION sequencing, Dovetail Micro-C Hi-C library prep and NovaSeq X sequencing) counted in W and out of computational-reproduction scope. Coverage = 25/25 (100%) of enumerated steps.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment; repository github.com/Platinum-Pedigree-Consortium/AcroMutRecomb (all steps C1-C21)",
+      "missing": "No environment closure of any kind is claimed or present. The repository file tree contains a single environment artifact, mutation/envs/env.yaml, and it is a fully floating conda spec: channels bioconda/conda-forge/defaults and nine dependencies (samtools, numpy, pandas, pysam, liftover, pybedtools, tqdm, scipy, biopython) with no version constraint on any of them, covering only the DNM-validation Snakemake pipeline and not the other ~19 steps. There is no conda-lock, no requirements.txt, no renv.lock, no Dockerfile, no Singularity definition, no container digest. The repository also has 0 releases and 0 tags (created 2025-12-05, last push 2025-12-11), and the same is true of both ancillary repositories named in Methods (EichlerLab/assembly_qc, arangrhie/Scratch), so the exact code state that produced the manuscript cannot be identified by any citable pointer. This is why version is capped at 1 on every step despite the paper's unusually complete prose version pinning.",
+      "how_to_close": "Ship a lockfile (conda-lock or pixi.lock) or a container image with a recorded digest covering the full toolchain, not just the DNM-validation pipeline; pin every dependency in mutation/envs/env.yaml; tag a release matching the manuscript in AcroMutRecomb and archive it to Zenodo for a citable DOI; pin the ancillary pipelines (assembly_qc, annotate.sh) by commit SHA in Methods."
+    },
+    {
+      "type": 6,
+      "where": "Step C20 - manual IGV curation of candidate de novo SNVs and SVs",
+      "missing": "The final filter that produces the paper's reported de novo mutation callset - and therefore the headline SAAC mutation rate in C21 - is human visual inspection of IGV screenshots with no version, no acceptance criteria, no curator count and no adjudication procedure. The prose is the single sentence 'We finally viewed the IGV screenshots of each candidate de novo SV and SNV to confirm the true DNMs and only report those that pass manual inspections (Data S3).' Code, version and params are all 0, so this step is recorded as blocked rather than inference-requiring: no amount of code reading at Stage 2 can recover the decision rule.",
+      "how_to_close": "State explicit, checkable acceptance criteria for the manual review (read support thresholds, allowed alignment artefacts, haplotype-switch exclusion rules), report the number of curators and how disagreements were resolved, and publish the pre-curation candidate list alongside the post-curation callset so the manual filter's effect is quantifiable."
+    },
+    {
+      "type": 4,
+      "where": "Data availability statement; every step operating on the 23-sample cohort (C1-C14, C16-C21)",
+      "missing": "The cohort is split by consent. Sequencing data and assemblies for 19 family members are public via the AWS Open Data program (s3://platinum-pedigree-data/) and ENA BioProject PRJEB86317, but four members who are load-bearing for the transmission analysis (G3-NA12883, G3-NA12884, G3-NA12887, G4-200103) 'did not consent for open access' and are available only at dbGaP phs003793 (Platinum Pedigree Consortium LRS) under controlled access. There is therefore no fully public route to the 23-sample assembly set the paper analyses. Additionally, the S3 prefix is given without a file manifest, object list, or snapshot date; ENA is given as a BioProject accession with no run-level list; the derived assemblies used as the actual analysis input are not separately deposited with checksums; and the curated satellite target sequences (Table S4) and the coordinate tables (Table S2) exist only as supplementary tables rather than as machine-readable deposits.",
+      "how_to_close": "Publish a file-level manifest with checksums for the s3://platinum-pedigree-data/ prefix and a run accession list for PRJEB86317; deposit the 23 final phased assemblies as a versioned archive with checksums; state explicitly which analyses cannot be reproduced from the public 19-sample subset alone; deposit Table S2 coordinates and Table S4 target sequences as machine-readable files."
+    },
+    {
+      "type": 5,
+      "where": "Repository github.com/Platinum-Pedigree-Consortium/AcroMutRecomb - coverage gaps, portability, and prose/code correspondence",
+      "missing": "The released repository covers only part of the pipeline. Present: pq-scatig identification (snakemakes/acro_parm.smk), variant detection (snakemakes/var_detect.smk), miss-alignment detection (snakemakes/miss_aln.smk), DNM validation (mutation/Snakefile), mutation spectrum (mutation/spectrum/Snakefile), transmission and recombination analysis (transmission/AcroMain.py, ParsePaf.py, TestRC.py, CreateFig.py), and annotation BEDs. Absent: the Verkko2 assembly driver (C1), assembly QC invocation (C2, deferred to the separately unversioned EichlerLab/assembly_qc), methylation (C4), centromere/CenMAP (C5), SD detection (C7), satellite annotation (C8, deferred to a personal scratch repository at github.com/arangrhie/Scratch/blob/master/Acro/src/annotate.sh with no tag or commit pin), ModDotPlot structure evaluation (C9), the DJ minigraph analysis (C10), and the PRDM9/FIMO analysis (C16, deferred to a third-party repository at github.com/AndreaGuarracino/readcombination with no pin). Portability is broken in the released config: snakemakes/liftover.yaml hardcodes the institution-internal absolute path /net/eichler/vol28/eee_shared/assemblies/CHM13/T2T/v2.0/T2T-CHM13v2.fasta as REF, so the released pipeline cannot run outside the authors' filesystem without editing. There is also a prose/code discrepancy on the p-arm permutation size: Methods say 36 Mbp, the README says 38 Mbp. Finally the repository is committed with an IDE directory (.idea/) and has no LICENSE file, no run order, no input-path documentation and no figure-to-script map beyond a handful of named plotting functions.",
+      "how_to_close": "Add the missing per-step drivers (assembly, QC, methylation, centromere, SD, satellite annotation, ModDotPlot, minigraph, FIMO) or pin the external repositories by commit SHA; replace the hardcoded /net/eichler path with a config-supplied reference plus checksum; reconcile the 36 vs 38 Mbp discrepancy; add a LICENSE, a run order and an explicit figure-to-script mapping."
+    },
+    {
+      "type": 3,
+      "where": "Steps C5, C11, C12, C13, C14, C16 - unpinned auxiliary tools inside otherwise version-pinned steps",
+      "missing": "A small set of tools is named without any version even though the surrounding step is pinned. SVbyEye, used for the manual validation views in C11, C12 and C13, is cited by URL (github.com/daewoooo/SVbyEye) with no version. Inside CenMAP v0.3.1 (C5), NucFlag, RepeatMasker and HumAS-SD / HumAS-HMMER_for_AnVIL are named with no version, so the HOR composition output depends on tool versions that the prose does not fix (they are only implicitly fixed by the CenMAP release). In C14 the multiple sequence aligner is given as '(v7.525)' with the tool name omitted entirely - the version string matches MAFFT's scheme, but the identity must be inferred. Dorado's basecalling model (C4) is not named, only the Dorado binary version. IGV (C20) has no version.",
+      "how_to_close": "Name every tool and pin every version explicitly, including visualization and manual-inspection tools; name the Dorado basecalling model; name the MSA program; state the tool versions that CenMAP v0.3.1 wraps."
+    },
+    {
+      "type": 1,
+      "where": "Steps C1, C2, C5, C9, C14, C15, C16",
+      "missing": "Parameter under-specification in an otherwise command-line-rich Methods. C1 gives no Verkko2 configuration, resource settings or per-sample input manifest. C2 gives no assembly_qc invocation and no Compleasm lineage. C5 runs CDR-Finder at 'default parameters' whose defaults are version-dependent and gives no CenMAP configuration. C9's structural-completeness judgement is visual with no dotplot parameters and no scoring rule. C14 gives 'default parameters' for the unnamed MSA program and no rule for selecting paralog-specific variants beyond 'two nearest'. C15 runs a 5,000-iteration BEDTools shuffle permutation test with no RNG seed, so the reported empirical p-values are not bit-reproducible, and the excluded-region BED is described but not deposited. C16 states no FIMO p-value/q-value threshold or background model and no definition of 'best hits' beyond 'narrow peaks'.",
+      "how_to_close": "Publish the Verkko2 and CenMAP configuration files, state the Compleasm lineage, set and report an explicit RNG seed for the permutation tests, deposit the shuffle exclusion BEDs, and state the FIMO significance threshold and background model."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code): https://github.com/Platinum-Pedigree-Consortium/AcroMutRecomb - stated verbatim in Code availability: 'Custom code and pipelines used in this study are publicly available at GitHub (https://github.com/Platinum-Pedigree-Consortium/AcroMutRecomb).'",
+      "http_status": "200 OK (URL-present, public, default branch main, created 2025-12-05, last push 2025-12-11, 0 releases, 0 tags, no license, description 'Acorcentric short arm mutations and recombination')",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to github.com and api.github.com (repo metadata, releases, tags, recursive git tree, raw README.md); landing page, file tree and README prose only. Two config artifacts (mutation/envs/env.yaml, snakemakes/liftover.yaml) were additionally read because they determine the capture_claim classification; no Snakemake rule bodies or Python source were read - that is Stage 2."
+    },
+    {
+      "artifact": "code repo (satellite annotation source): https://github.com/arangrhie/Scratch/blob/master/Acro/src/annotate.sh - stated verbatim in Methods: 'The final short arm satellite annotation is available on (https://github.com/Platinum-Pedigree-Consortium/AcroMutRecomb), with the full source code available under https://github.com/arangrhie/Scratch/blob/master/Acro/src/annotate.sh.'",
+      "http_status": "200 OK for the repository (URL-present, public, default branch master, created 2020-03-25, last push 2025-10-01, 0 releases, 0 tags, description 'Pile of codes'); the cited file path is a branch-tip URL with no commit pin",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to api.github.com repo metadata, releases and tags; file content not read at stage 1"
+    },
+    {
+      "artifact": "code repo (assembly QC pipeline): https://github.com/EichlerLab/assembly_qc - stated verbatim in Methods: 'We used our in-house evaluation pipeline (https://github.com/EichlerLab/assembly_qc) to calculate the base quality, assembly contiguity, and gene completeness.'",
+      "http_status": "200 OK (URL-present, public, default branch main, created 2024-03-11, last push 2026-04-29, 0 releases, 0 tags) - note the pipeline has been pushed to well after the preprint, and with no tag there is no way to identify the state used",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to api.github.com repo metadata, releases and tags"
+    },
+    {
+      "artifact": "code repo (third-party PRDM9 motif procedure): https://github.com/AndreaGuarracino/readcombination/tree/master/prdm9_binding_motifs - stated verbatim in Methods: 'The details can be found in https://github.com/AndreaGuarracino/readcombination/tree/master/prdm9_binding_motifs.'",
+      "http_status": "URL-present (branch-tip path, no commit or tag pin); not fetched at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "recorded from prose only"
+    },
+    {
+      "artifact": "data (open-consent subset, 19 family members): AWS Open Data program s3://platinum-pedigree-data/ and European Nucleotide Archive BioProject PRJEB86317 - stated verbatim in Data availability: '...are available via the AWS Open Data program (s3://platinum-pedigree-data/) as well as the European Nucleotide Archive (BioProject: PRJEB86317).'",
+      "http_status": "stated-in-paper (accession present: ENA BioProject PRJEB86317; S3 prefix given with no object manifest, no file list, no snapshot date); not fetched at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML Data availability statement"
+    },
+    {
+      "artifact": "data (controlled-access subset, 4 family members G3-NA12883, G3-NA12884, G3-NA12887, G4-200103): dbGaP phs003793 - stated verbatim in Data availability: 'Sequencing data and assemblies for four family members (G3-NA12883, G3-NA12884, G3-NA12887 and G4-200103) who did not consent for open access are available at dbGaP (phs003793; Platinum Pedigree Consortium LRS).'",
+      "http_status": "stated-in-paper (accession present, controlled access requiring authorization); not fetched at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML Data availability statement"
+    },
+    {
+      "artifact": "reference/annotation resources cited by URL without version pin or checksum: T2T-CHM13 v2.0 reference genome; CenSat v2.0/v2.1 annotation at https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/annotation/chm13v2.0_censat_v2.1.bed; Altemose HSat consensus fastas at https://github.com/altemose/HSatReview/tree/main; rDNA reference GenBank KY962518",
+      "http_status": "stated-in-paper (URL-present for CenSat and HSatReview; KY962518 is an exact GenBank accession; T2T-CHM13v2.0 named by build with no source URL or checksum in prose - the released snakemakes/liftover.yaml points at an institution-internal absolute path /net/eichler/vol28/eee_shared/assemblies/CHM13/T2T/v2.0/T2T-CHM13v2.fasta)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "external results table used as analysis input: family-wide recombination map at https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-025-08922-2/MediaObjects/41586_2025_8922_MOESM10_ESM.xlsx (Porubsky et al. 2025, Nature 643:427-436), tabs 'G3_refined' and 'G4'",
+      "http_status": "URL-present (publisher-hosted supplementary file, open); not fetched at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML Methods, 'Test the significance of recombinations'"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "da8fbcce7b7502cd02b37d86832a0048b07c9af16528dff66d034f5bcb188943",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

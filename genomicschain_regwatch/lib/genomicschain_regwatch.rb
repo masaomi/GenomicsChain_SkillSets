@@ -16,7 +16,7 @@
 #      ich.org and edps.europa.eu each blocked automated retrieval during the
 #      survey. A watcher that reports those as "unchanged" is worse than no
 #      watcher, because it converts a blind spot into a green light. This is
-#      the same discipline as Tier-2 reporting `no_target_declared` as a
+#      the same discipline as Tier-3 reporting `no_target_declared` as a
 #      complete result instead of quietly scoring a pass.
 #
 #   3. The scanner reports; the operator judges. Whether a diff is material is

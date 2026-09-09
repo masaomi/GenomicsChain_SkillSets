@@ -1,0 +1,567 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "633f71171aa6e011fcf9ab0fa42f9311e5866cbb7bcf0106d32063533f7a68b1",
+  "canonical_id": {
+    "value": "10.1101/2025.10.20.683404",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.20.683404v1",
+      "biorxiv:2025.10.20.683404v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Ancient-genomics reconstruction and population-genetic analysis of a new high-coverage (23.6x) Denisovan nuclear genome (Denisova 25) from a molar at Denisova Cave: read processing and alignment to hg19, snpAD genotype calling and filtering, aDNA damage and present-day-human contamination estimation (lineage assignment, AuthentiCT, contaminationX), mtDNA and Y-chromosome reconstruction and BEAST2 tip-dating, nuclear branch-shortening age estimation, PSMC demographic inference with scrm-based calibration, runs-of-homozygosity / HBD and heterozygosity estimation, D- and f4-statistics with ADMIXTOOLS, Neandertal-ancestry inference with admixfrog, 'Super-Archaic' segment detection with hmmix plus coalescent simulations, Sprime/admixfrog reanalysis of Denisovan ancestry in present-day humans, an adaptive-introgression scan in 236 SGDP non-Africans with GOfuncR GO enrichment, and a catalogue of 237,112 Denisovan-derived SNVs annotated with PrimateAI-3D, phyloP, GENCODE r44, GTEx v10 and the NHGRI-EBI GWAS Catalog. Physical sampling, DNA extraction, single-stranded library preparation, MiSeq/NovaSeq sequencing and the microCT/Avizo morphological segmentation are wet-lab (W, OOS for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis. IMPORTANT: the bioRxiv main text (JATS XML fetched by curl after WebFetch returned HTTP 403; title phrase '200,000-year-old Denisovan' verified present) contains NO Methods section, NO Data availability statement and NO Code availability statement at all — it ends at 'Future perspectives' followed by 'Supporting information DC1 Supplementary Notes'. All methods live in the 13 Supplementary Notes, distributed as a single 48 MB .docx (media-1.docx, HTTP 200), which was downloaded and text-extracted for this Stage-1 read. Steps were derived from that supplementary prose. Assessment is prose-only: no workflow file was read line-by-line, so env_capture_class is 'n/a' everywhere and the verdict ceiling is RI. Six wet-lab/physical steps counted in W and not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Base calling with Real-Time Analysis (RTA) on the NovaSeq instrument; demultiplexing with bcl2fastq (Illumina) allowing one mismatch in the indices; FASTQ to BAM conversion with 'samtools import' — no version stated for any of the three",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Ancient-DNA read processing: adapter trimming and merging of overlapping paired-end reads, alignment to the hg19 human reference, duplicate removal, and filtering to fragments >=35 bp with mapping quality >=25 inside the Map35_100 mappability track — pipeline described by citation to prior MPI-EVA publications (leeHom, BWA, mpieva/biohazard-tools cited in the reference list); no versions and no command lines given in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Ancient-DNA authenticity assessment: 5'/3' C-to-T substitution frequencies and fragment length distributions per library (average 52 bp; Tables S5-S6, Figures S5-S6) — computed with unnamed in-house scripts, no version",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Present-day human DNA contamination estimation by three methods: the 'lineage assignment' derived-allele method (Peyregne et al. 2019), AuthentiCT, and the two-consensus X-chromosome method of contaminationX (github.com/sapfo/contaminationX) — no versions stated for any of the three",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Diploid genotype calling with the ancient-DNA genotype caller snpAD plus 'standard filters' referenced to the Denisova 3 / Vindija processing; 1,670,458,986 genotypes retained (3.4% fewer callable bases than the 30-fold Denisova 3 genome) — snpAD version not stated, filter set defined only by citation",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Mitochondrial genome reconstruction for Denisova 25 and multiple-sequence alignment of the archaic/modern mtDNA panel (MAFFT cited; jModelTest cited for substitution-model selection); accessions for the comparison mtDNA panel are tabulated in Table S15, Denisova 25 itself listed as 'This study' — no tool versions stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Bayesian tip-dating and phylogeny for mtDNA and Y chromosome with BEAST2 (program version 2.6.1 for mtDNA; v2.6.7 for the Y analysis, with logcombiner v2.6.7 and TreeAnnotator v2.6.7; bModelTest): mtDNA 3 MCMC chains x 75,000,000 iterations sampled every 5,000 with 10,000,000 burn-in; Y 4 independent chains x 55,000,000 iterations, 10,000,000 pre-burnin, sampled every 5,000, 10% burnin at logcombiner; calibration constraints in Table S16 — exact version pins present, but no environment closure (no lockfile/container/conda spec); no RNG seeds reported",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Construction of the Y-chromosome comparison panel: MarkIlluminaAdapters from Picard tools (v2.18.29) to flag adapters in raw HGDP and 1000 Genomes reads, alignment to hg19 with BWA-MEM (v0.7.17), and ancestral-allele calling from the UCSC hg19-panTro6 multiple alignment file hg19.panTro6.synNet.maf — exact pins on both tools, no environment closure, no accession list for the HGDP/1KGP raw reads and no version for the UCSC alignment file",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Nuclear genetic dating of Denisova 25 by branch shortening (missing mutations relative to present-day humans) with two-standard-deviation intervals from a block jackknife (Supplementary Note 6) — custom method, no software named, no code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "PSMC demographic inference on presumably neutral regions (B-score >= 0.9) with the command 'psmc -N<N> -r<r> -p \"4+25*2+4+6\" -o output.psmc input.psmcfa', using the 20th of 25 iterations following psmc2history.pl defaults; tool source github.com/lh3/psmc cited — full command line given but no PSMC version pinned in this paper's prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "PSMC calibration by coalescent simulation following Mafessoni et al. (2020): whole genomes simulated with scrm, Denisova 25 filters applied, conversion with the custom script scrm2psmc.py, run through an example Snakemake pipeline — code public at github.com/StephanePeyregne/calibratePSMC (HTTP 200; root contains snakefile, config.yaml, scrm2psmc.py, Denisova3.psmcfa, genome_length.txt, filters/, uncorrected_scrm_codes/). README states 'tested with PSMC version 0.6.5-r67'. No conda/pixi lockfile, no container, no environment.yml; scrm version not pinned; no RNG seeds",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Runs of homozygosity and homozygous-by-descent segment identification (ROH >= 2.5 cM and >= 10 cM; per-genome scan over the pi parameter; uniform recombination rate 1.3 cM/Mb plus African-American and deCODE recombination maps) and group-size / migrant-rate estimation from ROH length and count — no software package named, no code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Per-chromosome and genome-wide heterozygosity estimation in high-coverage archaic genomes, with and without masking of admixfrog-called Neandertal segments >= 0.05 cM and with HBD segments > 1 Mb excluded (Table S37, Figures S23-S24) — custom computation, no software named, no code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "D- and f4-statistics computed with ADMIXTOOLS (admixr R package cited), including stratified D(Neandertal, Denisovan, African, outgroup) binned by SGDP Sub-Saharan African derived-allele frequency in 10% intervals, transversions only, outgroup allele from four great-ape reference genomes, standard errors from a 5 Mb block jackknife — no ADMIXTOOLS/admixr/R version pinned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Neandertal-ancestry inference in the two Denisovan genomes with admixfrog (penalty 0.4; window size 0.005 cM using the African-American recombination map, or 5,000 bp; autosomes and X fitted independently), plus f4-ratio and a two-component mixture model of ancestry proportions — admixfrog version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Detection of candidate 'Super-Archaic' segments with hmmix: model trained with default initial parameters (yielding mutation-rate variation and callable regions), ancestral states supplied as the Ensembl release-74 GRCh37 ancestral-allele FASTA (ftp.ensembl.org/pub/release-74/fasta/ancestral_alleles/homo_sapiens_ancestor_GRCh37_e71.tar.bz2, HTTP 200), posterior decoding at the maximum-likelihood parameters, segments annotated against Chagyrskaya 8, Denisova 3, Denisova 5, Denisova 25 and Vindija 33.19 — hmmix version not stated; external resource pinned in prose only (would be Class B/C at Stage 2)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Reanalysis of previously published archaic segments identified with Sprime in non-African 1000 Genomes individuals: the published Sprime output was downloaded and each segment's match rate to Denisova 3 versus Denisova 25 was computed — no download URL/DOI, no Sprime version, no code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "Adaptive-introgression scan across 236 present-day non-Africans from six geographic regions (SGDP), defining candidates as segments in the extreme upper tail of the frequency distribution (Z-score >= 4.5) in regions carrying Denisovan ancestry; 38 candidate regions annotated with the GENCODE Havana gene set (release 44, GRCh37); GO enrichment with the R package GOfuncR controlling for gene length, recombination rate and background selection — no versions for GOfuncR or R, no scan code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "Catalogue of 237,112 Denisovan-derived single-nucleotide variants (1,307 missense in 1,142 genes; 1,126 promoter-proximal changes affecting 1,052 genes), annotated with PrimateAI-3D pathogenicity scores (top set 0.8-1.0), phyloP conservation from 447 mammalian and 236 primate genomes, GTEx version 10 eQTL/sQTL, and the NHGRI-EBI GWAS Catalog retrieved on 12 October 2024, plus transcription-factor binding prediction (ISL1 at the FOXP2 promoter) — no versions for PrimateAI-3D, phyloP/phastCons or the TF-binding predictor; no code deposited; external resources pinned in prose only",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "Coalescent simulations of competing gene-flow scenarios for the 'Super-Archaic' signal (10% gene flow from a hominin diverging ~1 Ma into Denisovans, versus modern-human gene flow into Neandertals), compared against the observed genotype-covariance decay binned by inter-site distance — simulator described (scrm used elsewhere in the paper) but no version, no parameter file, no seeds and no simulation code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Sampling of the Denisova 25 molar in a clean room: two subsamples (2.7 mg, 8.9 mg) drilled at the cemento-enamel junction plus twelve subsamples (4.5-20.2 mg) scratched from the outer root layer",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "DNA extraction from eleven subsamples using silica-coated magnetic beads on an automated liquid-handling platform, with and without bleach pre-treatment, plus extraction negative controls",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Single-stranded DNA library preparation with control oligos and qPCR quantification (3.09e8-4.70e9 molecules for bleach-treated, 1.51e9-9.46e10 for untreated extracts), plus library-preparation negative controls",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "Preliminary paired-end shotgun screening sequencing of pooled libraries on a MiSeq platform in 76 cycles for aDNA-preservation assessment",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "Deep sequencing of the four selected libraries (A43615, A45393, A43617, A45394) on a NovaSeq platform, ~12.8 billion sequences, yielding 23.6-fold autosomal coverage",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W6",
+      "label": "Morphological characterisation: microCT scanning (BIR Actis 300, 0.0128 mm isovoxel) and slice-by-slice enamel/dentine segmentation in Avizo 8.0 (commercial software, exact version stated) with threshold-based segmentation and the magic-wand tool",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 17,
+    "n_X": 0,
+    "S": 20,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/20 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 3/20 computational steps (15%): C7 BEAST2 (v2.6.1 / v2.6.7 with logcombiner and TreeAnnotator v2.6.7), C8 Picard v2.18.29 + BWA-MEM v0.7.17 for the Y comparison panel, and C11 the calibratePSMC repo whose README states 'tested with PSMC version 0.6.5-r67'. The remaining 17/20 steps cap at NI: every other named tool (snpAD, admixfrog, hmmix, psmc, scrm, ADMIXTOOLS/admixr, samtools, bcl2fastq, MAFFT, AuthentiCT, contaminationX, GOfuncR, PrimateAI-3D) is cited without any version, and eight steps (C9, C12, C13, C17, C18, C19, C20 and the ROH/heterozygosity/branch-shortening custom analyses) have no deposited code at all. No environment lockfile, container digest or conda specification is claimed anywhere in the paper, the supplement or the one linked author repository, so even at Stage 2 no step could exceed RI on environment grounds. Both the zero and the 15% under-claim by construction: Tier-1 cannot credit an undeclared-but-present dependency.",
+    "coverage": "20 computational steps assessed, all from the Supplementary Notes prose (the main bioRxiv text contains no Methods, no Data availability and no Code availability statement). 6 wet-lab/physical steps (tooth sampling, DNA extraction, single-stranded library prep, MiSeq screening, NovaSeq deep sequencing, microCT + Avizo segmentation) counted in W and out of computational-reproduction scope. Computational coverage = 20/26 (77%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Whole paper - there is no Data availability statement anywhere",
+      "missing": "No accession (ENA/SRA/EGA or otherwise) is given for the newly generated Denisova 25 data at any level: raw NovaSeq reads, aligned BAMs, or the 1,670,458,986 filtered genotype calls. The main bioRxiv text ends at 'Future perspectives' followed directly by 'Supporting information DC1 Supplementary Notes'; the landing page carries no data statement; and a full-text search of the 48 MB supplementary .docx returns no deposition sentence. The only project accession appearing anywhere (PRJEB6622) is a reference entry for the previously published Ust-Ishim genome in the mtDNA comparison table (Table S15), where Denisova 25 itself is listed only as 'This study'. Every one of the 20 computational steps consumes this undeposited dataset.",
+      "how_to_close": "Deposit the Denisova 25 reads/BAMs and genotype calls under an ENA/SRA study accession (or the MPI-EVA cdna.eva.mpg.de archive with a stable URL) and add an explicit Data availability statement to the main text linking specimen, libraries (A43615, A45393, A43617, A45394) and files."
+    },
+    {
+      "type": 2,
+      "where": "17 of 20 computational steps (C1-C6, C9, C10, C12-C20)",
+      "missing": "No version is stated for snpAD, admixfrog, hmmix, psmc, scrm, ADMIXTOOLS / admixr, samtools, bcl2fastq, MAFFT, jModelTest, AuthentiCT, contaminationX, bam-caller, biohazard-tools, GOfuncR, PrimateAI-3D, phyloP or R itself. Version pins exist for only four tools in the entire work (BEAST2 2.6.1/2.6.7, Picard 2.18.29, BWA-MEM 0.7.17, Avizo 8.0) plus a README-level 'tested with PSMC version 0.6.5-r67'. Steps with no version cannot reach RI.",
+      "how_to_close": "Add a software-versions table to the Supplementary Notes naming and pinning every tool, interpreter (Python, R) and library actually used."
+    },
+    {
+      "type": 12,
+      "where": "All analysis code except the PSMC-calibration step",
+      "missing": "No analysis-code repository is deposited or linked for this paper. The only author code artifact found anywhere is github.com/StephanePeyregne/calibratePSMC (HTTP 200), which covers the scrm-to-PSMC calibration procedure alone (snakefile, config.yaml, scrm2psmc.py). The four other GitHub URLs in the supplement (lh3/psmc, bodkan/bam-caller, sapfo/contaminationX, mpieva/biohazard-tools) are third-party tool homepages, not this paper's analysis code.",
+      "how_to_close": "Deposit the full analysis codebase (read processing, genotyping and filtering, all population-genetic analyses and figure generation) in a public repository with a Zenodo DOI, and add a Code availability statement to the main text."
+    },
+    {
+      "type": 5,
+      "where": "Custom analyses C9, C12, C13, C17, C18, C19, C20",
+      "missing": "Branch-shortening dating, the ROH/HBD pi-parameter scan, heterozygosity estimation with segment masking, the Sprime match-rate reanalysis, the Z-score >= 4.5 adaptive-introgression scan, the Denisovan-derived variant catalogue pipeline, and the Super-Archaic coalescent simulations are all custom procedures with no software package named and no script published. The prose specifies thresholds well but not the implementations.",
+      "how_to_close": "Publish these scripts (with their input intermediate files or the rules that generate them) alongside the deposited genotype calls."
+    },
+    {
+      "type": 13,
+      "where": "External reference resources consumed by C8, C16, C18, C19",
+      "missing": "External resources are pinned in prose only, never by an executable rule: Ensembl release-74 GRCh37 ancestral-allele FASTA (exact FTP URL given, HTTP 200 - the best-pinned of the set), GENCODE Havana release 44 GRCh37, GTEx version 10, NHGRI-EBI GWAS Catalog 'retrieved on 12 October 2024' (dated but not versioned), the UCSC hg19.panTro6.synNet.maf alignment (no version/date), and the African-American and deCODE recombination maps (no version/source URL). At Stage 2 these would classify as Class B (pin in prose only) at best.",
+      "how_to_close": "Fetch each external resource in a versioned download rule inside the published workflow, recording the release identifier or a checksum."
+    },
+    {
+      "type": 4,
+      "where": "Stochastic steps C7, C11, C20 (and the admixfrog/hmmix EM initialisations in C15, C16)",
+      "missing": "No RNG seeds are reported for the BEAST2 MCMC chains, the scrm coalescent simulations, or the model-fitting initialisations. Chain lengths, sampling intervals and burn-in are fully specified, so results should match distributionally, but exact reproduction is not possible from the published description.",
+      "how_to_close": "Record seeds in the published scripts, or state explicitly that only distributional agreement is expected and supply the posterior/simulation outputs."
+    },
+    {
+      "type": 6,
+      "where": "C2 - ancient-DNA read processing",
+      "missing": "The entire read-processing sub-pipeline (adapter trimming and read merging, alignment to hg19, duplicate removal, mappability-track filtering) is externalised to prior MPI-EVA publications rather than described or shipped here. Only the resulting filters (>=35 bp, MQ >= 25, Map35_100) are stated in this paper.",
+      "how_to_close": "Ship the processing pipeline (or a pinned reference to a versioned release of it) rather than a citation to a methods paper."
+    },
+    {
+      "type": 2,
+      "where": "Environment closure across the whole paper",
+      "missing": "No lockfile (conda-lock, pixi.lock, renv.lock), no container image or digest, and no conda environment.yml is claimed in the paper, the Supplementary Notes, or the calibratePSMC README. The one Snakemake workflow that exists (calibratePSMC) ships a config.yaml but no environment specification, so even that step has no dependency closure.",
+      "how_to_close": "Ship a conda-lock or container digest covering the interpreter, channels and platform for the full analysis stack."
+    },
+    {
+      "type": 11,
+      "where": "W6 - microCT segmentation",
+      "missing": "Enamel/dentine segmentation was performed in Avizo 8.0, commercial software with an exact version stated. This affects only the morphological description (a W step), not any computational-reproduction step, so it does not enter |S|.",
+      "how_to_close": "N/A for Tier-1 computational readiness; noted for completeness. Depositing the microCT volumes would allow re-segmentation with open tools."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab / physical steps W1-W6",
+      "missing": "Tooth sampling, DNA extraction, single-stranded library preparation, MiSeq screening sequencing, NovaSeq deep sequencing and microCT scanning are physical sequence- and data-generation steps, out of scope for computational reproduction; counted in W (6), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the deposited reads or genotype calls would be the reproducible entry point, but none are deposited (see gap type 1)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession for the newly generated Denisova 25 genome (raw reads / BAM / genotype calls)",
+      "http_status": "none - no accession or repository stated in the paper, landing page, or 48 MB supplementary .docx",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text search of the curl-fetched JATS XML, the v1 landing page HTML, and the extracted text of media-1.docx for 'availability', 'deposit', 'accession', 'ENA', 'PRJEB/PRJNA/ERP/SRP/GSE/EGAS' - only PRJEB6622 found, and only as the reference accession for the previously published Ust-Ishim genome in Table S15"
+    },
+    {
+      "artifact": "author code repo: github.com/StephanePeyregne/calibratePSMC (custom scrm2psmc.py plus example Snakemake pipeline for the PSMC calibration step; README states 'tested with PSMC version 0.6.5-r67'; root has snakefile, config.yaml, scrm2psmc.py, Denisova3.psmcfa, genome_length.txt, filters/, uncorrected_scrm_codes/)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L, then WebFetch of the repo landing page"
+    },
+    {
+      "artifact": "third-party tool repo: github.com/lh3/psmc (cited for PSMC command-line semantics)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "third-party tool repo: github.com/sapfo/contaminationX (two-consensus X-chromosome contamination estimator)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "third-party tool repo: github.com/bodkan/bam-caller",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "third-party tool repo: github.com/mpieva/biohazard-tools (ancient-DNA read processing)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "external reference resource: Ensembl release-74 GRCh37 ancestral alleles (ftp.ensembl.org/pub/release-74/fasta/ancestral_alleles/homo_sapiens_ancestor_GRCh37_e71.tar.bz2), supplied to hmmix in C16",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L over HTTPS (paper gives the ftp:// form of the same path)"
+    },
+    {
+      "artifact": "reference accession PRJEB6622 (Ust-Ishim, cited comparison genome in Table S15 - NOT this paper's data)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, ebi.ac.uk/ena/browser/api/summary/PRJEB6622"
+    },
+    {
+      "artifact": "Supplementary Notes (all Methods): biorxiv .../DC1/embed/media-1.docx, 48,033,077 bytes",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with a browser user-agent; WebFetch of the JATS XML returned HTTP 403, curl of the same URL returned 200"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "27f305011c6e99bf132966a15c1e203df518e54c723c8ed33ba365c186278ae6",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

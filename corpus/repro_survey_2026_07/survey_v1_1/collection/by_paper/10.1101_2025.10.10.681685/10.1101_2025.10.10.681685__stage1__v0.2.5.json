@@ -1,0 +1,574 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "a1e05d588c3bf3f7c1d678d7353e230d6714cf78bb0b284755c610a785b3304c",
+  "canonical_id": {
+    "value": "10.1101/2025.10.10.681685",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Reproduce the computational results of the scJLIM manuscript: (a) the simulation benchmark of scJLIM vs bulk JLIM vs subcluster JLIM (calibration, global sensitivity, per-cell sensitivity/specificity/ROC AUC), (b) the OneK1K / ROSMAP / SLE single-cell eQTL-GWAS colocalization scans and the reported ~2x increase in colocalizations over pseudobulk, and (c) the downstream validation analyses (MAST differential expression in post-mortem midbrain snRNA-seq; DESeq2 differential expression in CiS iPSC-derived neuron bulk RNA-seq). The wet-lab arm (hiPSC transduction, NGN2 neuron differentiation, library prep, qPCR) is out of scope and audited for documentation only. Note: the paper is dual-natured - it also ships a new R package (scJLIM), so a tool-methods 'pipeline executability readiness' read is available as a secondary route; recorded here as 'mixed' because the headline claims are biological/statistical application results with a real wet-lab component.",
+  "step_source": "prose-methods",
+  "granularity_note": "Steps derived from the Methods prose (no Snakefile/Nextflow/CWL/WDL/Makefile is referenced in the paper or in either README). One step per distinct named tool or analysis invocation; the several dataset-specific repeats of the same tool chain (OneK1K / ROSMAP / SLE) are collapsed into one step per dataset arm to avoid inflating the denominator, except where the prose specifies materially different parameters. Version-axis rule applied consistently and recorded here because it drives most verdicts: version=1 iff (a) the prose states an exact version (Kallisto v0.46.2, DESeq2 v1.42.1 - exact pin WITHOUT verified environment closure = 1 at stage 1) OR (b) the step is executed by the scJLIM R package, whose README claims a conda environment.yml covering its dependencies (floating environment spec, unexecuted, analogous to the gold-set '--use-conda floating' case = version 1). Every other tool is named in prose with no version anywhere (gap 2a) = version 0. The environment.yml itself was NOT opened - that is a stage-2 job; whether it carries pins is the single biggest open question for this paper.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Simulate genotype panels with Hapgen2 using 1000 Genomes LD (10,000 GWAS individuals + 50 eQTL individuals, 100 loci of 200kb, causal SNP MAF>=0.2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Simulate quantitative phenotypes from the causal SNP and run a linear-model GWAS per simulated locus",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Simulate scRNA-seq datasets with the SplatPop R package (500 genes, 50 individuals, 25 cells/individual/cell-type, 2 or 4 cell types, programmed cell-type-specific eQTLs, imbalanced 30%/70% variants)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Benchmark runs on simulations: scJLIM vs bulk JLIM vs subcluster JLIM (calibration, global sensitivity, cell sensitivity/specificity/ROC AUC, Jaccard-based clustering-accuracy stratification at threshold 0.8)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "OneK1K genotype QC: convert genotype matrix to Plink format and filter (SNP call rate 0.03, individual call rate 0.03, HWE p<1e-6, MAF 0.1, relatedness 0.125)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Genotype imputation via the Michigan Imputation Server / Minimac3 (hg19), followed by MAF 0.1 and R2<=0.8 filtering",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "OneK1K scRNA-seq QC and normalization: drop fail_QC cells, per-cell library-size normalization x10,000 + log, highly-variable-gene selection with Seurat, regress out mitochondrial percentage and residual library size, scale",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Batch correction with ComBat using the 'pool_number' variable as batch (OneK1K)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "PCA on batch-corrected expression, UMAP with 20 PCs and kNN k=10, and per-cell-type PC-count selection by 1.5x Marchenko-Pastur maximum eigenvalue (12 T / 7 NK / 10 B / 10 Myeloid)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Compute genotype principal components with Plink2 (7 genotype PCs for OneK1K, 3 for ROSMAP, 7 for SLE)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "scJLIM linear-mixed-model eQTL mapping on OneK1K via the JuliaCall R package / Julia (genotype, cell- and donor-level covariates, expression PCs, genotype-by-PC interactions, donor random effect; delta-method marginal effect and standard error; per-cell Z and two-sided p)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Per-cell JLIM colocalization (single shared null distribution N=100,000), p>0.5 replacement by Uniform(0.5,1.0), Cauchy combination test (ACAT) for the global p-value, and the elimination-based selection of contributing cells; 1000 Genomes EUR reference LD",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Comparison arm: pseudobulk bulk-JLIM and subcluster-JLIM eQTL mapping and colocalization (sum counts per gene per cluster per individual, same donor covariates, matched number of pseudobulk PCs, Cauchy meta-analysis over subclusters)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "GWAS ingest and locus definition: drop structural variants and non-autosomes, restrict to genotyped SNPs, hg38->hg19 liftover using the UCSC common variant database, define loci as SNPs within 50kb of genome-wide-significant SNPs (p<5e-8, MAF>0.1), merge intersecting loci, exclude chr6:25-35Mb, link to protein-coding genes within 500kb of locus centre",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "ROSMAP snRNA-seq arm: doublet filtering (genotype and expression doublets, OPCs exempted), normalization/HVG/regress-out/scale, batch correction, PCA + UMAP (30 PCs, k=10), scJLIM eQTL mapping with 10 PCs per cell type and covariates (age at death, sex, batch, PMI, library size, mito%, 3 genotype PCs), plus matched bulk mapping and JLIM colocalization",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "SLE scRNA-seq arm: OneK1K-style preprocessing, ComBat on 'batch_cov', subset to European-ancestry individuals, scJLIM eQTL mapping with 10 PCs per cell type and stated covariates, plus bulk mapping and JLIM colocalization",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Differential expression in an independent post-mortem midbrain snRNA-seq dataset (10 PD/DLB, 8 controls) with MAST: hurdle model, fixed effects sex, age, race, mito%, log UMIs, sample ID random effect, disease status as the variable of interest, BH-adjusted p<0.1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "CiS neuron bulk RNA-seq processing: map to hg38/GRCh38 and transcript-level quantification against GENCODE release 46 (GRCh38.p16) with Kallisto v0.46.2, restrict to protein-coding genes, PCA-based batch-effect inspection",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C19",
+      "label": "Differential expression in CiS-cortical and CiS-dopamine neurons with DESeq2 v1.42.1 across three contrasts (SNCA-High vs endogenous, SNCA-Intermediate vs endogenous, SNCA-High vs Intermediate), |log2FC|>0.58 and Bonferroni p<0.05",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "W1",
+      "label": "hiPSC engineering: WTC11 dox-inducible NGN2 line transduced with lentiviral SNCA-IRES-mCherry (or mCherry-only control), FACS sorting on mCherry intensity, single-cell clonal selection, expansion, karyotyping, clone naming (SNCA-high / -intermediate / -endogenous)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "CiS neuron differentiation and collection: CiS-cortical neurons at DIV28, CiS-dopamine neurons at DIV60, three biological replicates per clone",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "RNA extraction (PureLink RNA Mini Kit), cDNA synthesis (SuperScript IV VILO with ezDNase), paired-end strand-specific library preparation and sequencing at Azenta Life Sciences",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Quantitative PCR validation (PowerUp SYBR Green, QuantStudio 7 Flex, 95C 15s then 40 cycles of 95C 1s / 60C 20s, melt-curve check, 2^-ddCt relative to GAPDH)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 14,
+    "n_X": 0,
+    "S": 19,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/19 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Unexecuted; no declared environment has been statically validated, let alone verified as the environment that produced the results. n_fetch_required=0, n_exact_capture_unexecuted=0; has_validated_env_capture=false, so this is a funnel ceiling and NOT a per-paper readiness claim.",
+    "inference_inclusive_upper_bound": "5/19 (26%) readiness upper bound (n_R + n_RI over |S|), unverified until tier-2. Not a claim that any step is reproducible. The 14 NI steps are dominated by a single recoverable cause - tool versions are absent from the prose for every third-party tool except Kallisto and DESeq2 - plus three dataset arms whose input data is not identified at all.",
+    "coverage": "computational coverage 19/23 (83%) - 19 C-steps in scope, 4 wet-lab W-steps out of scope (iPSC engineering, neuron differentiation, library prep/sequencing, qPCR)",
+    "repro_index": {
+      "value": 0.3,
+      "coverage": "19/23 (83%)",
+      "S": 19,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Methods, all third-party tools except two",
+      "missing": "No version number is given anywhere in the prose for Hapgen2, SplatPop, Plink, Plink2, Seurat, ComBat/sva, Minimac3 / Michigan Imputation Server pipeline, MAST, JuliaCall, Julia, R itself, ACAT, or JLIM. Only Kallisto v0.46.2 and DESeq2 v1.42.1 are pinned. This is gap 2a (version not recorded), not 2b (floating lower bound), and it is what caps 14 of 19 C-steps at NI.",
+      "how_to_close": "Publish sessionInfo() / conda list output, or add an environment file to the analysis repo covering the preprocessing stack, or state versions in the Methods."
+    },
+    {
+      "type": 2,
+      "where": "https://github.com/j-mitchel/scJLIM and https://github.com/j-mitchel/scJLIM-Analysis",
+      "missing": "Neither repository has any release or tag (GitHub releases API returns an empty list for both; tags API returns an empty list for both). The manuscript cites bare repository URLs, so the referenced code is floating HEAD with no commit hash recorded.",
+      "how_to_close": "Cut a release, archive it to Zenodo, and cite the DOI or commit SHA in the Code availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Data availability, SLE arm (Methods 'SLE processing details')",
+      "missing": "The SLE single-cell dataset is analysed as a third major application arm but is never named in Data availability - no accession, no repository, no DAC path. It is only inferable from reference 45 (Perez et al., Science 2022) via the narrative, and the reference is not linked to the arm in the availability statement.",
+      "how_to_close": "State the accession (and, if controlled, the DAC/application route) for the SLE scRNA-seq and genotype data."
+    },
+    {
+      "type": 1,
+      "where": "Methods, 'Single-cell transcriptomic analysis in post-mortem brain data'",
+      "missing": "The validation snRNA-seq dataset is described as 'a publicly available snRNA-seq dataset from post-mortem midbrain samples' (reference 61) but no accession or URL is given in Data availability.",
+      "how_to_close": "Add the accession for the midbrain snRNA-seq dataset to Data availability."
+    },
+    {
+      "type": 1,
+      "where": "Data availability vs Methods 'Bulk RNA sequencing and analysis in CiS neurons' and 'Quantitative PCR'",
+      "missing": "The bulk RNA-seq generated for this study (CiS-cortical DIV28 and CiS-dopamine DIV60 neurons, three biological replicates per clone, sequenced at Azenta) and the qPCR data are newly generated, yet no accession, deposit, or sample-to-file mapping is stated anywhere. Data availability lists only downloaded third-party resources.",
+      "how_to_close": "Deposit the raw reads (GEO/SRA) and the count matrix, and add the accession plus a sample sheet mapping clone/replicate to file."
+    },
+    {
+      "type": 6,
+      "where": "Methods, 'OneK1K processing details' - imputation",
+      "missing": "Imputation is externalised to the hosted Michigan Imputation Server (Minimac3, hg19). The reference panel is not named, the server job configuration is not recorded, and the step is not reconstructable as a local script from the prose.",
+      "how_to_close": "Record the reference panel, panel version, phasing choice and server job parameters, or ship the imputed genotype dosages."
+    },
+    {
+      "type": 12,
+      "where": "https://github.com/j-mitchel/scJLIM-Analysis",
+      "missing": "The manuscript analysis repository is public but effectively undocumented: the README is a single line ('Code to replicate results from scJLIM manuscript'). There is no run order, no entry point, no figure-to-script mapping, no stated dependency or environment file, and no workflow manager. Directory listing shows only Analyses/, Preprocessing/, scJLIM_revisions/.",
+      "how_to_close": "Add a README with execution order, inputs, expected outputs per figure, and an environment specification for the preprocessing stack."
+    },
+    {
+      "type": 4,
+      "where": "Methods, simulation design and JLIM null generation",
+      "missing": "No random seeds are stated for the Hapgen2 genotype simulation, the SplatPop scRNA-seq simulation, the N=100,000 JLIM null distribution, or the Uniform(0.5,1.0) replacement of per-cell p-values greater than 0.5. The last of these injects randomness directly into the reported global colocalization p-values.",
+      "how_to_close": "State and consume explicit seeds; report the sensitivity of the global p-values to the uniform-replacement draw."
+    },
+    {
+      "type": 3,
+      "where": "Data availability - auxiliary resources",
+      "missing": "Several resources sit on non-archival hosts and are already unstable: http://pi.well.ox.ac.uk:3010/ (Priority Index gene sets) returned no response at all (curl exit, HTTP code 000) on 2026-07-28; https://www.mayocliniclabs.com/test-catalog/overview/620092 (Mayo autoinflammatory gene panel) returned 403; the IBD/CD/UC summary statistics are cited as bare filenames on ibdgenetics.org; the AD GWAS is a SURFsara personal-share link.",
+      "how_to_close": "Mirror the auxiliary gene sets and any redistributable summary statistics to an authoritative archive (Zenodo / Software Heritage) and cite versioned snapshots."
+    },
+    {
+      "type": 1,
+      "where": "Data availability - ROSMAP",
+      "missing": "ROSMAP is legitimately controlled access, but the statement gives only 'accessed from Synapse under approved BWH study protocol 2025A003972' - no Synapse ID and no documented DAC/application path. Under rubric v0.2.5 controlled access scores Data=2 only when the accession resolves AND the DAC route is documented, so this arm is scored Data=1 (missing identifier) rather than penalised as absent.",
+      "how_to_close": "Cite the Synapse ID for the ROSMAP snRNA-seq and genotype data and name the AMP-AD data-use application route."
+    },
+    {
+      "type": 10,
+      "where": "Methods, iPSC / neuron / qPCR sections",
+      "missing": "Four wet-lab steps (W1-W4) are out of scope for computational reproduction and are recorded for documentation audit only. Documentation quality is good (catalogue numbers, cycling conditions, DIV timepoints, replicate counts) but the clone lines are not stated to be deposited or otherwise obtainable.",
+      "how_to_close": "State an availability route for the SNCA-high / -intermediate / -endogenous WTC11 clones."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (tool): https://github.com/j-mitchel/scJLIM",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from assessor host, unauthenticated; description verbatim 'Single-cell eQTL GWAS colocalization tool'; README present with conda environment.yml install instructions; releases API [] and tags API [] (no release, no tag); no license shown on landing page"
+    },
+    {
+      "artifact": "code repo (analysis): https://github.com/j-mitchel/scJLIM-Analysis",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L from assessor host, unauthenticated; description verbatim 'Code to replicate results from scJLIM manuscript'; 36 commits, 0 stars, 0 forks; directories Analyses/, Preprocessing/, scJLIM_revisions/; README is one line; releases API [] and tags API [] (no release, no tag); no license shown"
+    },
+    {
+      "artifact": "data: GEO GSE196829 (OneK1K genotype matrix)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE196829, unauthenticated"
+    },
+    {
+      "artifact": "metadata: https://github.com/immunogenomics/1K1K_QC (OneK1K cell annotations and QC metadata)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L, unauthenticated"
+    },
+    {
+      "artifact": "data: GWAS Catalog accession GCST009325 (PD GWAS; representative of the GCST accessions listed - GCST90061440, GCST003566, GCST90244787, GCST003814, GCST90014023, GCST90132223, GCST003156)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://www.ebi.ac.uk/gwas/studies/GCST009325, unauthenticated; only this one accession was resolved, the others were not individually checked"
+    },
+    {
+      "artifact": "data: https://figshare.com/articles/dataset/adhd2022/22564390 (ADHD GWAS; the paper also cites this same URL for the AN and ASD GWAS, which appears to be a citation error in the manuscript)",
+      "http_status": "202",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L, unauthenticated"
+    },
+    {
+      "artifact": "data: https://datashare.ed.ac.uk/handle/10283/3203 (depression GWAS)",
+      "http_status": "301",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L, unauthenticated; redirect not followed to a terminal 200 within the timeout"
+    },
+    {
+      "artifact": "data: https://vu.data.surfsara.nl/index.php/s/jVlyt1m9Bb2mAki (AD GWAS)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L, unauthenticated; personal-share style link, not an archival accession"
+    },
+    {
+      "artifact": "resource: http://pi.well.ox.ac.uk:3010/ (Priority Index gene sets)",
+      "http_status": "000 (no HTTP response; connection did not complete within 25s)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L --max-time 25 from assessor host; non-standard port 3010 may also be blocked by the assessor network - recorded verbatim, not interpreted as definitive link rot"
+    },
+    {
+      "artifact": "resource: https://www.mayocliniclabs.com/test-catalog/overview/620092 (autoinflammatory gene panel)",
+      "http_status": "403",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L with browser user-agent; likely bot blocking rather than removal - recorded verbatim"
+    },
+    {
+      "artifact": "data: ROSMAP scRNA-seq / genotype via Synapse (stated as 'under approved BWH study protocol 2025A003972')",
+      "http_status": "not checkable - no Synapse ID given in the paper",
+      "checked_at": "2026-07-28",
+      "network_context": "no URL or accession to resolve"
+    },
+    {
+      "artifact": "data: SLE scRNA-seq dataset (third application arm)",
+      "http_status": "not checkable - no accession or URL stated anywhere in the paper",
+      "checked_at": "2026-07-28",
+      "network_context": "absent from Data availability"
+    },
+    {
+      "artifact": "data: post-mortem midbrain snRNA-seq validation dataset (reference 61)",
+      "http_status": "not checkable - described as 'publicly available' with no accession",
+      "checked_at": "2026-07-28",
+      "network_context": "absent from Data availability"
+    },
+    {
+      "artifact": "data: CiS neuron bulk RNA-seq generated for this study",
+      "http_status": "not checkable - no deposit stated",
+      "checked_at": "2026-07-28",
+      "network_context": "absent from Data availability"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/10/13/2025.10.10.681685.source.xml",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L; JATS XML retrieved, 176,567 bytes; title-phrase check passed ('single-cell genetic colocalization test improves power' present)"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "env_lock_claimed",
+  "stage2_candidate": true,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "6699ed117f8ebe0ccb3a3825164c20bd75d78010de17e4143038ab14cb084e63",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

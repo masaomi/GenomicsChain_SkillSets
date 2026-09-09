@@ -1,0 +1,237 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "da46445a5f6c104f84546f57c93bd35916de20434434c41cfb0eddb0f815de04",
+  "canonical_id": {
+    "value": "10.1101/2022.02.18.461833",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2022.02.18.461833v4",
+      "biorxiv:2022.02.18.461833v4"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "The MolEvolvR computational workflow as delivered by the hosted R/Shiny web-app (https://jravilab.org/molevolvr): domain resolution of a query protein, protein- and domain-centric iterative homology search across the tree of life, domain-architecture reconstruction by alignment/clustering plus profile matching against domain and orthology databases, feature prediction (signal peptide, transmembrane, localization, secondary/tertiary structure), lineage mapping and phyletic-spread / domain co-occurrence analysis, and the dashboard visualizations (trees, MSAs, domain proximity networks). There is no wet-lab component in this paper.",
+  "step_source": "prose-methods",
+  "granularity_note": "This is a short-format tool announcement with NO Methods/Implementation section, NO Code Availability section, and only a one-sentence 'Data Availability and Reuse' statement pointing at the hosted web-app. The step list below is therefore reconstructed from the narrative Steps 1-3 description in the Results/description prose ('In Step 1 ... In Step 2 ... In Step 3 ...') plus the one implementation sentence ('written using custom R and shell scripts ... built with an R/Shiny framework'). Tools are named only by citation number (BLAST+, DELTA-BLAST, PSI-BLAST, T-Coffee, MUSCLE, Kalign, InterPro/InterProScan, SignalP, Phobius/TMHMM, HHpred/Jpred/PSIPRED/Gene3D) and are never bound to a stated invocation, version, or parameter. Coarse granularity: one step per named analysis stage, not one per cited tool, because the prose does not state which cited tool is actually invoked at which stage. No wet-lab steps (W=0).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Step 1a: resolve query protein(s) into constituent domains via profile matching against protein domain and orthology databases (InterPro / InterProScan and others cited by number, refs 32,33,69-72); accepts FASTA, NCBI/UniProt accessions, precomputed MSA, or external BLAST/InterProScan output",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "web-server",
+        "unversioned-reference-db",
+        "tool-named-by-citation-only"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Step 1b: iterative protein- and domain-centric homology searches across the tree of life (BLAST+ / DELTA-BLAST / PSI-BLAST cited as refs 19-21) to capture remote homologs missed by full-length searches",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "web-server",
+        "no-search-thresholds",
+        "unversioned-reference-db"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Step 2a: domain-architecture reconstruction for query and homologs using sequence alignment and clustering algorithms for domain detection (T-Coffee / MUSCLE / Kalign cited as refs 19,24,25,68)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "tool-named-by-citation-only",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Step 2b: putative molecular-function delineation via prediction algorithms for signal peptides (SignalP, refs 33,73), transmembrane regions (Phobius/TMHMM, refs 33,74-76), cellular localization (refs 33,75), and secondary/tertiary structure (HHpred/Jpred/PSIPRED/Gene3D, refs 33,77-80)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "tool-named-by-citation-only",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Step 3: map homologs and their domain architectures to lineages (taxonomy resources cited as refs 64-67) to compute phyletic spreads, co-occurrence patterns, and relative occurrences of domain architectures across lineages; implemented in 'custom R and shell scripts'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "custom-scripts-not-released",
+        "unversioned-reference-db"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Summarization/visualization layer: structure-based MSAs and phylogenetic trees, domain proximity networks, phyletic spread and co-occurrence plots, dashboard summary statistics and downloadable reports, served by the R/Shiny web-app (refs 46-63) with HTML/JavaScript/CSS customizations",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "hosted-service-only",
+        "no-release-version"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 6,
+    "n_X": 0,
+    "S": 6,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/6 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/6 (0%). All six computational steps cap at NI even under an inference-inclusive reading. The paper names no source repository (no GitHub/GitLab/Zenodo/Software Heritage URL appears anywhere in the full text or supplementary-material page), states no software versions, states no parameters or thresholds, and deposits no dataset. The 'Data Availability and Reuse' statement is a single sentence pointing at the hosted web-app plus an MIT license mention, which is a service-access statement, not a code or data availability statement. Because no source artifact is named in the paper, there is nothing for stage 2 to read and this paper does not become R-star-eligible via stage 2.",
+    "coverage": "6 computational steps assessed, reconstructed from the narrative Step 1-3 description and the single implementation sentence; no Methods, Implementation, or Code Availability section exists in the paper. 0 wet-lab steps. Coverage of the actual pipeline is necessarily partial: the prose describes the workflow at the level of analysis stage, not invocation.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Entire MolEvolvR workflow (all 6 C-steps)",
+      "missing": "No code repository is stated anywhere in the paper. The full text and the supplementary-material page contain zero occurrences of github/gitlab/bitbucket/zenodo/software-heritage/osf/codeocean. The implementation is described only as 'custom R and shell scripts' plus an 'R/Shiny framework'; none of it is pointed at a source location. The MIT license is asserted for the web-app but no licensed source tree is identified.",
+      "how_to_close": "Add an explicit Code Availability statement naming the source repository and an archived release (e.g. a Zenodo DOI for a tagged version), so the workflow can be inspected and re-executed rather than only used interactively through the hosted service."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for every step",
+      "missing": "No version pin of any kind. Not one software version number appears in the paper: R, Shiny, BLAST+, InterProScan, the alignment tools, and the prediction tools are all cited bibliographically without versions. No conda environment, no lockfile, no container image or digest, no renv.lock, no requirements file. No MolEvolvR release version or build identifier is given, and the Footnotes explicitly announce 'several backend updates' between versions, so the analysed system is a moving target.",
+      "how_to_close": "Publish a pinned environment (container digest, conda-lock/renv.lock) and a versioned MolEvolvR release identifier, and stamp each job's output with the release + environment used."
+    },
+    {
+      "type": 5,
+      "where": "C1-C5 analysis parameters",
+      "missing": "No parameters or thresholds are stated for any step: no BLAST program selection, e-value, iteration count, coverage or identity cutoff for the iterative homology search; no alignment tool selection or gap/model settings; no clustering thresholds for domain detection; no prediction-tool cutoffs; no taxonomy-mapping rules. Which cited tool is actually invoked at each stage is also unstated.",
+      "how_to_close": "Document the default parameter set of each pipeline stage (and which tool implements it) in the paper or in a versioned configuration file shipped with the source."
+    },
+    {
+      "type": 1,
+      "where": "Reference databases and worked-example inputs",
+      "missing": "No data accession of any kind is stated (no GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo). The reference resources (NCBI, InterPro, orthology databases, taxonomy) are named only by citation, with no snapshot date, release number, or frozen copy - so identical re-runs are not defined even in principle. The pre-loaded examples and the case study are referred to as living content inside the web-app rather than as deposited input/output files.",
+      "how_to_close": "Record and expose the reference-database release used per job, and deposit the case-study input sequences plus the corresponding expected outputs as a fixed archived dataset."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE stated. Verbatim, the only availability text in the paper is 'Data Availability and Reuse: All the data, analyses, and visualizations are available in our interactive and queryable web application: http://jravilab.org/molevolvr . The web-app is licensed under the MIT license.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL is present in the full text or on the supplementary-material page.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "case-insensitive scan of the fetched v4 full-text HTML and the v4 supplementary-material page for github/gitlab/bitbucket/zenodo/softwareheritage returned no matches; no repository was searched for on the open web, per protocol"
+    },
+    {
+      "artifact": "hosted service (stated in paper as the availability route): https://jravilab.org/molevolvr - also cited in the Abstract and Footnotes",
+      "http_status": "200 OK (redirects to https://jravilab.cuanschutz.edu/molevolvr/app_direct/molevolvr_app/)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser user-agent, following redirects"
+    },
+    {
+      "artifact": "companion instance stated in paper: https://jravilab.org/psp (PSP stress-response specialization of the same approach)",
+      "http_status": "302 (redirect issued; not followed further)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, no redirect following"
+    },
+    {
+      "artifact": "data accessions: NONE. No GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession is stated anywhere in the paper.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text scan; the only data pointer is the web-app URL above"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "0b2a31fd02cdf67dc9382a2c9efbd21d0bf0d88c4ac9c7ec3f68a1bd97b0ef78",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

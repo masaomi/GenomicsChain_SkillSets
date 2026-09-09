@@ -1,0 +1,666 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "08e8e6ab02ea0a70cd98f8a41561c19c832f2cdb17b711803e8d1ca1cb1c2feb",
+  "canonical_id": {
+    "value": "10.1101/2025.10.11.681520",
+    "kind": "doi",
+    "aliases": [
+      "biorxiv;2025.10.11.681520v2",
+      "elife;RP110149"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Reproduce, from the deposited FASTQ/barcode-count data, the TYK2 deep-mutational-scanning variant-effect estimates for IFN-alpha signaling and protein abundance (barcode-count generation, per-position negative binomial GLMM, linear contrasts vs untreated, FACS-bin 'midpoint' abundance statistics), the derived variant classifications (signaling-only LOF, drug resistance/potentiation), the structural visualizations, and the human-genetics arm (UK Biobank REGENIE association, GCTA-COJO conditioning, SuSiE fine-mapping, VEP annotation, per-individual DMS score logistic regression, SKAT-O / AllelicSeries rare-variant tests, UKB-PPP pQTL analysis). Library construction, cell-line engineering, DMS assay execution, FACS sorting, CRISPR knock-in and western blotting are out of scope (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool/analysis invocation in the Methods prose of the bioRxiv v2 JATS XML. 22 computational steps, 9 wet-lab steps. Stage-1 prose triage only: no code was read and no artifact was executed; the GitHub landing page + README prose were read to record the environment CLAIM (docker/Dockerfile + nix flake.lock) but no repository file content was evaluated. The bioRxiv v2 Methods and the eLife (RP110149) published Methods were cross-checked and are substantively identical for all computational steps; the eLife version additionally adds MaveDB accessions and a Zenodo-archived code copy that are NOT present in the preprint, so those were NOT credited here.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Reporter design and optimization (8x ISRE + minP + barcoded luciferase transcriptional reporter; VAMP-seq-derived GFP-TYK2-IRES-BFP-T2A-BSR abundance reporter)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Base cell line generation (all TYK2 copies knocked out in HEK293T, H11 safe-harbor landing pad, isoclonal selection)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "DMS library generation: TYK2 CDS (P29597) split into 17 ~210 bp segments, Twist oligo pools, barcode appending, two-step cloning, Bxb1 integration, Blasticidin selection",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "IFN-alpha signaling DMS assay execution in biological triplicate (doxycycline induction, IFN-alpha 2a stimulation +/- TYK2 inhibitors, RNA extraction, SuperScript IV RT) and Illumina NextSeq 2000 sequencing library preparation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Protein abundance DMS assay: barcode bottlenecking to ~20 barcodes/variant, FACS sorting on a Sony MA900 into four GFP:BFP quartile bins, gDNA extraction and amplicon library prep",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Individual-allele TYK2 cell lines for validation (GFP-tagged and untagged constructs integrated into the H11 landing pad)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "CRISPR knock-in of P1104A into endogenous TYK2 of Kit225 cells (HiFi Cas9 RNP + ssODN HDR donor, nucleofection, limiting-dilution cloning, MiSeq amplicon NGS)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W8",
+      "label": "Western blotting of TYK2 variant cell lines (RIPA lysis, BCA quantification, LICOR Odyssey imaging)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W9",
+      "label": "Cell line validation (STR profiling at UC Berkeley DNA Sequencing Facility; EZ-PCR mycoplasma testing)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Variant-barcode map construction from 2x150 paired-end NextSeq 2000 amplicon sequencing of the 17 sub-libraries; demultiplexing and variant-barcode association 'mapped as previously described' (Howard et al. 2025) - no tool or version named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Barcode-count generation: first 21 bp of each single-end read extracted and joined to the variant-barcode map requiring a perfect barcode match (repo dirs fastq/, sra/, barcode_maps/, mapped_counts/); inputs are SRA PRJNA1291213 and Zenodo 15347448",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "IFN-alpha primary variant effect model: negative binomial generalized linear mixed model, one model per position, incorporating all variant counts at that position plus all WT counts of the corresponding protein segment; log2(fold change) vs WT + SE (repo src/model.R, src/model_utils.R)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Linear contrast of each variant in each condition against the same variant in the untreated (no-cytokine) condition to obtain final IFN-alpha variant effect estimates",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Protein abundance primary model: same GLMM with the four fluorescence bins (25/50/75/100) used as the 'condition' and the offset removed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Abundance 'midpoint' statistics: per variant, 1000 draws simulated from a normal distribution parameterized by the regression estimate and SE, weighted average across bins with weights 0.125/0.375/0.625/0.875 (repo src/midpoints.R); no random seed stated in prose",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Orthogonal variant classification: all reported TYK2 alleles downloaded from ClinVar on January 9, 2025 (no release/version identifier, no file accession)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "C_mutable_latest",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Classification of signaling-only LOF variants: merge of the 100 U/mL IFN-alpha signaling and abundance datasets, filtered on log2FC(IFN-alpha) < 0 and FDR < 0.05, and abundance midpoint shift > 0 or FDR(midpoint shift) > 0.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Identification of drug resistance / potentiation variants: drug-treated conditions (100 U/mL IFN-alpha + inhibitor, Table 1) tested for significantly different drug response vs WT at FDR < 0.01; potentiation profiling normalized to the cytokine-stimulated no-drug condition",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Structural modeling and molecular visualization with UCSF ChimeraX (no version): PDB 4OLI, 4PO6, 7T6F as MatchMaker scaffold, inhibitor-bound structures 6NZP and 8S9A; composite full-length TYK2 model",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "GWAS aggregation and inverse-variance fixed-effects meta-analysis of P1104A across UK Biobank, FinnGen and published studies (sources listed in a supplementary table); no software named, no script referenced",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "UK Biobank association testing with REGENIE (no version) on high-quality common variants at the TYK2 locus (INFO > 0.8, MAF > 0.01, 200 kb window), traits PsO / RA / hypothyroidism / IBD / UC + pooled autoimmune trait, covariates PC1-10, sex, age",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Conditional analysis with GCTA-COJO (no version) at p < 5e-8 for independent signals and p < 5e-5 for suggestive signals",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Fine-mapping with SuSiE (no version, no stated priors or L parameter) to prioritize causal variants at the conditioned signals",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Rare-variant discovery in the UK Biobank 450k WES dataset: Ensembl VEP annotation (no version, no cache/assembly version stated), canonical-transcript missense filter, MAF < 0.01%, yielding 447 rare protein-altering variants",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "UK Biobank participant QC and phenotype construction (heterozygosity/missingness outliers, sex-mismatch and aneuploidy exclusions, British White subset, one per related pair; case definition by ICD10 + GP records + PheCodes, 31,726 cases / 308,674 controls); no software or script stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Per-individual DMS score (genotype-weighted scaled log2FC, formula given) and logistic regression of autoimmune case status on IFN-alpha and abundance DMS scores, with rs34536443 dosage, PC1-10, sex and age as covariates; nested models compared by AIC. No code for this analysis is in the stated repository",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Rare-variant association testing with the R SKAT-O package and the R AllelicSeries package (no versions), with variant categories built from VEP consequence, SIFT prediction, CADD Phred >= 20 / <= 20 and LOFTEE High Confidence LOF; covariates PC1-10, sex, age",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Plasma pQTL analysis over UKB-PPP full summary statistics for 2936 Olink proteins: conditional analysis at p < 5e-8 followed by SuSiE to test whether P1104A or I684S is a causal variant for each protein's plasma level",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "CRISPR knock-in clone genotyping: bcl2Fastq demultiplexing followed by the CRISPR-DAV pipeline (no versions) with HDR_NewBase set to 10352442C on hg38 to identify homozygous P1104A clones",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Image densitometry with Fiji (no version): E-Gel band quantification for library pooling, and western-blot quantification of full-length TYK2 integrated density normalized to GAPDH",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C22",
+      "label": "FACS validation analysis: gating and GFP:BFP ratio histograms generated in FlowJo (BD Biosciences, no version, proprietary; no workspace or gating definition provided) from ~600,000 events per sample",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "license-gated"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 18,
+    "n_X": 4,
+    "S": 22,
+    "W": 9,
+    "n_fetch_required": 5,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/22 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Unexecuted; declared environment statically valid but not verified as the env that produced the results. n_exact_capture_unexecuted = 0, n_fetch_required = 5.",
+    "inference_inclusive_upper_bound": "0/22 (0%) readiness upper bound at stage 1: (n_R + n_RI) / |S| = (0 + 0) / 22. The DMS arm (C2-C9) is the strongest half of the paper - raw FASTQ on SRA PRJNA1291213, barcode maps and mapped counts on Zenodo 15347448, modeling code public at https://github.com/octantbio/bms-dms with a Dockerfile and a nix flake.lock - but the prose names no software version anywhere in the paper, so the version axis cannot exceed 1 at stage 1 and the lock remains an unverified claim. The human-genetics arm (C11-C19) is separately capped by controlled-access UK Biobank data and by the absence of that analysis code from the stated repository. Unexecuted; under-claims by construction.",
+    "coverage": "computational coverage |S| / (|S| + |W|) = 22 / 31 = 71%; 9 wet-lab steps (reporter design, base cell line, library construction, both DMS assay executions, validation cell lines, CRISPR knock-in, western blotting, cell-line authentication) scored OOS",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "whole paper - every computational step (C1-C22)",
+      "missing": "2a - no software version is stated anywhere in the Methods. Verbatim searching of the v2 JATS body returns zero version strings: ChimeraX, REGENIE, GCTA-COJO, SuSiE, VEP, SKAT-O, AllelicSeries, bcl2Fastq, CRISPR-DAV, Fiji, FlowJo and R itself are all named without versions. The environment closure exists only in the repository (docker/Dockerfile + docker/flake.nix + docker/flake.lock), which the paper does not mention.",
+      "how_to_close": "State versions in the Methods, or reference the repository's nix flake.lock / Docker image from the Data and code availability statement so the claim is discoverable from the paper."
+    },
+    {
+      "type": 9,
+      "where": "C11, C16, C17 (and the covariate construction shared by C12-C19)",
+      "missing": "The human-genetics analyses - the GWAS meta-analysis, the UK Biobank QC and phenotype-definition pipeline, and the per-individual DMS score plus logistic-regression model selection, which carries a central claim of the paper - have no code in the stated repository. The paper states only 'Code for data processing, statistical modeling, and summary statistics are available on GitHub at https://github.com/octantbio/bms-dms', and the repository landing page describes that code as the DMS negative-binomial GLMM (src/) plus figure Quarto/Rmd files (paper/).",
+      "how_to_close": "Deposit the UK Biobank QC, phenotype-definition, DMS-score and association-testing scripts, or state explicitly which analyses the repository does and does not cover."
+    },
+    {
+      "type": 1,
+      "where": "C11-C19",
+      "missing": "Individual-level UK Biobank data (450k WES, imputed genotypes, phenotypes) is controlled-access and requires an approved application; the paper gives no application/project ID. UKB-PPP summary statistics for the 2936 Olink proteins are cited by publication only, with no accession or download URL. The aggregated external GWAS sources are listed in a supplementary table rather than as accessions.",
+      "how_to_close": "Quote the UK Biobank application number and give accessions/URLs for the UKB-PPP summary statistics and each external GWAS used in the meta-analysis."
+    },
+    {
+      "type": 8,
+      "where": "Data and code availability - https://github.com/octantbio/bms-dms",
+      "missing": "The repository URL is given without a commit SHA, tag or archival DOI in the preprint. A tag v1.0.0 (6f0f5d9f201c04ae17e35c5bf082bcfc5bbe24c2) exists in the repository and the later eLife version cites an archived copy, but the bioRxiv v2 statement points at a mutable default branch (master, last pushed 2026-06-05).",
+      "how_to_close": "Cite a tag or Zenodo/Software Heritage archive of the exact analysis code state in the preprint's availability statement."
+    },
+    {
+      "type": 13,
+      "where": "C7 (ClinVar), C10 (PDB), C15/C18 (VEP cache, SIFT, CADD, LOFTEE)",
+      "missing": "External resources are consumed without a pinned release. ClinVar is cited as a dated download ('January 9, 2025') with no release identifier or file hash; PDB entries are given by accession without an entry version; the VEP release, its cache/assembly build, and the SIFT / CADD / LOFTEE versions used for variant classification are not stated. No workflow file exists to classify these fetches as class A - they are prose-only (B) or mutable (C) at stage 1.",
+      "how_to_close": "Pin ClinVar to a dated release archive with a checksum, state VEP release + cache version + CADD/LOFTEE versions, and pin PDB entry versions."
+    },
+    {
+      "type": 4,
+      "where": "C6 (and, downstream of it, all abundance-based analyses C8, C17)",
+      "missing": "The 'midpoint' abundance statistic is computed from 1000 simulated draws per variant from a normal distribution; no random seed is stated in prose. Reproduction of the published midpoint values is therefore distributional rather than exact unless a seed is set in the deposited code.",
+      "how_to_close": "State the seed in the Methods and show it consumed in src/midpoints.R."
+    },
+    {
+      "type": 5,
+      "where": "C1",
+      "missing": "Demultiplexing and variant-barcode association mapping are described only as 'as previously described' with a citation to Howard et al. 2025; no tool, no parameters and no script are named for this step in this paper.",
+      "how_to_close": "Restate the barcode-mapping procedure with its tool/parameters, or point to the specific script in the repository."
+    },
+    {
+      "type": 3,
+      "where": "C22 (FlowJo), C21 (Fiji)",
+      "missing": "Analysis performed in interactive GUI software: FlowJo gating and GFP:BFP histogram generation, and Fiji densitometry. No gating strategy file, FlowJo workspace, macro or ROI definition is deposited, and the underlying FCS files and blot images are not in any stated accession.",
+      "how_to_close": "Deposit FCS files and the FlowJo workspace (or an equivalent scripted gating definition), and the raw blot images with the Fiji macro used."
+    },
+    {
+      "type": 10,
+      "where": "W1-W9",
+      "missing": "Reporter and plasmid design, base cell line engineering, DMS library construction, both DMS assay executions including FACS sorting, individual validation cell lines, CRISPR knock-in and western blotting are wet-lab; excluded from |S| as OOS.",
+      "how_to_close": "n/a - out of scope for computational reproducibility."
+    },
+    {
+      "type": 12,
+      "where": "C20",
+      "missing": "The MiSeq amplicon-NGS reads used to genotype the CRISPR P1104A knock-in clones are not covered by any stated accession; SRA BioProject PRJNA1291213 is described as 'raw FASTQ files for each DMS assay sample'.",
+      "how_to_close": "Deposit the amplicon sequencing reads alongside the DMS data."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "paper full text (bioRxiv v2 JATS XML)",
+      "http_status": "200 (189496 bytes, fetched via curl; WebFetch returned 403 and the first three curl attempts returned 429 Cloudflare rate-limit)",
+      "checked_at": "2026-07-27",
+      "network_context": "https://www.biorxiv.org/content/biorxiv/early/2025/12/23/2025.10.11.681520.source.xml"
+    },
+    {
+      "artifact": "code repository - GitHub https://github.com/octantbio/bms-dms",
+      "http_status": "URL-present and stated-in-paper; landing page + README prose read (200). Verbatim from the paper: 'Code for data processing, statistical modeling, and summary statistics are available on GitHub at https://github.com/octantbio/bms-dms.' No commit or tag is cited in the preprint. Repository is MIT-licensed, default branch master, last pushed 2026-06-05, one tag v1.0.0. Top level: aux, barcode_maps, docker, fastq, mapped_counts, paper, sra, src, sumstats. docker/ contains Dockerfile + flake.nix + flake.lock; src/ contains model.R, model_utils.R, midpoints.R; paper/ contains Rmd/Quarto figure files. No source file content was evaluated (stage1 prose-only).",
+      "checked_at": "2026-07-27",
+      "network_context": "GitHub landing page + raw README.md + contents API listing"
+    },
+    {
+      "artifact": "SRA BioProject PRJNA1291213 (raw FASTQ for each DMS assay sample)",
+      "http_status": "stated-in-paper (accession quoted in Data and code availability; not fetched - stage1 prose-only)",
+      "checked_at": "2026-07-27",
+      "network_context": "no HTTP resolution attempted at stage 1"
+    },
+    {
+      "artifact": "Zenodo accession 15347448 (oligonucleotide-barcode maps and mapped barcode-level read counts, tab-delimited)",
+      "http_status": "stated-in-paper (accession quoted; DOI 10.5281/zenodo.15347448 also badged in the repository README; not fetched - stage1 prose-only)",
+      "checked_at": "2026-07-27",
+      "network_context": "no HTTP resolution attempted at stage 1"
+    },
+    {
+      "artifact": "UK Biobank (450k WES, imputed genotypes, phenotypes) and UKB-PPP plasma proteomics summary statistics - third-party controlled input",
+      "http_status": "stated-in-paper by name and citation only; no application ID, no accession, no URL. Controlled access.",
+      "checked_at": "2026-07-27",
+      "network_context": "no HTTP resolution attempted at stage 1"
+    },
+    {
+      "artifact": "ClinVar (downloaded January 9, 2025), PDB entries 4OLI, 4PO6, 7T6F, 6NZP, 8S9A - third-party public inputs",
+      "http_status": "stated-in-paper (PDB accessions quoted; ClinVar by download date only, no release identifier); not fetched - stage1 prose-only",
+      "checked_at": "2026-07-27",
+      "network_context": "no HTTP resolution attempted at stage 1"
+    },
+    {
+      "artifact": "MaveDB urn:mavedb:00001270-a / 00001271-a and a Zenodo-archived copy of the code",
+      "http_status": "none in the assessed preprint - these appear only in the later eLife (RP110149) version and were NOT credited in this stage-1 assessment",
+      "checked_at": "2026-07-27",
+      "network_context": "eLife API article 110149, read only for cross-checking the preprint Methods"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "env_lock_claimed",
+  "stage2_candidate": true,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "374c6cd4433d1c2fc4be9721b6742d1c058b12462d23620f3f598c64b7823496",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

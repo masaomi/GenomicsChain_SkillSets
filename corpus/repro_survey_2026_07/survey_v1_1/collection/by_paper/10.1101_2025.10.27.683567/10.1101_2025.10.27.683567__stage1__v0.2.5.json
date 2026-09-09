@@ -1,0 +1,365 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "bd4ad73395956c5db6be9738a4cf33f6a3c83d1750ebf4dd727e307270842464",
+  "canonical_id": {
+    "value": "10.1101/2025.10.27.683567",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.27.683567v2",
+      "biorxiv:2025.10.27.683567v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Association analyses of cardiometabolic and physical activity traits with human skeletal muscle cell type abundance, gene expression, and chromatin accessibility in the FUSION Tissue Biopsy Study (n=263): snRNA-seq mapping (STARsolo) and snATAC-seq mapping (BWA-MEM) to hg38, ambient RNA decontamination (DecontX), joint snRNA/snATAC clustering and cell type assignment (Liger + marker genes), nucleus/sample QC exclusions, MET-based physical activity energy expenditure derivation, differential cell type abundance (glm.nb from MASS 7.3-65), cell-type-level / total-pseudobulk / bulk differential gene expression and Type 1 downsampling (DESeq2 1.44.0), gene set enrichment (RNA-Enrich with org.Hs.eg.db 3.20.0 and GO.db 3.20.0), Spearman comparison of association result sets (cor.test in R), snATAC pseudobulk peak counting with consensus peak harmonization, and cell-type differential chromatin accessibility (DESeq2 1.44.0). Muscle biopsy collection, OGTT clinical phenotyping, questionnaire administration, nuclei isolation + snRNA/snATAC library prep and sequencing, and bulk RNA library prep and sequencing are wet-lab / physical-measurement steps (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v2 JATS XML Methods section (retrieved by curl; WebFetch of the .source.xml returned HTTP 403). The paper has NO Data availability section and NO Code availability section: a full-text search for github/gitlab/bitbucket/zenodo/figshare/software-heritage/accession/GEO/SRA/dbGaP/EGA/ArrayExpress returned zero matches. The only data-provenance statement anywhere is in the Acknowledgements: 'The samples/data used for the research were obtained from THL Biobank (study number THLBB2025_5).' Upstream single-nucleus data generation and processing (mapping, decontamination, clustering, ATAC consensus peak calling) are described only briefly here and deferred to reference 33 (the prior FUSION single-nucleus muscle atlas paper) and reference 18 (Scott et al.) for bulk RNA-seq; the prose in THIS paper is what is scored. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "snRNA-seq read mapping with STARsolo to the human genome (hg38) reference — no version, no parameters, no reference build accession/annotation release stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "snATAC-seq read mapping with the Burrows-Wheeler Aligner (BWA-MEM) to the human genome (hg38) reference — no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Ambient RNA decontamination for snRNA-seq droplets with DecontX — no version, no parameters, no contamination threshold stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Joint clustering of snRNA-seq and snATAC-seq nuclei with Liger, followed by manual cell type assignment from known marker genes into 13 clusters — no Liger version, no k/lambda/resolution parameters, no marker gene list or assignment criteria in this paper's prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Droplet-level QC thresholds and sample/nucleus exclusions — removal of the mixed muscle fiber cluster (exonic read overrepresentation); exclusion of samples with <100 snRNA-seq or <100 snATAC-seq nuclei (n=2), one non-Finnish individual, one individual per first-degree relative pair, and 19 individuals without THL Biobank consent; retaining 168,309 snRNA and 242,069 snATAC nuclei from 263 participants. Numeric thresholds stated, but the droplet-level QC thresholds themselves are deferred to reference 33 and no script is provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Derivation of leisure-time physical activity energy expenditure from the 12-month questionnaire — MET assignment by intensity, weekly duration = frequency x duration, energy expenditure (METS*kg*hr/wk) = duration x body weight x MET, total = sum over activities, vigorous = sum over activities with MET >= 6 (Compendium of Physical Activities). Formulas fully stated; no code, no MET lookup table, no software named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Differential cell type abundance by trait — negative binomial models via glm.nb() from the R MASS package (version 7.3-65) on snRNA, snATAC, and combined nuclei sets; covariates sex, age, batch, city of collection; log10 total nuclei offset; inverse-normalized continuous traits; confounding models adjusted for HOMA-IR and total physical activity; FDR 5% within each nuclei set",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Cell-type-level pseudobulk construction and gene/sample filtering — per-participant summation of UMI counts per gene across nuclei of a cell type; exclusion of genes with zero counts in >75% of samples by cell type; exclusion of samples with <10 snRNA nuclei of that cell type; exclusion of adipocytes and T cells (all traits) and macrophage/neuronal (T2D analysis). Thresholds stated; no script, no software named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Cell-type-level differential gene expression by trait with DESeq2 (version 1.44.0), single-cell recommendations (likelihood ratio test, minmu = 1e-6); covariates batch, city of collection, median mitochondrial fraction, total RNA nuclei, sex, age; inverse-normalized continuous covariates; no independent filtering; FDR 5% per trait and cell type",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Total pseudobulk differential gene expression with DESeq2 (version 1.44.0), bulk recommendations (Wald test); genes with <5 counts in >75% of samples excluded (18,618 genes, 263 samples, samples with >=100 nuclei retained); adjusted for observed cell type proportions plus the cell-type-level covariate set; confounding models adjusted for HOMA-IR and vigorous physical activity; no independent filtering; FDR 5%",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Bulk tissue differential gene expression with DESeq2 (version 1.44.0), bulk recommendations (Wald test); bulk RNA-seq restricted to the single-nucleus samples, genes with <5 counts in >75% of samples excluded (22,309 genes, 252 samples); adjusted for sex, age, median insert size, mean RIN, median TIN, batch, city of collection, mean GC content, and single-nucleus cell type proportions; no independent filtering; FDR 5%",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Type 1 muscle fiber count downsampling and re-testing — Type 1 UMIs per gene multiplied by (total UMIs in target cell type / total UMIs in Type 1), rounded to nearest integer, restricted to individuals present in the target cell type analysis; differential expression re-run with DESeq2 (version 1.44.0) as previously described. No RNG involved (deterministic scaling), no script provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Gene set enrichment by trait with RNA-Enrich (logistic regression on signed -log10 p-values adjusted for mean read count) — RNA-Enrich itself has NO version pin; ENSEMBL-to-Entrez mapping and GO term definitions from org.Hs.eg.db version 3.20.0 and GO.db version 3.20.0; GO biological process sets with 10-500 genes (n=6486); p-values <1e-25 winsorized to 1e-25; FDR 5% per trait and cell type",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Comparison of gene expression-trait and gene set-trait association sets — Spearman correlation of signed (by beta) -log10 p-values via cor.test() in R with complete observations, tested against rho = 0, Bonferroni thresholds 0.05/(28*8) across trait pairs and 0.05/(66*2) across cell type pairs. No R version stated anywhere in the paper, no plotting/analysis script provided",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "snATAC cell-type pseudobulk peak count construction — per-individual summation of peak counts across nuclei of a cell type on a harmonized consensus peak summit list across cell types (harmonization procedure deferred to reference 33); samples with >=10 nuclei retained, peaks with mean count <1 excluded; no cell types excluded. No peak caller, no version, no script named in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Cell-type-level differential chromatin accessibility by trait with DESeq2 (version 1.44.0), single-cell recommendations; covariates batch, city of collection, median mitochondrial fraction, TSS enrichment, total ATAC nuclei, sex, age; inverse-normalized continuous covariates; no independent filtering; FDR 5% per trait and cell type",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 8,
+    "n_X": 2,
+    "S": 16,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 6/16 computational steps — the statistical modelling steps carry exact prose version pins (MASS 7.3-65 for glm.nb cell type abundance; DESeq2 1.44.0 for cell-type, total pseudobulk, bulk, downsampled Type 1, and chromatin accessibility differential testing) together with fully enumerated covariate sets, test choices, filters, and FDR thresholds. 8/16 steps cap at NI because no version is pinned (STARsolo, BWA-MEM, the QC/exclusion logic, the MET energy-expenditure derivation, pseudobulk construction, RNA-Enrich, the R cor.test comparisons with no R version anywhere in the paper, and the snATAC consensus-peak/pseudobulk construction). 2/16 are blocked (X): DecontX and Liger are named with neither version nor any parameter, and Liger's output feeds every downstream cell-type analysis via a manual marker-gene cluster assignment whose criteria are not in this paper. No analysis code repository exists, no lockfile, container, or conda specification is claimed, and there is no Data availability statement, so even at Stage 2 no step could exceed RI.",
+    "coverage": "16 computational steps assessed from the bioRxiv v2 JATS Methods (FUSION Tissue Biopsy Study through single-nucleus cell type differential chromatin accessibility). 5 wet-lab / physical-measurement steps (vastus lateralis muscle biopsy collection from 331 Finnish participants; 2-hour 4-point OGTT with fasting serum insulin for glucose tolerance status and HOMA-IR; administration of the validated 12-month leisure time physical activity questionnaire; nuclei isolation and snRNA-seq + snATAC-seq library preparation and sequencing of 287 frozen biopsies in 10 batches; bulk RNA extraction, library prep, and strand-specific paired-end sequencing of 301 biopsies to a mean depth of 91.3M reads) counted in W and out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Whole paper — no Code availability statement",
+      "missing": "The paper cites no analysis code repository of any kind. A full-text search of the JATS XML for github, gitlab, bitbucket, zenodo, figshare, and Software Heritage returned zero matches. No pipeline driver, no pseudobulk aggregation script, no DESeq2 model script, no RNA-Enrich wrapper, and no plotting script for the 29 supplementary figures is provided. Every one of the 16 computational steps therefore scores code = 1 (reconstructable from prose) at best, never 2.",
+      "how_to_close": "Publish the analysis scripts (nucleus QC and exclusions, pseudobulk aggregation, the glm.nb and DESeq2 model code with its covariate construction, the RNA-Enrich wrapper, and the figure scripts) in a public repository with a tagged release archived to Zenodo, and add a Code availability statement citing the DOI."
+    },
+    {
+      "type": 4,
+      "where": "Whole paper — no Data availability statement",
+      "missing": "There is no Data availability section. No accession of any kind (GEO, SRA, ENA, ArrayExpress, dbGaP, EGA, figshare, Zenodo) appears anywhere in the full text. The only provenance statement is in the Acknowledgements, verbatim: 'The samples/data used for the research were obtained from THL Biobank (study number THLBB2025_5).' This names a controlled-access route for the biological samples but gives no repository, no dataset identifier, and no application procedure for the snRNA-seq, snATAC-seq, or bulk RNA-seq data or the derived count matrices. Complete association results are stated to be in Tables S3, S5, S10, and S13 (outputs, not reproduction inputs).",
+      "how_to_close": "Add a Data availability statement naming the controlled-access repository (e.g. EGA or dbGaP) with a dataset accession and the access application route, and deposit the de-identified cell-type pseudobulk count matrices, peak count matrices, and covariate tables that are the actual entry point for the modelling steps."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment",
+      "missing": "No environment lockfile, container image or digest, conda/renv specification, or sessionInfo() output is claimed anywhere. Four R package versions are pinned (MASS 7.3-65, DESeq2 1.44.0, org.Hs.eg.db 3.20.0, GO.db 3.20.0) but the R version itself is never stated, nor are Bioconductor release, BLAS/LAPACK, or any of the upstream aligner/clustering toolchain versions. capture_claim is exact_pins_partial at best; there is no dependency closure.",
+      "how_to_close": "Ship an renv.lock or conda-lock file (or a container digest) covering R, Bioconductor, DESeq2, MASS, org.Hs.eg.db, GO.db, RNA-Enrich, Liger, DecontX, STARsolo, and BWA, and record sessionInfo() alongside the results."
+    },
+    {
+      "type": 3,
+      "where": "Steps C1, C2, C3, C4, C13, C14, C15",
+      "missing": "No version pins for STARsolo, BWA-MEM, DecontX, Liger, or RNA-Enrich, and no R version for the cor.test-based comparisons. The hg38 reference is named only as 'the human genome (hg38) reference' with no assembly patch level, no source, and no gene annotation (GTF) release — a substantive gap since gene-level UMI counts and the 11,490-23,849 genes tested per cell type depend on the annotation version. The GO term source is pinned (GO.db 3.20.0, org.Hs.eg.db 3.20.0), which is good practice.",
+      "how_to_close": "Pin an exact version (or commit) for every tool including STARsolo, BWA, DecontX, Liger, RNA-Enrich, and R itself, and state the exact hg38 assembly release and GTF annotation version used for both the RNA and ATAC references."
+    },
+    {
+      "type": 1,
+      "where": "Steps C1, C2, C3, C4, C5, C15",
+      "missing": "Parameter under-specification in the upstream single-nucleus processing. No STARsolo or BWA-MEM command-line options; no DecontX contamination model settings or filtering threshold; no Liger k, lambda, quantile-normalization, or clustering resolution, and no marker gene list or assignment rule for the 13 cell type clusters; the 'droplet-level quality control thresholds' are asserted but their values are deferred to reference 33; the ATAC consensus peak summit harmonization procedure and its peak caller are likewise deferred to reference 33.",
+      "how_to_close": "State every non-default parameter and RNG seed for the mapping, decontamination, and clustering steps in Methods or in the published scripts, and restate (rather than only cite) the droplet QC thresholds and the consensus peak harmonization procedure."
+    },
+    {
+      "type": 6,
+      "where": "Step C4 — cell type assignment from marker genes",
+      "missing": "Cluster-to-cell-type assignment ('used known cell type markers to identify the clusters') and the removal of the mixed muscle fiber cluster 'due to overrepresentation of exonic reads' are manual curation decisions with no recorded marker list, no threshold, and no curated cluster label file. Every downstream result in the paper is conditional on this labelling.",
+      "how_to_close": "Publish the marker gene panel, the per-cluster evidence used, and the final nucleus-to-cell-type label assignment as a citable data file, or replace the manual assignment with a scripted reference-based annotation with stated thresholds."
+    },
+    {
+      "type": 7,
+      "where": "Steps C1-C5, C15 — upstream processing deferred to prior publications",
+      "missing": "The single-nucleus data generation and processing pipeline is deferred to reference 33, and the bulk RNA-seq collection, processing, and QC to reference 18 (Scott et al.). This paper's prose is therefore not self-contained: reproducing the count matrices that all 16 steps consume requires reconstructing methods from two other papers, neither of which is verified here.",
+      "how_to_close": "Either restate the upstream pipeline with versions and parameters, or publish the processed count and peak matrices directly so that the entry point for this paper's analyses is a citable artifact rather than a chain of prior-paper method sections."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab / physical-measurement steps (W = 5)",
+      "missing": "Vastus lateralis biopsy collection (~250 mg per participant, 331 participants, three Finnish study sites, 2009-2013), the 2-hour 4-point OGTT with fasting serum insulin, administration of the validated 12-month leisure time physical activity questionnaire, nuclei isolation plus snRNA-seq and snATAC-seq library preparation and sequencing of 287 frozen biopsies in 10 batches, and bulk RNA extraction/library prep/sequencing of 301 biopsies are physical steps, out of scope for computational reproduction; counted in W and not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the reproducible entry point would be the deposited raw reads or, preferably, the de-identified count matrices, once an accession is published."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code)",
+      "http_status": "none — no code repository of any kind is stated in the paper",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text search of the bioRxiv v2 JATS XML for github/gitlab/bitbucket/zenodo/figshare/software-heritage: zero matches"
+    },
+    {
+      "artifact": "data accession (snRNA-seq, snATAC-seq, bulk RNA-seq, or derived count matrices)",
+      "http_status": "none — no accession stated; full-text search for GEO/GSE/SRA/ENA/ArrayExpress/dbGaP/phs/EGA/accession returned zero matches, and the paper has no Data availability section",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v2 JATS XML full text (147,527 bytes, retrieved by curl)"
+    },
+    {
+      "artifact": "controlled-access sample source: THL Biobank, study number THLBB2025_5 (stated verbatim in Acknowledgements: 'The samples/data used for the research were obtained from THL Biobank (study number THLBB2025_5).')",
+      "http_status": "stated-in-paper only — study number given, no repository URL, no dataset identifier, no access procedure",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "reference genome: 'the human genome (hg38) reference' — no source URL, no assembly patch level, no annotation release",
+      "http_status": "stated-in-paper (name only)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "annotation databases: org.Hs.eg.db version 3.20.0 and GO.db version 3.20.0 (Bioconductor), used for ENSEMBL-to-Entrez mapping and GO biological process definitions",
+      "http_status": "stated-in-paper with exact version pins (Class A style in-prose database pin; not verified at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "complete association results: Supplementary Tables S3, S5, S10, S13 (delivered as separate supplementary materials, not in the main supplementary PDF)",
+      "http_status": "stated-in-paper (supplementary files not retrieved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "9ad1d4b8ad4f7e9c617084faa2efa2347bae62e14383df81b72657cbcb057b3e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

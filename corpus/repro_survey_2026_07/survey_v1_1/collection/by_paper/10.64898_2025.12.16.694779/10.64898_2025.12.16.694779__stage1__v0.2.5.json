@@ -1,0 +1,850 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "c71edd38b1ba0283de5819f4a9647177520df05ecea6c2b31d46e3fe547daee0",
+  "canonical_id": {
+    "value": "10.64898/2025.12.16.694779",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.16.694779v1",
+      "biorxiv:2025.12.16.694779v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "De novo Oxford Nanopore + Illumina genome assembly, annotation and comparative genomics of the intertidal fungus Annulohypoxylon annulatoides RYS0019: image-based colony-growth quantification (Photoshop, FIJI Trainable Weka Segmentation, PyPhe, growth-curve fitting and ANOVA in R), assembly and polishing (Flye, Medaka, Purge_Dups, NextPolish), completeness (compleasm), orthology and phylogeny (OrthoFinder, concatenated single-copy alignment, IQ-TREE), repeat masking (Tandem Repeats Finder, EarlGrey), gene prediction (STAR, BRAKER3/GeneMark-ETP/AUGUSTUS), functional annotation (eggNOG-mapper, pfam_scan, run_dbcan) with a Wilcoxon/Benjamini-Hochberg domain-enrichment test, synteny (BLASTP, DAGchainer), promoter prediction (Promoter 2.0 web service), AT-rich isochore segmentation (OcculterCut), and Nanopore 5mC/6mA methylation calling (Dorado, Modkit) with windowed summarisation. Wet-lab work (rocky-shore sampling and fungal isolation, DNA/RNA extraction, ITS/beta-tubulin/calmodulin PCR and Sanger identification, temperature/salinity/UV/heat-shock phenotyping assays and scanner imaging, ONT and Illumina library preparation and sequencing) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Colony-image pre-processing 'in Photoshop' - no Photoshop version, no description of the operations applied, and the scanner images themselves are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "input-data-not-deposited",
+        "proprietary-dependency",
+        "tool-unversioned",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Hyphal-area segmentation and quantification in FIJI with the Trainable Weka Segmentation plugin (Schindelin et al. 2012 cited), 'trained and validated on 140 images each, achieving 98.33% classification accuracy' - no FIJI or plugin version, trained classifier model not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "input-data-not-deposited",
+        "tool-unversioned",
+        "trained-model-not-deposited",
+        "stochastic-no-seed"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Colony growth quantification with PyPhe (v0.98; Kamrad et al. 2020) on 12-hourly Epson V850 scans - version pinned, no sub-command or settings given, raw scans not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "input-data-not-deposited",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Estimation of maximum growth rate (r) and carrying capacity (K) from the growth time-series 'in R' - no R version, no package, no growth model named, no script deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "input-data-not-deposited",
+        "code-not-deposited",
+        "tool-unversioned",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Strain comparison by one-way ANOVA followed by Tukey post hoc test (Fig 2 letters, asterisks at P<0.01 / P<0.001) - software and version unstated, script not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "input-data-not-deposited",
+        "tool-unversioned",
+        "code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "De novo assembly of Oxford Nanopore reads with Flye (v2.9.5; Kolmogorov et al. 2019) - no read-type flag (--nano-hq / --nano-raw), no genome size, no iteration count",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Consensus polishing with Medaka (v1.11.3; https://github.com/nanoporetech/medaka) using Nanopore reads - the medaka basecalling/consensus model (a required argument that determines the output) is not named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent",
+        "model-unnamed"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Haplotig and overlapping-contig removal with Purge_Dups (v1.2.6; Guan et al. 2020) - no cutoff settings, no read-mapping step described",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Short-read polishing with NextPolish (v1.4.1; Hu et al. 2020) using Illumina reads - no configuration file, no task/rounds setting",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Genome completeness with compleasm (v0.2.6; N. Huang & Li 2023) using the 'ascomycota_obd10' [sic, ascomycota_odb10] fungi dataset - version pinned and lineage dataset named, but the BUSCO ODB10 snapshot is auto-downloaded and its release/date is not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "reference-db-unpinned",
+        "typo-in-lineage-name"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Retrieval of protein sequences for 16 Hypoxylaceae species plus Xylaria venustula FL0490 (and a further 23-taxon set for domain comparison) 'from JGI and NCBI' / JGI Genome Portal https://genome.jgi.doe.gov/portal/ - species names only, no accessions, no assembly/annotation versions, no download date",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "accession-missing",
+        "reference-resource-unpinned",
+        "jgi-portal-registration-gated"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Orthologous group inference with OrthoFinder (v2.5.5; Emms & Kelly 2019) over 16 Hypoxylaceae proteomes plus outgroup (12,686 OGs, 1,144 single-copy) - version pinned, no search program (-S), no inflation or tree options given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Multiple-sequence alignment and concatenation of single-copy orthologues into a supermatrix - the aligner, trimming step and concatenation script are not named at all",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "tool-unnamed",
+        "accession-missing",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Maximum-likelihood species phylogeny with IQ-TREE (v2.3.5; Minh et al. 2020) on the concatenated amino-acid alignment - version pinned, but no substitution model or ModelFinder invocation, no partitioning, no bootstrap/aLRT setting, no random seed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-absent",
+        "stochastic-no-seed"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Tandem repeat identification and soft-masking with Tandem Repeats Finder (v4.09.1; Benson 1999) in A. stygium TJAS01, Annulohypoxylon sp. FPYF3050, A. maeteangense and A. annulatoides - version pinned, but TRF's seven required numeric parameters (match, mismatch, delta, PM, PI, minscore, maxperiod) are not given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Transposable-element detection and masking with EarlGrey (v4.2.4; Baril et al. 2024) - version pinned, but no -r species flag, no RepeatMasker/Dfam/RepBase library release, no iteration setting",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "reference-db-unpinned",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "RNA-seq read mapping to the assembly with STAR (v2.7.11; Dobin et al. 2013) to support GeneMark refinement - version pinned, no index-build settings, no alignment flags, no trimming step described",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent",
+        "upstream-qc-undescribed"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Gene prediction with BRAKER (v3.0.8; Gabriel et al. 2023) training GeneMark-ETP (v1.0) and AUGUSTUS (v3.5.0), inputs = hardmasked A. annulatoides assembly + related-species protein set + RNA-seq alignments; 11,523 (abstract says 11,529) gene models - all three versions pinned and the input triple is described, but no command-line flags, no species/training identifier, no seed for the stochastic training",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "stochastic-no-seed",
+        "gene-count-discrepancy-abstract-vs-methods"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Functional annotation with eggNOG-mapper v2 (v2.1.2; default parameters; Huerta-Cepas et al. 2019) on the eggNOG v5.0 database - tool version pinned, database release pinned, and 'default parameters' stated explicitly",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "Protein domain/family assignment with pfam_scan (v1.6; http://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/) against Pfam release 37.2 (Mistry et al. 2021) - tool and database releases both pinned; E-value / gathering-threshold settings not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Pfam domain-abundance enrichment: Wilcoxon rank-sum test of domain counts between the Hypoxylaceae group and outgroup Ascomycota, Benjamini-Hochberg adjusted p<0.05, matrix filtered to enriched domains and 'species labels were manually curated for downstream visualisation' - statistical thresholds stated, but no software, no version, no script, and the manual curation step is not documented",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "code-not-deposited",
+        "manual-step-undocumented",
+        "tool-unnamed",
+        "accession-missing"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Carbohydrate-active enzyme annotation with run_dbcan (v2.0.11; https://github.com/linnabrown/run_dbcan) - tool version pinned, but the dbCAN HMM/CAZy database release is not stated and no tool-selection or E-value settings are given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "reference-db-unpinned",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Pairwise protein comparison with BLASTP (v2.15.0; Altschul et al. 1990) retaining reciprocal single-copy orthologues for synteny - version pinned, no E-value, no max_target_seqs, no reciprocity criterion defined numerically",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Syntenic block inference with DAGchainer (v1.12; Haas et al. 2004) 'considering the linear order of orthologous genes along each genome while ignoring physical distance between loci' - version pinned and the gene-order (rather than bp-distance) mode is described, but the numeric gap/score parameters are not given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Second OrthoFinder (v2.5.5) invocation restricted to the four Annulohypoxylon genomes to extract single-copy orthologues for pairwise synteny - version pinned, no flags, and the proteome sources still carry no accessions",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-missing",
+        "params-absent"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Promoter prediction for six Annulohypoxylon species with Promoter (v2.0; https://services.healthtech.dtu.dk/services/Promoter-2.0/) - a remote DTU academic web service; version pinned, but the promoter-region definition (upstream window), score threshold, and submission date are not given, and the service is not redistributable so its exact state cannot be captured",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "external-web-service",
+        "license-gated",
+        "params-absent",
+        "accession-missing"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "AT-rich isochore identification with OcculterCut segmentation (Testa et al. 2016) - NO version given, no parameter settings; the downstream inclusion rule ('>1 Mbp of AT-rich sequence') is stated in prose but not as a scripted filter",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "tool-unversioned",
+        "accession-missing",
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "5mC and 6mA modified-base calling from Oxford Nanopore data with Dorado (v0.8.3; https://github.com/nanoporetech/dorado) 'under default parameters'; prose says 'Raw FASTA files were processed with Dorado', but Dorado modified-base calling requires raw POD5/FAST5 signal and the SRA deposit for this BioProject holds one basecalled ONT run (SRR36465263, GridION) rather than confirmed raw signal; the basecalling model is not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "raw-signal-availability-unverified",
+        "model-unnamed",
+        "input-description-inconsistent"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "Methylation call processing with Modkit (v0.4.1; https://github.com/nanoporetech/modkit) 'under default parameters' - version pinned and defaults declared; the specific subcommand (pileup / summary) is not named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-partial",
+        "raw-signal-availability-unverified"
+      ]
+    },
+    {
+      "step_id": "C30",
+      "label": "Methylation filtering and windowing: calls supported by fewer than 10 reads or with posterior probabilities below 10% excluded, methylation levels summarised in non-overlapping 10 kbp windows - thresholds and window size are fully stated, but no script, tool or language is named or deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "code-not-deposited",
+        "tool-unnamed"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Rocky-shore field sampling (four 25x25 m plots, three rocks, three microhabitats), swab inoculation onto YPD + 30 permille salt, incubation at 20/30 C, subculture and maintenance (56 isolates)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Nucleic-acid extraction: QuickExtract and Quick-DNA Miniprep/Microprep kits; modified CTAB HMW protocol (liquid-nitrogen grinding, chloroform with isoascorbic acid, isopropanol precipitation, RNase, size selection); Qiagen RNeasy Plant Mini Kit for total RNA",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W3",
+      "label": "Strain identification by PCR and Sanger sequencing of ITS (ITS1F/ITS4), beta-tubulin (Bt2a/Bt2b) and calmodulin (CMD5/CMD6) with stated cycling conditions, gel verification and reference-database comparison",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W4",
+      "label": "Manual phenotyping: six A. annulatoides strains on PDA across temperature (20/30/40 C) and salinity (20/30/70 permille), colony diameters measured at two-day intervals, three biological replicates",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W5",
+      "label": "Acute-stress treatments and scanner-based time-lapse imaging: heat shock (30 C 3 d, 40 C 1 d, 30 C 6 d) and UV shock (Sankyo Denki G30T8 UV-C, 253.7 nm, 13.4 W, 50 cm, ~40.3 J/cm2 over 24 h) with Epson V850 scans every 12 h, three biological replicates",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W6",
+      "label": "Oxford Nanopore library preparation (SQK-LSK114) and sequencing on an R10.4.1 flow cell (FLO-MIN114), GridION",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    },
+    {
+      "step_id": "W7",
+      "label": "Illumina library preparation and sequencing: DNA PCR-Free Prep kit for RYS0019, YMJ2251 and YMJ2252 plus RNA-seq library, all on NovaSeq X Plus (library prep outsourced)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-out-of-scope"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 7,
+    "n_NI": 23,
+    "n_X": 0,
+    "S": 30,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/30 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "7/30 (23%) computational steps reach RI at the stage-1 prose ceiling (C10 compleasm v0.2.6, C18 BRAKER v3.0.8 / GeneMark-ETP v1.0 / AUGUSTUS v3.5.0, C19 eggNOG-mapper v2.1.2 on eggNOG v5.0, C20 pfam_scan v1.6 on Pfam 37.2, C24 DAGchainer v1.12, C28 Dorado v0.8.3, C29 Modkit v0.4.1). The Methods are unusually disciplined about version pinning - 22 of 30 computational steps name a tool with an exact version - yet only 7 reach RI, because the Params axis is 0 for most of them: assembly and masking tools (Flye, Medaka, Purge_Dups, NextPolish, TRF, EarlGrey, STAR, OrthoFinder, IQ-TREE, BLASTP, run_dbcan) are cited with a version and a citation but no command line, no flags, and for Medaka and Dorado not even the basecalling model, which alone determines the output. The remaining NI steps fall into three groups: (i) five image/growth-analysis steps (C1-C5) whose input scanner images and derived growth measurements are not deposited anywhere and whose fitting and statistics code is not deposited; (ii) unversioned tools (OcculterCut, FIJI/Trainable Weka Segmentation, Photoshop, R, and the unnamed aligner used to build the concatenated supermatrix); (iii) comparative-genomics steps whose input proteomes are identified only by species name from 'JGI and NCBI' with no accession, assembly version or download date. No step can exceed version=1 at stage 1: there is no lockfile, no conda environment file, no container, and no sessionInfo anywhere in the paper, so the exact pins that do exist are pins without environment closure.",
+    "coverage": "30 computational steps assessed from Methods prose; 7 wet-lab steps counted (W) and marked OOS. Computational coverage = 30/37 (81%). Full text obtained from the bioRxiv JATS XML source endpoint (first two attempts returned Cloudflare 1015 / HTTP 429; a third attempt after a 130 s wait succeeded, 136,598 bytes, title phrase 'isochores shapes the genome' verified present). No repository landing page or README could be read because the paper names no analysis-code repository at all - the only GitHub URLs in the text are the upstream homepages of medaka, dorado, modkit and run_dbcan. Data liveness verified directly against NCBI (BioProject, SRA runinfo, Assembly esummary).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "All 30 computational steps - the paper as a whole",
+      "missing": "There is no Code Availability statement anywhere in the manuscript, and no analysis-code repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage) is named. The Data Availability statement covers sequencing data only: 'All sequencing data generated in this study have been deposited in the NCBI Sequence Read Archive (SRA) under BioProject PRJNA1381326 and detailed in Supplementary Table S1.' The four GitHub URLs that appear in Methods (medaka, dorado, modkit, run_dbcan) are the upstream tool homepages, not author code. Consequently no command lines, no wrapper scripts, no workflow file (Snakefile/Nextflow/Makefile), and no plotting code exist for any step.",
+      "how_to_close": "Deposit the assembly/annotation/comparative-genomics command lines and the R and image-analysis scripts in a public repository with a release tag or Zenodo DOI, and add a Code Availability statement pointing to it."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for the entire pipeline (all 30 C-steps)",
+      "missing": "No conda environment file, conda-lock/pixi.lock, requirements file, renv snapshot, container image or digest, and no R sessionInfo is claimed anywhere. Exact version pins exist in prose for 22 of 30 steps (Flye 2.9.5, Medaka 1.11.3, Purge_Dups 1.2.6, NextPolish 1.4.1, compleasm 0.2.6, OrthoFinder 2.5.5, IQ-TREE 2.3.5, TRF 4.09.1, EarlGrey 4.2.4, BRAKER 3.0.8, GeneMark-ETP 1.0, AUGUSTUS 3.5.0, STAR 2.7.11, eggNOG-mapper 2.1.2, pfam_scan 1.6, run_dbcan 2.0.11, BLASTP 2.15.0, DAGchainer 1.12, Promoter 2.0, PyPhe 0.98, Dorado 0.8.3, Modkit 0.4.1) but with no interpreter, channel, or platform declaration - i.e. exact pins without environment closure, which caps the Version axis at 1 for every step.",
+      "how_to_close": "Ship a conda-lock or pixi.lock (or a container image with a recorded digest) covering the command-line stack, plus an renv.lock or sessionInfo for the R-based growth-curve fitting and statistics."
+    },
+    {
+      "type": 1,
+      "where": "C1-C5 - phenotyping image and growth data",
+      "missing": "The scanner time-lapse images (Epson V850, 12-hourly), the manually measured colony diameters, the FIJI/Weka segmentation output, and the derived per-strain growth-rate and carrying-capacity tables underlying Figure 2 and Supplementary Figs 3-6 are not deposited in any repository. The Data Availability statement covers sequencing data only, and Supplementary Table S1 is described as strain/sequencing metadata. Without the images, none of C1-C5 can be re-run.",
+      "how_to_close": "Deposit the raw scanner images and the tabulated growth measurements (per strain, condition, replicate, timepoint) in a general-purpose repository such as Zenodo or figshare and cite the DOI in Data Availability."
+    },
+    {
+      "type": 1,
+      "where": "C11-C16, C18, C21, C23-C27 - comparative genomes and proteomes",
+      "missing": "The 16 Hypoxylaceae proteomes, the Xylaria venustula FL0490 outgroup, the four Annulohypoxylon assemblies used for repeat masking and synteny, and the 23-taxon set used for the Pfam domain comparison are identified by species/strain name only, with the sources given as 'JGI and NCBI' and the JGI Genome Portal root URL (https://genome.jgi.doe.gov/portal/). No JGI project IDs, no NCBI assembly accessions, no annotation versions, and no download dates are given. JGI portal downloads are additionally registration-gated for some genomes, so the exact input set cannot be reconstituted.",
+      "how_to_close": "Add a supplementary table listing, per taxon, the JGI project ID or NCBI GCA/GCF accession with assembly and annotation version and the retrieval date; the paper already has Supplementary Table S3 listing the 16 proteomes and it should carry these identifiers."
+    },
+    {
+      "type": 2,
+      "where": "C1 (Photoshop), C2 (FIJI + Trainable Weka Segmentation), C4-C5 (R and R packages), C13 (aligner), C21 (statistics software), C27 (OcculterCut), C30 (windowing script)",
+      "missing": "These steps name no version at all. OcculterCut is the tool that produces the paper's central result (AT-rich isochore segmentation) and is cited only as 'OcculterCut segmentation (Testa et al., 2016)'. The aligner and trimmer used to build the concatenated single-copy amino-acid supermatrix for IQ-TREE are not even named. R itself is never versioned although growth-curve fitting and the ANOVA/Tukey and Wilcoxon/BH tests are all done in it.",
+      "how_to_close": "State the version of every tool, including OcculterCut, FIJI and the Weka plugin, R and each R package, and name the alignment and concatenation tools used before IQ-TREE."
+    },
+    {
+      "type": 4,
+      "where": "C2 (Weka classifier training), C14 (IQ-TREE ML search), C18 (BRAKER/GeneMark-ETP/AUGUSTUS training)",
+      "missing": "No random seed is reported for any stochastic step. The Trainable Weka Segmentation classifier is described as 'trained and validated on 140 images each, achieving 98.33% classification accuracy' but the trained model, the feature set and the training/validation split are not deposited. IQ-TREE is run without a stated model-selection procedure, bootstrap scheme or seed. BRAKER3 gene prediction involves stochastic GeneMark-ETP and AUGUSTUS training; the abstract reports 11,529 predicted proteins while Methods reports 11,523 protein-coding gene models, an unexplained 6-model discrepancy consistent with an unpinned re-run.",
+      "how_to_close": "Record and report seeds for IQ-TREE and BRAKER, deposit the trained Weka classifier model file, and reconcile the 11,523 vs 11,529 gene-count discrepancy."
+    },
+    {
+      "type": 13,
+      "where": "C10 (compleasm ascomycota_odb10), C16 (EarlGrey repeat libraries), C22 (run_dbcan dbCAN/CAZy database)",
+      "missing": "Three reference resources are consumed without a pinned release. compleasm auto-downloads the BUSCO ODB10 lineage snapshot and the snapshot date is not stated (the name is also misspelled 'ascomycota_obd10' in Methods). EarlGrey v4.2.4 bundles RepeatMasker with a Dfam/RepBase library whose release is not stated, and no -r species flag is given. run_dbcan v2.0.11 is pinned but the dbCAN HMM / CAZyDB release it queries is not. By contrast eggNOG v5.0 and Pfam 37.2 ARE pinned, which is good practice and is why C19 and C20 reach RI.",
+      "how_to_close": "State the ODB10 snapshot date, the Dfam/RepBase release used by EarlGrey, and the dbCAN database release, in the same way eggNOG v5.0 and Pfam 37.2 are already stated."
+    },
+    {
+      "type": 5,
+      "where": "C4, C5, C21, C30 (and the manual curation inside C21)",
+      "missing": "Four analyses are described only in prose with no code: growth-curve fitting for r and K 'in R' (no model, no package); the one-way ANOVA plus Tukey post hoc comparison behind the Figure 2 letter groups; the Wilcoxon rank-sum plus Benjamini-Hochberg domain-enrichment test including the matrix filtering step, where 'species labels were manually curated for downstream visualisation' - an undocumented manual intervention on the analysed matrix; and the methylation call filtering and 10 kbp windowing.",
+      "how_to_close": "Deposit these scripts, and replace the manual label curation with a scripted, recorded mapping so the domain-abundance figure can be regenerated deterministically."
+    },
+    {
+      "type": 11,
+      "where": "C1 (Adobe Photoshop), C26 (Promoter 2.0 web service)",
+      "missing": "Image pre-processing depends on Adobe Photoshop, a commercial product cited with no version and no description of the operations applied - so the step is neither free-software reproducible nor described well enough to substitute an open tool. Promoter 2.0 is a DTU Health Tech academic web service that cannot be installed or version-frozen by a third party; the submission date and the score threshold used to call a promoter are not given.",
+      "how_to_close": "Replace or document the Photoshop operations with a scripted equivalent (ImageJ macro or Python), and record for Promoter 2.0 the submission date, the input window definition and the score cut-off, ideally exporting the raw service output as a supplementary file."
+    },
+    {
+      "type": 6,
+      "where": "C26 (Promoter 2.0)",
+      "missing": "The promoter-prediction sub-analysis is externalised to a remote service whose model state at the time of use is not recorded. Any future re-run depends on the service still being available and unchanged; there is no local fallback and no archived output.",
+      "how_to_close": "Archive the Promoter 2.0 output files as supplementary data alongside the input sequences and the submission date."
+    },
+    {
+      "type": 3,
+      "where": "C28-C29 - Nanopore raw signal for modified-base calling",
+      "missing": "Methods state 'Raw FASTA files were processed with Dorado (v0.8.3) and Modkit (v0.4.1) ... to detect 5-methylcytosine (5mC) and N6-methyldeoxyadenosine (6mA)'. Dorado modified-base calling operates on raw POD5/FAST5 signal, not on FASTA. The BioProject deposit contains a single ONT run (SRR36465263, GridION, 981,666 spots, mean length 4,771 bp) which is a basecalled read set; whether the original signal files were also submitted could not be confirmed from the public runinfo. If only basecalled reads were deposited, the entire methylation analysis (a headline result of the paper) cannot be re-derived from the public deposit.",
+      "how_to_close": "Deposit the POD5 signal files (SRA accepts ONT original-format submissions) or the Dorado modBAM output, and correct the 'raw FASTA' wording in Methods to name the actual input format and the basecalling model."
+    },
+    {
+      "type": 10,
+      "where": "W1-W7",
+      "missing": "Seven wet-lab steps (field sampling and isolation, nucleic-acid extraction, PCR/Sanger identification, manual growth assays, heat/UV shock treatments with scanner imaging, ONT library prep and sequencing, Illumina library prep and sequencing) are out of computational-reproduction scope and excluded from the denominator. They are documented at a normal methods-section level; the UV dose in particular is quantified (~40.3 J/cm2 over 24 h at 50 cm from a Sankyo Denki G30T8 lamp), which is better than typical.",
+      "how_to_close": "n/a - out of scope for Tier-1 computational reproducibility; recorded for completeness."
+    },
+    {
+      "type": 2,
+      "where": "C6-C9, C12, C14-C17, C22, C23, C25, C26 - parameter reporting",
+      "missing": "The dominant single cause of NI in this paper is not missing versions but missing parameters. Thirteen steps name a tool with an exact version and cite it correctly, yet give no command line at all. Two of these are consequential rather than cosmetic: Medaka's consensus model and Dorado's basecalling model are required arguments that change the output, and neither is named. Flye is run without a read-type flag, TRF without any of its seven required numeric parameters, IQ-TREE without a substitution model, and BLASTP without an E-value.",
+      "how_to_close": "Publish the exact command lines (or a workflow file) for every tool invocation, and name the Medaka consensus model and the Dorado basecalling model explicitly."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE. The paper contains no Code Availability statement and names no analysis-code repository. The only version-control URLs in the text are upstream tool homepages cited inside Methods: https://github.com/nanoporetech/medaka , https://github.com/nanoporetech/dorado , https://github.com/nanoporetech/modkit , https://github.com/linnabrown/run_dbcan . Two further tool URLs are given: http://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/ (pfam_scan) and https://services.healthtech.dtu.dk/services/Promoter-2.0/ (web service). Status: none (no author code repository stated in the paper).",
+      "http_status": "n/a - no author repository exists to check",
+      "checked_at": "2026-07-28",
+      "network_context": "determined by exhaustive grep of the fetched JATS XML for github/gitlab/bitbucket/zenodo/figshare/osf/doi.org-10.5281 patterns; only the four upstream tool repositories matched. No web search was performed to find an unstated repository."
+    },
+    {
+      "artifact": "data accession (raw sequencing): NCBI BioProject PRJNA1381326. Stated verbatim in Data Availability: 'All sequencing data generated in this study have been deposited in the NCBI Sequence Read Archive (SRA) under BioProject PRJNA1381326 and detailed in Supplementary Table S1.' Also cited inline in Methods. Status: URL-present and resolving; public. BioSample SAMN54131315 (Annulohypoxylon sp. HMH-2024a strain RYS0019), registered 15-Dec-2025. Five SRA runs, all released 2025-12-29: SRR36465263 (ONT GridION WGS, 981,666 spots, 4.68 Gbp), SRR36465262 / SRR36465264 / SRR36465265 (Illumina NovaSeq X Plus WGS), SRR36465266 (Illumina NovaSeq X Plus RNA-Seq PolyA). Caveat: the runinfo shows basecalled read sets; ONT original-format signal (POD5/FAST5) needed to re-run Dorado modified-base calling is not evident.",
+      "http_status": "200 OK (ncbi.nlm.nih.gov/bioproject/PRJNA1381326); eutils esearch db=sra returned Count=5; runinfo returned 5 run records",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser UA to ncbi.nlm.nih.gov, eutils.ncbi.nlm.nih.gov and trace.ncbi.nlm.nih.gov/Traces/sra-db-be/runinfo"
+    },
+    {
+      "artifact": "genome assembly: GenBank GCA_057318435.1 (ASM5731843v1), coverage 78x, linked to BioProject PRJNA1381326. NOT cited in the paper - the manuscript reports the 41.8 Mbp / 28-scaffold / N50 4.4 Mbp assembly and Supplementary Table S2 but gives no assembly accession in Data Availability. Status: public and resolving, discovered by querying the stated BioProject.",
+      "http_status": "200 OK (eutils esummary db=assembly, Count=1)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl to eutils.ncbi.nlm.nih.gov; recorded because the assembly is the primary input to most downstream C-steps and the paper does not cite its accession"
+    },
+    {
+      "artifact": "reference resources (third-party, public but unpinned): JGI Genome Portal https://genome.jgi.doe.gov/portal/ (proteomes for A. bovei var. microspora, A. nitens, A. stygium, A. truncatum, A. moriforme, A. maeteangense and others, no project IDs given); NCBI (unspecified accessions); eggNOG v5.0 (PINNED); Pfam release 37.2 (PINNED); BUSCO ascomycota_odb10 lineage via compleasm (release date not stated); dbCAN/CAZy database via run_dbcan (release not stated); EarlGrey bundled Dfam/RepBase library (release not stated).",
+      "http_status": "not individually checked (resource names cited in Methods prose; only eggNOG and Pfam carry a release pin)",
+      "checked_at": "2026-07-28",
+      "network_context": "prose-cited resource names and root URLs only"
+    },
+    {
+      "artifact": "external web service: Promoter 2.0, https://services.healthtech.dtu.dk/services/Promoter-2.0/ - DTU Health Tech academic service used for promoter prediction in six Annulohypoxylon species. No submission date, threshold or archived output reported.",
+      "http_status": "not checked",
+      "checked_at": "2026-07-28",
+      "network_context": "prose-cited service URL; the service is not redistributable and its model state at time of use is unrecorded"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "6847283d26f4e846bcc13f4b03a55595e091a814436f26a801051f80924ea2e4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

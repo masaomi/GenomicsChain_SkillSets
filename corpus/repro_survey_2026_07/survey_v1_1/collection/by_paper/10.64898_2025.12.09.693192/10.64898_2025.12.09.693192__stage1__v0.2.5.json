@@ -1,0 +1,337 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "cd8a9005fcbbca7aa583acd815a0eaf87505900c2f7228ace6f48c01b71bf73f",
+  "canonical_id": {
+    "value": "10.64898/2025.12.09.693192",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.09.693192v1",
+      "biorxiv:2025.12.09.693192v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "BatchSVG, an R/Bioconductor package that identifies batch-biased spatially variable genes (SVGs) by comparing per-gene binomial residual deviance and deviance rank with and without a batch covariate, thresholded by a data-driven number-of-standard-deviations (nSD) rule. The reproduction target is entirely computational and has two parts: (i) the method/package itself (featureSelect(), svg_nSD(), biasDetect() on SpatialExperiment objects), and (ii) the two demonstration analyses reported in Results - human hippocampus Visium (4 of 36 capture areas, nnSVG-based SVG selection giving 2,082 SVGs, 15 batch-biased SVGs removed, PRECAST clustering at k=7) and human dorsolateral prefrontal cortex Visium (3 of 12 samples, 1,864 nnSVG SVGs, 2 batch-biased SVGs removed, PRECAST clustering at k=6), each evaluated by normalized mutual information against prior annotations, PCA-based silhouette scores, marker-gene spatial expression, per-domain abundance and QC metrics. There are no wet-lab steps: both datasets were generated in prior publications (10.1101/2024.04.26.590643 and 10.1038/s41593-020-00787-0), so W = 0.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the bioRxiv v1 full text. The canonical JATS XML endpoint (https://www.biorxiv.org/content/early/2025/12/12/2025.12.09.693192.source.xml) returned HTTP 403 to WebFetch and, when fetched via curl with a browser user-agent, returned 200 but served a DIFFERENT article ('Marker effect p-values for single-step SNP-BLUP genomic models', DOI 10.1101/2025.10.30.685527); that content was discarded as a mis-served response. The assessment was therefore made from the .full landing page (https://www.biorxiv.org/content/10.64898/2025.12.09.693192v1.full, 200 OK), which carries the complete Abstract, Methods (sections 3.1-3.3), Results (4.1-4.2), Discussion and the combined 'Data and code availability' statement. The paper is short-format (Bioinformatics application-note shape): Methods describe the model and the package API, while the concrete per-dataset invocations appear in Results. Steps were therefore built from Methods + Results together. The analysis repository landing page and README were read at Stage 1 (prose only, no file-level inspection): the README states only that each of two dataset folders (humanHippocampus2024/, spatialLIBD_DLPFC_12_3_7_12_expanded/) contains a run_analysis.nf Nextflow file with scripts in scripts/spatial/, plus plots/ and results/ folders, and that HPC_analysis.R and DLPFC_analysis.R reproduce the figures. Because the workflow files were NOT read (that is Stage 2), step_source is recorded as prose-methods, not nextflow.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Acquisition and subsetting of the human hippocampus Visium dataset: anterior hippocampus from ten adult neurotypical donors, 36 capture areas across nine slides (four samples per slide), of which four samples were selected. The dataset is attributed only to the prior manuscript (doi 10.1101/2024.04.26.590643); the paper's 'Data and code availability' statement gives NO data accession, NO repository URL and NO data-package name for it, and the criterion by which the four samples were chosen from the 36 capture areas is not stated in prose.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "SVG detection / feature selection on the four hippocampus samples with nnSVG (ref 10, doi 10.1038/s41467-023-39748-z), reusing 'the nnSVG-based SVG selection process from the original manuscript' - top 2,000 ranked features retained per sample and only genes appearing in more than one sample kept, yielding 2,082 SVGs. The two selection parameters are stated, but no nnSVG version, no upstream QC/normalisation/filtering description and no nnSVG runtime arguments are given, and the procedure is delegated by reference to the prior manuscript.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "BatchSVG applied to the 2,082 hippocampus SVGs with sample as the batch covariate: per-gene binomial residual deviance fitted with and without the batch covariate, relative change in deviance (RCD) and rank deviance (RD) computed, then nSD thresholding via featureSelect() / svg_nSD() / biasDetect(), identifying 15 batch-biased SVGs and a refined set of 2,067. The package is public on Bioconductor and the model is fully specified mathematically, but the actual nSD threshold values used (and whether thresholding was on RCD, RD or both) are NOT stated in prose, and the BatchSVG package version is not given - only the floors 'at least Bioconductor version 3.21' and 'R at least version 4.4.0'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "PRECAST clustering (ref 3, doi 10.1038/s41467-023-35947-w) of the four hippocampus samples at k = 7, run twice: once on the original 2,082-SVG feature set and once on the 2,067-SVG refined set. Only k is stated. No PRECAST version, no platform/premin/postmin/gene-selection settings, no number of principal components, no random seed and no convergence criteria are given, and PRECAST is stochastic.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Evaluation of the hippocampus clustering: normalized mutual information (NMI) of each cluster set against the prior manuscript's annotations (reported 0.51 -> 0.52), principal components analysis used to generate per-domain silhouette scores, marker-gene checks (CALB1 for dentate gyrus granule cell layer, GADD45B as an example batch-biased SVG), percent abundance of DG GCL spots per sample, and per-cluster QC metrics (mitochondrial percent, total UMIs, detected genes). No implementation is named for NMI or silhouette (no package, no version), the number of PCs used for the silhouette computation is not stated, and the QC-metric definitions/thresholds are not given.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Acquisition and subsetting of the human dorsolateral prefrontal cortex (dlPFC) Visium dataset: twelve samples across three donors, of which three were chosen, one per donor. Attributed only to the prior publication (doi 10.1038/s41593-020-00787-0); no accession, no data-package name and no URL are given in this paper's availability statement, and which three of the twelve samples were used is not stated in prose (the repository folder name spatialLIBD_DLPFC_12_3_7_12_expanded hints at the sample identifiers but was not opened at Stage 1).",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "SVG detection on the three dlPFC samples with nnSVG, subsetting to genes statistically significant in at least two samples, yielding 1,864 SVGs. The 'significant in >= 2 samples' rule is stated but the significance criterion itself (p-value or FDR threshold, and which nnSVG statistic) is not, nor is the nnSVG version or any other argument.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "BatchSVG applied to the 1,864 dlPFC SVGs with sample as the batch covariate, identifying 2 batch-biased SVGs. Same code/version situation as C3 (public Bioconductor package, Bioconductor >= 3.21 and R >= 4.4.0 floors only, no package version); the nSD threshold values used for this dataset are again not stated in prose, and nothing indicates whether they match those used for the hippocampus dataset.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "PRECAST clustering of the three dlPFC samples at k = 6 on the original versus BatchSVG-refined feature sets, plus evaluation: NMI against manual annotations (reported 0.39 -> 0.58), silhouette scores per domain, layer-marker interpretation (L3/4 versus L5/6 separation) and QC metrics. Only k is stated; as in C4/C5 no PRECAST version, no settings, no seed and no metric implementations are given.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Figure generation for Figure 1 and Supplementary Figures 1-9 and Supplementary Tables 1-2 (deviance and rank scatterplots coloured by nSD, spot plots of log-normalised counts for GADD45B and CALB1, PRECAST domain spot plots, silhouette violin plots, DG GCL abundance bar plot, QC violin plots). The README names HPC_analysis.R and DLPFC_analysis.R as the figure-reproduction scripts, so code exists, but no plotting package or version is named anywhere in the paper and no per-plot arguments (colour scales, normalisation used for 'log-normalized counts', ordering) are stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 8,
+    "n_X": 0,
+    "S": 10,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 2/10 computational steps (C3 and C8, the two BatchSVG invocations). Those two reach RI - and only RI - because BatchSVG is a public Bioconductor package whose method is fully specified mathematically in Methods 3.1 and whose installation is bounded by the stated floors 'at least Bioconductor version 3.21' and 'depending on R (at least version 4.4.0)'; a Bioconductor release constrains the package set, which is the only version-bearing statement anywhere in the paper. The remaining 8/10 steps cap at NI on the version axis: no version at all is stated for nnSVG (C2, C7), PRECAST (C4, C9), the NMI/silhouette/QC implementations (C5), the plotting stack (C10), or the data-loading path (C1, C6). No environment closure of any kind is claimed: the analysis repository (https://github.com/kinnaryshah/BatchSVG-analyses) README documents only two dataset folders each holding a run_analysis.nf Nextflow file plus scripts, with no renv.lock, no conda environment, no Dockerfile, no sessionInfo, no tag and no release. Capture claim is therefore floating - minimum-version floors are not pins - and the paper is not a stage2 candidate. Note that the two RI steps are also parameter-limited: the nSD thresholds that produced the 15 and 2 batch-biased genes are not stated in prose, so even those steps depend on reading the deposited scripts.",
+    "coverage": "10 computational steps assessed, covering the full reported pipeline for both demonstration datasets: hippocampus data acquisition/subsetting, nnSVG feature selection, BatchSVG bias detection, PRECAST clustering, evaluation metrics (C1-C5), and the parallel dlPFC chain (C6-C9), plus figure generation (C10). W = 0: both Visium datasets were generated in prior publications (doi 10.1101/2024.04.26.590643 and doi 10.1038/s41593-020-00787-0) and this paper reports no wet-lab work, so there are no out-of-scope experimental steps. The method derivation itself (Methods 3.1, the RCD / RD / nSD definitions) is not counted as a separate executable step; it is folded into C3 and C8. The BatchSVG package's own vignette and website (Methods 3.3) are documentation, not a reported analysis step, and are recorded under liveness rather than as a step.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Both demonstration datasets (C1 hippocampus, C6 dlPFC); 'Data and code availability' section",
+      "missing": "The availability statement covers software and analysis code only. Neither dataset is given an accession, a URL, or a Bioconductor ExperimentHub / data-package name. Both are identified purely by citation to a prior paper (doi 10.1101/2024.04.26.590643 for the hippocampus atlas; doi 10.1038/s41593-020-00787-0 for the dlPFC dataset). A reproducer must go to the cited papers to locate the data, and the exact object/version they must retrieve (raw versus processed SpatialExperiment, which release) is unspecified.",
+      "how_to_close": "State the data source explicitly in this paper: accession (or the spatialLIBD / ExperimentHub object name plus its snapshot date) for each dataset, and state whether raw counts or a preprocessed SpatialExperiment object was the entry point."
+    },
+    {
+      "type": 2,
+      "where": "Whole R/Bioconductor environment (Methods 3.3; 'Data and code availability'; repository README)",
+      "missing": "No environment lockfile, container image or digest, conda environment file, renv.lock or sessionInfo output is claimed anywhere in the paper or visible in the analysis repository README. The only environment statement is a pair of minimum-version FLOORS - 'at least Bioconductor version 3.21' and 'depending on R (at least version 4.4.0)' - which bound the environment from below but do not pin it. The Nextflow pipelines (run_analysis.nf) imply an execution environment but the README documents no container or conda profile for them.",
+      "how_to_close": "Commit an renv.lock (or a container image referenced by digest, or a Nextflow -profile with a conda/container spec) covering the full R/Bioconductor stack, and report sessionInfo() from the run that produced the published figures. State the exact Bioconductor release and R patch version used, not a floor."
+    },
+    {
+      "type": 3,
+      "where": "C2, C7 (nnSVG); C4, C9 (PRECAST); C5 (NMI, silhouette, PCA); C10 (plotting); C3, C8 (BatchSVG itself)",
+      "missing": "No exact version is given for any package used in the analyses. nnSVG and PRECAST - the two tools whose outputs the whole result depends on - are cited only by their method papers. BatchSVG's own version is not stated; only a Bioconductor release floor. Since BatchSVG was under active development at submission (the paper links the devel branch), 'at least 3.21' does not identify the code that produced the 15 and 2 batch-biased gene calls.",
+      "how_to_close": "Add a versions table to the manuscript giving the exact version of BatchSVG, nnSVG, PRECAST, SpatialExperiment, scran/scater (or whichever normalisation stack was used) and the plotting packages, backed by the lockfile from gap type 2."
+    },
+    {
+      "type": 4,
+      "where": "C3, C8 (BatchSVG nSD thresholds); C4, C9 (PRECAST); C7 (nnSVG significance criterion); C5 (silhouette PCA)",
+      "missing": "The headline numbers (15 batch-biased SVGs in hippocampus, 2 in dlPFC) are produced by the nSD thresholding rule, but the actual nSD cutoff values used - and whether the cut was on RCD, on RD, or on both jointly - are not stated anywhere in the prose. For PRECAST only k (7 and 6) is given; no platform, gene-selection, PC count, or convergence settings. For C7 the phrase 'statistically significant in at least two samples' does not name the statistic or the threshold. For C5 the number of principal components entering the silhouette computation is not stated.",
+      "how_to_close": "State the nSD cutoffs used for each dataset and each statistic in Methods 3.1/Results, give the full PRECAST argument set, and name the significance statistic and threshold used for the nnSVG subsetting."
+    },
+    {
+      "type": 5,
+      "where": "C1, C6 (data acquisition and subsetting)",
+      "missing": "No download/ingest script is described in prose for either dataset, and the README does not mention one. The subsetting decisions - which four of 36 hippocampus capture areas, which three of twelve dlPFC samples - are not recoverable from the paper text; the dlPFC repository folder name (spatialLIBD_DLPFC_12_3_7_12_expanded) is suggestive but is not a stated sample list.",
+      "how_to_close": "State the selected sample/capture-area identifiers explicitly in the manuscript, and include the data-retrieval code (or the ExperimentHub call with its snapshot) in the repository."
+    },
+    {
+      "type": 6,
+      "where": "Results 4.1 and 4.2; Supplementary Tables 1 and 2",
+      "missing": "The identities of the 15 hippocampus and 2 dlPFC batch-biased SVGs are deferred to supplementary tables ('Supplementary materials are available at Bioinformatics online'), which are not part of the bioRxiv full text read at Stage 1. Likewise the workflow diagram (Supplementary Figure 1) that documents the featureSelect / svg_nSD / biasDetect sequence is supplementary. The comparison target for the result therefore cannot be reconstructed from the main text alone.",
+      "how_to_close": "Deposit the batch-biased gene lists and the per-gene RCD/RD/nSD tables in the analysis repository (under results/) in addition to the journal supplement, so they are retrievable without journal access."
+    },
+    {
+      "type": 7,
+      "where": "C2, C7 (nnSVG selection inherited from the hippocampus atlas manuscript)",
+      "missing": "The hippocampus SVG set is obtained by 'leveraging the nnSVG-based SVG selection process from the original manuscript', i.e. by reference to another paper's pipeline whose version, parameters and code state are not pinned here. The 2,082-SVG starting set - the input to every downstream number in section 4.1 - is thus defined by an external, unpinned procedure.",
+      "how_to_close": "Either re-run and document the nnSVG selection inside this repository with stated parameters, or cite the exact commit/release of the upstream pipeline and the exact output object that was consumed."
+    },
+    {
+      "type": 9,
+      "where": "Analysis repository https://github.com/kinnaryshah/BatchSVG-analyses",
+      "missing": "The repository is cited by bare URL with no tag, release, commit SHA or archival DOI (no Zenodo, no Software Heritage deposit). The README documents no releases or tags. The exact code state that produced Figure 1 and the supplementary tables is therefore not identifiable, and a force-push or history rewrite would silently break the citation. The BatchSVG package itself is cited via the Bioconductor DEVEL URL (https://bioconductor.org/packages/devel/bioc/html/BatchSVG.html), which is a moving target by construction.",
+      "how_to_close": "Cut a tagged release of BatchSVG-analyses at the manuscript state, archive it to Zenodo for a DOI, and cite the DOI. Cite a specific Bioconductor release URL and package version for BatchSVG rather than the devel branch."
+    },
+    {
+      "type": 11,
+      "where": "Repository structure (run_analysis.nf in each dataset folder) versus the manuscript",
+      "missing": "The manuscript describes the analyses only in prose and never mentions that they are implemented as Nextflow pipelines. Conversely the README describes the Nextflow files but gives no execution instructions, no profile, no Nextflow version, no resource requirements and no entry-point command. Neither surface alone tells a reproducer how to run anything: the paper omits the existence of the workflow, and the workflow is undocumented. (Whether the .nf files themselves pin containers or versions was NOT checked - that is a Stage-2 question.)",
+      "how_to_close": "Add a Usage section to the README with the Nextflow version, the invocation command, the profile/container used and the expected inputs; and reference the workflow explicitly in the manuscript's code availability statement."
+    },
+    {
+      "type": 12,
+      "where": "C4, C9 (PRECAST clustering); C5 (PCA-based silhouette)",
+      "missing": "No random seed is stated anywhere. PRECAST is a probabilistic embedding-clustering-alignment model with stochastic initialisation, and the entire claimed effect is a difference in cluster assignment (NMI 0.51 -> 0.52 for hippocampus, 0.39 -> 0.58 for dlPFC) between two runs on slightly different feature sets. Without a fixed seed neither the individual cluster solutions nor the magnitude of the NMI difference is reproducible, and the hippocampus effect in particular (0.01 NMI) is small enough that run-to-run variability is a live confound.",
+      "how_to_close": "Set and report a global seed and the seed passed to PRECAST; better, report the NMI difference across multiple seeded runs so the reader can see the effect against run-to-run variance."
+    },
+    {
+      "type": 13,
+      "where": "Manuscript section 10, 'Data and code availability'",
+      "missing": "The section is titled as covering both data and code but in substance covers only code and software: it names the Bioconductor package URL, the Bioconductor/R version floors, and the analyses repository URL. It says nothing about the two datasets analysed. There is no separate Data Availability statement.",
+      "how_to_close": "Split the statement into an explicit Data Availability part (accessions / object names for both Visium datasets) and a Code Availability part (package version, analyses repository DOI or tag, environment specification)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Analysis code repository: https://github.com/kinnaryshah/BatchSVG-analyses - stated verbatim in the paper ('All data analysis is freely available at https://github.com/kinnaryshah/BatchSVG-analyses'), URL present. Public. Landing page shows README.md, .gitignore, dlpfc_genes.r, sensitivity_analysis.R, and the folders humanHippocampus2024/, spatialLIBD_DLPFC_12_3_7_12_expanded/, scripts/spatial/. README states each dataset folder holds a run_analysis.nf Nextflow file and that HPC_analysis.R / DLPFC_analysis.R reproduce the figures; it states no software versions, no install or run instructions, and no environment specification (no renv.lock, no conda env, no Dockerfile, no sessionInfo). No releases or tags documented on the landing page.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -sL with browser user-agent, unauthenticated, from assessor host; GitHub REST API queries for /releases and /tags returned 403 rate-limit, so release/tag absence is asserted only from the rendered landing page"
+    },
+    {
+      "artifact": "Software package (Bioconductor devel): https://bioconductor.org/packages/devel/bioc/html/BatchSVG.html - stated verbatim in the paper's availability statement and repeated in the footnotes, URL present. Also cited in Methods 3.3 as https://bioconductor.org/packages/BatchSVG for the vignette.",
+      "http_status": "504",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -sL with browser user-agent, unauthenticated, from assessor host; both the devel and release URLs returned 504 Gateway Timeout on repeated attempts. Recorded verbatim. A 504 is a gateway/upstream condition at check time and is NOT evidence that the package is absent; the status is reported as observed, not interpreted."
+    },
+    {
+      "artifact": "Human hippocampus Visium dataset (C1) - NO accession, NO URL and NO data-package name given by the authors. Attributed only by citation to J. R. Thompson et al., bioRxiv 2025, doi 10.1101/2024.04.26.590643.",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - absence recorded verbatim from the manuscript; no search was performed for an accession the paper does not state"
+    },
+    {
+      "artifact": "Human dlPFC Visium dataset (C6) - NO accession, NO URL and NO data-package name given by the authors. Attributed only by citation to K. R. Maynard et al., Nature Neuroscience 24:425-436, 2021, doi 10.1038/s41593-020-00787-0.",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - absence recorded verbatim from the manuscript; no search was performed for an accession the paper does not state"
+    },
+    {
+      "artifact": "Environment lock / container / conda specification: none stated in the paper and none visible on the analysis repository landing page or in its README. The paper states only minimum floors: 'at least Bioconductor version 3.21' and 'depending on R (at least version 4.4.0)'.",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - absence recorded; not searched for beyond the cited repository landing page and README"
+    },
+    {
+      "artifact": "Paper full text: https://www.biorxiv.org/content/10.64898/2025.12.09.693192v1.full (200 OK, used as the source of record). The instructed JATS XML endpoint https://www.biorxiv.org/content/early/2025/12/12/2025.12.09.693192.source.xml returned 403 to WebFetch and, via curl, returned 200 with the WRONG article (DOI 10.1101/2025.10.30.685527, 'Marker effect p-values for single-step SNP-BLUP genomic models'); that payload was discarded.",
+      "http_status": "200 (landing .full) / 403 and mis-served 200 (source.xml)",
+      "checked_at": "2026-07-27",
+      "network_context": "WebFetch then curl -sL with browser user-agent, unauthenticated, from assessor host"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "ee9a8e659184e1ed891812de81ffc6ff6f33a4adb208042a91f0baccd41c0a4d",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

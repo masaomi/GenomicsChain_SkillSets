@@ -1,0 +1,626 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "3d4f1ee490948693be39a1e537279b24d97862cd70ed543cda98362470df187c",
+  "canonical_id": {
+    "value": "10.1101/2025.10.31.685862",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.31.685862v1",
+      "biorxiv:2025.10.31.685862v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Training and evaluation of VariantFormer, a 1.2B-parameter hierarchical transformer predicting tissue-specific gene expression from personalized diploid genomes. Computational scope = the entire study: cohort WGS/RNA-seq acquisition and harmonization (MAGE/1000G, ENTEx, GTEx v9/v10, ADNI, six ENCODE cancer cell lines), personalized-sequence construction via bcftools consensus with IUPAC heterozygote encoding, BPE tokenizer training, mutation-aware encoder pretraining on ENTEx chromatin activity, two-stage expression-model training, and post-training tasks (baseline comparison vs Enformer/Borzoi/EVO 2/genotype-RF, Alzheimer's case-control classification, MAGMA v1.10 gene enrichment, eQTL Catalogue variant-effect benchmarking, in-silico APOE mutagenesis, DNase-seq attention validation). No wet-lab experiments were performed by the authors; all cohorts are pre-existing. |W| = 0.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation derived from Methods sections 5.1-5.4 and 6.1-6.4 of the JATS full text, plus the repo LANDING page and README PROSE (github.com/czi-ai/variantformer). No workflow file (Snakefile/Nextflow/CWL/WDL) is described in prose, so the granularity anchor is the named-tool rule. Reference-genome/annotation setup is kept as its own step because it is pinned to specific assembly and GENCODE releases that every downstream step consumes. The two supervised-training stages are kept separate because they use different gene sets, epoch counts and learning rates. Baseline model runs (Enformer, Borzoi, EVO 2, genotype-RF) are folded into the single expression-evaluation step C20. Supplementary Methods S1.2-S1.6 are referenced by the paper but were not fetched at stage 1; several version/parameter judgements below may move once those are read. NOTE: this is a prose-only pass. The repository tree listing shows a Dockerfile, install.sh, pyproject.toml, configs/*.yaml, tests/ and inference notebooks, but NO source file was read line-by-line and no lockfile presence was confirmed - that is stage-2 work.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Reference genome and annotation setup: GRCh38 (GRCh38_no_alt_analysis_set_GCA_000001405.15), GENCODE v24 basic annotation (gencode.v24.basic.annotation.gtf.gz), autosomes chr1-chr22 only",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "prose-pin-only",
+        "no-explicit-script"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Candidate cis-regulatory element acquisition: ENCODE Registry of cCREs (ENCSR487PRC), primary file ENCFF234XEZ.bed.gz, plus donor/tissue-specific ENTEx cCRE annotations (accessions in Supplementary Table 2); n = 1,063,878 cCREs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-pinned",
+        "supplementary-table-dependency"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "MAGE / 1000 Genomes high-coverage (30x) WGS download: phased SNV/INDEL/SV panel, 20220422 release (1kGP_high_coverage_Illumina.chrN.filtered.SNV_INDEL_SV_phased_panel.vcf.gz, chr1-22) for 731 samples from ftp.1000genomes.ebi.ac.uk",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "release-dated-ftp-file",
+        "no-download-script-in-prose"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "ENTEx phased WGS VCF download from ENCODE (Illumina NextSeq 500); file accessions listed in Supplementary Table 3",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-pinned",
+        "supplementary-table-dependency"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "GTEx v9 WGS acquisition for 953 individuals from dbGaP (phs000424.v9, genotype dataset phg001796.v1.GTEx_v9_WGS_953.genotype-calls-vcf.c1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "dac-path-documented"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "ADNI WGS acquisition (808 participants, LONI Image and Data Archive) and hg19 -> GRCh38 liftover with CrossMap using the hg19ToHg38 chain file",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "controlled-access",
+        "dac-path-documented",
+        "unversioned-tool"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "ENCODE cancer cell-line variant calling (A549, GM23248, HepG2, K562, NCI-H460, Panc1): dual-caller DeepVariant v1.6.0 (germline) + DeepSomatic v1.6.0 (tumor-only), somatic-priority merge at overlapping positions, PASS-only filtering, custom INFO origin annotation (details in Supplementary S1.4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-tool-pins-prose",
+        "custom-merge-script-not-located"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "VCF filtering and standardization: restrict variants to cCRE regions and gene transcriptional windows, add 'chr' prefix, reheader against GRCh38, sort, index (bcftools; no version stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "no-commands-in-prose"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Personalized diploid sequence generation: samtools faidx extraction + bcftools consensus -H I (IUPAC heterozygote encoding, VariantFormer) and -H A (alt-allele, Enformer/Borzoi/EVO 2); SV/complex rearrangements excluded; cCREs padded 50 bp each side; windows 98 kb (Enformer/Borzoi) and 8 kb (EVO 2) around gene start; genotype baselines use 150 kb windows, MAF > 0.01, biallelic SNPs, mean imputation",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "repo-covers-sequence-construction"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Genetic ancestry inference for GTEx and ADNI: PLINK v1.90b6.24 LD pruning (50 SNP window, 5 SNP step, r2 = 0.2), PCA on 20 PCs, KNN classifier (k = 7, distance-weighted Euclidean) trained on 731 1000 Genomes reference samples (AFR/EUR/EAS/SAS/AMR)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-tool-pin-prose",
+        "supplementary-methods-dependency"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "MAGE RNA-seq processing: pseudo-counts from Zenodo record 10535719, conversion to TPM using effective gene lengths, read-depth normalization, GENCODE v38 -> v24 identifier mapping via stable Ensembl IDs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "zenodo-record-pinned",
+        "no-script-located"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "GTEx v10 expression processing: GTEx_Analysis_v10_RNASeQCv2.4.2_gene_tpm.gct from the GTEx Portal, RIN > 6 sample filter, standardization to GENCODE v24",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access-derivatives",
+        "file-version-pinned"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "ADNI microarray processing (Affymetrix Human Genome U219, 650 participants with paired WGS): RIN > 6 filter, multi-symbol probe splitting, removal of probes below global median intensity, median collapse across probes per gene, quantile normalization, log transform, GENCODE v24 mapping",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "controlled-access",
+        "no-software-named",
+        "threshold-underspecified"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "ENCODE cell-line RNA-seq quantification retrieval: total RNA-seq gene TSVs with GENCODE v24 / GRCh38 - K562 ENCFF171FQU, HepG2 ENCFF863QWG, GM23248 ENCFF640FPG, A549 ENCFF244DNJ, NCI-H460 ENCFF876SRX, Panc1 ENCFF710IFD",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "accession-pinned"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Cross-cohort expression integration into a single AnnData object: gene filter (< 20 non-zero counts across samples removed), non-coding tissue-specific 10th-percentile non-zero threshold filter, non-zero-only training values",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-library",
+        "integration-script-not-located"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "BPE DNA tokenizer training on reference cCRE sequences (ENCFF234XEZ, +/-50 bp flanks): HuggingFace Tokenizers BPE model, vocabulary size 500, uppercase normalization, IUPAC code filtering (A,C,G,T,R,Y,S,W,K,M,B,D,H,V)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "vocab-artifact-shipped-in-repo",
+        "library-version-unstated-in-prose"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Mutation-aware sequence encoder pretraining on ENTEx chromatin-activity classification: 12-layer transformer encoder, 512-dim token embeddings, ALiBi positional encoding, Flash Attention, forward+reverse strand, tissue-specific classification heads; DDP over 8 GPUs, per-device batch 32, gradient accumulation 12 (effective 3,072), 29 epochs, Adam lr 1e-4, ReduceLROnPlateau (patience 2, factor 0.1), bfloat16 mixed precision",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "training-entrypoint-not-evident-in-repo-landing",
+        "stochastic-no-seed-stated",
+        "readme-pins-runtime"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Expression-model training Stage 1 (protein-coding): 18,439 genes, 12 epochs, CRE encoder frozen, gene encoder fine-tuned, modulators trained end-to-end; 376 GPUs x 2 pairs x 2 tissues x 11 accumulation steps (effective batch 16,544), AdamW lr 1e-4, weight decay 0.01, gradient clipping 1.0, warmup-cosine schedule with 1% warmup, bfloat16",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "training-entrypoint-not-evident-in-repo-landing",
+        "stochastic-no-seed-stated",
+        "large-scale-compute"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Expression-model training Stage 2 (all annotated genes): +32,517 non-coding genes (50,956 total), 10 additional epochs initialized from Stage 1, learning rate reduced to 4e-5 with minimum 1e-6",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "training-entrypoint-not-evident-in-repo-landing",
+        "stochastic-no-seed-stated"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Gene-expression prediction benchmark: gene correlation and subject correlation on held-out donors, comparing VariantFormer against Enformer, Borzoi, EVO 2 and a genotype random-forest baseline (AlphaGenome explicitly not benchmarked - not released for fine-tuning)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "baseline-checkpoints-unversioned",
+        "baseline-harness-not-located",
+        "supplementary-methods-dependency"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Alzheimer's case-control classification from gene embeddings: random forests per gene (baselines) or per gene-tissue pair (VariantFormer), grid search over n_trees {100,500,1000} and max_depth {10,20,30}, stratified 10-fold CV on training donors, refit on all training donors, OOD test set of 40 held-out subjects (330 subjects total: 215 AD / 155 CN, 16,510 protein-coding genes), training-only top-K selection, nested bootstrap 95% percentile intervals",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "repo-covers-ad-risk",
+        "stochastic-no-seed-stated"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "MAGMA v1.10 gene-based enrichment: PGC Alzheimer's GWAS summary statistics (23andMe excluded), liftover to GRCh38, duplicate-SNP removal (first occurrence retained), 1000 Genomes Phase 3 EUR LD reference, SNP-to-gene annotation with 100 kb upstream / 50 kb downstream windows over GENCODE v24 boundaries",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-tool-pin-prose",
+        "liftover-tool-unnamed"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "eQTL Catalogue curation and variant-effect benchmarking: six ge datasets (TwinsUK adipose/blood/skin; Braineac2 and BrainSeq substantia nigra / BA9 frontal cortex / putamen), tissue-label harmonization to GTEx nomenclature, LCL removed, SNPs only, top 50,000 pairs per tissue by p-value, MAF < 0.05 subset (top 10,000), ancestry-stratified BrainSeq sets (AF_EUR > 0.10 & AF_AFR < 0.05; AF_AFR > 0.10 & AF_EUR < 0.05), context-window filtering against VariantFormer/Borzoi/AlphaGenome",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "repo-ships-eqtl-notebook",
+        "catalogue-release-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "In-silico APOE mutagenesis on ADNI OOD carriers: rs429358 (chr19:44908684 T>C) and rs7412 (chr19:44908822 C>T) extraction, generation of actual-genotype vs reference-reverted personalized sequences (eps4 N = 12, eps2 N = 1), tissue-conditioned risk-probability comparison (log OR with 95% CI)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "repo-ships-variant2risk-notebook",
+        "small-n-eps2"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Cross-attention vs chromatin-accessibility validation: ENCODE adrenal-gland DNase-seq bigWig (ENCFF632QUC, UBERON:0002369) compared against attention weights for a random subset of 50 protein-coding genes, GENCODE v24 gene starts/strands",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "random-subset-no-seed",
+        "gene-list-not-deposited",
+        "bigwig-tooling-unnamed"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 18,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 25,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/25 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "18/25 (72%) steps reach RI at stage-1 prose level; 7/25 cap at NI. The NI steps all fail on the version axis with no software named or no version stated: CrossMap liftover (C6), bcftools VCF standardization (C8), samtools/bcftools personalized-sequence construction (C9), ADNI microarray normalization with no software named (C13), AnnData integration (C15), the baseline benchmark whose Enformer/Borzoi/EVO 2 checkpoints and versions are unpinned (C20), and the DNase-seq attention validation whose 50-gene random subset has no seed or deposited gene list (C25). Data is never the binding constraint: GTEx (dbGaP phs000424.v9) and ADNI (LONI) are controlled-access with documented DAC paths and are therefore scored 2 with the controlled-access flag, and all other sources are public with pinned accessions. The binding constraints are (a) unversioned command-line genomics tooling in the preprocessing chain and (b) the absence, at prose level, of any located training or preprocessing entrypoint - the public repo landing page shows inference notebooks, model modules, configs, tests, an install.sh and a Dockerfile, but no training driver. Under stage-1 rules version is capped at 1 regardless of the Dockerfile, so this bound is a floor: a stage-2 code read could raise version to 2 for the repo-covered steps if the container/lock provides genuine environment closure.",
+    "coverage": "25 computational steps assessed from Methods prose (sections 5.1-5.4, 6.1-6.4) plus repo landing page and README prose; 0 wet-lab steps (|W| = 0, all cohorts pre-existing), so computational coverage = 25/25 = 100%. Supplementary Methods S1.2-S1.6 and Supplementary Tables 1-3 are referenced by the Methods but were not fetched at stage 1.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Preprocessing tool chain: CrossMap (C6), bcftools/samtools (C8, C9), ADNI microarray normalization software (C13), AnnData/scanpy (C15), bigWig tooling (C25), HuggingFace Tokenizers (C16), GWAS liftover tool (C22)",
+      "missing": "No version is stated in prose for any of these tools; for C13 no software is named at all for quantile normalization / probe collapse. Exact prose pins exist only for DeepVariant v1.6.0, DeepSomatic v1.6.0, PLINK v1.90b6.24 and MAGMA v1.10.",
+      "how_to_close": "State exact versions for every command-line tool in Methods, or ship the preprocessing environment (conda-lock / pixi.lock / recorded container digest) covering the genomics CLI stack alongside the Python model environment."
+    },
+    {
+      "type": 12,
+      "where": "Data preprocessing and model training (C1-C15, C17-C19)",
+      "missing": "The public repository (github.com/czi-ai/variantformer) is presented in the Code availability statement as 'the pretrained models are publicly available'; the landing page and README describe inference notebooks (vcf2exp, variant2exp, vcf2risk, variant2risk, eqtl_analysis), model modules, configs and tests, but no training driver or cohort-preprocessing pipeline is visible. The Data availability statement nevertheless directs readers to 'process the data independently using our provided analysis pipeline'.",
+      "how_to_close": "Deposit (or point explicitly to) the cohort preprocessing scripts and the pretraining / two-stage training entrypoints with their configuration files, so the claimed 'analysis pipeline' is locatable and the training runs are re-executable rather than only the inference path."
+    },
+    {
+      "type": 2,
+      "where": "Repository-level environment declaration (README prose)",
+      "missing": "The README declares a partial environment - GPU H100 or L40, CUDA 12, Ubuntu 24.04, Python 3.12, torch 2.8, an exact flash-attn wheel (2.8.3+cu12torch2.8cxx11abiTRUE-cp312) - and states that a Dockerfile builds a 'self-contained container with all dependencies installed'. No published image digest, no dated release/tag (the repository has zero GitHub releases), and no lockfile is named in prose. Whether install.sh / pyproject.toml pin package sources, channels and the full direct-dependency set is unverified at stage 1.",
+      "how_to_close": "Publish a built image with a recorded digest (or a resolved lockfile pinning interpreter, index/channel and platform) and tag a release corresponding to the manuscript, so the environment claim becomes statically checkable rather than a build recipe."
+    },
+    {
+      "type": 4,
+      "where": "C17, C18, C19 (all training stages), C21 (random-forest CV and bootstrap), C25 (random 50-gene subset)",
+      "missing": "No random seed is stated anywhere in the Methods prose for encoder pretraining, two-stage expression training, the stratified 10-fold CV / nested bootstrap, or the random selection of 50 protein-coding genes for the attention-vs-DNase analysis. The 50-gene list is not deposited.",
+      "how_to_close": "Report seeds (and show them consumed in code) for training, cross-validation and bootstrap; deposit the exact gene list used for the attention validation. Absent seeds, results are assessable only distributionally."
+    },
+    {
+      "type": 13,
+      "where": "External reference resources: GRCh38 no-alt analysis set, GENCODE v24, ENCODE cCRE and DNase-seq accessions, 1000 Genomes 20220422 panel, 1000 Genomes Phase 3 EUR LD panel, eQTL Catalogue FTP paths, Zenodo 10535719, 43 GB of model artifacts fetched by download_artifacts.py",
+      "missing": "All reference resources are pinned in PROSE (assembly build, GENCODE release, ENCODE accessions, dated FTP release). Whether the executable workflow itself fetches these at pinned versions - in particular what download_artifacts.py resolves and whether the eQTL Catalogue release is pinned - is unverified; env_capture_class is deliberately left n/a at stage 1.",
+      "how_to_close": "Stage-2 code read of download_artifacts.py, utils/assets.py and the data-loading configs to classify each external resource A / B / C."
+    },
+    {
+      "type": 5,
+      "where": "C20 baseline benchmark; C13 ADNI microarray filtering; C23 eQTL Catalogue release",
+      "missing": "Baseline model checkpoints/versions for Enformer, Borzoi, EVO 2 and the genotype random-forest hyperparameters are not pinned in prose (details deferred to Supplementary S1.2). The 'global median intensity' probe filter for ADNI is stated qualitatively without the resulting threshold. The eQTL Catalogue release/version is not stated (FTP paths deferred to Supplementary Table 1).",
+      "how_to_close": "State baseline checkpoint identifiers and versions, the concrete ADNI intensity threshold, and the eQTL Catalogue release used, in the main Methods rather than only in supplementary tables."
+    },
+    {
+      "type": 1,
+      "where": "GTEx and ADNI processed derivatives",
+      "missing": "Processed GTEx and ADNI files cannot be shared under the data use agreements, so an independent assessor must regenerate every derived matrix from raw controlled-access data. This is legitimate controlled access (accessions resolve, DAC paths are documented) and is NOT penalized on the data axis, but it does mean the exact processed inputs to training are not obtainable as-is.",
+      "how_to_close": "Where the DUA permits, deposit derived non-identifying artifacts (sample manifests, filtered gene lists, train/test donor split assignments) so the regeneration path is checkable even without the restricted matrices."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/czi-ai/variantformer - stated verbatim in the Code availability section ('The pretrained models are publicly available on GitHub https://github.com/czi-ai/variantformer'). Public, MIT licensed, default branch main, created 2025-09-20, last push 2026-05-03. ZERO GitHub releases/tags. Tree contains Dockerfile, Makefile, install.sh, pyproject.toml, download_artifacts.py, configs/, datasets/, processors/, seq2gene/, seq2reg/, utils/, vocabs/, notebooks/ (5 ipynb + 3 marimo py), tests/ (5 test files). No lockfile (uv.lock / conda-lock / requirements.txt) observed in the tree listing.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to github.com and api.github.com (repo metadata + git trees main?recursive=1) + raw README.md"
+    },
+    {
+      "artifact": "model landing page: https://virtualcellmodels.cziscience.com/model/variantformer - stated verbatim in the Code availability section (CZI Virtual Cells Platform)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "data accession: GTEx controlled access via dbGaP phs000424 (Methods pin study accession phs000424.v9, genotype dataset phg001796.v1.GTEx_v9_WGS_953.genotype-calls-vcf.c1); Data availability states 'Apply through dbGaP (phs000424)'",
+      "http_status": "not individually resolved (controlled-access accession cited in prose; DAC application path documented)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited controlled-access identifier; no unauthenticated resolution attempted"
+    },
+    {
+      "artifact": "data accession: ADNI controlled access - Data availability states 'Apply at http://adni.loni.usc.edu/data-samples/access-data/'; WGS, U219 microarray expression and DXSUM diagnosis files obtained from the LONI Image and Data Archive. No per-file accession given.",
+      "http_status": "not individually resolved (controlled-access portal cited in prose; DAC application path documented)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited controlled-access portal; no unauthenticated resolution attempted"
+    },
+    {
+      "artifact": "data accession: ENCODE open access - Data availability states 'https://www.encodeproject.org/ (publicly available)'. Specific accessions pinned in Methods: cCRE registry ENCSR487PRC / ENCFF234XEZ.bed.gz; DNase-seq ENCFF632QUC; cell-line RNA-seq ENCFF171FQU, ENCFF863QWG, ENCFF640FPG, ENCFF244DNJ, ENCFF876SRX, ENCFF710IFD; ENTEx cCRE and WGS accessions deferred to Supplementary Tables 2 and 3.",
+      "http_status": "200 OK (portal root)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to www.encodeproject.org; individual accessions not separately resolved"
+    },
+    {
+      "artifact": "data accession: 1000 Genomes open access - Data availability states 'https://www.internationalgenome.org/ (publicly available)'; Methods pin the 20220422 high-coverage phased panel files on ftp.1000genomes.ebi.ac.uk",
+      "http_status": "not individually resolved (prose-cited FTP release)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited public FTP release path"
+    },
+    {
+      "artifact": "data accession: Zenodo record 10535719 (MAGE RNA-seq pseudo-counts), cited verbatim in Methods 5.1.4 as 'downloaded from Zenodo (record ID: 10535719)'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L to https://zenodo.org/records/10535719"
+    },
+    {
+      "artifact": "data resource: eQTL Catalogue (https://www.ebi.ac.uk/eqtl/) - six ge datasets from TwinsUK, Braineac2, BrainSeq; FTP paths and metadata deferred to Supplementary Table 1. No release version stated.",
+      "http_status": "not individually resolved (prose-cited resource, no version)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited public resource"
+    },
+    {
+      "artifact": "data resource: PGC Alzheimer's Disease Working Group GWAS summary statistics (23andMe excluded), used for MAGMA v1.10; no accession or download URL stated in the paper",
+      "http_status": "n/a (no identifier given)",
+      "checked_at": "2026-07-27",
+      "network_context": "no URL or accession present in the Methods or Data availability text"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "3ef6cc4cdbc9f5b9d4761a0e07e817eb991c406556aebad4a8911ba7c68d1ef4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

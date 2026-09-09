@@ -1,0 +1,881 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "45861cfb0b1ad1a6f8d9bda5d10cece7f335c06ac9a100f1466a5d419ae92b9c",
+  "canonical_id": {
+    "value": "10.1101/2024.12.18.629274",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2024.12.18.629274v3",
+      "biorxiv:2024.12.18.629274v3"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Personalized multi-platform characterization of somatic mosaicism in the dorsolateral prefrontal cortex of a single donor (LIBD75). Computational target: construction of a donor-specific phased diploid assembly from ONT WGS (Shasta/Flye -> HapDup -> Hapo-G, QC by BUSCO/QUAST/Merqury and a custom 10x SNP-recall script); phase-block refinement and read haplotagging (PAV, LongRanger, HaplotagLR, assign_haplotype.py); germline and somatic variant calling across four platforms (ONT WGS, Illumina WGS, 10x linked-reads, TEnCATS Cas9-enriched nanopore, MALBAC single-cell ONT and Illumina) with DeepVariant, Clair3, ClairS-TO, GATK Mutect2, MosaicForecast, DELLY2, Sniffles2, Manta, PALMER, xTea/xTea_long, MELT, RepeatMasker and NanoPal; new tools GARLIC (single-cell somatic CNVs via physical phase coverage + circular binary segmentation) and PalmeSom (single-cell somatic TEs); callset integration, per-haplotype VAF analysis, repeat-class enrichment testing and manual IGV curation. Wet-lab DNA extraction, Cas9 targeted enrichment, MALBAC amplification and sequencing are W (out of computational-reproduction scope).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v3 JATS XML Methods (retrieved by curl; WebFetch of the .source.xml returned HTTP 403) plus the prose of the Code availability repository README (github.com/mills-lab/LIBD75). The README is unusually rich: it reproduces literal command lines with exact version numbers for most tools, which raises the code axis to 2 for many steps. It is nevertheless a command cookbook, not a runnable pipeline: there is no driver script, no workflow file, no environment specification, two sections are empty placeholders ('SV here' for both ONT and Illumina SV calling), two 'And the output is processed by TODO' stubs remain in the single-cell mpileup sections, and the 'Data Analysis' heading is empty. Singularity images are referenced by filename or library tag (deepvariant_1.6.0.sif, hapdup_0.12.sif, clair3_latest.sif, clairs-to_latest.sif, mosaicforecast_0.0.1.sif, library://becklab/pav/pav:latest) with no digest and two floating 'latest' tags. No lockfile, conda environment, requirements file, release tag or Zenodo software archive exists for the analysis code (the Zenodo DOI holds data products, not code). Stage-1 read only; no code was executed and no workflow source was read line-by-line.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: genomic DNA extraction from LIBD75 donor DLPFC bulk tissue (MagAttract High Molecular Weight DNA Kit; aliquots for ONT, 10x Genomics and Illumina library prep)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: ONT bulk whole-genome sequencing library preparation and sequencing of LIBD75 DLPFC (PromethION, R10.4.1)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: TEnCATS Cas9-targeted enrichment (Quick CIP dephosphorylation, Alt-R S.p. HiFi Cas9 V3 RNP with in vitro transcribed gRNAs against L1Hs/AluYa5/AluYb8, dA-tailing, SQK-LSK114 ligation, Ampure/LFB cleanup) and nanopore sequencing on MinION and PromethION2 Solo R10.4.1 flow cells for 72 h. Molecular protocol deposited at protocols.io (dx.doi.org/10.17504/protocols.io.kqdg3q66ev25/v1)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: single-neuron isolation from DLPFC, MALBAC whole-genome amplification, and library preparation for ONT single-cell sequencing and Illumina NovaSeq single-cell sequencing (University of Michigan Advanced Genomics Core)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: 10x Genomics linked-read (Chromium, 53x) and Illumina NovaSeq 6000 short-read (30x) bulk-tissue library preparation and sequencing, as described in Garrison et al. and performed by the BSMN",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Basecalling and alignment of ONT bulk WGS with dorado 7.2, model dna_r10.4.1_e8.2_400bps_sup@v5.0.0, --min-qscore 9, 5mCG_5hmCG modified-base calling, --trim adapters, -Y --mm2-preset map-ont against GCA_000001405.15_GRCh38_no_alt, piped to samtools sort/index",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Basecalling and alignment of TEnCATS nanopore reads with dorado 7.2 (dna_r10.4.1_e8.2_400bps_sup@v5.0.0), CG methylation calling, minimum qscore 9, map-ont preset to the same hg38 no_alt reference",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Basecalling of MALBAC single-cell ONT data with Guppy v6.2.11 or v6.4.6 high-accuracy model dna_r10.4.1_e8.2_400bps_hac (min qscore 9), chimeric MALBAC read splitting with duplex_tools (native adapters replaced by the MALBAC primer), alignment with minimap2 v2.26-r1175",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Draft haploid genome assembly from ONT WGS with Shasta v0.11.1 (--config customized.conf, 30 threads) and Flye v2.9.2 (--nano-raw -g 3g -t 30); Shasta draft selected for downstream work",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Diploid conversion of the haploid draft: realignment of original ONT reads with minimap2 v2.28 (map-ont) and HapDup v0.12 (singularity hapdup_0.12.sif, --rtype ont, -t 24) producing dual and phased assemblies",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Polishing of both assembly versions with Hapo-G v1.38 using Illumina short reads, run three times sequentially (README shows a single hapog invocation)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Assembly quality assessment with BUSCO v5.7.1 (paper: primates_odb10; README: --auto-lineage), QUAST v5.2.0 against GCA_000001405.15_GRCh38_no_alt_analysis_set.fa, and Merqury v1.3 with meryl k=21 on Illumina reads",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Custom 10x linked-read heterozygous phased SNP recall-rate pipeline (samtools mpileup at 10x SNP loci on the two haplotype assemblies, followed by QC_consist.py in the LIBD75 repository)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "capture-static-only",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Analysis of 10x Genomics linked-read data with LongRanger (paper: v2.2; README: version 2.2.2) in wgs mode (--somatic --vcmode=gatk:GenomeAnalysisTK.jar 3.7, --sex=male) to obtain phased SNVs and phase blocks",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Variant calling from the phased assembly with PAV v2.3.4 (singularity run library://becklab/pav/pav:latest -c 16; config.json + assemblies.tsv in repo), yielding SNVs, indels, SVs and inversions with a 50 bp size cutoff",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Annotation of PAV insertion sequences with RepeatMasker v4.1.2 (-e hmmer -species human) and refinement to active TE subfamilies (L1Hs, AluY, SVA) requiring a minimum 6 bp polyA tail",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Assembly-based TE calling with PALMER v2.0.1 (--mode asm, --ref_ver GRCh38, per-chromosome, types LINE/ALU/SVA) and intersection with the annotated PAV callset to build the high-confidence assembly TE callset",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Refinement of phased SNVs and phase blocks: VAF>=0.2 filtering of assembly SNVs against Illumina WGS, merging of HapDup and LongRanger phase blocks, phase-switch detection and haplotype flipping, subdivision of blocks lacking matching SNVs (no code published)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Haplotagging of long reads with HaplotagLR (no version reported; --log_likelihood_threshold 0 -F 0 --threads 4)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Short-read haplotype assignment with assign_haplotype.py (LIBD75 repo) applying the three read-pair rules (consistent agreement / discrepant -> unphased / unmapped mate -> unphased); no version or release tag",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "capture-static-only",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "SNV calling from ONT bulk WGS with DeepVariant v1.6.0 (singularity deepvariant_1.6.0.sif, --model_type=ONT_R104, 36 shards), Clair3 v1.0.6 (clair3_latest.sif, model r1041_e82_400bps_sup_v410 from nanoporetech/rerio), and ClairS-TO v0.0.2 (clairs-to_latest.sif, platform ont_r10_dorado_sup_4khz); FILTER=PASS / NonSomatic filtering",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "SNV calling from Illumina bulk WGS with GATK Mutect2 v4.3.0, DeepVariant v1.6.0 WGS model, and ClairS-TO v0.0.2 ilmn model; PASS/NonSomatic filtering",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "SV calling from ONT bulk WGS with DELLY2 v1.2.6 (lr mode) and Sniffles2 v2.4 (default mode); DUP pooled with INS as INS/DUP. The LIBD75 README section for these calls is an empty placeholder ('SV here')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "SV calling from Illumina bulk WGS with DELLY2 v1.2.6 (--call default mode) and Manta v1.6.0 (default mode), with convertInversion.py applied to diploidSV.vcf to reformat inversions. README placeholder only ('SV here')",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "TE calling from ONT bulk WGS with PALMER v2.0.1 (--mode raw, per chromosome, LINE/ALU/SVA) requiring >=1 high-confidence supporting read and SVA start_inVariant>=420 / end_inVariant>=1355, and xTea_long v0.1.0 (gnrt_pipeline_local_long_read_v38.py with the bundled L1 consensus/RMSK libraries, --min 4000 -f 31 -y 15)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "TE calling from Illumina bulk WGS with xTea v0.1.9 (-f 5907 -y 7, gencode.v33 annotation, built-in consensus library) and MELT v2.2.2 Single (Hg38.genes.bed, mei_list.txt); PASS calls retained",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Mosaic SNV detection from Illumina bulk WGS with MosaicForecast (container mosaicforecast_0.0.1.sif): MuTect2-PoN_filter.py on the Mutect2 output, ReadLevel_Features_extraction.py with k24.umap.wg.bw, and Prediction.R with 50xRFmodel_addRMSK_Refine.rds in Refine mode; 'mosaic' calls retained",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Somatic SV detection from ONT bulk WGS with Sniffles2 v2.4 mosaic/somatic mode, default parameters (no README command block)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Somatic TE derivation with PALMER v2.0.1: relaxed supporting-read cutoff, then masking of calls sharing TE subfamily and insertion orientation with the assembly-based callset, remaining calls classified as candidate somatic TEs (thresholds not fully specified, no script)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "TEnCATS on-target rate and non-reference TE calling with NanoPal (github.com/Boyle-Lab/NanoPal-Snakemake; no version, tag or commit cited): alignment, PALMER TE detection, BLASTn on-target classification, location clustering, filtering of calls with <2 supporting reads",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "capture-static-only",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Semi-automatic refinement of TEnCATS somatic TE candidates: exclusion of UCSC segmental duplications, project low-confidence mask regions and reference Alu/LINE-1 RepeatMasker regions; TE-signal-only requirement; endonuclease motif (TTTT/AA) requirement; final manual inspection with BLAT and IGV (no published code)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "Single-cell somatic CNV detection with GARLIC: physical phase coverage (PPC) per haplotype, log2 ratio R_ppc, dynamic bins spanning ~100 SNPs in a phase block, bad-bin masking with the project mask file, Circular Binary Segmentation, germline CNV filtering against HGSVC/1000G datasets, R_ppc and coverage plots. Code availability lists github.com/mills-lab/GARLIC (HTTP 404); Methods lists github.com/WeichenZhou/GARLIC (HTTP 200). No version or release tag",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "capture-static-only",
+        "redundancy-rescue-authoritative"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Single-cell somatic TE detection with PalmeSom (PALMER-derived): per-cell Alu/L1/SVA signal calling, +/-25 bp binning across 121 cells, read categorisation (read-through / left- and right-soft-clipped supportive / non-signal), misalignment false-positive module, tiered summarisation with >=5 supportive reads, high-confidence criteria and somatic filters (bulk AF<20%, <=10 supporting reads, not in population studies, >=1 non-signal supportive read per haplotype). Both cited repositories are dead: github.com/mills-lab/PALMESOM (404) and github.com/HelloYanming/PALMESOM (404)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C29",
+      "label": "Single-cell Illumina somatic CNV detection with an adapted version of Ginkgo (github.com/kunalkathuria/adaptedGinkgo; no version, tag or parameters reported)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C30",
+      "label": "Single-cell Illumina TE detection with xTea v0.1.9 (--user --nclip 1 --cr 0 --nd 0, -f 5907 -y 7) and MELT v2.2.2 Single with default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "Integration of callsets: assembly calls as primary set; exact position+ALT match for SNVs; insertion merge windows +/-10 bp (assembly), +/-30 bp (long reads), +/-50 bp (short reads) with <50% length difference; 50% reciprocal overlap for DEL/INV; TE family and orientation match; somatic callers (MosaicForecast, Sniffles2 mosaic, PALMER mosaic) as primary for somatic sets (no published merging code)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C32",
+      "label": "Generation of high-confidence assembly-based callsets by assigning VAFs randomly selected among Clair3/ClairS-TO/DeepVariant (SNVs), DELLY2/Sniffles2 (SVs) and PALMER/xTea_long (TEs), with samtools coverage over +/-30 bp windows; cutoffs VAF=0.2 (SNV, SV) and 0.15 (TE) derived from the observed bimodal distribution. Random selection with no RNG seed and no published code",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "Pseudo-bulk construction with samtools merge (115 MinION cells; 5 PromethION cells; cell 9203 alone) and germline recall-rate calculation against the high-confidence assembly callsets, including samtools mpileup allele checks for SNVs under several masking conditions",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C34",
+      "label": "Per-haplotype VAF calculation: HP:Z:1 / HP:Z:2 split BAMs, samtools mpileup for SNVs, Sniffles2 v2.4 and DELLY2 v1.2.6 for SVs (Sniffles2 prioritised), xTea_long and PALMER for TEs with samtools coverage depth, depth<5 filtering, haplotype A/B assignment and the empirical y=0.2x and x=0.8 cutoffs for candidate somatic refinement",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "Genomic annotation and repeat enrichment: RepeatMasker v4.1.2 classes, UCSC Segmental Duplication track, Tandem Repeats Finder annotations with 300 bp slack, overlap analysis with pyranges (no version), fractional counting, expected counts under the slack-corrected null and Fisher's Exact Test",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C36",
+      "label": "Manual inspection of every candidate somatic call in bulk and single cells with IGV (read distribution, genomic content, annotations), plus GARLIC coverage/PPC plots for large deletions; all inspections used DSA phasing information (irreducibly manual, no code or decision log)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 21,
+    "n_NI": 15,
+    "n_X": 0,
+    "S": 36,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/36 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification); unexecuted; declared environment statically valid but not verified as the env that produced the results. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "RI ceiling on 21/36 computational steps (C1, C2, C4, C5, C6, C7, C9, C10, C11, C12, C16, C17, C18, C19, C20, C21, C22, C23, C24, C30, C34). These carry exact prose version pins (dorado 7.2 + model v5.0.0, Shasta 0.11.1, Flye 2.9.2, minimap2 2.28, HapDup 0.12, Hapo-G 1.38, BUSCO 5.7.1, QUAST 5.2.0, Merqury 1.3, LongRanger 2.2/2.2.2, PAV 2.3.4, RepeatMasker 4.1.2, PALMER 2.0.1, DeepVariant 1.6.0, Clair3 1.0.6, ClairS-TO 0.0.2, GATK Mutect2 4.3.0, DELLY2 1.2.6, Sniffles2 2.4, Manta 1.6.0, xTea 0.1.9 / xTea_long 0.1.0, MELT 2.2.2, MosaicForecast 0.0.1) together with literal command lines in the LIBD75 README, but no environment closure, so version is capped at 1. The remaining 15/36 steps cap at NI: C3, C8, C13, C14, C15, C25, C26, C27, C28, C29, C31, C32, C33, C35, C36. The dominant NI causes are (a) the three project-developed tools published without any version, tag or DOI archive - GARLIC, PalmeSom and the NanoPal Snakemake port - with PalmeSom's two cited URLs both dead (404); (b) HaplotagLR and pyranges named with no version at all; (c) an entire tier of glue analyses with no published code (phase-block merging and switch correction, callset integration windows, high-confidence VAF assignment by unseeded random selection among callers, pseudo-bulk recall computation, repeat-enrichment testing, and the semi-automatic TE refinement plus manual IGV/BLAT curation that produces the paper's headline somatic callsets). Even under stage-2 execution no step could exceed RI without an executed environment capture, because no lockfile, conda spec, image digest or release snapshot is claimed anywhere.",
+    "coverage": "36 computational analysis steps assessed from the bioRxiv v3 JATS Methods plus the Code availability README prose. 5 wet-lab steps (bulk gDNA extraction, ONT WGS library prep and sequencing, TEnCATS Cas9 enrichment and nanopore sequencing, single-neuron isolation with MALBAC amplification, 10x linked-read and Illumina NovaSeq bulk library prep) counted in W and out of computational-reproduction scope. Coverage = 41/41 (100%) of enumerated steps.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 36 computational steps)",
+      "missing": "No environment lockfile, container image digest, conda/mamba environment file, requirements.txt or renv.lock is claimed in the paper or in the LIBD75 README. Singularity images are named by file (deepvariant_1.6.0.sif, hapdup_0.12.sif, mosaicforecast_0.0.1.sif) or by mutable library tag (library://becklab/pav/pav:latest, clair3_latest.sif, clairs-to_latest.sif) with no digest, and no build recipe or registry reference is provided for any of them. The python/R glue layer (QC_consist.py, assign_haplotype.py, pyranges, Prediction.R) has no declared dependency closure.",
+      "how_to_close": "Publish image digests (or def/Dockerfiles plus a registry reference) for every Singularity container used, replace the two ':latest' references with pinned tags, and ship a conda-lock or pixi lockfile covering the python and R glue stack; reference these from Code availability."
+    },
+    {
+      "type": 5,
+      "where": "Code availability - github.com/mills-lab/LIBD75 (HTTP 200, last pushed 2025-02-10, MIT, 54 kB; contains only README.md, assign_haplotype.py and assembly/{QC_consist.py, customized.conf})",
+      "missing": "The repository is a command cookbook rather than a runnable pipeline. Two whole sections are placeholders ('SV here' under both Bulk Tissue ONT and Bulk Tissue Illumina), the single-cell mpileup blocks end in 'And the output is processed by TODO', and the 'Data Analysis' section is empty, so no figure or statistics code is published. There is no release tag, no Zenodo software DOI, and no code for phase-block refinement, callset integration, VAF assignment, pseudo-bulk recall, repeat enrichment, or the semi-automatic somatic TE refinement.",
+      "how_to_close": "Complete the placeholder sections, publish the integration/VAF/enrichment/plotting scripts, add a driver script or workflow file, tag a release and archive it to Zenodo with a DOI cited from Code availability."
+    },
+    {
+      "type": 5,
+      "where": "Code availability - PalmeSom",
+      "missing": "The URL given in Code availability and Methods, https://github.com/mills-lab/PALMESOM, returns HTTP 404, and the alternative URL in the LIBD75 README, https://github.com/HelloYanming/PALMESOM, also returns HTTP 404. PalmeSom is one of the two tools newly developed in this study and is the sole source of the single-cell somatic TE callset, so that result currently has no published implementation at all.",
+      "how_to_close": "Publish the PalmeSom repository at a stable public URL, tag a release, archive to Zenodo, and correct the citation in both the manuscript and the LIBD75 README."
+    },
+    {
+      "type": 3,
+      "where": "Steps C8, C13-C15, C25-C29, C31-C33, C35, C36",
+      "missing": "No version, tag or commit for the project-developed and adapted tools: GARLIC, PalmeSom, the NanoPal Snakemake port (Boyle-Lab/NanoPal-Snakemake), the adapted Ginkgo (kunalkathuria/adaptedGinkgo), assign_haplotype.py and QC_consist.py. HaplotagLR is cited with no version, and pyranges, BLAT, IGV, samtools and BLASTn are named without versions. The Guppy basecalling step is ambiguous between v6.2.11 and v6.4.6.",
+      "how_to_close": "Cite an exact release tag or commit SHA for every project repository and adapted tool, add versions for HaplotagLR, samtools, BLAST/BLAT, IGV and pyranges to a Methods versions table, and state which Guppy version was used for which cells."
+    },
+    {
+      "type": 6,
+      "where": "Steps C26, C36 (and the TE candidate refinement feeding Figure 5c and Supplementary Tables 5-9)",
+      "missing": "The final somatic TE and somatic CNV callsets are produced by an explicitly 'semi-automatic pipeline with manual inspection' using BLAT and IGV, with human judgement on read distribution, genomic content and annotations. No inspection log, decision record, screenshot set or acceptance rubric is published, so the step is not reproducible by any means.",
+      "how_to_close": "Publish the pre-inspection candidate list, the per-candidate accept/reject decisions with reasons, and the inspection criteria, so that a third party can at minimum audit the curation even if it cannot be re-executed."
+    },
+    {
+      "type": 1,
+      "where": "Step C32 (high-confidence assembly-based callset VAF assignment)",
+      "missing": "Representative VAFs are obtained by 'randomly selecting' among the values reported by Clair3, ClairS-TO and DeepVariant (SNVs), DELLY2 and Sniffles2 (SVs), and PALMER or xTea_long (TEs). No RNG seed, no selection code and no record of which caller supplied which value are published, so the VAF distributions, the derived cutoffs (0.2 for SNVs/SVs, 0.15 for TEs) and the germline/somatic partition cannot be regenerated exactly.",
+      "how_to_close": "Publish the selection script with a fixed seed, or release the per-call table recording which caller's VAF was used for each variant."
+    },
+    {
+      "type": 4,
+      "where": "Data availability - Illumina NovaSeq and 10x Genomics linked-read bulk-tissue WGS (steps C6, C8, C9, C13, C15, C17, C19, C21, C22, C29, C30)",
+      "missing": "These datasets are not given an accession; the paper states only that they 'can be found in the BSMN data resouces' with a literature citation (Garrison et al.). BSMN human brain sequencing data is distributed under controlled access, so eleven computational steps depend on data that a reader cannot retrieve from the paper alone.",
+      "how_to_close": "Cite the specific BSMN / NIMH Data Archive study accession and the access-request procedure for the LIBD75 Illumina NovaSeq and 10x linked-read data."
+    },
+    {
+      "type": 7,
+      "where": "Cross-source version discrepancies between Methods and the LIBD75 README",
+      "missing": "LongRanger is v2.2 in Methods but 'version 2.2.2' in the README; BUSCO is run with the primates_odb10 dataset in Methods but with --auto-lineage in the README; PALMER is v2.0.1 in Methods while the referenced PALMER repository carries no matching release statement; Code availability lists GARLIC at github.com/mills-lab/GARLIC (404) while Methods lists github.com/WeichenZhou/GARLIC (200). A reader cannot tell which of each pair was actually executed.",
+      "how_to_close": "Reconcile Methods and README so that a single authoritative version and parameter set is stated per tool, and fix the dead GARLIC and PalmeSom URLs."
+    },
+    {
+      "type": 9,
+      "where": "External resources consumed by the pipeline (references, models, masks, repeat libraries)",
+      "missing": "Several external resources are fetched without a pinned snapshot: the Clair3 model r1041_e82_400bps_sup_v410 is obtained from nanoporetech/rerio (a moving repository), UCSC segmental duplication and RepeatMasker tracks are cited without a download date or version, the GIAB genome-stratifications URL points to a versioned release (v3.5, good) but the ENCODE and HGSVC low-confidence region sources are cited only by reference, and the xTea/MELT built-in consensus libraries are used as shipped. Stage-1 cannot verify how any of these are obtained in code.",
+      "how_to_close": "Record the exact download URL, release/version and checksum for every external model, mask and annotation track, and fetch them from a pinned snapshot inside the pipeline."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/mills-lab/LIBD75 (Code availability: 'The scripts in this project can be found at https://github.com/mills-lab/LIBD75 .')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated GitHub API + raw.githubusercontent: description 'Codes for LIBD75 Project', MIT licence, default branch main, last pushed 2025-02-10, size 54 kB, no releases; root contains LICENSE, README.md, assign_haplotype.py and assembly/ (QC_consist.py, customized.conf)"
+    },
+    {
+      "artifact": "code repo: github.com/WeichenZhou/PALMER (Code availability: 'PALMER: https://github.com/WeichenZhou/PALMER')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L of the repo root"
+    },
+    {
+      "artifact": "code repo: github.com/mills-lab/GARLIC (Code availability: 'GARLIC: https://github.com/mills-lab/GARLIC')",
+      "http_status": "404 Not Found",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L; the Methods text instead gives https://github.com/WeichenZhou/GARLIC, which returns 200 OK (last pushed 2024-12-15; README.md, lib/, scp/, no releases) - redundancy rescue"
+    },
+    {
+      "artifact": "code repo: github.com/mills-lab/PALMESOM (Code availability: 'PalmeSom: https://github.com/mills-lab/PALMESOM')",
+      "http_status": "404 Not Found",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L; the LIBD75 README alternative https://github.com/HelloYanming/PALMESOM also returns 404 - no live source for PalmeSom"
+    },
+    {
+      "artifact": "code repo: github.com/Boyle-Lab/NanoPal-Snakemake (Code availability: 'For NanoPal, https://github.com/Boyle-Lab/NanoPal-Snakemake')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated GitHub API; last pushed 2026-07-15 (after this preprint version, no tag cited); contains nanopal.smk, config/, containers/ (Singularity .def build recipes, not digests), profiles/, scripts/"
+    },
+    {
+      "artifact": "code repo: github.com/kunalkathuria/adaptedGinkgo (LIBD75 README, single-cell Illumina CNV step)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L of the repo root"
+    },
+    {
+      "artifact": "code repo: github.com/HKU-BAL/ClairS-TO (Methods: 'ClairS-TO (v0.0.2, https://github.com/HKU-BAL/ClairS-TO )')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L; third-party tool repository"
+    },
+    {
+      "artifact": "data accession: SRA BioProject PRJNA1291649 ('The long-read WGS, TEnCATS, and MALBAC sequencing data can be found in SRA under BioProject: PRJNA1291649.')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "NCBI esearch db=bioproject returns 1 record (UID 1291649); ENA portal API read_run query returns public runs (SRR34541497, SRR34541498, SRR34541501, SRR34541502, SRR34541506, ...)"
+    },
+    {
+      "artifact": "data deposit: Zenodo https://doi.org/10.5281/zenodo.15733390 ('The assemblies, phase blocks, mask file, and callsets from different technologies can be found at Zenodo') - note the manuscript text renders this as 'zenodo.15733390118' with the reference marker 118 concatenated",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L resolves to https://zenodo.org/records/15733390; holds data products (assemblies, phase blocks, mask, callsets), not analysis code"
+    },
+    {
+      "artifact": "controlled/unaccessioned data: Illumina NovaSeq and 10x Genomics linked-read bulk WGS ('can be found in the BSMN data resouces 64')",
+      "http_status": "not-checkable (no accession given)",
+      "checked_at": "2026-07-27",
+      "network_context": "the paper supplies only a literature citation to the BSMN resource; no study accession or repository URL is stated, so liveness cannot be resolved from the paper"
+    },
+    {
+      "artifact": "protocol: protocols.io https://dx.doi.org/10.17504/protocols.io.kqdg3q66ev25/v1 (TEnCATS molecular protocol, cited under Code availability)",
+      "http_status": "not-checked (wet-lab protocol, out of computational scope)",
+      "checked_at": "2026-07-27",
+      "network_context": "recorded verbatim from Code availability; W-layer artifact"
+    },
+    {
+      "artifact": "reference genomes: GRCh38 GCA_000001405.15 (ftp.ncbi.nlm.nih.gov .../seqs_for_alignment_pipelines.ucsc_ids/) and CHM13-T2T GCA_009914755.4, plus GIAB genome-stratifications v3.5 de-redundancy/homopolymer/chrX filters",
+      "http_status": "URL-present (not fetched at stage1)",
+      "checked_at": "2026-07-27",
+      "network_context": "URLs quoted verbatim from Data availability; the GIAB stratification URL is version-pinned (v3.5), the others are directory-level"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "712437e0955883a2b0cf8b8a797b6b830a2cf3da39f6629d5f9a2eb7b0a5d3f2",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "571f154b3ef8672e8de7903bf7d86d002268225083e4e8b02735151d2c4cf545",
+  "canonical_id": {
+    "value": "10.64898/2025.12.09.691744",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.09.691744v1",
+      "biorxiv:2025.12.09.691744v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "DAWN-SCAPE method application: from third-party bulk-RNA-seq expression matrix (Gandal et al.) plus DE and AP significance metrics (Gandal et al.; Fu et al.; Wan et al.; Liu et al.), run p-to-z conversion and Efron locfdr recalibration, gene filtering, Partial Neighborhood Selection (PNS, l1-regularized neighborhood selection) network construction, four-state joint-HMRF hidden-state inference over an initialization-threshold grid, stable Two-Step Leiden + consensus clustering, cluster labeling by if-else composition rules, and downstream cell-type marker (Seurat FindMarkers on Velmeshev et al. snRNA-seq) and GO/SynGO enrichment. No wet-lab work is performed in this paper; all reported experiments are secondary analyses of published data.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis extracted from Methods (main) plus Supplementary Sections S1.2-S1.3 (Description of Datasets, Details of Pipeline), which carry essentially all of the operational detail. Upstream Gandal-et-al. preprocessing (CPM/RSEM gene filtering, limma-trend + CQN normalization, WGCNA NetworkConcepts outlier removal, lmerTest technical-covariate regression) is described but is inherited third-party preprocessing, folded into C1 rather than verdicted separately. The WGCNA-module comparison in Results is folded into C8 (WGCNA is used there to subdivide large AD clusters). NO code-availability statement, NO data-availability statement, and NO repository URL of any kind (GitHub/GitLab/Bitbucket/Zenodo/figshare/OSF/Code Ocean/Software Heritage) appears anywhere in the JATS full text; a case-insensitive scan of the full text for those hosts returns zero matches. No software version number is stated for any tool or R package anywhere in the paper.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Input assembly: bulk cortex RNA-seq expression matrix (54 neurotypical controls, from Gandal et al. [1], 24 836 genes x 725 samples after upstream limma-trend/CQN normalization, WGCNA outlier removal, lmerTest covariate regression) + DE q/p-values (ASD: Gandal et al. [1]; AD: Fu et al. [13]) + AP p-values (ASD: Wan et al. [33]; AD: Liu et al. [30] combined with 53 fixed common/rare-variant genes [31,32])",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-data-accession",
+        "third-party-derived-input"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "q-value to p-value transform, p-to-z conversion, and replacement of infinite z-scores by equally spaced values between floor/ceiling of the two largest finite z-scores plus N(0,0.001) noise (custom procedure, random draw, no seed stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unseeded-randomness"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Calibration assessment and recalibration of DE z-scores using Efron's locfdr method [19] (two-component null/signal mixture; MLE null N(0.537,1.477) for ASD, N(0.892,1.58) for AD); AP z-scores left unadjusted",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unpinned-r-package"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Gene filtering prior to network construction: intersect expression / DE / AP gene sets, drop genes with <50% non-zero cells, retain the 8 000 highest-mean-expression genes; forced inclusion of 52 of 53 AD 'fixed' genes with AP p set to 0.0 and DE p set to 0.5 when absent",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Network construction by Partial Neighborhood Selection (PNS) [5]: key set = union of genes in smallest 10% of DE or AP p-values; correlation filter tau = 0.5 for core set S and neighbor set N; l1-regularized (LASSO) Meinshausen-Buhlmann neighborhood selection with regularization parameter lambda chosen by average degree / power-law R2 / degree-one proportion / average shortest path / stable-edge proportion / CV-MSE / visual inspection (lambda values reported in Supplementary Table S1)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-implementation-named",
+        "human-in-the-loop-selection"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Four-state joint-HMRF inference (Algorithms 1-2, ICM optimization) run over an initialization-threshold grid for 100 iterations - ASD {0.01,...,0.15} x {0.01,...,0.15} step 0.01; AD {0.05,...,0.50} x {0.05,...,0.50} step 0.05 - then manual selection of five runs 'in a relatively stable region' with sufficient active genes, majority vote across the five state labels with ties resolved to the lower state",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "human-in-the-loop-selection",
+        "non-convex-initialization-sensitive"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Stable Two-Step Leiden clustering (Algorithm 3; Leiden [12] then embedding-similarity hierarchical re-merge to k clusters), hyperparameter grid search over (resolution r, k) with s = 100 random seeds per pair, scored by scaled modularity + silhouette (on the bulk expression matrix) + mean pairwise ARI, followed by consensus-matrix hierarchical clustering at the selected (r', k')",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unseeded-randomness",
+        "search-grid-not-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Manual subdivision of large clusters (>= 250 genes): ASD clusters cut into two or three components 'based on the structure of the dendrogram'; AD large clusters subdivided using WGCNA [7]",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "manual-curation",
+        "unpinned-r-package"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Cluster labeling as Etiological / Emergent / Other via if-else rules on within-cluster and by-state composition proportions (thresholds given in the supplementary if-else rule table)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Cell-type-specific marker gene derivation with Seurat FindMarkers [21,22] on the Velmeshev et al. [20] snRNA-seq dataset, then per-cluster marker enrichment testing (major cell types: excitatory/inhibitory neurons, microglia, astrocytes, OPC, oligodendrocytes, pericytes, vascular)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-data-accession",
+        "params-absent",
+        "unpinned-r-package"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Functional enrichment with clusterProfiler enrichGO [24,25] with Benjamini-Hochberg [26] multiple-testing correction, plus SynGO [27] synapse-specific enrichment; run both per-cluster and pooled by cluster type (Supplementary Tables S8-S10)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "unpinned-r-package",
+        "unpinned-annotation-db"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 11,
+    "n_X": 0,
+    "S": 11,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/11 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "All 11 computational steps cap at NI even under the most generous inference-inclusive reading. The blocking condition is absolute rather than marginal: the paper provides no code repository and no code-availability statement of any kind, so the novel components (PNS invocation, four-state joint-HMRF, Two-Step Leiden, consensus clustering, if-else cluster labeling) exist only as pseudocode in the supplement; and no software version is stated for any tool or R package anywhere in the text, so the version axis is 0 for every step. Two steps additionally depend on undocumented human judgement (C6 'select five runs in a relatively stable region'; C8 manual dendrogram-based subdivision of large ASD clusters). Parameter reporting is by contrast unusually good (explicit grids, tau = 0.5, 8 000-gene cut, s = 100 seeds, lambda in Table S1), but parameters cannot lift a step whose code and version axes are 0.",
+    "coverage": "11 computational steps assessed from Methods prose plus Supplementary Sections S1.2-S1.3; 0 wet-lab steps (W = 0, no experiments performed in this paper). No data-availability and no code-availability section is present.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Entire DAWN-SCAPE pipeline (all 11 C-steps)",
+      "missing": "No code repository, scripts, notebooks, package, commands, or configuration files are provided anywhere in the paper, and there is no code-availability statement. The method is novel (joint four-state HMRF, Two-Step Leiden, stability/consensus wrapper) and exists only as prose plus pseudocode Algorithms 1-3 in the supplement, so no executable artifact exists for a stage-2 read.",
+      "how_to_close": "Publish the DAWN-SCAPE implementation as an R/Python package or analysis repository (GitHub + archived Zenodo DOI) containing the PNS driver, joint-HMRF inference, Two-Step Leiden, consensus clustering, labeling rules, and the per-application driver scripts, and cite it in a Code Availability section."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for every named tool (locfdr, LASSO/neighborhood-selection implementation, Leiden, WGCNA, Seurat, clusterProfiler, SynGO, limma/lmerTest in inherited preprocessing)",
+      "missing": "No version number, no R/Python version, no sessionInfo, no conda environment, no renv lockfile, no container. The version axis is 0 for all 11 steps; capture_claim is 'none'.",
+      "how_to_close": "Record exact package versions (sessionInfo / renv.lock or conda-lock) and ideally ship a container digest alongside the code repository."
+    },
+    {
+      "type": 1,
+      "where": "C1, C10 - all input datasets",
+      "missing": "No accession, URL, or repository identifier is given for any input: the Gandal et al. bulk expression matrix and WGCNA modules, the ASD DE q-values, the AD DE p-values (Fu et al.), the ASD AP p-values (Wan et al.), the AD AP p-values (Liu et al.) plus the 53 fixed genes, and the Velmeshev et al. snRNA-seq data are all referenced by citation only. There is no data-availability statement.",
+      "how_to_close": "Add a Data Availability section listing the concrete accessions/URLs (e.g. the Synapse/psychENCODE identifiers for the expression matrix and the exact supplementary tables of each source paper) and deposit the harmonized DE/AP z-score input files actually consumed by the pipeline."
+    },
+    {
+      "type": 12,
+      "where": "C2, C7 (and C6 indirectly)",
+      "missing": "Stochastic steps with no random seed reported: the infinite-z-score replacement adds N(0,0.001) noise and randomly assigns replacement values; Two-Step Leiden is run over s = 100 unspecified random seeds; consensus clustering aggregates those runs. Exact numerical reproduction of the published cluster assignments is therefore not possible from the prose.",
+      "how_to_close": "Report or ship the seeds (and the RNG/backend) used for the reported runs, or provide the consensus matrices as intermediate artifacts."
+    },
+    {
+      "type": 5,
+      "where": "C6, C7, C8, C10",
+      "missing": "Human-judgement and unstated-parameter points: C6 selects 'five runs in a relatively stable region' with no stated selection rule; C7 does not state the resolution set or k set searched; C8 subdivides large ASD clusters 'based on the structure of the dendrogram' (manual) and uses WGCNA for AD with no stated soft power / merge parameters; C10 gives no Seurat FindMarkers parameters (test, logFC/pct thresholds) and no enrichment test definition for the marker-overlap testing.",
+      "how_to_close": "State the run-selection criterion as an explicit rule, list the searched (r, k) grids, give the WGCNA and Seurat parameter settings, and either automate or fully document the manual cluster subdivision."
+    },
+    {
+      "type": 6,
+      "where": "C11",
+      "missing": "GO/SynGO annotation database versions and enrichGO settings (ontology, universe/background gene set, p/q cutoffs, minGSSize) are unstated; enrichment results drift with annotation releases.",
+      "how_to_close": "Pin the OrgDb/GO.db and SynGO release versions and report the background gene universe and significance cutoffs used."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE - no GitHub/GitLab/Bitbucket/Zenodo/figshare/OSF/Code Ocean/Software Heritage URL and no Code Availability statement anywhere in the paper",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "case-insensitive scan of the retrieved JATS XML full text (biorxiv .source.xml, 183 311 bytes) for github|gitlab|zenodo|bitbucket|osf.io|figshare|codeocean returned zero matches; the only external links in the XML are ORCID, ROR funder IDs, the CC licence, and the two supplementary .xlsx files"
+    },
+    {
+      "artifact": "data accession: NONE - no GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/Synapse/figshare/Zenodo accession stated; all inputs cited as published third-party datasets (Gandal et al. [1], Fu et al. [13], Wan et al. [33], Liu et al. [30], Velmeshev et al. [20]) with no identifiers and no Data Availability statement",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text scan for GSE/SRP/PRJNA/E-MTAB/phs/EGA/synapse-accession patterns returned no matches ('synapse' occurs only as the biological term and in the SynGO reference title)"
+    },
+    {
+      "artifact": "supplementary material: two inline supplementary workbooks referenced in the XML (supplements/691744_file03.xlsx = Supplemental Tables S4-S10; supplements/691744_file04.xlsx = Supplemental Tables S11-S17), containing cluster memberships, marker genes and enrichment results - results artifacts, not pipeline inputs or code",
+      "http_status": "not individually fetched (referenced as bioRxiv supplement paths in the JATS XML)",
+      "checked_at": "2026-07-27",
+      "network_context": "paths recorded verbatim from the JATS XML supplementary-material elements"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "97c762d1b85f49cabe1f7ec71aec8026b250e2cf6a00bcfa31cea4168436852e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

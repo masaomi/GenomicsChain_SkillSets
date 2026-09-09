@@ -1,0 +1,2229 @@
+{
+  "first_stamped_at": "2026-08-02",
+  "phase": "Phase 2-A (pre-submit digest stamping)",
+  "digest": "canonical_json_sha256(report minus report_content_hash minus manifest.chain_record)",
+  "implementation": "genomicschain_core/lib/genomicschain_core/report_content_hash.rb (loaded, not reimplemented)",
+  "collection": "/Users/masa/forback/github/GenomicsChain_MVP2_2026/log/repro_survey_2026_07/survey_v1_1/collection",
+  "last_run_mode": "APPLY",
+  "total_reports": 201,
+  "already_canonical": 0,
+  "stamped_this_run": 0,
+  "pending_stamp": 0,
+  "mismatched": [
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2022.02.18.461833/10.1101_2022.02.18.461833__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2022.02.18.461833",
+      "stored": "184724846fd2031769bf0046b95399fb3754c85f3bc39f57ee53419a49f36e35",
+      "recomputed": "da46445a5f6c104f84546f57c93bd35916de20434434c41cfb0eddb0f815de04"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2023.04.14.536893/10.1101_2023.04.14.536893__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2023.04.14.536893",
+      "stored": "22545877fdc5500036240c3381ea87f7baccfb5825e7a9b8992607d73e139416",
+      "recomputed": "6b9ee679b6900d9cb38e402189ae07107d609665a82efc94dd9f8c3bfd90cce2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2023.05.31.543169/10.1101_2023.05.31.543169__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2023.05.31.543169",
+      "stored": "9f64ab1ef68eac25094ef3e936385952085c8b48db070a405d8c7792689c007d",
+      "recomputed": "5be25e89c7ba16666a0147bb6c774921e02e78bc978bdc7cf64d49c12fb6a955"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.08.06.606834/10.1101_2024.08.06.606834__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.08.06.606834",
+      "stored": "73ab1004863a13e02e354e60d2e54335abd7067cccfda513983b3f570ba63fd5",
+      "recomputed": "547e4f909a33a05aa2f2b6f7beab49e5ac7e41e48fef065bc17bd1cd1b81a4b3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.09.20.614071/10.1101_2024.09.20.614071__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.09.20.614071",
+      "stored": "27924663c1043b7a4bbe7eb95724e200b10401eb1b0b56c9c65d0a7e2a39f0b6",
+      "recomputed": "2658d96d66fda7c2b54f44847e7d15725090ab96964faf057cc2cf0fa6caecaf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.08.617260/10.1101_2024.10.08.617260__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.08.617260",
+      "stored": "33a1847fa42ca55cae51adcf9660f0f5c0f83b018f22aa2898ca10a9f4cad6c1",
+      "recomputed": "b922fdad45261b4ea9254c69896973c88c0c5b2bd8fbd040efe96e1b3c4a506e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.15.618594/10.1101_2024.10.15.618594__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.15.618594",
+      "stored": "4a5f5453ce27178e47275f22ada3c15b4755d394bf4a2ed15032dd7def1fe285",
+      "recomputed": "60ac181305d766d487868c2245e525a9a236ccee12d58e105fc0e1b6383aabb9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.16.618588/10.1101_2024.10.16.618588__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.16.618588",
+      "stored": "477a3aed8ab822c1ebd65b174ebf6e4fa9f51c7bbd73773f4e52aa64d2e0c1a3",
+      "recomputed": "9a8604a9736152d0bde8fb7b192ca2724d8babb26c4e2916f7ab850fdfd2ded7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.11.27.625433/10.1101_2024.11.27.625433__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.11.27.625433",
+      "stored": "ee05ebe9cb71ce904231bb8ce6aaaf2cee47601a861fc3eedc974977fe84eadc",
+      "recomputed": "639db9246c5ee42ec6efd544cecd55d6aaac4b33569fe9f6e316018f918a0537"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.12.06.627142/10.1101_2024.12.06.627142__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.12.06.627142",
+      "stored": "071209d4b57703084ad190f8d5f6d69a59af37a67671a69b82f2d07e36da8306",
+      "recomputed": "6f76777a3c81226835f68db20de5fbdeb9d8c2c5deae8a0f44102481ed82e17f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.12.18.629274/10.1101_2024.12.18.629274__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.12.18.629274",
+      "stored": "1445be47c0a209fddfe71fb9b9ad095380479af1894fd6cb589b605c509bc0a3",
+      "recomputed": "45861cfb0b1ad1a6f8d9bda5d10cece7f335c06ac9a100f1466a5d419ae92b9c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.01.29.635579/10.1101_2025.01.29.635579__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.01.29.635579",
+      "stored": "48c31bd5e5e2f7a7427e9b2c835a4ce724b723d4b4aedf5cddfaf656f7664824",
+      "recomputed": "407fa0dcb519a69ceef9015988f53e204abeae13ad7550e748663d29cc3d3b5d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.02.06.636950/10.1101_2025.02.06.636950__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.02.06.636950",
+      "stored": "337af69aa7d423d61abe72da2838620284439752746d2f02e37fa1a06b437cdf",
+      "recomputed": "8a6f961145ecc93bdba211c4cc56e7a139c2bfed9774b289451444478ca3265d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.10.642480/10.1101_2025.03.10.642480__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.10.642480",
+      "stored": "4628a33831456dbb785f2d54a6cbc7e4c3eb3a45d96c92ef81cc292b49da45a1",
+      "recomputed": "d1569e8030a776d754ccce17f69db4165400a7022a7e7557aebefc0c99b4656b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.11.642605/10.1101_2025.03.11.642605__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.11.642605",
+      "stored": "da6fd2a8d7ebd66414eefeb0c1c1a61718fe42f1d9c25766b7be75bb1e47e89d",
+      "recomputed": "ad1f79f1d8ca4793b12a8ebd1697e0f2086b8eb4fee79a8d88eed5f6b75c3398"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.14.643265/10.1101_2025.03.14.643265__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.14.643265",
+      "stored": "940814f37ed3f2549766cef3f63398f3dbc24edd3b3885fc3f3699c5ad73886b",
+      "recomputed": "cf05f9453c144069ca1aafd3a5b99d7f86965be4440b61dc7dd011f6a19ac56c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.27.645809/10.1101_2025.03.27.645809__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.27.645809",
+      "stored": "a1af36a75a6f232ca39a044de30cc924faf5b1d07eb81a3a614eb2a38a156f43",
+      "recomputed": "54f5ca5f682b10948b46afa79c2419d199006f68f733ce866653a120d9f85fca"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.08.647763/10.1101_2025.04.08.647763__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.08.647763",
+      "stored": "589767c4fa3b3e30b1d7e3846d6df5d4a628c5611204a241b74808427ca8acb0",
+      "recomputed": "d6edd1e6df3c0e9a9cd9e4f05e7e585cad0b3d01c5d92100d6f025a861af912c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.15.649007/10.1101_2025.04.15.649007__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.15.649007",
+      "stored": "88919cf2a961f64f663eb7d62d7977b9090e0342cb299c832a1cdfed32854cd7",
+      "recomputed": "316e0b67b8b0cfe007204c7ca211b690d80f2ab051ab7a904675f024ac54b0fa"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.19.649648/10.1101_2025.04.19.649648__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.19.649648",
+      "stored": "ce2e7bd0decf41e50e068a09391c561d74c7cb921163699cbf72c5b7756e1671",
+      "recomputed": "34fa7cc67384c907be9fb2745c65a84c0733ccf8d39b4cc63191bfff3f6bcee9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.05.24.655897/10.1101_2025.05.24.655897__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.05.24.655897",
+      "stored": "68f6831aec4217306ffe08bcba477170d5a7a741493a20c6356c9da58b13ae76",
+      "recomputed": "88fb805ec40c4b6c8490f8a2a898ae26ed3fd3e7b72b2ddac2770c94835ea704"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.14.659582/10.1101_2025.06.14.659582__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.14.659582",
+      "stored": "f7ef640129bca9c68da57e0e97392b410a1ac3ca642fc8dddf955bf16493cb60",
+      "recomputed": "5ac65d77d8d845a88a4578a3d319648a357370842d45ffbc16ce6b57d4c9a907"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.25.661447/10.1101_2025.06.25.661447__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.25.661447",
+      "stored": "9d938d87141056323885218ea028929e9ac976192e112f95caa520eaff38b98b",
+      "recomputed": "701765ae7793e27cee5fafeb82a688fd92972823c580912b1a4517ec05299eaf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.30.662443/10.1101_2025.06.30.662443__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.30.662443",
+      "stored": "a6a54b92759953270fccf5bf123d60dae3cab123852404a4c6b2f55d6704472d",
+      "recomputed": "0de86363bf9ae11ad92818617cc69840687aac47e2ee7a9b8fd43cc71571d9ea"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.03.663019/10.1101_2025.07.03.663019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.03.663019",
+      "stored": "5c79b190c3f20b9dbbc2f56bef3ba3cb59988dc4fdff881cb37077e5b8939edf",
+      "recomputed": "ab9e505f1072bd2baa89ba579452f88b229cdd39d4b9bc88ca50be1cba78f1d7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.11.664466/10.1101_2025.07.11.664466__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.11.664466",
+      "stored": "1d6c9fb373ae91d91ebc6e416cd3a1839fdc125c16af0a830427106d3ea570c8",
+      "recomputed": "80b76f8040ba104b395cf172e7036d85bfb72d3dde60d7c851210cd8a178d9e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.14.664631/10.1101_2025.07.14.664631__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.14.664631",
+      "stored": "936a291f15fd021aaf06a543959ce861d1bf01388f6351f1cd9e3261440f88d1",
+      "recomputed": "0ff8164a508ab80ea9e24f30ed86d83fbed25bf40a94559c00752da8cf7e8a71"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.08.14.670415/10.1101_2025.08.14.670415__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.08.14.670415",
+      "stored": "8819bcffe4cd97cc8bb2971b718e62f34f3b3893c3597551d65062da3e57b107",
+      "recomputed": "90ca06e942c4bef6506237bec9a2d985bead9f744239027d451e939db0dab6bd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.11.675724/10.1101_2025.09.11.675724__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.11.675724",
+      "stored": "0afdaa2dd13b0d4f7b5585cbd744b63c09c3b28a83d5e468eee02c27f1c0291d",
+      "recomputed": "1f0d05e9f361b7066819046747732b9b370a965931c63ab17721e595048f3712"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.17.676769/10.1101_2025.09.17.676769__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.17.676769",
+      "stored": "d8fac872d4e4f3d8da8466bf966411f27122b69a9b75f672c4dcc2e5234c8cc9",
+      "recomputed": "3727a21676f7d834338828294d3873b2bdd4ffc85579b442095a745b19208f9b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.22.677720/10.1101_2025.09.22.677720__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.22.677720",
+      "stored": "6804fe4512c2d212e63642813b07df9e7539d24427ac3b5615e9be61e5e8cabe",
+      "recomputed": "532da1766775a97e47dc5db0239f0d15b2f5c85252bfc05e1ab7b1e22671ae7b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.24.678374/10.1101_2025.09.24.678374__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.24.678374",
+      "stored": "864d8ea09e74ad7a4cc8c5b02aa2d2433fda70608ff5b6411751cc9552001183",
+      "recomputed": "cbb14e1da82531283d5484bfcb28a07da33877632e8483766600a0310661bed6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.28.679077/10.1101_2025.09.28.679077__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.28.679077",
+      "stored": "a2f45f9f230b85e9bca6f34a3905a4f2268ad4d025f3057d6ee238e821d51295",
+      "recomputed": "d85494ccd95061fa7785f23fab0de9e9371045ab4334db8e65bdf9ca0c7c8000"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.678058/10.1101_2025.10.01.678058__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.678058",
+      "stored": "d97960922e751274b7865d845d40848ad77aec4cf3fe473279b00447bdefdd86",
+      "recomputed": "0b318546e40f0e125045a62cf1a41b8078ec050d36d0f4530ca9d01af831a450"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.679902/10.1101_2025.10.01.679902__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.679902",
+      "stored": "8979743199f710d39407333ae982761e72dca720da36a936138e529dda40fff3",
+      "recomputed": "edaa69be0c4b648ecd0d080ae2b88ea986bc7ce0a4ff505c2b9e7a3c83e7d6f3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.679930/10.1101_2025.10.01.679930__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.679930",
+      "stored": "d78d347e38447c1360e31a6e94a3b4bb39dcfa8bc73b84f2a72e6cece095848a",
+      "recomputed": "f287fa2b4856f4b3727660916532c7fb8abba27eb06e54f43aae88fc05a96ccf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.02.679816/10.1101_2025.10.02.679816__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.02.679816",
+      "stored": "620bd1c91cfa2fd94464d5d4de44556004cbca4d527aa11de0261fb5c5537a57",
+      "recomputed": "bb748dd6aef4af830a374440d478297bbf8a271f40e4aee196402b49a94f2f50"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.02.679855/10.1101_2025.10.02.679855__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.02.679855",
+      "stored": "799a0be87b9254441b682c353e8f49a149093c09d209cdf93150ed0b5e8e77d3",
+      "recomputed": "157d2533b2ae9ab4bca3058a3b8471715e3ce51da302f01de6f9e7cb8134c28a"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.04.680405/10.1101_2025.10.04.680405__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.04.680405",
+      "stored": "b8fd66838167bce1f8b94511329cfe6fc3365d78abd3e3274d9fee8128c7b1ac",
+      "recomputed": "ea8ca9ad5348fd476f84db12dd54dd4f641b6d191efdf5fe1d02d12fa7053c51"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.05.680569/10.1101_2025.10.05.680569__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.05.680569",
+      "stored": "00d4f30ad8d5801621ad4f4b2e4dd2ba36199482752b6fbd869b0b4178528c2e",
+      "recomputed": "830c1e2f9085dcad31f8f882edb931e889161f5cf4ae7617538dd1b294daced2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680641/10.1101_2025.10.06.680641__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680641",
+      "stored": "7b1b79ddc52c139fcb044f79020e26960e972684c6ad5301013c751aef952cb7",
+      "recomputed": "21d149af0d8f771f47042c625dac464c372ea80140cffb8184f30a8f29bc677a"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680777/10.1101_2025.10.06.680777__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680777",
+      "stored": "d723d4825578178e23527eb531839fd9df8c5d415d4191febbd608cb81b27957",
+      "recomputed": "0fbc675666ddfd4a97137fa3eb59b55819f521dabefc28d83d0502ae80117e01"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680821/10.1101_2025.10.06.680821__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680821",
+      "stored": "6c649b154b7c81d80e86e88075ddd95204c79d9eb4170b7179e086f6f3e36be2",
+      "recomputed": "6ca9e2327bf292331c3b9e28d23cf81b813178f1b1e3cd5303192586240b97a3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.07.680947/10.1101_2025.10.07.680947__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.07.680947",
+      "stored": "4aceb76f09ca79741154fa1f5cbfd4759853e26a6e01ea0c9f6dd8fc892b7703",
+      "recomputed": "1a65beafc14a9ef52f563447293a542eac6cd725b622ea6ead9daf0e3aa7facf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.680649/10.1101_2025.10.08.680649__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.680649",
+      "stored": "282642010d313ff867ca3dbf2f646d54fadd5d5f88d03ff12bc6613c785addf9",
+      "recomputed": "3af7bfbddec9539106139387ecf128f7c21f4c531ba200db53719e581d1da0a9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.680958/10.1101_2025.10.08.680958__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.680958",
+      "stored": "9b30107b96568ac1c7263bc465802cba787591d3eea636d2aa8eb098baa70a2b",
+      "recomputed": "6cba309c32f1a238f92cb7ab9c3c0e7a38c5df37be478ac66d13744cdbf8e294"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.681110/10.1101_2025.10.08.681110__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.681110",
+      "stored": "b016aa27b286f842516dfb462566d5702ccd5328e282084f6254e9e83fee5a39",
+      "recomputed": "aa8ff5a36318739eca5544b62761d73ed9bbc9875fe32609e3785c5a235c1c2b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.679175/10.1101_2025.10.09.679175__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.679175",
+      "stored": "398950846887d9730d6c4525f291031ff9bde77c2d36af3bf3b9387421575ab3",
+      "recomputed": "46207bcb1e2fe993664a4444682c64819dcbaf0737aaa97ab38eae2e96ad6f3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681344/10.1101_2025.10.09.681344__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681344",
+      "stored": "1e29cc1cbf96e77cfae578d3f6c7b7c7256068d9b79353e2454d7ecf03536326",
+      "recomputed": "c8a59a8af106206e4a4a8b2cf19cb2b36307e7b216b5afb84613c6216d648abe"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681365/10.1101_2025.10.09.681365__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681365",
+      "stored": "46d857fdd789a6efd0a7dc369b4ea33c78c5dc93a6e997d5b94560f494a1442e",
+      "recomputed": "741cd1a03fa7f3e628362ee0c15289b3fd26af0cf3dd81c1948229da59530f14"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681413/10.1101_2025.10.09.681413__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681413",
+      "stored": "a6ac8c8e4a1e5e15a5192854ba5469dd49d038beea09f226143c4433e4b96892",
+      "recomputed": "206fc040ea957d0c4883fef98107e0cde8c9f4a8fbe907b0d3e61c6e5d2743f9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681420/10.1101_2025.10.09.681420__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681420",
+      "stored": "13232a31e94fb6943f70e04f865e71d025c74f728fc42fa419c9bfc152c0acc2",
+      "recomputed": "235dafe840b13c7ae9b465c661fa1bc59a80c0d99206d25081cd4604c1adf1b4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681516/10.1101_2025.10.09.681516__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681516",
+      "stored": "bbe2cca2361636fba90320d42f207b65e082d958550f6b604dd1f56fb8f4d913",
+      "recomputed": "5229b2312c5a38fdab8e8de4fa522cf625232f215b38898d7f6d839d4c2990e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.10.681685/10.1101_2025.10.10.681685__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.10.681685",
+      "stored": "1a122d5a9f3c813c1e31b04127285e5173be106f8165ebc79444204fed298462",
+      "recomputed": "a1e05d588c3bf3f7c1d678d7353e230d6714cf78bb0b284755c610a785b3304c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.10.681754/10.1101_2025.10.10.681754__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.10.681754",
+      "stored": "48bfa368231489679c0512c64b1dcffe143bb45b3d451ac18b5fbb88cd69bed2",
+      "recomputed": "489117bf08c82a572f27ca687d4e813069acaa9c75aab129dde2cda0353f36f0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.11.681520/10.1101_2025.10.11.681520__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.11.681520",
+      "stored": "09e9027afa9b017607b4b27714d4c2e0dc82873c60ee6cc479673c0e18de9337",
+      "recomputed": "08e8e6ab02ea0a70cd98f8a41561c19c832f2cdb17b711803e8d1ca1cb1c2feb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.11.681805/10.1101_2025.10.11.681805__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.11.681805",
+      "stored": "df8e3120371cf92b2567ec20c72b0376fdfcda0dfc153361d1debe2d4087e63b",
+      "recomputed": "62e08b5fbc17b613acdf47c086a3d7f00481ed5ca95a17956d18d346633527ff"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.13.681552/10.1101_2025.10.13.681552__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.13.681552",
+      "stored": "75971505d76c23e7265fe35b0ed1c88e3ce489d3ebfd27322c97e1ba4c90a72e",
+      "recomputed": "2701fdcdcb577381248b29bee2955f638bd56dd917f69ef2a9614af98f308490"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.13.681986/10.1101_2025.10.13.681986__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.13.681986",
+      "stored": "163f233df135d6c609a7b0123f0d804cd76d0e23d43b8b9b8621c04bdb499b3e",
+      "recomputed": "4b1fe0b32c262c61430f5fb6d93b7fbd92da364fbefae99e4a60130631f957d8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682260/10.1101_2025.10.14.682260__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682260",
+      "stored": "e970043a68337ff90c36646c25258bbefbe1b15c4fa401d2f7c2a2b9f4187cb7",
+      "recomputed": "c2d88415566f09427717172127433723d36ab251ba519f863458c4e928ebc41c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682318/10.1101_2025.10.14.682318__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682318",
+      "stored": "870433e4bff3b917d4689b1c11914207de6ed9ff3766a7bf1d1d1dc1f250b8b5",
+      "recomputed": "88139b2362ddb40b36d0c29b133ee844b1c4d711d317bb97b4c01f9a1578c0d3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682350/10.1101_2025.10.14.682350__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682350",
+      "stored": "149e30d52d8fd03d75e4ecac33b5dd5e3c24ac2b4f94990d514a94344dc4de0a",
+      "recomputed": "239a71960352c216926cc44e11fdd01aee2d2a84f7fd58b25052b45fa2e765e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682378/10.1101_2025.10.14.682378__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682378",
+      "stored": "c48246f5af333b7ca30e9589ce443b20374370dab928edb2c5ae1a6a316cec4e",
+      "recomputed": "01abbe466606cc57366e22dc93693d6bc17523b221ba4b7f932a44a219dc9271"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682411/10.1101_2025.10.14.682411__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682411",
+      "stored": "eeab479faf647925afb6950989e3000876ba3c3162e6f54fab5fe7b9d0e6c790",
+      "recomputed": "3486674acf44f8a92a657c1f5515244ea42383f3b26a9a133daf8c27184b03b9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682431/10.1101_2025.10.14.682431__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682431",
+      "stored": "5d28e8267bfe380213961be7e384a3bfb98de2cdfffedee89dbbfce0cc2bf718",
+      "recomputed": "96b70ac00b758688f2b1603e08fbe87609ee29551d0094e837d2e7dbfeb6cba8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682832/10.1101_2025.10.16.682832__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682832",
+      "stored": "59d738e2160c601bc3f8218fffa8d94d23f1892efee376d40f2e2e63763c12a1",
+      "recomputed": "f2797ee0ea0fd0bf4c70388704f378b58cb05acba3f5ced964b41afaba957b00"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682876/10.1101_2025.10.16.682876__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682876",
+      "stored": "42abd65103a1dbc77b75abf9717f5480ed02064adeb8ce6b80db210aafbf6364",
+      "recomputed": "0cc91640c07e7c5824b30bb0fc22a5ce8bb385311e93ee70baaa5c3dd6c19f59"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682892/10.1101_2025.10.16.682892__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682892",
+      "stored": "7c9e9555ee2380f330b1e164533baf261dba6ed9506d364e119da9283e359056",
+      "recomputed": "c69b2cefe140b9bfbbbbf900bd022b169d05e13ddcd6dcc1d7c630480363c851"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682960/10.1101_2025.10.16.682960__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682960",
+      "stored": "ba3b307ed408f8f78b61b44938ab1b28589c59596d220b7c23800cb623264829",
+      "recomputed": "de25f8ccbebdf0abd07d0d315f21cb6251057e15cb6e70ef10e462886a9eb2fb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.682904/10.1101_2025.10.17.682904__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.682904",
+      "stored": "3549a04355012932a7cfba25f4db0f52d442248ae92b21088ff5e327c6d8e62d",
+      "recomputed": "6feffe2dc1908a9c58537c684ddf2333fe139c4bcc1a4395d97b0bdd3c0e0776"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.683019/10.1101_2025.10.17.683019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.683019",
+      "stored": "d985afa5aac52ac26c25d5b3d01a94192b6127fef7ccfbee053724b07df7e2d6",
+      "recomputed": "28c1b76b48af1e1534d4f83816ca1ca4dc278749d82ccb7134789ab37b505d5d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.683157/10.1101_2025.10.17.683157__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.683157",
+      "stored": "6c81c9ac080d989a3220e0df59f394c798b38a75613d4afcbd3a8db982f66c6b",
+      "recomputed": "e451952ad90fc74dbfd3f7c393fb909e5decdb23083069dfa76a728d6ed21948"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.19.683276/10.1101_2025.10.19.683276__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.19.683276",
+      "stored": "00cbe5e33e2a51b8558ce1898d7fe3e4e61d99115881a8f01fe09f07628a75e4",
+      "recomputed": "6cde3f4ec4eeee0d2eb717624f3e04185c261d07344ed6a01bbc13ea0704cba2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683404/10.1101_2025.10.20.683404__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683404",
+      "stored": "88d8236473919394ca69f5c477bf8d5a9090e55a0516c546ce5ea6242b91cc5f",
+      "recomputed": "633f71171aa6e011fcf9ab0fa42f9311e5866cbb7bcf0106d32063533f7a68b1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683418/10.1101_2025.10.20.683418__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683418",
+      "stored": "988bcd922baa126618c868179f263700b3702b9563cdc9f84af6a28032749ac7",
+      "recomputed": "fd9afd3d7cd958b8ee4f77d194c9c61f6e33ee60d90977ba5d47c4f36e862c3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683496/10.1101_2025.10.20.683496__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683496",
+      "stored": "164ec909fdcf5798274328d2e34aa1f686b263d895163827b46c091c150c34ce",
+      "recomputed": "ff0c8d59c421d157c42bc3608efe7a8831e2e8b06cddb23b14f5fa1a4547101d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.21.683615/10.1101_2025.10.21.683615__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.21.683615",
+      "stored": "fa8734714e543eec20086b51897510d56d3a8461c4e6bcfbb5d1fb5ef46a5e2e",
+      "recomputed": "7cf90dd6eee1437553edeeb1efcefaa49e1d9f87bdbfc0b5f582de9fa331e697"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.21.683758/10.1101_2025.10.21.683758__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.21.683758",
+      "stored": "d909ab779d85108bf9840a3a419d3df2cc9c9b97464caee07d29d579bda927df",
+      "recomputed": "0a651b885da13f165a846323bd4b0fdd0386715ba59db64145b664da8403cefb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.683841/10.1101_2025.10.22.683841__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.683841",
+      "stored": "1577c6e8e85dc79e43e0194278138c4daac51823e02118506f941cddb34064b6",
+      "recomputed": "5623b8009098c89d72e14d5272df31b7de44dda0c4643b34f4d5bcbdefad63c8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.683976/10.1101_2025.10.22.683976__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.683976",
+      "stored": "7016fa5dc0f31684517749c493145781ff2d1e27c625f466b575e32b4339ec54",
+      "recomputed": "24e6ed25ed65199bffa8e1bb2eac9f2a22acf059a32c784a19933b2c1c23b681"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.684019/10.1101_2025.10.22.684019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.684019",
+      "stored": "903a09f3e7ae4d877c82f1b6c5ca2e99c61e1538c686624d62040f281b872ead",
+      "recomputed": "090baa9c925b9f8ccd90b54710e5665e742a9f3ec8a5908bde675876624b5fc4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684100/10.1101_2025.10.23.684100__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684100",
+      "stored": "b2a943d480f9f4df61d1e9f4d8762258a10cc94e6a62df849562ad8ce4767701",
+      "recomputed": "412868cd1b898578dd9a0e091cc3ed3aafa94e3703e76081bf841479aa58bcc1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684114/10.1101_2025.10.23.684114__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684114",
+      "stored": "b2fb50859dcfaac473bb3cd07a3a664c1ec36e5da7402edbc16780c8660ca279",
+      "recomputed": "5e82627de9b9bff584661b0d64157612ebdd38b5a942d03c7664b2314771fa8e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684174/10.1101_2025.10.23.684174__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684174",
+      "stored": "8c1be0b77f747098e2f5fb89c11430c938c9668dfd602540b8a696ee1172e598",
+      "recomputed": "94906241a0ae13a01d6990cbacd1fd8b0c647590094cebbf2429cd6537b7e24b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684307/10.1101_2025.10.24.684307__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684307",
+      "stored": "e28f319dd3d25dd584655cea2dbbb1ea9f1fba71002c161a8746c3e0c86fc348",
+      "recomputed": "a06a67ec766c88c26567d535125a1b16c209d23900946efa6c6d3fcd6cfb420c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684346/10.1101_2025.10.24.684346__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684346",
+      "stored": "2a13d91f094a57c6a91020c3c0e7f8c8df59c374f54ae6d3b0c76ec0876b49b2",
+      "recomputed": "eef0f77676a7f063f2010bb74243c6f25ce24aeb025334edb21f14db12e47bd1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684366/10.1101_2025.10.24.684366__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684366",
+      "stored": "54e24d200fb2d9668d4a6cf9fe7ed1bdcbcbb38b0a21159fee963fd2e5d59dcc",
+      "recomputed": "0a45b418cc835b361bc9b632a5fd0d55c02f6cc67ec4b9a869cedf135ec97ffd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.25.684551/10.1101_2025.10.25.684551__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.25.684551",
+      "stored": "582233f735800ee161a4d76574301d563d157ad572d5b02d9ac6270cb3ae1b08",
+      "recomputed": "0346ec4dd0be30487a9164c86c80b0785acfe846fd43a14fb39eca74ad59689b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.27.683567/10.1101_2025.10.27.683567__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.27.683567",
+      "stored": "c95cd3faf2829f76c0c682abcb848ef11c159e9b5da5096a6ead1da52cb57e52",
+      "recomputed": "bd4ad73395956c5db6be9738a4cf33f6a3c83d1750ebf4dd727e307270842464"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685005/10.1101_2025.10.28.685005__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685005",
+      "stored": "3e10acc0a455721ed4078708f56c0ef5ca1e76fb5d7ba279026bd194c0646dd8",
+      "recomputed": "6e1739b7574806f3c28ef0eb44b3f7e24ef9e5022ba0eae3b28c4ab0db5c8dbb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685014/10.1101_2025.10.28.685014__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685014",
+      "stored": "9317f3774f90a3a4753b66612a6b30766cb95b6fe88a06d6818127d359a1f694",
+      "recomputed": "4fd138b42d82dcd896fbbdafa7e2b860e396fe30b113d7092c9da624af05cb75"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685023/10.1101_2025.10.28.685023__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685023",
+      "stored": "93c69156c47a8ef937ed93126f18fa4b847f3808dc04d680faed0f88005e7089",
+      "recomputed": "c1fd9f3d0e7d990df69f09c10a930449fd86f197d2e5f4d908caa37f8d0b3cd4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685157/10.1101_2025.10.28.685157__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685157",
+      "stored": "65f502f66822f86d48ff3ff9a69f2be75acfcfaad653e08c8a1bd84a30bac1ff",
+      "recomputed": "b96e26e9bcba9c6704b2353a97952e5d8eba25ddef556030503c6034ad19b84c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.679705/10.1101_2025.10.29.679705__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.679705",
+      "stored": "09de1be8fad12f2ad44bb8e0e8df3bcf6b08b12783fb3c831cb4eedbb0059a69",
+      "recomputed": "c80b2a0c2e7461ee56272f910fcd1b1268668327d7b4a91078bfa7bbd0f017fa"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.685264/10.1101_2025.10.29.685264__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.685264",
+      "stored": "885690854d9801ce3e114fe699567675f4bb34bb4147030434646917f1a4f031",
+      "recomputed": "cf4d1f246f2139ecb697ce485fc4f1514a4179243d12a0f8575a20c89f070757"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.685401/10.1101_2025.10.29.685401__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.685401",
+      "stored": "67546d65b242827a50f0c3c5deea82df287307556df2b62fbe4365e89f5d3933",
+      "recomputed": "7fd26409075208e387e40b182380abef7bf4395b5efcfe2180f55c068e553a34"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.30.685527/10.1101_2025.10.30.685527__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.30.685527",
+      "stored": "65694ebbaeddf023ed61d71e765ef78b3ee5168b2bf173c2eee07d8aa63ec728",
+      "recomputed": "c4c745d96b741d3403787d5992d2e104944f85019d82f7162c80423c2ad46b09"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.30.685688/10.1101_2025.10.30.685688__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.30.685688",
+      "stored": "d18f8cc6d4e6cdcda2346018a4cc97af5c47a4b4ef396f7a0a8ee2e6137e6ff3",
+      "recomputed": "1ed5fb85bd68a65ca176025951a37dfca6194940657cf7cde3d61908a50cbcba"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685756/10.1101_2025.10.31.685756__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685756",
+      "stored": "49a82eabc7c64a30f70b9ef9ff3404b0899d16661940c2e1a60f493329b0e703",
+      "recomputed": "59cfeb11e7d09f74ddec317eeedbae20a408aaad7aaf767b387686b033026e14"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685816/10.1101_2025.10.31.685816__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685816",
+      "stored": "b3d6cd623c2291de3261ecfd147e94cbfcdfd159ba7b8959bf58001e172a0ec5",
+      "recomputed": "e13544268fb79bd8d81a176d36482104804c1bf28630e8caf18153a19deaa474"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685860/10.1101_2025.10.31.685860__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685860",
+      "stored": "cac79d0233665d540134fb03b41d335385af61a3eb708d69ff28bdc88baadee2",
+      "recomputed": "8bb2dc54bb316d8ae3264cf8aa0469a6d7a7191a4306fcfacec94efb4fa740e5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685862/10.1101_2025.10.31.685862__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685862",
+      "stored": "fbc4306c5338fa34ed252f1859950edb2e80f1f7bfbb82d645ad9edabdcde066",
+      "recomputed": "3d4f1ee490948693be39a1e537279b24d97862cd70ed543cda98362470df187c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.02.686137/10.1101_2025.11.02.686137__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.02.686137",
+      "stored": "1d401ee6084e15d0f31d372b75f461456a626192ed4ddea28fa0aa2ba2b934ae",
+      "recomputed": "7be7c4b13aab945b46b038e035ef2998b87d48528f4e81be7c1928c0faa87a2b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.04.686611/10.1101_2025.11.04.686611__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.04.686611",
+      "stored": "ed5aed46659b310ebf6108007199ad1908026dcc0d384e0a4aca5ea68bc78ac6",
+      "recomputed": "af4dbc261113c38c95605d3424ecb138b4ba63694ed8269c72a8492451aa1230"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.05.686701/10.1101_2025.11.05.686701__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.05.686701",
+      "stored": "86a31f05a36df36ccbfa0fec9109d73f6176417eedcf632689a223e5840d9f4c",
+      "recomputed": "13fc3f02b710e0707196c1f7ffd3aa1a60d7983cc6730600d9a35c4a3d7bb5f6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.686975/10.1101_2025.11.06.686975__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.686975",
+      "stored": "ccccad367c2aa3acebb450ce8b5b48fbcb968a9be4630adc1907644bf4b99eb2",
+      "recomputed": "fe2623ad91d594b56789230e68780303e588d4f31d3ddfc037c073f44cf39b24"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.686988/10.1101_2025.11.06.686988__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.686988",
+      "stored": "bfc33848a7cff6579cfaaffdfb10cb7019c3580e971c34d385867181175bdfff",
+      "recomputed": "b2f78d6e93a94567e7f2fa55f8dfa27ca6289c2fc8d79cd5935f0d95a883631b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.687031/10.1101_2025.11.06.687031__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.687031",
+      "stored": "124b366cabb6693e7f42e75b4b8a0c8eec00dc89eb5e1179585e8fdd5943423c",
+      "recomputed": "aebdd4abceb2b8a4954ea0ad011e99db425908cee25deab122bb81ece50c1eec"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.08.687335/10.1101_2025.11.08.687335__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.08.687335",
+      "stored": "08a53ec857d362a835dff62200ea5e3cd7e045ae3b10d7a61e287d50627643d5",
+      "recomputed": "92636430afa81c1ba0ffd84605a360f6cab649935c6301934d22d153120bb26c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.08.687354/10.1101_2025.11.08.687354__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.08.687354",
+      "stored": "ace24601188633a4fdf62f7b13d2024651d3da08cbb62cbc53b2605af267e407",
+      "recomputed": "b1f077d9f997272715416582031909f14ccd86b62f1a731dd1fcb1a6aed392b1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.09.687458/10.1101_2025.11.09.687458__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.09.687458",
+      "stored": "d0f33ab59c31b8ae1876f7dcc679b84e56041996b8f5aa5ea2b677a290dbc9f7",
+      "recomputed": "7b680974b1b452e671a5ef0798b31776201a8a256ab017028d41254b05be89cb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.10.687711/10.1101_2025.11.10.687711__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.10.687711",
+      "stored": "8d5f04ad62fa366446291378a1358fae8218a6108e6ae1739983df05025911a3",
+      "recomputed": "b250ffc42fc46e88cb05cbb64e72ac1bc83a82df9d1c3d5ed020eb84701f3d2d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.11.687715/10.1101_2025.11.11.687715__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.11.687715",
+      "stored": "43e62d260a695ce6e6676f6a0eebd96fa1e02bf003b7bfff80186437cad196a4",
+      "recomputed": "687230e44b74df38be60dfec10754d2a9b9d962ea1f30b167413d1043099f7e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.12.688105/10.1101_2025.11.12.688105__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.12.688105",
+      "stored": "35ecf5bc9c0c6d8d8a41a09f9cca74a148ec71f7624fbbe088668b15b42272ee",
+      "recomputed": "a0b005a27ec36ed1873ff759fd7bc1ba4fcd632ae0c41f1c5fb9c3acdaa123d1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.13.688250/10.1101_2025.11.13.688250__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.13.688250",
+      "stored": "abb0ed7977ce51787dad3b89b6cb232bc91854162057cbf17f6c12a7504b6ba0",
+      "recomputed": "b8aad3a28372f9071d09b47a738016a9b503038206433051d6d02d1608ec9097"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688483/10.1101_2025.11.14.688483__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688483",
+      "stored": "618cfc73563e199674c60a03dbd3c11631d6cf86aae50a318c2d5cb2637b4aef",
+      "recomputed": "fcb0eaecb14e07c7a1cc995f1284fe4d1ff325b93f2e0bfa0e28881ac5604edc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688492/10.1101_2025.11.14.688492__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688492",
+      "stored": "7d32c93162c47338d07cac20931a15d1140e17c4d45c6f4f7c795a8006cd9c8f",
+      "recomputed": "e87b8755cc5d95b8b38ff49a8f40b6caaa3851335e0b24933a26e2b9b747b1bc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688503/10.1101_2025.11.14.688503__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688503",
+      "stored": "da1c2efdb86e3d54533aa8aa287ba7abdc7ec949f13a5a2488f9c98519ae1ab4",
+      "recomputed": "15ace21e4c1f335ca74c22dbd5b92d20e0644b0539667bbdb9a42fa0c3d58774"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688545/10.1101_2025.11.14.688545__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688545",
+      "stored": "f1dc7a55135b35d18d9622e970b30cd53df4a1306ea9efee3d3083c639981579",
+      "recomputed": "c794cbd162efc83b5a81bab64b8ef62b2e624b914a2d473766cc3ca4cdc16e95"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.17.688763/10.1101_2025.11.17.688763__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.17.688763",
+      "stored": "b1d532c4d62f320af541f0075312b2bff80faf91f252234e97d0d9e935e93b3b",
+      "recomputed": "20feebc2e632c3717182538978a5e7126f5c44c1279bfe2df71d770b0d0f8067"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.17.688789/10.1101_2025.11.17.688789__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.17.688789",
+      "stored": "08a2142814c78aa2df66b22aeff179470ad09ecb948cdebc38d39d86f9ddf4fd",
+      "recomputed": "50bd07ef404dc68d702365b1f19a009b2c11bab3291fde7909b906184d7c1b45"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689018/10.1101_2025.11.18.689018__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689018",
+      "stored": "8931f602b69ecc05f3c1eee0d135f968865275f4104630be8d5967087f917f9f",
+      "recomputed": "84c570f515463f940c0bf0e73d633d3bac5569d565e12cc6caea3cf68579c630"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689019/10.1101_2025.11.18.689019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689019",
+      "stored": "fda7eee6bcf431e61aabaf76a62a59f01eb993d5ce716bc4460b2cc72529e20c",
+      "recomputed": "19c6d8af12a99a5d1ca016ec1429c2c88efb17f3aa2a5efc8598853f2b150721"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689066/10.1101_2025.11.18.689066__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689066",
+      "stored": "707ad928b08d1e497c9268bd526594607fc3e5e6860006a7c26c065e9bd6ed94",
+      "recomputed": "66ab3e6dd1015a141fa4c7f3819f775aab440fbe3ddf53ffa327b712b4c6662f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.19.689290/10.1101_2025.11.19.689290__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.19.689290",
+      "stored": "9f85738411c8c073886b65b44567db55987a198725abca9a8f790de26757d711",
+      "recomputed": "5b1498d3111d7db78349a62e92cad2cfda70f94ff5f4987c0c89c763305a56ac"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.688229/10.1101_2025.11.20.688229__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.688229",
+      "stored": "e65fdf7f65f984a44597802686151a4e2fb1f6f4da22c269cbdebc8e1959237c",
+      "recomputed": "1b8945fd52200d7d0433950bd3c8229d65f1ac982d5935b4e46a4dbe75e0c6d1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.688662/10.1101_2025.11.20.688662__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.688662",
+      "stored": "d0dab023feaaf69887434b871430cbbae2f23595d7e9b61280b4cca258c8bb52",
+      "recomputed": "556f70c24148aeddd075488da62cf1c28df9f9b92b829053c7516209cfedac5c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.689509/10.1101_2025.11.20.689509__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.689509",
+      "stored": "e0318de3a10581b6f1c25479efbbdb1c548fc36367dba5a7ca1d8a1ba2cc0054",
+      "recomputed": "58d1d6741e35aff013dc4cd662aaa477422f5394cb5261949f3a6430584b9ff8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.21.689783/10.1101_2025.11.21.689783__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.21.689783",
+      "stored": "dc6f435cf97d45ab3c0abe571ddc4286f9cc53a097b8be9c486c083432c2e519",
+      "recomputed": "8063651075df2b53ce3bb35ef50840757e80fe647e5571d9ab8fb352016fbba6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.23.690014/10.1101_2025.11.23.690014__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.23.690014",
+      "stored": "3b6fdfec7bfa8004f2f60900f2117adef08ce5bec8dc6cc887dbdcaa52a2f175",
+      "recomputed": "fd2014eaf8cc3d62a4ceb4b4e47b1f3342e60463426ff42794d3e7b69a93511e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.24.690189/10.1101_2025.11.24.690189__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.24.690189",
+      "stored": "cdcb7aaf52ad325848e73fbac1d11cf6b5b5a68e1a02157e6d59029dcbf50582",
+      "recomputed": "45f047ed69360714d960efb6842af9975f2d52b022c83a99ab9a7f6dd6934246"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.24.690302/10.1101_2025.11.24.690302__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.24.690302",
+      "stored": "75542ce06de8233c7dd6c004d6836243a261f81cea37ebf5db4d989afa355897",
+      "recomputed": "cd8b4bd38f283526fac889b73f7fecb86264f8af3186ee24384e50e940c2850c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690513/10.1101_2025.11.26.690513__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690513",
+      "stored": "9cbc021dbde4fcdd63df2bd08b82dff4d14632e166423ef06fe5623cde5c9c78",
+      "recomputed": "01c1613866608adadce18b55425eb957eca09ab0df9209f1794845fef9751533"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690746/10.1101_2025.11.26.690746__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690746",
+      "stored": "e9c950d9ee4e31a6cc17142f4476d7f5619976193129200935db2332576a3540",
+      "recomputed": "55ad5782e006b8313a9b2674f6c550f310b7bde01868bb6ec5a3270af02eef8b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690781/10.1101_2025.11.26.690781__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690781",
+      "stored": "d2026812ff1565dae83506ce1ae484edf43563a8da26444fc3659a6297af6609",
+      "recomputed": "41507bd30137d130c7f76af4edf1a8e7dc7469ca0842dc1287fa81d9104daee3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690794/10.1101_2025.11.26.690794__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690794",
+      "stored": "e9dc420f46d0a1d8852bb585881426bf8ede203c9402de88b749775e4cb5ad04",
+      "recomputed": "dc8a6b84589976fb8c034a185e862cffee0d114093811bf4aa64676fe3fea5ae"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690820/10.1101_2025.11.26.690820__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690820",
+      "stored": "c06ae5576d977a7427071b72b79a77f4cfb8b9bb7e63f4c704a542dbee5400f7",
+      "recomputed": "20292daea08805168ebde22beeae9d919e955275296116b70bdbdf9f207906fc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.27.691004/10.1101_2025.11.27.691004__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.27.691004",
+      "stored": "ce6108ac96455e1abc13d5776cebe680a8cef00d3a8465f9300dcc926a3004bf",
+      "recomputed": "de96b679725e6e7407291ca60c44f80c5f89c246062505d5e5d0c6b97ca1d09c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.28.691168/10.1101_2025.11.28.691168__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.28.691168",
+      "stored": "4f41d507f8f9c860c60421e6cc51f0f46d72d79f7e79d52becfc8376d62a846f",
+      "recomputed": "9135f06d1c3ec48f161205fd4b612eb88e056485c5703209ae3c339c711d6a48"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.11.29.691288/10.64898_2025.11.29.691288__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.11.29.691288",
+      "stored": "2212acaf901589b07f562716b5bbb866f695156b861fc8157db878736de2026c",
+      "recomputed": "115b7186c9ec720d9ad1c2c7dd60e74350c67f83ebc4ba4af345cefea5becdee"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.11.30.691444/10.64898_2025.11.30.691444__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.11.30.691444",
+      "stored": "6cd2e7e368e433963f7304553dfb8a9fb74c47a540bfe9b19746b2e31797c8c3",
+      "recomputed": "0ac998fb93867e62e97b7a9ff3f45c7972225d01a88ef9c168b2bd5df13da124"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.686997/10.64898_2025.12.01.686997__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.686997",
+      "stored": "19572a1e6939b01c43b0dfa00c47b419777333c05bb4f001b7e68236e876c3d5",
+      "recomputed": "4a9f621066a4da7cb5bfbe46ff87e6c8a1dd51f9dbb8958651e8afd724dc84d5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.691511/10.64898_2025.12.01.691511__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.691511",
+      "stored": "e68a2d36f3b17aafa11d73a254dd43a1adb26159055d7fd6e31cca5d5c0379c0",
+      "recomputed": "a6338b97e1e8f7636079631d90cc25f7e8d95be02e828056bfa1407674863446"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.691737/10.64898_2025.12.01.691737__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.691737",
+      "stored": "d89d88b4705a146273afa27cdcd85f18ebf8302c083636ac2e5928045c5cb4c6",
+      "recomputed": "4e7cd301316c793510dba1b1817dea57c57440c0cdf125df29a27935697bad8e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.02.691879/10.64898_2025.12.02.691879__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.02.691879",
+      "stored": "e15a142abfae317c15b5f8d53d1c37ca6600c5107482d5520f5891e29910d717",
+      "recomputed": "b4c95bf918f1f8aed69f01a16e1e69d9acc9ae4b9f783e376b5854eaf6c40e28"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.02.691900/10.64898_2025.12.02.691900__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.02.691900",
+      "stored": "9af31fc2c7e12e1faf541239c31adeef6e9b145f43d29be4fc5dd799401a476e",
+      "recomputed": "1cd7f846fa99c71ac8b138ad2aca856e9131fe97b5adb77556938b87690468a7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.691750/10.64898_2025.12.03.691750__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.691750",
+      "stored": "52260ecc37216e8ddae6a058c72ee30dfec5eaec9a8985bdbddc8a38bebfad5b",
+      "recomputed": "f187f8fc9483ef7e0b0f8652b0679dc979d3847d03535ca64ed2829075b6ff39"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.692181/10.64898_2025.12.03.692181__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.692181",
+      "stored": "b87480d3f0f8731a18ba43bb4ec20878f12abc0ab21ccbbed13c87e505b8e5e2",
+      "recomputed": "288fc8e4759b2d158034e25b7a9e1e9c3666659e92b3d3416377a0480a1bfc83"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.692186/10.64898_2025.12.03.692186__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.692186",
+      "stored": "928812e5fec7be16b38fd9254647b0e060d70262181599928f1dbd3495dbd4c2",
+      "recomputed": "f14b0ebc999d69c17e321ddf2f57d9e8e399992ea8c74dfa01e72379f3ff93b5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692271/10.64898_2025.12.04.692271__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692271",
+      "stored": "a49fecb2ae8b8963dbc712a0bbd2eb8d8441d5bcb200ffe326520430c8a95bf2",
+      "recomputed": "ec3e1d9c4b2f72995aa6d34cb936a32701583bf2657fb7f406bdca592617b037"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692280/10.64898_2025.12.04.692280__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692280",
+      "stored": "a537866a890b2163082fd8d5296ed2b6a6cc03109f93f8c6b7c05013516fbbf6",
+      "recomputed": "4e46ca64f4f597731dcdcb934f8d46fe2637d7150d4369c03bf2e15c95c6330c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692404/10.64898_2025.12.04.692404__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692404",
+      "stored": "192fb8269cf4914caee39c4f0113f7edbf8b2781d5b45d210c15ad79687dc597",
+      "recomputed": "8c3da7e7cc788a1b199dd13fe8f35f33c54b871417f4a04411b0bfe2fde87881"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.05.692270/10.64898_2025.12.05.692270__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.05.692270",
+      "stored": "220d097b12621a472383d41b10550581230032c68214312923eb685c382fefcc",
+      "recomputed": "0f777cfea126ac70431464a1251e546d8f4a143eda83879edb890abdb5997edb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.05.692650/10.64898_2025.12.05.692650__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.05.692650",
+      "stored": "68865abbf15491b976d6e39918de21d5db84033f36d212d2c347c7533ad9ef77",
+      "recomputed": "9bf9a2d9c4a9bed3f7abc0941ea3ba05865adf80086622e54f8511fafc697b52"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.06.692715/10.64898_2025.12.06.692715__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.06.692715",
+      "stored": "01d692499c81b01feccdbf7f0754b708ce5434523f6e729709cc4f2a324f551e",
+      "recomputed": "44e68906863c0e27a29b023ca265babad6f3773c9f8f2ce53108ae05385bdebb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692553/10.64898_2025.12.07.692553__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692553",
+      "stored": "885971c09aa1f0881fb1f2c6d1888191d8db171bbf4bd9ed79cad3e1befffc83",
+      "recomputed": "f139fa112720b2e5c8ad94add40a8fb667e37ba80e381769b95b38aa203c30ff"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692584/10.64898_2025.12.07.692584__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692584",
+      "stored": "eceb29bd95966101854e733cf46be2ae1f73a52313e03f6ed0a8f89307a528d7",
+      "recomputed": "231ab6890cf499c3f3b1ef661d12dc6b0f319487786bdcc2f1aecd21292819a9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692843/10.64898_2025.12.07.692843__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692843",
+      "stored": "6b34ace8bc10a005761609c0a59c036bad1b9bd1f98ce8b6b46139b0e7d8fd19",
+      "recomputed": "1d54b2f9f9f4c15b211433ec477e5cbbf3302f57d9dbc7c159fdb5318e4ec733"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692646/10.64898_2025.12.08.692646__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692646",
+      "stored": "2ccf813031841f2a9efc3f422d2dee61492e22dbc9200464f31bf2e9ab5ade62",
+      "recomputed": "f4d3bc7afc9a9ec0e167b0ed25ca99a6dcdeac6139843a1535733277bdd71a07"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692692/10.64898_2025.12.08.692692__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692692",
+      "stored": "92420b2a5179c7709d2144dd7d7ac1a5d0d5bcb316fb05c405dc11ae5cd8ff1e",
+      "recomputed": "6bf799798ac2a5c0548b1c46d318ddfe5eab7263447169ee8ea53681de221183"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692949/10.64898_2025.12.08.692949__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692949",
+      "stored": "c9ad8041d7b47dee522f87c737e59916b815b9fad0c53a9da44a08197de35b8f",
+      "recomputed": "e2dd82907cb4e6d024389a997ec4c6eefd3ef1cbc087e4d424234b79f4b59d84"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.693002/10.64898_2025.12.08.693002__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.693002",
+      "stored": "f6e2068e6ebfd47f5973088154a7826d7a4b28a3c27c18a223d1c122d90adbf9",
+      "recomputed": "ed5c971dc860811d5a31ea5b28cdafae662d0c011ad1a3690e936ce86d86fddc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.691744/10.64898_2025.12.09.691744__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.691744",
+      "stored": "027d0a7b957ac1db35c96d3459a805acccf160fce47adfb6a893641eba99404e",
+      "recomputed": "571f154b3ef8672e8de7903bf7d86d002268225083e4e8b02735151d2c4cf545"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693136/10.64898_2025.12.09.693136__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693136",
+      "stored": "3d9aac656ef20f995d610a88c61ac4ce329e6b843642cb88c967b79b77c551f3",
+      "recomputed": "1dbc4ceb09765e04495f4221877a2236502b142266fa48b24c242c215fbeb23d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693182/10.64898_2025.12.09.693182__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693182",
+      "stored": "07c9f34936fbabfecd1e5babc59d857dde818b98c0b7f9bbc141a190b0c53958",
+      "recomputed": "3fc31d5d7f6bf4c7bf2fcdf446e6567ec762cd557419d23f2c192ea565302e94"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693192/10.64898_2025.12.09.693192__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693192",
+      "stored": "cbfe503958b552d3cbf3ee345416ddc04ffefee10cee92cda91ace1f9d5b95eb",
+      "recomputed": "cd8a9005fcbbca7aa583acd815a0eaf87505900c2f7228ace6f48c01b71bf73f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693261/10.64898_2025.12.09.693261__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693261",
+      "stored": "fe1034f45fe24a8151c5169d8c545db30524f120e988b4a4c02fa9f17635a067",
+      "recomputed": "563cecc843230277adf25a306bfc60f0f9ddd50e7353849e3db674884729acdd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693473/10.64898_2025.12.10.693473__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693473",
+      "stored": "d55083988fe0d6982ec82ae67aa4afdbf795ffe78050740436ba42b1dd53676e",
+      "recomputed": "bf8c4405292da7e42fb9f3e6248e812e2061ba3e799dd107676de0d76f175c1e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693495/10.64898_2025.12.10.693495__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693495",
+      "stored": "0dd7badd298536347b945338c7a87f05d3bad90d1916b0a6825958eb66d2a61a",
+      "recomputed": "0298c0d0c5bba086715cb7b7b9428195f648ff5de66658f1e37c225b43f54ad1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693501/10.64898_2025.12.10.693501__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693501",
+      "stored": "405c3c31ff0947f25c6464c59509ebb25f65a2cfbfcdd65cf3ea395aa15f87de",
+      "recomputed": "99833b9dfc417e085158585aaeda57c8b90544c918c70690eb2b2855ac0ed7d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693515/10.64898_2025.12.10.693515__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693515",
+      "stored": "18a31a2ac5b9cf2e382c4ec1ca3b46ba56ffd5882bc0336eacf40757c3196ef7",
+      "recomputed": "5bb5d3fe92f018b976885e24a487daf0cdbb0ea09570f20a6f6a640b06dd99d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693604/10.64898_2025.12.10.693604__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693604",
+      "stored": "62cab8f027edf9cc1c51ce1e329570a0d5be39daedbbc59dbf5d1d4f5bbb0330",
+      "recomputed": "cba7dee13d30ce5ae5dc2048cf7794fefd1136114712a1dec5c50a8383451b5f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.11.693713/10.64898_2025.12.11.693713__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.11.693713",
+      "stored": "dfcd65f3d128e97550f0f2ef81fb54c0b00f78192e6962edd4f88bd8a70b95bb",
+      "recomputed": "ebca3110cc65a85cf0ee09ee24489e7743a005d1f7edd66cecdc98817acdf9e0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693252/10.64898_2025.12.12.693252__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693252",
+      "stored": "dafd74652d3e64770471378648412596794f1bd8c369f29758fbfb5cc2f22791",
+      "recomputed": "0d3d77ac7b4e63730ed70c8ab7eaa02c54dad37728595beef3c68b1eb6a802a1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693928/10.64898_2025.12.12.693928__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693928",
+      "stored": "691a4ecfeccc33b7154d472c1b844fbc131b42f1bcff2109fb43c47656860150",
+      "recomputed": "4dd9ce294fb7148094507238ce6f75c6221df4ac78f1a824417df0b8f6eebfca"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693949/10.64898_2025.12.12.693949__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693949",
+      "stored": "caed1b4afda4c67055710453ba924930e2752cd37dc3716971670d2b60d1910d",
+      "recomputed": "874475e9b690d659b417a0394861780990aaa33da5a786d588ef25d4aee99492"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.694004/10.64898_2025.12.12.694004__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.694004",
+      "stored": "d33b1042dcc0a76d55726ff0915146afe4acf07594c420eaa86de2e4e4a438b1",
+      "recomputed": "04023cebba5566c8a65d8075a3d2e63fc71e65ef55f66a8269169f3dd403194d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.694020/10.64898_2025.12.12.694020__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.694020",
+      "stored": "cb86eebd0e11728b4ff22956606a717339ec20db59495edef26918b9c31b1ab0",
+      "recomputed": "88143169ebf352381ced54d34457677e2346ac544261168ad8dff0e9ac3270d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694519/10.64898_2025.12.16.694519__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694519",
+      "stored": "01739a3bef603a66ca6072e06f3f83fc1a404b118330df17010099fb99611907",
+      "recomputed": "3addfaced6e8c1eb0292c4a570eca475ee0e03645c5ce928870ac4a915b652d7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694545/10.64898_2025.12.16.694545__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694545",
+      "stored": "a05686302ae1aaf50bf9c7f13d02527b99a54d395f2ec55aeeb6e63729cb2ffa",
+      "recomputed": "fe940b715f95d82a322b6e2837b023a914c0393c8318ab2440d5ca95c8efa5de"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694674/10.64898_2025.12.16.694674__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694674",
+      "stored": "c7204802ba8793a83e6d2840f420124b2b382eaf7e7d266a05b863bc4752846e",
+      "recomputed": "3901ffd7e701b39d9432427b7ed6a08f325b6086b916c8ab6f5fd0fa69efad0c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694773/10.64898_2025.12.16.694773__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694773",
+      "stored": "55ccbd22fb9d45a3b57484579c6ef0287417233e6370cf6b83004b446e12ee1e",
+      "recomputed": "a51e6fb2c36dbc5ffed95f90150e1364c377bea2c7b96f083983b03e7013d577"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694779/10.64898_2025.12.16.694779__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694779",
+      "stored": "4f1c01f6fa1e03da319288ef080be1760f401d0e46017e5851ceecb062a3fdb2",
+      "recomputed": "c71edd38b1ba0283de5819f4a9647177520df05ecea6c2b31d46e3fe547daee0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.18.695158/10.64898_2025.12.18.695158__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.18.695158",
+      "stored": "b9aac01174419498b8d60d29e51d749dc7ebb6d68df3f49760b2dd07aea1b1c4",
+      "recomputed": "10e4caaf8372168e186a5564401a9a0a8fffb6d9a936e0d21bfc797fba787f3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.18.695196/10.64898_2025.12.18.695196__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.18.695196",
+      "stored": "cdcf133043175a3a80fbfcca3fa7a487a8bcb5f1e1a0f979b29884572641806a",
+      "recomputed": "531cf55b2c50208b40374fddbd4c726c75e3910feb53eae32b753d375dc71036"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.693868/10.64898_2025.12.19.693868__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.693868",
+      "stored": "5d1515e14683fbc14b49c5dd6a6ef5d90c0962ab49007fa473908d401956e440",
+      "recomputed": "5d69180642d713f7feaace3ad86009bd796ad5ce6b282b1fd6b32c7c58ebf905"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.694255/10.64898_2025.12.19.694255__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.694255",
+      "stored": "bd0108d4b8f0cec4154e17ab9398bf37f24140f4629fbd9106f3d3c2574baf18",
+      "recomputed": "9131db3d68e3829f236609f18c5c22a17989a30f4c6e11635f55d260b804fc52"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.695525/10.64898_2025.12.19.695525__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.695525",
+      "stored": "e65bc9b7d929f13f3d39539c17b1f0666adcf285f41adac247c1b167712d4bfe",
+      "recomputed": "c8b5c8d660cb8732f6ece2edadad3b0989e680e5697aef248405e5fbda06f14d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.695579/10.64898_2025.12.19.695579__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.695579",
+      "stored": "85aa76d7c7366e6b9157a642681613f305aae517fe92a07b1a2efe90b93c9668",
+      "recomputed": "20332a5a65ca7b9fdf5315c903d2174e84cb3c76c419e74949d826f640fa68dc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.20.695731/10.64898_2025.12.20.695731__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.20.695731",
+      "stored": "b0694b54ec5796d54ec93c9f3f1a985558fc9701ed8c45ced933748726ac9ed7",
+      "recomputed": "7a3a7f5b3777bd3eeda39567baa42d5ecf3263896b2839faa7b1f8f1240084a3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.20.695734/10.64898_2025.12.20.695734__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.20.695734",
+      "stored": "07dd95e4236b9cccd559f722b7f9fda82f64dc3cb49d734d95ff10e8f995140a",
+      "recomputed": "ba7f95fe73c788afbb3b5816fd51c347495d5387cd2e3c57d6a5b617fd283fa1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.21.694342/10.64898_2025.12.21.694342__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.21.694342",
+      "stored": "ab9801cfc7c8525a7514a2c41644eabc5d8a1d9481f483169fecb5e6af6a915d",
+      "recomputed": "08ff648a9afcbfcb1d78b555f24717a58e830c2bc9198bc1ba8c8860cd9367a6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.695871/10.64898_2025.12.22.695871__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.695871",
+      "stored": "b1459beefd0adde0b2ea00714a578576fba33a627feacafedb17f865b6e25459",
+      "recomputed": "bafe6e050ac5bff5884204b3d17b67e931710b64b19452a5bae4f0522079a863"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.696044/10.64898_2025.12.22.696044__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.696044",
+      "stored": "6c3674180ec55e4e304c648b6b27e8e3b08b934f9b88214c5344714201a00ef9",
+      "recomputed": "65ee43b9037416c079bb7a55ac2eb8683236143a11173a2e0f24c0b865c1260e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.696056/10.64898_2025.12.22.696056__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.696056",
+      "stored": "cf0d37e811629e2b66229da9d6b8317a45aa6ece8351122c3a5a3b23f2153e94",
+      "recomputed": "9ae240eb56377ff1015848a46ca5b4e3914ffe75e3c50a6b5367f98e2ed1ee9d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.23.696241/10.64898_2025.12.23.696241__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.23.696241",
+      "stored": "d7b5232d5b16c737353d0b909e393438f45ec9fc2e467f345a107c467a547a91",
+      "recomputed": "4d409c34f4c5e60c9882fabb1d588a2ead9c30c8348dbca7b94e9c76f14a3e01"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.26.690930/10.64898_2025.12.26.690930__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.26.690930",
+      "stored": "0fb0d87cd3431129b1c6432d630c4fa875350757bc3488f9c60bbd9b44eb3fa1",
+      "recomputed": "3afc7d9e3e526af96701198126a8692ae021dca7eeba73809300e235d3d2557e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.26.695997/10.64898_2025.12.26.695997__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.26.695997",
+      "stored": "bdda91d695a52eea9e28e88309f571da9ac7802c5e5c4d24f4d362770a017990",
+      "recomputed": "2d3d15bdc15f0167a6e982a0d34cbebdd186491361a2a430dfdd5e451cb9e73f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.29.696801/10.64898_2025.12.29.696801__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.29.696801",
+      "stored": "6559f195ac718bec32407538e60f1582bf434637ebf14ea4a825d6fa07fe30a0",
+      "recomputed": "e9b93d0f16417cc3e534336d347546fb509540d2fec95ad249097ef4c88ca169"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.30.695215/10.64898_2025.12.30.695215__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.30.695215",
+      "stored": "c448d3c43f93fdc08a4f049c65377a83c43b14ed599da5b30f8cdc88f0699098",
+      "recomputed": "03b99ce879a022971d6173c208bc22560f3fe836f6ed987094f36a14cab6346b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.30.696765/10.64898_2025.12.30.696765__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.30.696765",
+      "stored": "5d3653300e3f0c3c1c33c05c6e9d07bb6f9a1a810b5c717294925d3a3fa20f45",
+      "recomputed": "3e35e735d8c646336136e46bfcb95c5351960fdd0289dcdce26507c8d20bef61"
+    }
+  ],
+  "b1_manifest_hash_failures": [],
+  "delta_this_run": [],
+  "census": [
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2022.02.18.461833/10.1101_2022.02.18.461833__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2022.02.18.461833",
+      "report_content_hash": "da46445a5f6c104f84546f57c93bd35916de20434434c41cfb0eddb0f815de04"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2023.04.14.536893/10.1101_2023.04.14.536893__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2023.04.14.536893",
+      "report_content_hash": "6b9ee679b6900d9cb38e402189ae07107d609665a82efc94dd9f8c3bfd90cce2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2023.05.31.543169/10.1101_2023.05.31.543169__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2023.05.31.543169",
+      "report_content_hash": "5be25e89c7ba16666a0147bb6c774921e02e78bc978bdc7cf64d49c12fb6a955"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.08.06.606834/10.1101_2024.08.06.606834__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.08.06.606834",
+      "report_content_hash": "547e4f909a33a05aa2f2b6f7beab49e5ac7e41e48fef065bc17bd1cd1b81a4b3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.09.20.614071/10.1101_2024.09.20.614071__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.09.20.614071",
+      "report_content_hash": "2658d96d66fda7c2b54f44847e7d15725090ab96964faf057cc2cf0fa6caecaf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.08.617260/10.1101_2024.10.08.617260__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.08.617260",
+      "report_content_hash": "b922fdad45261b4ea9254c69896973c88c0c5b2bd8fbd040efe96e1b3c4a506e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.15.618594/10.1101_2024.10.15.618594__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.15.618594",
+      "report_content_hash": "60ac181305d766d487868c2245e525a9a236ccee12d58e105fc0e1b6383aabb9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.10.16.618588/10.1101_2024.10.16.618588__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.10.16.618588",
+      "report_content_hash": "9a8604a9736152d0bde8fb7b192ca2724d8babb26c4e2916f7ab850fdfd2ded7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.11.27.625433/10.1101_2024.11.27.625433__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.11.27.625433",
+      "report_content_hash": "639db9246c5ee42ec6efd544cecd55d6aaac4b33569fe9f6e316018f918a0537"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.12.06.627142/10.1101_2024.12.06.627142__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.12.06.627142",
+      "report_content_hash": "6f76777a3c81226835f68db20de5fbdeb9d8c2c5deae8a0f44102481ed82e17f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2024.12.18.629274/10.1101_2024.12.18.629274__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2024.12.18.629274",
+      "report_content_hash": "45861cfb0b1ad1a6f8d9bda5d10cece7f335c06ac9a100f1466a5d419ae92b9c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.01.29.635579/10.1101_2025.01.29.635579__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.01.29.635579",
+      "report_content_hash": "407fa0dcb519a69ceef9015988f53e204abeae13ad7550e748663d29cc3d3b5d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.02.06.636950/10.1101_2025.02.06.636950__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.02.06.636950",
+      "report_content_hash": "8a6f961145ecc93bdba211c4cc56e7a139c2bfed9774b289451444478ca3265d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.10.642480/10.1101_2025.03.10.642480__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.10.642480",
+      "report_content_hash": "d1569e8030a776d754ccce17f69db4165400a7022a7e7557aebefc0c99b4656b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.11.642605/10.1101_2025.03.11.642605__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.11.642605",
+      "report_content_hash": "ad1f79f1d8ca4793b12a8ebd1697e0f2086b8eb4fee79a8d88eed5f6b75c3398"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.14.643265/10.1101_2025.03.14.643265__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.14.643265",
+      "report_content_hash": "cf05f9453c144069ca1aafd3a5b99d7f86965be4440b61dc7dd011f6a19ac56c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.03.27.645809/10.1101_2025.03.27.645809__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.03.27.645809",
+      "report_content_hash": "54f5ca5f682b10948b46afa79c2419d199006f68f733ce866653a120d9f85fca"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.08.647763/10.1101_2025.04.08.647763__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.08.647763",
+      "report_content_hash": "d6edd1e6df3c0e9a9cd9e4f05e7e585cad0b3d01c5d92100d6f025a861af912c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.15.649007/10.1101_2025.04.15.649007__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.15.649007",
+      "report_content_hash": "316e0b67b8b0cfe007204c7ca211b690d80f2ab051ab7a904675f024ac54b0fa"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.04.19.649648/10.1101_2025.04.19.649648__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.04.19.649648",
+      "report_content_hash": "34fa7cc67384c907be9fb2745c65a84c0733ccf8d39b4cc63191bfff3f6bcee9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.05.24.655897/10.1101_2025.05.24.655897__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.05.24.655897",
+      "report_content_hash": "88fb805ec40c4b6c8490f8a2a898ae26ed3fd3e7b72b2ddac2770c94835ea704"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.14.659582/10.1101_2025.06.14.659582__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.14.659582",
+      "report_content_hash": "5ac65d77d8d845a88a4578a3d319648a357370842d45ffbc16ce6b57d4c9a907"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.25.661447/10.1101_2025.06.25.661447__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.25.661447",
+      "report_content_hash": "701765ae7793e27cee5fafeb82a688fd92972823c580912b1a4517ec05299eaf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.06.30.662443/10.1101_2025.06.30.662443__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.06.30.662443",
+      "report_content_hash": "0de86363bf9ae11ad92818617cc69840687aac47e2ee7a9b8fd43cc71571d9ea"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.03.663019/10.1101_2025.07.03.663019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.03.663019",
+      "report_content_hash": "ab9e505f1072bd2baa89ba579452f88b229cdd39d4b9bc88ca50be1cba78f1d7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.11.664466/10.1101_2025.07.11.664466__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.11.664466",
+      "report_content_hash": "80b76f8040ba104b395cf172e7036d85bfb72d3dde60d7c851210cd8a178d9e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.07.14.664631/10.1101_2025.07.14.664631__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.07.14.664631",
+      "report_content_hash": "0ff8164a508ab80ea9e24f30ed86d83fbed25bf40a94559c00752da8cf7e8a71"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.08.14.670415/10.1101_2025.08.14.670415__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.08.14.670415",
+      "report_content_hash": "90ca06e942c4bef6506237bec9a2d985bead9f744239027d451e939db0dab6bd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.11.675724/10.1101_2025.09.11.675724__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.11.675724",
+      "report_content_hash": "1f0d05e9f361b7066819046747732b9b370a965931c63ab17721e595048f3712"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.17.676769/10.1101_2025.09.17.676769__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.17.676769",
+      "report_content_hash": "3727a21676f7d834338828294d3873b2bdd4ffc85579b442095a745b19208f9b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.22.677720/10.1101_2025.09.22.677720__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.22.677720",
+      "report_content_hash": "532da1766775a97e47dc5db0239f0d15b2f5c85252bfc05e1ab7b1e22671ae7b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.24.678374/10.1101_2025.09.24.678374__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.24.678374",
+      "report_content_hash": "cbb14e1da82531283d5484bfcb28a07da33877632e8483766600a0310661bed6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.09.28.679077/10.1101_2025.09.28.679077__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.09.28.679077",
+      "report_content_hash": "d85494ccd95061fa7785f23fab0de9e9371045ab4334db8e65bdf9ca0c7c8000"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.678058/10.1101_2025.10.01.678058__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.678058",
+      "report_content_hash": "0b318546e40f0e125045a62cf1a41b8078ec050d36d0f4530ca9d01af831a450"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.679902/10.1101_2025.10.01.679902__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.679902",
+      "report_content_hash": "edaa69be0c4b648ecd0d080ae2b88ea986bc7ce0a4ff505c2b9e7a3c83e7d6f3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.01.679930/10.1101_2025.10.01.679930__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.01.679930",
+      "report_content_hash": "f287fa2b4856f4b3727660916532c7fb8abba27eb06e54f43aae88fc05a96ccf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.02.679816/10.1101_2025.10.02.679816__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.02.679816",
+      "report_content_hash": "bb748dd6aef4af830a374440d478297bbf8a271f40e4aee196402b49a94f2f50"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.02.679855/10.1101_2025.10.02.679855__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.02.679855",
+      "report_content_hash": "157d2533b2ae9ab4bca3058a3b8471715e3ce51da302f01de6f9e7cb8134c28a"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.04.680405/10.1101_2025.10.04.680405__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.04.680405",
+      "report_content_hash": "ea8ca9ad5348fd476f84db12dd54dd4f641b6d191efdf5fe1d02d12fa7053c51"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.05.680569/10.1101_2025.10.05.680569__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.05.680569",
+      "report_content_hash": "830c1e2f9085dcad31f8f882edb931e889161f5cf4ae7617538dd1b294daced2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680641/10.1101_2025.10.06.680641__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680641",
+      "report_content_hash": "21d149af0d8f771f47042c625dac464c372ea80140cffb8184f30a8f29bc677a"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680777/10.1101_2025.10.06.680777__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680777",
+      "report_content_hash": "0fbc675666ddfd4a97137fa3eb59b55819f521dabefc28d83d0502ae80117e01"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.06.680821/10.1101_2025.10.06.680821__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.06.680821",
+      "report_content_hash": "6ca9e2327bf292331c3b9e28d23cf81b813178f1b1e3cd5303192586240b97a3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.07.680947/10.1101_2025.10.07.680947__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.07.680947",
+      "report_content_hash": "1a65beafc14a9ef52f563447293a542eac6cd725b622ea6ead9daf0e3aa7facf"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.680649/10.1101_2025.10.08.680649__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.680649",
+      "report_content_hash": "3af7bfbddec9539106139387ecf128f7c21f4c531ba200db53719e581d1da0a9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.680958/10.1101_2025.10.08.680958__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.680958",
+      "report_content_hash": "6cba309c32f1a238f92cb7ab9c3c0e7a38c5df37be478ac66d13744cdbf8e294"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.08.681110/10.1101_2025.10.08.681110__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.08.681110",
+      "report_content_hash": "aa8ff5a36318739eca5544b62761d73ed9bbc9875fe32609e3785c5a235c1c2b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.679175/10.1101_2025.10.09.679175__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.679175",
+      "report_content_hash": "46207bcb1e2fe993664a4444682c64819dcbaf0737aaa97ab38eae2e96ad6f3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681344/10.1101_2025.10.09.681344__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681344",
+      "report_content_hash": "c8a59a8af106206e4a4a8b2cf19cb2b36307e7b216b5afb84613c6216d648abe"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681365/10.1101_2025.10.09.681365__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681365",
+      "report_content_hash": "741cd1a03fa7f3e628362ee0c15289b3fd26af0cf3dd81c1948229da59530f14"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681413/10.1101_2025.10.09.681413__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681413",
+      "report_content_hash": "206fc040ea957d0c4883fef98107e0cde8c9f4a8fbe907b0d3e61c6e5d2743f9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681420/10.1101_2025.10.09.681420__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681420",
+      "report_content_hash": "235dafe840b13c7ae9b465c661fa1bc59a80c0d99206d25081cd4604c1adf1b4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.09.681516/10.1101_2025.10.09.681516__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.09.681516",
+      "report_content_hash": "5229b2312c5a38fdab8e8de4fa522cf625232f215b38898d7f6d839d4c2990e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.10.681685/10.1101_2025.10.10.681685__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.10.681685",
+      "report_content_hash": "a1e05d588c3bf3f7c1d678d7353e230d6714cf78bb0b284755c610a785b3304c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.10.681754/10.1101_2025.10.10.681754__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.10.681754",
+      "report_content_hash": "489117bf08c82a572f27ca687d4e813069acaa9c75aab129dde2cda0353f36f0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.11.681520/10.1101_2025.10.11.681520__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.11.681520",
+      "report_content_hash": "08e8e6ab02ea0a70cd98f8a41561c19c832f2cdb17b711803e8d1ca1cb1c2feb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.11.681805/10.1101_2025.10.11.681805__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.11.681805",
+      "report_content_hash": "62e08b5fbc17b613acdf47c086a3d7f00481ed5ca95a17956d18d346633527ff"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.13.681552/10.1101_2025.10.13.681552__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.13.681552",
+      "report_content_hash": "2701fdcdcb577381248b29bee2955f638bd56dd917f69ef2a9614af98f308490"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.13.681986/10.1101_2025.10.13.681986__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.13.681986",
+      "report_content_hash": "4b1fe0b32c262c61430f5fb6d93b7fbd92da364fbefae99e4a60130631f957d8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682260/10.1101_2025.10.14.682260__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682260",
+      "report_content_hash": "c2d88415566f09427717172127433723d36ab251ba519f863458c4e928ebc41c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682318/10.1101_2025.10.14.682318__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682318",
+      "report_content_hash": "88139b2362ddb40b36d0c29b133ee844b1c4d711d317bb97b4c01f9a1578c0d3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682350/10.1101_2025.10.14.682350__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682350",
+      "report_content_hash": "239a71960352c216926cc44e11fdd01aee2d2a84f7fd58b25052b45fa2e765e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682378/10.1101_2025.10.14.682378__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682378",
+      "report_content_hash": "01abbe466606cc57366e22dc93693d6bc17523b221ba4b7f932a44a219dc9271"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682411/10.1101_2025.10.14.682411__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682411",
+      "report_content_hash": "3486674acf44f8a92a657c1f5515244ea42383f3b26a9a133daf8c27184b03b9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.14.682431/10.1101_2025.10.14.682431__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.14.682431",
+      "report_content_hash": "96b70ac00b758688f2b1603e08fbe87609ee29551d0094e837d2e7dbfeb6cba8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682832/10.1101_2025.10.16.682832__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682832",
+      "report_content_hash": "f2797ee0ea0fd0bf4c70388704f378b58cb05acba3f5ced964b41afaba957b00"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682876/10.1101_2025.10.16.682876__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682876",
+      "report_content_hash": "0cc91640c07e7c5824b30bb0fc22a5ce8bb385311e93ee70baaa5c3dd6c19f59"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682892/10.1101_2025.10.16.682892__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682892",
+      "report_content_hash": "c69b2cefe140b9bfbbbbf900bd022b169d05e13ddcd6dcc1d7c630480363c851"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.16.682960/10.1101_2025.10.16.682960__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.16.682960",
+      "report_content_hash": "de25f8ccbebdf0abd07d0d315f21cb6251057e15cb6e70ef10e462886a9eb2fb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.682904/10.1101_2025.10.17.682904__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.682904",
+      "report_content_hash": "6feffe2dc1908a9c58537c684ddf2333fe139c4bcc1a4395d97b0bdd3c0e0776"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.683019/10.1101_2025.10.17.683019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.683019",
+      "report_content_hash": "28c1b76b48af1e1534d4f83816ca1ca4dc278749d82ccb7134789ab37b505d5d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.17.683157/10.1101_2025.10.17.683157__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.17.683157",
+      "report_content_hash": "e451952ad90fc74dbfd3f7c393fb909e5decdb23083069dfa76a728d6ed21948"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.19.683276/10.1101_2025.10.19.683276__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.19.683276",
+      "report_content_hash": "6cde3f4ec4eeee0d2eb717624f3e04185c261d07344ed6a01bbc13ea0704cba2"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683404/10.1101_2025.10.20.683404__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683404",
+      "report_content_hash": "633f71171aa6e011fcf9ab0fa42f9311e5866cbb7bcf0106d32063533f7a68b1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683418/10.1101_2025.10.20.683418__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683418",
+      "report_content_hash": "fd9afd3d7cd958b8ee4f77d194c9c61f6e33ee60d90977ba5d47c4f36e862c3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.20.683496/10.1101_2025.10.20.683496__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.20.683496",
+      "report_content_hash": "ff0c8d59c421d157c42bc3608efe7a8831e2e8b06cddb23b14f5fa1a4547101d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.21.683615/10.1101_2025.10.21.683615__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.21.683615",
+      "report_content_hash": "7cf90dd6eee1437553edeeb1efcefaa49e1d9f87bdbfc0b5f582de9fa331e697"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.21.683758/10.1101_2025.10.21.683758__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.21.683758",
+      "report_content_hash": "0a651b885da13f165a846323bd4b0fdd0386715ba59db64145b664da8403cefb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.683841/10.1101_2025.10.22.683841__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.683841",
+      "report_content_hash": "5623b8009098c89d72e14d5272df31b7de44dda0c4643b34f4d5bcbdefad63c8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.683976/10.1101_2025.10.22.683976__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.683976",
+      "report_content_hash": "24e6ed25ed65199bffa8e1bb2eac9f2a22acf059a32c784a19933b2c1c23b681"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.684019/10.1101_2025.10.22.684019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.22.684019",
+      "report_content_hash": "090baa9c925b9f8ccd90b54710e5665e742a9f3ec8a5908bde675876624b5fc4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684100/10.1101_2025.10.23.684100__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684100",
+      "report_content_hash": "412868cd1b898578dd9a0e091cc3ed3aafa94e3703e76081bf841479aa58bcc1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684114/10.1101_2025.10.23.684114__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684114",
+      "report_content_hash": "5e82627de9b9bff584661b0d64157612ebdd38b5a942d03c7664b2314771fa8e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.23.684174/10.1101_2025.10.23.684174__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.23.684174",
+      "report_content_hash": "94906241a0ae13a01d6990cbacd1fd8b0c647590094cebbf2429cd6537b7e24b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684307/10.1101_2025.10.24.684307__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684307",
+      "report_content_hash": "a06a67ec766c88c26567d535125a1b16c209d23900946efa6c6d3fcd6cfb420c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684346/10.1101_2025.10.24.684346__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684346",
+      "report_content_hash": "eef0f77676a7f063f2010bb74243c6f25ce24aeb025334edb21f14db12e47bd1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.24.684366/10.1101_2025.10.24.684366__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.24.684366",
+      "report_content_hash": "0a45b418cc835b361bc9b632a5fd0d55c02f6cc67ec4b9a869cedf135ec97ffd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.25.684551/10.1101_2025.10.25.684551__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.25.684551",
+      "report_content_hash": "0346ec4dd0be30487a9164c86c80b0785acfe846fd43a14fb39eca74ad59689b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.27.683567/10.1101_2025.10.27.683567__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.27.683567",
+      "report_content_hash": "bd4ad73395956c5db6be9738a4cf33f6a3c83d1750ebf4dd727e307270842464"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685005/10.1101_2025.10.28.685005__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685005",
+      "report_content_hash": "6e1739b7574806f3c28ef0eb44b3f7e24ef9e5022ba0eae3b28c4ab0db5c8dbb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685014/10.1101_2025.10.28.685014__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685014",
+      "report_content_hash": "4fd138b42d82dcd896fbbdafa7e2b860e396fe30b113d7092c9da624af05cb75"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685023/10.1101_2025.10.28.685023__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685023",
+      "report_content_hash": "c1fd9f3d0e7d990df69f09c10a930449fd86f197d2e5f4d908caa37f8d0b3cd4"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.28.685157/10.1101_2025.10.28.685157__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.28.685157",
+      "report_content_hash": "b96e26e9bcba9c6704b2353a97952e5d8eba25ddef556030503c6034ad19b84c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.679705/10.1101_2025.10.29.679705__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.679705",
+      "report_content_hash": "c80b2a0c2e7461ee56272f910fcd1b1268668327d7b4a91078bfa7bbd0f017fa"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.685264/10.1101_2025.10.29.685264__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.685264",
+      "report_content_hash": "cf4d1f246f2139ecb697ce485fc4f1514a4179243d12a0f8575a20c89f070757"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.29.685401/10.1101_2025.10.29.685401__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.29.685401",
+      "report_content_hash": "7fd26409075208e387e40b182380abef7bf4395b5efcfe2180f55c068e553a34"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.30.685527/10.1101_2025.10.30.685527__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.30.685527",
+      "report_content_hash": "c4c745d96b741d3403787d5992d2e104944f85019d82f7162c80423c2ad46b09"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.30.685688/10.1101_2025.10.30.685688__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.30.685688",
+      "report_content_hash": "1ed5fb85bd68a65ca176025951a37dfca6194940657cf7cde3d61908a50cbcba"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685756/10.1101_2025.10.31.685756__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685756",
+      "report_content_hash": "59cfeb11e7d09f74ddec317eeedbae20a408aaad7aaf767b387686b033026e14"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685816/10.1101_2025.10.31.685816__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685816",
+      "report_content_hash": "e13544268fb79bd8d81a176d36482104804c1bf28630e8caf18153a19deaa474"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685860/10.1101_2025.10.31.685860__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685860",
+      "report_content_hash": "8bb2dc54bb316d8ae3264cf8aa0469a6d7a7191a4306fcfacec94efb4fa740e5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.31.685862/10.1101_2025.10.31.685862__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.10.31.685862",
+      "report_content_hash": "3d4f1ee490948693be39a1e537279b24d97862cd70ed543cda98362470df187c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.02.686137/10.1101_2025.11.02.686137__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.02.686137",
+      "report_content_hash": "7be7c4b13aab945b46b038e035ef2998b87d48528f4e81be7c1928c0faa87a2b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.04.686611/10.1101_2025.11.04.686611__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.04.686611",
+      "report_content_hash": "af4dbc261113c38c95605d3424ecb138b4ba63694ed8269c72a8492451aa1230"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.05.686701/10.1101_2025.11.05.686701__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.05.686701",
+      "report_content_hash": "13fc3f02b710e0707196c1f7ffd3aa1a60d7983cc6730600d9a35c4a3d7bb5f6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.686975/10.1101_2025.11.06.686975__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.686975",
+      "report_content_hash": "fe2623ad91d594b56789230e68780303e588d4f31d3ddfc037c073f44cf39b24"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.686988/10.1101_2025.11.06.686988__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.686988",
+      "report_content_hash": "b2f78d6e93a94567e7f2fa55f8dfa27ca6289c2fc8d79cd5935f0d95a883631b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.06.687031/10.1101_2025.11.06.687031__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.06.687031",
+      "report_content_hash": "aebdd4abceb2b8a4954ea0ad011e99db425908cee25deab122bb81ece50c1eec"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.08.687335/10.1101_2025.11.08.687335__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.08.687335",
+      "report_content_hash": "92636430afa81c1ba0ffd84605a360f6cab649935c6301934d22d153120bb26c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.08.687354/10.1101_2025.11.08.687354__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.08.687354",
+      "report_content_hash": "b1f077d9f997272715416582031909f14ccd86b62f1a731dd1fcb1a6aed392b1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.09.687458/10.1101_2025.11.09.687458__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.09.687458",
+      "report_content_hash": "7b680974b1b452e671a5ef0798b31776201a8a256ab017028d41254b05be89cb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.10.687711/10.1101_2025.11.10.687711__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.10.687711",
+      "report_content_hash": "b250ffc42fc46e88cb05cbb64e72ac1bc83a82df9d1c3d5ed020eb84701f3d2d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.11.687715/10.1101_2025.11.11.687715__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.11.687715",
+      "report_content_hash": "687230e44b74df38be60dfec10754d2a9b9d962ea1f30b167413d1043099f7e3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.12.688105/10.1101_2025.11.12.688105__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.12.688105",
+      "report_content_hash": "a0b005a27ec36ed1873ff759fd7bc1ba4fcd632ae0c41f1c5fb9c3acdaa123d1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.13.688250/10.1101_2025.11.13.688250__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.13.688250",
+      "report_content_hash": "b8aad3a28372f9071d09b47a738016a9b503038206433051d6d02d1608ec9097"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688483/10.1101_2025.11.14.688483__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688483",
+      "report_content_hash": "fcb0eaecb14e07c7a1cc995f1284fe4d1ff325b93f2e0bfa0e28881ac5604edc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688492/10.1101_2025.11.14.688492__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688492",
+      "report_content_hash": "e87b8755cc5d95b8b38ff49a8f40b6caaa3851335e0b24933a26e2b9b747b1bc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688503/10.1101_2025.11.14.688503__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688503",
+      "report_content_hash": "15ace21e4c1f335ca74c22dbd5b92d20e0644b0539667bbdb9a42fa0c3d58774"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.14.688545/10.1101_2025.11.14.688545__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.14.688545",
+      "report_content_hash": "c794cbd162efc83b5a81bab64b8ef62b2e624b914a2d473766cc3ca4cdc16e95"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.17.688763/10.1101_2025.11.17.688763__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.17.688763",
+      "report_content_hash": "20feebc2e632c3717182538978a5e7126f5c44c1279bfe2df71d770b0d0f8067"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.17.688789/10.1101_2025.11.17.688789__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.17.688789",
+      "report_content_hash": "50bd07ef404dc68d702365b1f19a009b2c11bab3291fde7909b906184d7c1b45"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689018/10.1101_2025.11.18.689018__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689018",
+      "report_content_hash": "84c570f515463f940c0bf0e73d633d3bac5569d565e12cc6caea3cf68579c630"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689019/10.1101_2025.11.18.689019__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689019",
+      "report_content_hash": "19c6d8af12a99a5d1ca016ec1429c2c88efb17f3aa2a5efc8598853f2b150721"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689066/10.1101_2025.11.18.689066__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.18.689066",
+      "report_content_hash": "66ab3e6dd1015a141fa4c7f3819f775aab440fbe3ddf53ffa327b712b4c6662f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.19.689290/10.1101_2025.11.19.689290__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.19.689290",
+      "report_content_hash": "5b1498d3111d7db78349a62e92cad2cfda70f94ff5f4987c0c89c763305a56ac"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.688229/10.1101_2025.11.20.688229__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.688229",
+      "report_content_hash": "1b8945fd52200d7d0433950bd3c8229d65f1ac982d5935b4e46a4dbe75e0c6d1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.688662/10.1101_2025.11.20.688662__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.688662",
+      "report_content_hash": "556f70c24148aeddd075488da62cf1c28df9f9b92b829053c7516209cfedac5c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.20.689509/10.1101_2025.11.20.689509__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.20.689509",
+      "report_content_hash": "58d1d6741e35aff013dc4cd662aaa477422f5394cb5261949f3a6430584b9ff8"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.21.689783/10.1101_2025.11.21.689783__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.21.689783",
+      "report_content_hash": "8063651075df2b53ce3bb35ef50840757e80fe647e5571d9ab8fb352016fbba6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.23.690014/10.1101_2025.11.23.690014__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.23.690014",
+      "report_content_hash": "fd2014eaf8cc3d62a4ceb4b4e47b1f3342e60463426ff42794d3e7b69a93511e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.24.690189/10.1101_2025.11.24.690189__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.24.690189",
+      "report_content_hash": "45f047ed69360714d960efb6842af9975f2d52b022c83a99ab9a7f6dd6934246"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.24.690302/10.1101_2025.11.24.690302__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.24.690302",
+      "report_content_hash": "cd8b4bd38f283526fac889b73f7fecb86264f8af3186ee24384e50e940c2850c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690513/10.1101_2025.11.26.690513__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690513",
+      "report_content_hash": "01c1613866608adadce18b55425eb957eca09ab0df9209f1794845fef9751533"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690746/10.1101_2025.11.26.690746__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690746",
+      "report_content_hash": "55ad5782e006b8313a9b2674f6c550f310b7bde01868bb6ec5a3270af02eef8b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690781/10.1101_2025.11.26.690781__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690781",
+      "report_content_hash": "41507bd30137d130c7f76af4edf1a8e7dc7469ca0842dc1287fa81d9104daee3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690794/10.1101_2025.11.26.690794__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690794",
+      "report_content_hash": "dc8a6b84589976fb8c034a185e862cffee0d114093811bf4aa64676fe3fea5ae"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690820/10.1101_2025.11.26.690820__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.26.690820",
+      "report_content_hash": "20292daea08805168ebde22beeae9d919e955275296116b70bdbdf9f207906fc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.27.691004/10.1101_2025.11.27.691004__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.27.691004",
+      "report_content_hash": "de96b679725e6e7407291ca60c44f80c5f89c246062505d5e5d0c6b97ca1d09c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.28.691168/10.1101_2025.11.28.691168__stage1__v0.2.5.json",
+      "canonical_id": "10.1101/2025.11.28.691168",
+      "report_content_hash": "9135f06d1c3ec48f161205fd4b612eb88e056485c5703209ae3c339c711d6a48"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.11.29.691288/10.64898_2025.11.29.691288__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.11.29.691288",
+      "report_content_hash": "115b7186c9ec720d9ad1c2c7dd60e74350c67f83ebc4ba4af345cefea5becdee"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.11.30.691444/10.64898_2025.11.30.691444__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.11.30.691444",
+      "report_content_hash": "0ac998fb93867e62e97b7a9ff3f45c7972225d01a88ef9c168b2bd5df13da124"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.686997/10.64898_2025.12.01.686997__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.686997",
+      "report_content_hash": "4a9f621066a4da7cb5bfbe46ff87e6c8a1dd51f9dbb8958651e8afd724dc84d5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.691511/10.64898_2025.12.01.691511__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.691511",
+      "report_content_hash": "a6338b97e1e8f7636079631d90cc25f7e8d95be02e828056bfa1407674863446"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.01.691737/10.64898_2025.12.01.691737__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.01.691737",
+      "report_content_hash": "4e7cd301316c793510dba1b1817dea57c57440c0cdf125df29a27935697bad8e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.02.691879/10.64898_2025.12.02.691879__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.02.691879",
+      "report_content_hash": "b4c95bf918f1f8aed69f01a16e1e69d9acc9ae4b9f783e376b5854eaf6c40e28"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.02.691900/10.64898_2025.12.02.691900__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.02.691900",
+      "report_content_hash": "1cd7f846fa99c71ac8b138ad2aca856e9131fe97b5adb77556938b87690468a7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.691750/10.64898_2025.12.03.691750__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.691750",
+      "report_content_hash": "f187f8fc9483ef7e0b0f8652b0679dc979d3847d03535ca64ed2829075b6ff39"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.692181/10.64898_2025.12.03.692181__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.692181",
+      "report_content_hash": "288fc8e4759b2d158034e25b7a9e1e9c3666659e92b3d3416377a0480a1bfc83"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.03.692186/10.64898_2025.12.03.692186__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.03.692186",
+      "report_content_hash": "f14b0ebc999d69c17e321ddf2f57d9e8e399992ea8c74dfa01e72379f3ff93b5"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692271/10.64898_2025.12.04.692271__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692271",
+      "report_content_hash": "ec3e1d9c4b2f72995aa6d34cb936a32701583bf2657fb7f406bdca592617b037"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692280/10.64898_2025.12.04.692280__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692280",
+      "report_content_hash": "4e46ca64f4f597731dcdcb934f8d46fe2637d7150d4369c03bf2e15c95c6330c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.04.692404/10.64898_2025.12.04.692404__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.04.692404",
+      "report_content_hash": "8c3da7e7cc788a1b199dd13fe8f35f33c54b871417f4a04411b0bfe2fde87881"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.05.692270/10.64898_2025.12.05.692270__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.05.692270",
+      "report_content_hash": "0f777cfea126ac70431464a1251e546d8f4a143eda83879edb890abdb5997edb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.05.692650/10.64898_2025.12.05.692650__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.05.692650",
+      "report_content_hash": "9bf9a2d9c4a9bed3f7abc0941ea3ba05865adf80086622e54f8511fafc697b52"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.06.692715/10.64898_2025.12.06.692715__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.06.692715",
+      "report_content_hash": "44e68906863c0e27a29b023ca265babad6f3773c9f8f2ce53108ae05385bdebb"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692553/10.64898_2025.12.07.692553__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692553",
+      "report_content_hash": "f139fa112720b2e5c8ad94add40a8fb667e37ba80e381769b95b38aa203c30ff"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692584/10.64898_2025.12.07.692584__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692584",
+      "report_content_hash": "231ab6890cf499c3f3b1ef661d12dc6b0f319487786bdcc2f1aecd21292819a9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.07.692843/10.64898_2025.12.07.692843__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.07.692843",
+      "report_content_hash": "1d54b2f9f9f4c15b211433ec477e5cbbf3302f57d9dbc7c159fdb5318e4ec733"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692646/10.64898_2025.12.08.692646__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692646",
+      "report_content_hash": "f4d3bc7afc9a9ec0e167b0ed25ca99a6dcdeac6139843a1535733277bdd71a07"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692692/10.64898_2025.12.08.692692__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692692",
+      "report_content_hash": "6bf799798ac2a5c0548b1c46d318ddfe5eab7263447169ee8ea53681de221183"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.692949/10.64898_2025.12.08.692949__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.692949",
+      "report_content_hash": "e2dd82907cb4e6d024389a997ec4c6eefd3ef1cbc087e4d424234b79f4b59d84"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.08.693002/10.64898_2025.12.08.693002__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.08.693002",
+      "report_content_hash": "ed5c971dc860811d5a31ea5b28cdafae662d0c011ad1a3690e936ce86d86fddc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.691744/10.64898_2025.12.09.691744__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.691744",
+      "report_content_hash": "571f154b3ef8672e8de7903bf7d86d002268225083e4e8b02735151d2c4cf545"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693136/10.64898_2025.12.09.693136__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693136",
+      "report_content_hash": "1dbc4ceb09765e04495f4221877a2236502b142266fa48b24c242c215fbeb23d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693182/10.64898_2025.12.09.693182__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693182",
+      "report_content_hash": "3fc31d5d7f6bf4c7bf2fcdf446e6567ec762cd557419d23f2c192ea565302e94"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693192/10.64898_2025.12.09.693192__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693192",
+      "report_content_hash": "cd8a9005fcbbca7aa583acd815a0eaf87505900c2f7228ace6f48c01b71bf73f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.09.693261/10.64898_2025.12.09.693261__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.09.693261",
+      "report_content_hash": "563cecc843230277adf25a306bfc60f0f9ddd50e7353849e3db674884729acdd"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693473/10.64898_2025.12.10.693473__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693473",
+      "report_content_hash": "bf8c4405292da7e42fb9f3e6248e812e2061ba3e799dd107676de0d76f175c1e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693495/10.64898_2025.12.10.693495__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693495",
+      "report_content_hash": "0298c0d0c5bba086715cb7b7b9428195f648ff5de66658f1e37c225b43f54ad1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693501/10.64898_2025.12.10.693501__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693501",
+      "report_content_hash": "99833b9dfc417e085158585aaeda57c8b90544c918c70690eb2b2855ac0ed7d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693515/10.64898_2025.12.10.693515__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693515",
+      "report_content_hash": "5bb5d3fe92f018b976885e24a487daf0cdbb0ea09570f20a6f6a640b06dd99d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.10.693604/10.64898_2025.12.10.693604__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.10.693604",
+      "report_content_hash": "cba7dee13d30ce5ae5dc2048cf7794fefd1136114712a1dec5c50a8383451b5f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.11.693713/10.64898_2025.12.11.693713__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.11.693713",
+      "report_content_hash": "ebca3110cc65a85cf0ee09ee24489e7743a005d1f7edd66cecdc98817acdf9e0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693252/10.64898_2025.12.12.693252__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693252",
+      "report_content_hash": "0d3d77ac7b4e63730ed70c8ab7eaa02c54dad37728595beef3c68b1eb6a802a1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693928/10.64898_2025.12.12.693928__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693928",
+      "report_content_hash": "4dd9ce294fb7148094507238ce6f75c6221df4ac78f1a824417df0b8f6eebfca"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.693949/10.64898_2025.12.12.693949__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.693949",
+      "report_content_hash": "874475e9b690d659b417a0394861780990aaa33da5a786d588ef25d4aee99492"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.694004/10.64898_2025.12.12.694004__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.694004",
+      "report_content_hash": "04023cebba5566c8a65d8075a3d2e63fc71e65ef55f66a8269169f3dd403194d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.12.694020/10.64898_2025.12.12.694020__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.12.694020",
+      "report_content_hash": "88143169ebf352381ced54d34457677e2346ac544261168ad8dff0e9ac3270d9"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694519/10.64898_2025.12.16.694519__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694519",
+      "report_content_hash": "3addfaced6e8c1eb0292c4a570eca475ee0e03645c5ce928870ac4a915b652d7"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694545/10.64898_2025.12.16.694545__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694545",
+      "report_content_hash": "fe940b715f95d82a322b6e2837b023a914c0393c8318ab2440d5ca95c8efa5de"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694674/10.64898_2025.12.16.694674__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694674",
+      "report_content_hash": "3901ffd7e701b39d9432427b7ed6a08f325b6086b916c8ab6f5fd0fa69efad0c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694773/10.64898_2025.12.16.694773__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694773",
+      "report_content_hash": "a51e6fb2c36dbc5ffed95f90150e1364c377bea2c7b96f083983b03e7013d577"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.16.694779/10.64898_2025.12.16.694779__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.16.694779",
+      "report_content_hash": "c71edd38b1ba0283de5819f4a9647177520df05ecea6c2b31d46e3fe547daee0"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.18.695158/10.64898_2025.12.18.695158__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.18.695158",
+      "report_content_hash": "10e4caaf8372168e186a5564401a9a0a8fffb6d9a936e0d21bfc797fba787f3c"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.18.695196/10.64898_2025.12.18.695196__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.18.695196",
+      "report_content_hash": "531cf55b2c50208b40374fddbd4c726c75e3910feb53eae32b753d375dc71036"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.693868/10.64898_2025.12.19.693868__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.693868",
+      "report_content_hash": "5d69180642d713f7feaace3ad86009bd796ad5ce6b282b1fd6b32c7c58ebf905"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.694255/10.64898_2025.12.19.694255__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.694255",
+      "report_content_hash": "9131db3d68e3829f236609f18c5c22a17989a30f4c6e11635f55d260b804fc52"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.695525/10.64898_2025.12.19.695525__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.695525",
+      "report_content_hash": "c8b5c8d660cb8732f6ece2edadad3b0989e680e5697aef248405e5fbda06f14d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.19.695579/10.64898_2025.12.19.695579__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.19.695579",
+      "report_content_hash": "20332a5a65ca7b9fdf5315c903d2174e84cb3c76c419e74949d826f640fa68dc"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.20.695731/10.64898_2025.12.20.695731__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.20.695731",
+      "report_content_hash": "7a3a7f5b3777bd3eeda39567baa42d5ecf3263896b2839faa7b1f8f1240084a3"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.20.695734/10.64898_2025.12.20.695734__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.20.695734",
+      "report_content_hash": "ba7f95fe73c788afbb3b5816fd51c347495d5387cd2e3c57d6a5b617fd283fa1"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.21.694342/10.64898_2025.12.21.694342__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.21.694342",
+      "report_content_hash": "08ff648a9afcbfcb1d78b555f24717a58e830c2bc9198bc1ba8c8860cd9367a6"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.695871/10.64898_2025.12.22.695871__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.695871",
+      "report_content_hash": "bafe6e050ac5bff5884204b3d17b67e931710b64b19452a5bae4f0522079a863"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.696044/10.64898_2025.12.22.696044__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.696044",
+      "report_content_hash": "65ee43b9037416c079bb7a55ac2eb8683236143a11173a2e0f24c0b865c1260e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.22.696056/10.64898_2025.12.22.696056__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.22.696056",
+      "report_content_hash": "9ae240eb56377ff1015848a46ca5b4e3914ffe75e3c50a6b5367f98e2ed1ee9d"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.23.696241/10.64898_2025.12.23.696241__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.23.696241",
+      "report_content_hash": "4d409c34f4c5e60c9882fabb1d588a2ead9c30c8348dbca7b94e9c76f14a3e01"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.26.690930/10.64898_2025.12.26.690930__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.26.690930",
+      "report_content_hash": "3afc7d9e3e526af96701198126a8692ae021dca7eeba73809300e235d3d2557e"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.26.695997/10.64898_2025.12.26.695997__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.26.695997",
+      "report_content_hash": "2d3d15bdc15f0167a6e982a0d34cbebdd186491361a2a430dfdd5e451cb9e73f"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.29.696801/10.64898_2025.12.29.696801__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.29.696801",
+      "report_content_hash": "e9b93d0f16417cc3e534336d347546fb509540d2fec95ad249097ef4c88ca169"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.30.695215/10.64898_2025.12.30.695215__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.30.695215",
+      "report_content_hash": "03b99ce879a022971d6173c208bc22560f3fe836f6ed987094f36a14cab6346b"
+    },
+    {
+      "file": "survey_v1_1/collection/by_paper/10.64898_2025.12.30.696765/10.64898_2025.12.30.696765__stage1__v0.2.5.json",
+      "canonical_id": "10.64898/2025.12.30.696765",
+      "report_content_hash": "3e35e735d8c646336136e46bfcb95c5351960fdd0289dcdce26507c8d20bef61"
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.06.652471",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.06.652471v1",
+      "biorxiv:2025.05.06.652471v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational integrative APA analysis identifying DDX55 as a 3'UTR-isoform regulator: RNA-seq processing of >500 ENCODE RBP-depletion experiments (BBDuk trimming, STAR v2.7.1a alignment, DaPars v0.9.1 tandem-PAS/dPDUI shift calling) + updated eCLIP peak calling (CLIPper v1.2.1 with a custom 500-nt downstream-extended annotation) + expressed-3'UTR/PAS-proximal binding analysis (Salmon v0.14.1, APASdb overlap) + motif discovery (Homer findMotifsGenome.pl) + targeted 3'end (QuantSeq) processing (Cutadapt, STAR v2.6.1a, custom cluster/PAS-assignment and internal-priming heuristics). Wet-lab siRNA knockdown / western / 3'RACE / QuantSeq library prep are validation (W), out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from biorxiv v1 JATS Methods prose (fetched via curl; WebFetch was 403-blocked). CRITICAL LIVENESS: the 'Availability of data and materials' statement says processed data AND 'code to reproduce figures ... will be published after peer review', and raw/processed 3'end-seq data 'deposited at GEO and will be available after peer review'. Therefore NO author code repository is currently public (no GitHub/GitLab/Zenodo URL anywhere in the paper) and the newly generated 3'end-seq data is embargoed with no accession disclosed. Third-party ENCODE inputs and APASdb are public. Standard open tools scored code=1 (tool itself available); author custom glue/figure/clustering code scored code=0 (embargoed). Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "BBDuk (BBTools suite) adapter removal + quality trimming of ENCODE RNA-seq fastq (ktrim=r k=23 mink=11 hdist=1 minlength=35 tpe tbo qtrim=r trimq=20 qin=33) — no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "FastQC post-trim QC confirmation — no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "STAR v2.7.1a alignment to hg38 with Ensembl v94 splice junctions (--alignSJoverhangMin 8; uniquely mapped reads retained)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "DaPars v0.9.1 tandem-PAS shift detection on hg38 RefSeq (Coverage_cutoff=30; changing = |dPDUI|>=20% & adj-p<0.05; non-changing = |dPDUI|<5% & adj-p>0.05)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "CLIPper v1.2.1 eCLIP peak calling on ENCODE read-2 bams (--bonferroni --superlocal --threshold-method binomial) using a CUSTOM 500-nt downstream-extended gff annotation (modified annotation files not released)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked", "custom-annotation-not-released"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Samtools view extraction of read 2 (flag 128) from ENCODE eCLIP bams — no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Salmon v0.14.1 quasi-mapping quantification of control samples on Ensembl v94 transcriptome (k-mer=31); expressed transcripts >=1 TPM median across controls",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Homer findMotifsGenome.pl motif discovery under HepG2 DDX55 IDR peaks (-p 4 -rna -S 10 -len 4,5,6,7,8 -noknown) + sliding-window UGUA/AWUAAA frequency analysis — no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Cutadapt adapter + polyA/polyT trimming of newly generated QuantSeq 3'end reads — no version; input 3'end-seq data embargoed (GEO, released after peer review; no accession)",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["input-data-embargoed"]
+    },
+    {
+      "step_id": "C10",
+      "label": "STAR v2.6.1a alignment of trimmed QuantSeq 3'end reads (--outFilterType BySJout --outFilterMultimapNmax 200 --outFilterMismatchNoverLmax 0.6 --alignIntronMin 20 --alignIntronMax 1000000 --alignSJoverhangMin 8 ...); input 3'end-seq data embargoed",
+      "layer": "C",
+      "axes": { "data": 0, "code": 1, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["input-data-embargoed", "capture-static-only"]
+    },
+    {
+      "step_id": "C11",
+      "label": "Custom 3'end-cluster definition, PAS assignment, internal-priming removal heuristics, binding/functional-target integration, and figure-reproduction code — author code embargoed ('will be published after peer review'); input data embargoed",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["author-code-embargoed", "input-data-embargoed"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 4,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 11,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/11 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 4/11 computational steps (the version-pinned standard-tool steps on public ENCODE data: STAR v2.7.1a, DaPars v0.9.1, CLIPper v1.2.1, Salmon v0.14.1). 7/11 steps cap at NI: 4 due to unpinned tool versions (BBDuk, FastQC, Samtools, Homer), and 3 due to embargoed newly-generated 3'end-seq input data and/or embargoed author code (Cutadapt, STAR v2.6.1a-3'end, and the custom clustering/integration/figure step). No env lockfile or container is claimed; exact pins are partial with no closure, so no step exceeds RI even under stage2. Author pipeline code and processed data are explicitly promised only 'after peer review' — currently no code repo exists.",
+    "coverage": "11 computational steps assessed from biorxiv v1 Methods prose. 4 wet-lab validation steps (siRNA transfection/cell culture, western/fractionation, QuantSeq library prep+sequencing, 3'RACE) counted (W) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "Whole analysis pipeline (Availability of data and materials statement)",
+      "missing": "No author code is currently public. Statement: 'Processed data ... and code to reproduce figures ... will be published after peer review.' No GitHub/GitLab/Zenodo/Software Heritage URL appears anywhere in the paper. Custom clustering, internal-priming, integration, and figure code are therefore unavailable.",
+      "how_to_close": "Publish the analysis + figure code (with commit/release tag) to a public repo (GitHub + Zenodo DOI), including the custom 3'end-cluster/PAS-assignment/internal-priming scripts and the 500-nt-extended CLIPper annotation files."
+    },
+    {
+      "type": 1,
+      "where": "Newly generated QuantSeq 3'end sequencing data (steps C9-C11)",
+      "missing": "Raw and processed 3'end-seq data 'deposited at GEO and will be available after peer review' — the GEO accession (GSE...) is not disclosed and the data is embargoed, so the DDX55-knockdown analysis input cannot be obtained.",
+      "how_to_close": "Release the GEO Series accession publicly and cite it verbatim in the data-availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (no environment capture)",
+      "missing": "No conda/env spec, no lockfile, no container. Only 4 tools carry exact version pins (STAR v2.7.1a & v2.6.1a, DaPars v0.9.1, CLIPper v1.2.1, Salmon v0.14.1) — partial, no dependency closure.",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or a container digest pinning every tool plus dependencies per platform."
+    },
+    {
+      "type": 3,
+      "where": "Unversioned tools (BBDuk/BBTools, FastQC, Samtools, Homer, Cutadapt)",
+      "missing": "No version numbers recorded for these tools; steps relying solely on them cannot reach RI.",
+      "how_to_close": "Record exact version (and build) for each tool in Methods or a versions table."
+    },
+    {
+      "type": 1,
+      "where": "ENCODE RNA-seq / eCLIP inputs (Supplementary Tables 1 and 3)",
+      "missing": "Exact ENCODE experiment/file accessions are relegated to supplementary tables (not enumerated in prose); the analysis-defining sample selection cannot be verified from the text alone.",
+      "how_to_close": "N/A for readiness if supplementary tables enumerate accessions; verify at stage2 that the tables list machine-readable ENCODE accessions."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: HepG2 siRNA transfection/cell culture, nuclear-cytoplasmic fractionation, western blotting (anti-DDX55/GAPDH/lamin-B1), QuantSeq REV V2 library prep + sequencing (Lexogen), 3'RACE",
+      "missing": "Physical validation steps are out of scope for computational reproduction (OOS); counted in W (4), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the (currently embargoed) deposited 3'end-seq reads are the reproducible entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — 'code to reproduce figures ... will be published after peer review'. No GitHub/GitLab/Zenodo/Software Heritage URL present in the paper.",
+      "http_status": "n/a (no author code repository exists yet)",
+      "checked_at": "2026-07-23",
+      "network_context": "availability statement parsed from biorxiv v1 JATS XML (curl 200; WebFetch 403-blocked)"
+    },
+    {
+      "artifact": "data accession: newly generated 3'end (QuantSeq) sequencing — 'deposited at GEO and will be available after peer review'; accession NOT disclosed, EMBARGOED",
+      "http_status": "n/a (embargoed, no accession)",
+      "checked_at": "2026-07-23",
+      "network_context": "availability statement, prose-only (stage1)"
+    },
+    {
+      "artifact": "data input: ENCODE RNA-seq + eCLIP experiments (encodeproject.org; listed in Supplementary Tables 1 & 3) — public portal",
+      "http_status": "not fetched (portal, per-accession in supp tables; prose-only stage1)",
+      "checked_at": "2026-07-23",
+      "network_context": "public ENCODE portal referenced in Methods prose"
+    },
+    {
+      "artifact": "data input: APASdb human liver / lymph-node 3'end read counts — public database",
+      "http_status": "not fetched (public DB referenced in prose; stage1)",
+      "checked_at": "2026-07-23",
+      "network_context": "APASdb referenced in Methods prose"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "bf0a8af46f0ad8f30bac9329f54219be75d845e2d5ad35f3feca61d5a5c03d10",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

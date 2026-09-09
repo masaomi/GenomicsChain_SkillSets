@@ -1,0 +1,270 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "21d149af0d8f771f47042c625dac464c372ea80140cffb8184f30a8f29bc677a",
+  "canonical_id": {
+    "value": "10.1101/2025.10.06.680641",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.06.680641v1",
+      "biorxiv:2025.10.06.680641v1"
+    ]
+  },
+  "paper_type": "hybrid",
+  "reproduction_target": "Standards/tool paper (GA4GH refget Sequence Collections, 'seqcol') carrying an embedded, self-contained computational analysis that supplies all Results. The tool half comprises the specification (schema, RFC-8785/JCS + GA4GH digest encoding algorithm, retrieval/comparison API) and its implementations (the refget Python package with a Rust digest core and a FastAPI server; the EVA Java/PostgreSQL server; an Omnipy client; the refget.databio.org deployment with the SCIM and SCOM web modules). The reproduction target is the analysis half: download FASTA files for 60 human and 36 mouse reference genomes from the providers enumerated in Table 1 / Supplemental Tables S1-S6, compute seqcol digests with the encoding algorithm, run the pairwise /comparison function over all pairs for four attributes (names, lengths, sequences, name_length_pairs), derive Jaccard similarity and OPA/OPB overlap proportions and the resulting subset/superset relationships, and compute per-sequence presence across major reference versions. Reproduction target = Figures 2-6 and Supplemental Figures 1-3, plus the tabulated results in Supplemental Files 1-4. There are no wet-lab steps (W = 0).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis-invocation, derived from the bioRxiv v1 JATS XML full text (fetched by curl, HTTP 200, 115,704 bytes; WebFetch returned HTTP 403 on both the .source.xml and the .full landing page). The Methods section 'Analysis comparing common reference genomes' is two short paragraphs ('Data sources' and 'Analysis') and names no software tool, no version, and no command line for the analysis itself; the only named implementation anywhere in the paper is the refget Python package cited by bare repository URL in Data availability. Steps are therefore cut at the level of the named analysis operations in that prose (download -> digest -> pairwise compare -> Jaccard/OPA/OPB -> sequence-presence), not at the level of named executables, because no executables are named. Figure generation (Figs 2-7, density maps, median-difference plots, bar charts) is not counted as a separate step because no plotting tool, language or script is named anywhere; it is recorded as a gap instead. The specification/implementation half of the paper (spec text, reference implementation, EVA server, Omnipy client, Ensembl deployment, SCIM/SCOM web modules) describes software artifacts rather than a reproducible analysis and is not step-listed; the compliance test suite shipped with the package is noted in liveness but is not a paper-result reproduction step. Prose discrepancy recorded verbatim and not silently reconciled: Methods say 'we first collected 68 human and 36 mouse reference genomes' while Results and the abstract analyse '60 human and 36 mouse reference genomes'; no exclusion criterion is stated.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Acquisition of the reference genome corpus: 'We first collected 68 human and 36 mouse reference genomes commonly used for sequencing analysis from a variety of different data distributors (Table 1, S1-S6). We included primary assemblies, patches, and variations containing decoy sequences.' Providers include Ensembl, ENA, DDBJ, GENCODE, NCBI, UCSC and iGenomes; sub-corpora are UCSC hg19 derivatives (S3) and 9 NCBI GRCh38 patches p0-p14 (S4). No download URLs, retrieval dates, file names or checksums are given in the paper prose, and no download script exists.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "no-fetch-script",
+        "inputs-unpinned-no-checksum",
+        "corpus-count-discrepancy-68-vs-60"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Seqcol digest computation: 'We downloaded FASTA files, processed them using the refget Sequence Collections encoding algorithm'. The algorithm is specified normatively (canonical seqcol object of names/lengths/sequences vectors -> RFC-8785 JCS per inherent attribute -> GA4GH digest -> JCS over the resulting object -> final digest) at https://ga4gh.github.io/refget, and a reference implementation exists at https://github.com/refgenie/refget, but the paper names no package version, commit, release tag or PyPI pin, states no schema/inherent-attribute configuration for this run, and provides no driver script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "repo-cited-bare-url",
+        "no-version-pin",
+        "analysis-driver-absent"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "All-pairs comparison: 'then applied the comparison function to compare each pair of genomes. We compared four attributes: names, lengths, sequences, and name-length-pairs.' This yields 1770 pairwise human comparisons (Fig. 5E) and 630 mouse comparisons (Supp. Fig. 2E), plus the 15-pair and 10-pair provider subsets. Whether the local library or the /comparison endpoint of a deployed server was used is not stated; no server instance, snapshot date or invocation code is given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "local-vs-service-ambiguous",
+        "no-version-pin",
+        "analysis-driver-absent"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Similarity scoring and relationship inference: 'for each attribute, we computed: 1) the Jaccard similarity (Figure 1E) ... and 2) OPA and OPB scores, which provide an asymmetrical overlap proportion with respect to either genome independently (Figure 1F). Together, these scores allowed us to define the relationships, such as subset/superset, between two reference genomes for each attribute (Figure 1G).' The formulas are given only graphically in Fig. 1E-F and the relationship table only as Fig. 1G; the numeric thresholds separating 'low', 'medium' and 'high' similarity used throughout Results, and the cut-offs in the Fig. 1G relationship table, are never stated in prose. No scoring code is provided.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "thresholds-unspecified",
+        "figure-only-definition",
+        "analysis-code-absent"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Sequence-presence analysis across reference classes: 'We divided the reference into major versions (hg38, hg19, etc.) and assessed the frequency of each sequence in the class' (4775 hg38, 600 hg19, 51 hg18 sequences; mouse mm39 607, mm10 478, m38 239, mm9 35, m37) and the derived duplicate/identity/subset percentages reported in Fig. 5H-I and Supp. Fig. 2H-I (e.g. '28% were duplicates' for human, 22% for mouse). No tool, script, class-assignment rule or duplicate-definition is stated; the class assignment of each of the 96 references is not tabulated in the prose.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "class-assignment-rule-unspecified",
+        "duplicate-definition-unspecified",
+        "analysis-code-absent"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 5,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/5 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/5 (0%) at Stage 1: no computational step reaches even the RI ceiling. All five steps cap at NI, and the cap is driven by three independent zeros that no code inspection could lift. (i) Code: the repository cited in Data availability (https://github.com/refgenie/refget) is the reference implementation of the standard, not the analysis of this paper; no script, notebook or workflow that downloads the 96 FASTA files, drives the digest computation, runs the 2400 pairwise comparisons, computes Jaccard/OPA/OPB or produces Figures 2-7 is deposited or linked anywhere. Steps C1, C4 and C5 therefore score code=0 outright; C2 and C3 score code=1 only because a public library implementing the underlying operation exists. (ii) Version: the paper pins nothing at all - no package version, no release tag, no commit, no interpreter version, no provider snapshot date. The repository does publish releases (v0.8.3 through v0.11.0 exist), but the paper cites it by bare URL, so version=0 for every step and the capture_claim is floating rather than release_snapshot. (iii) Params: the numeric similarity thresholds behind the 'low/medium/high' language used throughout Results, the Fig. 1G relationship cut-offs, the reference-class assignment rule and the duplicate definition exist only inside figures or not at all, so C4 and C5 score params=0. Data is the one strong axis: all inputs are public reference assemblies from named providers and all computed results are shipped as Supplemental Files 1-4, so data=2 throughout - but public-in-principle is not pinned-in-practice, since no URLs, retrieval dates or checksums are given for genomes (UCSC hg19 derivatives, NCBI GRCh38 p0 from 2013-12-17 through p14 from 2022-02-03) whose provider-side files can and do change. Note the asymmetry worth recording: this is a paper about content-derived identifiers for exactly this problem, yet its own analysis inputs are identified by provider name and prose description rather than by the seqcol digests it introduces.",
+    "coverage": "5 computational analysis steps assessed from the bioRxiv v1 JATS full-text Methods ('Analysis comparing common reference genomes'). 0 wet-lab steps (W = 0); this is a standards/software paper with a computational demonstration and contains no physical experiment. Computational coverage = 5/5. Not step-listed and therefore outside the denominator: the normative specification itself, the four software implementations (refget Python package with Rust digest core and FastAPI server, EVA Java/PostgreSQL server at github.com/EBIvariation/eva-seqcol, Omnipy client, planned Ensembl deployment), the refget.databio.org service with its SCIM and SCOM web modules, and the package's compliance test suite - these are tool artifacts, not reproduction steps for a stated result. Figure generation is likewise excluded from the denominator because no plotting tool or script is named; it is recorded as gap type 12 instead.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Data availability section and Methods 'Analysis comparing common reference genomes'; whole paper - there is no 'Code availability' section",
+      "missing": "No analysis code exists for the paper's own results. Data availability states only: 'The formal specification is hosted at: https://ga4gh.github.io/refget/ The reference implementation can be found at: https://github.com/refgenie/refget'. That repository is the standard's library and server (its README documents the seqcolapi Docker build and pytest suite, not a paper reproduction workflow); it contains no driver for this study. Absent are: the FASTA acquisition script, the digest-computation driver over the 96 genomes, the all-pairs comparison loop (1770 human + 630 mouse pairs), the Jaccard/OPA/OPB scoring code, the sequence-presence/class-assignment code, and every figure-generation script for Figures 2-7 and Supplemental Figures 1-3. Supplemental Files 1-4 ship the computed results but not the code that produced them.",
+      "how_to_close": "Deposit the analysis repository (acquisition -> digest -> comparison -> scoring -> figures) as a public, archived snapshot (Zenodo DOI or a tagged release), and cite it in a Code availability statement distinct from the reference-implementation URL."
+    },
+    {
+      "type": "2a",
+      "where": "All five computational steps; Data availability",
+      "missing": "No version identifier of any kind appears in the paper. The refget Python package and its Rust digest implementation are cited only as a bare repository URL with no release tag, commit SHA, PyPI version or access date, even though the repository does publish tagged releases (v0.8.3 2025-07-31, v0.9.0 2025-08-13, v0.10.0 2026-01-27, v0.10.1 2026-02-11, v0.11.0 2026-03-19; default branch 'master' last pushed 2026-07-26). The version of the specification in force at analysis time is likewise unstated, which matters because the spec was still moving toward GA4GH approval ('With the standard now approved by GA4GH'). No interpreter (Python/Rust/R) version is given. This is the reason capture_claim is floating rather than release_snapshot, and the reason version=0 rather than 1 on every step.",
+      "how_to_close": "Cite the exact release tag or commit SHA of refgenie/refget used for the analysis, together with the specification version, and record the Python/Rust toolchain versions."
+    },
+    {
+      "type": 7,
+      "where": "Whole computational environment",
+      "missing": "No environment closure is claimed anywhere: no lockfile (requirements.txt, poetry.lock, uv.lock, conda-lock, pixi.lock, Cargo.lock reference), no conda/mamba environment YAML, no renv.lock, no session_info, and no container image or digest for the analysis. The repository README does describe a container build for the deployed service ('docker build -f deployment/dockerhub/Dockerfile -t databio/seqcolapi seqcolapi', pushed to DockerHub by GitHub Actions on release), but that image is the public API server, is referenced by mutable tag rather than digest, is not cited by the paper, and is not claimed as the environment in which the 96-genome analysis was run - so it does not raise capture_claim to container_digest_claimed. Since the paper pins no versions at all, this step is moot for the version axis: version is already 0, not capped-at-1.",
+      "how_to_close": "Ship a lockfile or a digest-pinned container for the analysis environment (Python + refget package + Rust digest core + plotting stack) and declare the platform it was executed on."
+    },
+    {
+      "type": 5,
+      "where": "Methods 'Data sources' (step C1); Table 1 and Supplemental Tables S1-S6",
+      "missing": "The 96 input reference assemblies are identified by provider and human-readable name only ('Ensembl, ENA, DDBJ, GENCODE, NCBI, UCSC', 'iGenomes', 'hg19-p13no-alt', 'GRCh38 p0 ... p14'). The paper prose gives no download URL, no FTP path, no retrieval date and no checksum for any FASTA, and does not report the seqcol digests of its own inputs. Provider-side files at these paths are mutable and several of the analysed derivatives (masked variants, no-alt variants, iGenomes bundles) are not accession-addressable, so a reproducer cannot establish that they obtained the same bytes.",
+      "how_to_close": "Publish, per analysed genome, the exact source URL, the retrieval date, a checksum, and - most directly available to this paper - the seqcol top-level digest, so the corpus is self-identifying under the very standard being introduced."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Data sources' versus Abstract/Results (step C1)",
+      "missing": "Methods state 'we first collected 68 human and 36 mouse reference genomes'; the Abstract and Results analyse '60 human and 36 mouse reference genomes' (Supplemental Table 5; 1770 pairwise comparisons = C(60,2), confirming 60). Eight human references were dropped between collection and analysis with no exclusion criterion stated anywhere in the text. A reproducer cannot reconstruct the analysed set from the prose.",
+      "how_to_close": "State the exclusion criterion and list the excluded references, or correct the discrepancy so that collected and analysed counts agree."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Analysis' and Results throughout (steps C4, C5)",
+      "missing": "Key analysis parameters are absent or figure-only. (i) The 'low' / 'medium' / 'high' similarity bands used to state every qualitative Result ('4 of 6 references have high pairwise similarities', 'the DDBJ reference had medium similarity', 'the ENA had low similarity') have no numeric definition in prose. (ii) The Jaccard and OPA/OPB formulas appear only as diagrams (Fig. 1E-F) and the OPA/OPB-to-relationship mapping only as a table image (Fig. 1G); the cut-offs it uses are not in the text. (iii) The rule assigning each reference to a 'major version' class (hg38/hg19/hg18, mm39/mm10/m38/mm9/m37) for the sequence-presence analysis is unstated. (iv) The definition of 'duplicate' behind '28% were duplicates' (human) and '22%' (mouse) - presumably top-level digest identity, but not said - is unstated, as is the subset criterion behind Fig. 5I.",
+      "how_to_close": "Move the similarity-band cut-offs, the Jaccard/OPA/OPB definitions, the Fig. 1G relationship thresholds, the class-assignment rule and the duplicate/subset definitions into Methods prose as machine-checkable numeric criteria."
+    },
+    {
+      "type": 9,
+      "where": "Steps C2 and C3 - which implementation actually ran",
+      "missing": "The prose says the FASTA files were 'processed ... using the refget Sequence Collections encoding algorithm' and that 'the comparison function' was applied, without saying whether this was the local Python/Rust implementation, the deployed API at https://refget.databio.org, or another implementation, and without a service snapshot date. Since the paper simultaneously reports that multiple independent implementations exist (refget Python package, EVA Java server, Omnipy client, planned Ensembl service), the identity of the executing implementation is load-bearing for reproduction and is not recorded.",
+      "how_to_close": "Name the implementation and mode (local library vs hosted endpoint), its version, and - if a hosted service was used - the service-info response and date of the run."
+    },
+    {
+      "type": 10,
+      "where": "Whole paper",
+      "missing": "No wet-lab steps exist (W = 0). Recorded explicitly so the denominator is not mistaken for a partially-scoped read: the paper contains no physical experiment, so the computational denominator S = 5 covers the entire reproduction target.",
+      "how_to_close": "N/A."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: refget reference implementation, https://github.com/refgenie/refget (Data availability, verbatim: 'The reference implementation can be found at: https://github.com/refgenie/refget')",
+      "http_status": "200 OK - public, active ('Python tools for identification and distribution of reference sequences and sequence collections'; default branch 'master'; last push 2026-07-26). Tagged releases exist: v0.11.0 (2026-03-19), v0.10.1 (2026-02-11), v0.10.0 (2026-01-27), v0.9.0 (2025-08-13), v0.8.3 (2025-07-31). URL-present in paper, but cited by bare URL with no tag or commit.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L (HTTP 200) plus api.github.com/repos/refgenie/refget and /releases; README prose read via WebFetch. README documents a pytest suite and a service container build ('docker build -f deployment/dockerhub/Dockerfile -t databio/seqcolapi seqcolapi', DockerHub push on release via GitHub Actions); it documents no paper-reproduction workflow. This repository is the standard's implementation, NOT the analysis code for this paper."
+    },
+    {
+      "artifact": "specification site: https://ga4gh.github.io/refget/ (Data availability, verbatim: 'The formal specification is hosted at: https://ga4gh.github.io/refget/'; also cited in Methods as the location of the full encoding algorithm)",
+      "http_status": "200 OK - live. No specification version number is cited by the paper.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "deployed service: https://refget.databio.org (public reference API deployment, plus the SCIM comparison-interpretation module at /scim and the SCOM 1-vs-many module at /scom)",
+      "http_status": "200 OK - live. Mutable hosted service; no snapshot date, service-info digest or database version is recorded in the paper.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "third-party implementation: EVA seqcol server, https://github.com/EBIvariation/eva-seqcol (Java + PostgreSQL, cited in Results 'Existing and planned implementations')",
+      "http_status": "200 OK - public repository. Not a reproduction artifact for this paper's analysis; described as under development.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "third-party implementation: Omnipy client, https://omnipy.readthedocs.io/ (cited in Results as an alternative client under development)",
+      "http_status": "200 OK - live documentation site.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    },
+    {
+      "artifact": "planned implementation: Ensembl public seqcol instance on beta infrastructure, https://beta.ensembl.org ('The first release of this service is due in early 2026')",
+      "http_status": "stated-in-paper (future/planned at time of preprint; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "not independently fetched; recorded as a forward-looking statement, not an artifact of the analysis"
+    },
+    {
+      "artifact": "data accessions: none. No GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession appears anywhere in the paper.",
+      "http_status": "none - no accession stated",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text JATS XML read in full (curl of biorxiv .source.xml, HTTP 200, 115,704 bytes). Absence is the finding; no web search was performed to locate a substitute."
+    },
+    {
+      "artifact": "input data: 60 human + 36 mouse reference genome FASTA files from Ensembl, ENA, DDBJ, GENCODE, NCBI, UCSC and iGenomes (Table 1, Supplemental Tables S1-S6)",
+      "http_status": "stated-in-paper (public provider assemblies named in prose and supplemental tables; no URL, retrieval date, checksum or seqcol digest given for any file)",
+      "checked_at": "2026-07-27",
+      "network_context": "not independently fetched; recorded as prose-level identification only. Methods say 68 human genomes were collected, Results analyse 60."
+    },
+    {
+      "artifact": "result artifacts: Supplemental Files 1-4 (all calculated human results, all mouse results, human sequence-presence results, mouse sequence-presence results), hosted as bioRxiv supplementary material",
+      "http_status": "stated-in-paper (attached supplementary files DC1-DC4; not separately fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "declared in Data availability verbatim: 'All calculated results for human references can be found in Supplemental File 1 and all results for mouse references can be found in Supplemental File 2. Human reference sequence presence results can be found in Supplemental File 3. Mouse reference sequence presence results can be found in Supplemental File 4.' These are outputs, not the code that produced them."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "9337f0cd659262a73ac46970f0976fdaa8fb3323331d22658bb8a16b8eb75431",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier3_verdict.schema.json",
+  "title": "GenomicsChain Tier-3 executed-R Verdict Record",
+  "description": "Metadata-only record for a Tier-3 execution verdict. Raw genomic inputs/outputs stay local; only hashes + verdict identity + attestation binding are recorded. record_version 0.3 SPLITS the single `verdict` enum into two independent axes (execution_verdict, comparison_verdict), because 'did it run' and 'did it match' are separate questions and the corpus survey (2026-08-14, n=5 papers passing the Tier-1 gate) found 0/5 papers declaring any comparison target. Under 0.2 a completed run with nothing to compare against was forced into `executed_inconclusive_needs_tolerance`, naming a complete result as an incomplete one. No 0.2 records were ever issued, so 0.3 replaces rather than extends it.",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "jobspec_digest",
+    "execution_verdict",
+    "comparison_verdict",
+    "trust_tier",
+    "result_hash",
+    "environment_provenance",
+    "inputs_provenance",
+    "run_count",
+    "backend_id",
+    "started_at",
+    "elapsed_seconds",
+    "operator"
+  ],
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": ["tier3_verdict"],
+      "description": "Record-type discriminator."
+    },
+    "record_version": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$",
+      "description": "Schema version. 0.3 = two-axis verdict. Pre-1.0; bump freely on field changes."
+    },
+    "mcp_tool_name": {
+      "type": "string",
+      "enum": ["gc_tier3_submit"]
+    },
+    "mcp_tool_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^repro://.+$",
+      "description": "Reproduction subject, e.g. repro://656122/C9 (paper/step)."
+    },
+    "jobspec_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the canonical JobSpec (env lock + data pins + pipeline). The server RECOMPUTES it from the submitted jobspec_json and validates it against the accepted Stage-2 subject. When run_count > 1 this identifies the ONE spec that was repeated, not one digest per run."
+    },
+
+    "execution_verdict": {
+      "type": "string",
+      "enum": ["completed", "env_failed", "data_blocked", "outputs_unusable"],
+      "description": "AXIS 1 — did the job run? completed = terminated successfully with a non-empty output set. env_failed = the environment or the command failed. data_blocked = the declared inputs could not be obtained. outputs_unusable = it terminated but produced nothing usable. This axis says NOTHING about whether the result matches anything."
+    },
+    "comparison_verdict": {
+      "type": "string",
+      "enum": ["no_target_declared", "match_exact", "match_normalized", "mismatch", "not_attempted"],
+      "description": "AXIS 2 — did the result match a declared target? no_target_declared = the paper publishes no checksum or nominated artifact, so there was nothing to compare against (the COMMON case: 0/5 in the 2026-08-14 survey). match_exact = byte-identical to the declared target. match_normalized = identical after the comparator's declared normalisation (e.g. archive containers unpacked, mtimes ignored). mismatch = a target existed and the result differed. not_attempted = execution did not reach the comparison step."
+    },
+
+    "environment_provenance": {
+      "type": "string",
+      "enum": ["declared_container", "declared_lock", "declared_tools", "authored_by_operator", "none"],
+      "description": "WHOSE environment ran. declared_container = a container image digest the paper declared. declared_lock = an environment file (conda YAML etc.) the paper declared. declared_tools = a tool+version list the paper declared, resolved by the runner. authored_by_operator = the operator built an environment the paper did not supply — a certificate MUST NOT present this as 'the declared environment'. none = no environment was pinned. Not a quality score: it records who is accountable for the environment."
+    },
+    "inputs_provenance": {
+      "type": "string",
+      "enum": ["public_accession", "archive_doi", "controlled_access", "operator_supplied", "unknown"],
+      "description": "WHERE the inputs came from. public_accession = a public repository accession (ENA/GEO/SRA). archive_doi = a deposited archive (Zenodo etc.). controlled_access = an application-gated source (UK Biobank, dbGaP) — a third party cannot repeat the run. operator_supplied = the operator provided inputs the paper did not publish. unknown = not determined."
+    },
+
+    "run_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many independent executions of the same JobSpec were performed. 1 establishes only that it ran. >=2 additionally establishes whether repeated execution yields the same result — see self_consistency. Cost scales linearly with this number, so it is the operator's choice, not a fixed policy."
+    },
+    "self_consistency": {
+      "type": "object",
+      "description": "Present only when run_count >= 2. Reports whether the repeated runs agreed. A certificate states the NUMBER OF RUNS, never the words 'stable' or 'deterministic': the reader decides what N runs are worth.",
+      "required": ["runs", "all_identical", "comparator_id"],
+      "properties": {
+        "runs": { "type": "integer", "minimum": 2 },
+        "all_identical": {
+          "type": "boolean",
+          "description": "True when every run produced the same result under comparator_id."
+        },
+        "comparator_id": {
+          "type": "string",
+          "description": "Comparator used for the run-to-run comparison. Note this may differ from the paper-target comparator."
+        },
+        "run_result_hashes": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "description": "Per-run result_hash, in run order."
+        },
+        "first_divergence": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "First observed difference between runs, when all_identical is false."
+        },
+        "variation": {
+          "type": "string",
+          "enum": ["same_environment", "distinct_environments"],
+          "description": "Whether the repeats varied the environment. same_environment detects pipeline-internal nondeterminism only; distinct_environments additionally detects environment dependence."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "trust_tier": {
+      "type": "string",
+      "enum": ["self_reported", "peer_verified", "hardware_attested"],
+      "description": "Enforceable guarantee tier. MVP: server enforces self_reported = a non-repudiable signed assertion of a CLAIMED run; execution NOT independently verified."
+    },
+    "result_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over the sorted canonical list [{relative_path, sha256, size_bytes}] of fetched outputs, RECOMPUTED locally by the runner. Not the backend-reported hash. When run_count >= 2 this is the first run's hash; the rest are in self_consistency.run_result_hashes."
+    },
+    "backend_result_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Optional backend-reported result hash. Divergence from result_hash -> execution_verdict env_failed (transport/backend tamper)."
+    },
+
+    "expected_output": {
+      "type": "object",
+      "description": "OPTIONAL. Absent when comparison_verdict is no_target_declared, which is the common case. Present only when a comparison target exists.",
+      "required": ["target", "sha256", "source"],
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "\"file:<relative_path>\" for a single output file, otherwise the aggregate result tree."
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "source": {
+          "type": "string",
+          "enum": ["paper_declared", "llm_extracted", "operator_supplied"],
+          "description": "Provenance of the comparison target. Only paper_declared with a resolvable citation backs a leaderboard verdict."
+        },
+        "source_citation": {
+          "type": "string",
+          "description": "DOI / supplementary-table / figure reference the hosted side can spot-check."
+        },
+        "extractor_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "validated_by": {
+          "type": ["string", "null"],
+          "description": "Independent validator identity. null = unvalidated."
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected_output_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "OPTIONAL top-level copy of expected_output.sha256, part of the signed identity when a target exists."
+    },
+
+    "comparator_id": {
+      "type": "string",
+      "description": "Comparator used against the declared target. Absent when no target was declared."
+    },
+    "comparator_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "backend_id": {
+      "type": "string",
+      "enum": ["thoa", "aws_ec2", "local", "aws_tee"],
+      "description": "Execution backend that produced the result."
+    },
+    "input_files": {
+      "type": "array",
+      "description": "OPTIONAL, HASHES-ONLY.",
+      "items": {
+        "type": "object",
+        "required": ["sha256"],
+        "properties": {
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "relative_path": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "output_files": {
+      "type": "array",
+      "description": "OPTIONAL, HASHES-ONLY.",
+      "items": {
+        "type": "object",
+        "required": ["sha256"],
+        "properties": {
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "relative_path": { "type": "string" },
+          "size_bytes": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "container_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Digest of the container image that ran, when environment_provenance is declared_container. Recorded at execution time: registry tags move (measured 2026-08-17 — a December-2025 preprint's image had been re-pushed that morning), so the tag alone does not identify the run."
+    },
+    "result_evidence_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the Tier-3 result bundle (backend outputs, jobspec digest, output file list)."
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256(canonical_json({digest_subject_hash, signed_identity, operator_pubkey})). Recovery lookup key (INV-10)."
+    },
+    "leaderboard_eligible": {
+      "type": "boolean",
+      "description": "Server-set eligibility CLAIM. Requires execution_verdict=completed AND comparison_verdict in {match_exact, match_normalized} AND expected_output.source=paper_declared with a signed source_citation. DELIBERATELY LEFT UNREACHABLE for papers that declare no target: the strong claim is not loosened to make the leaderboard non-empty. Under trust_tier=self_reported it remains a signed self-claim, not a verified fact."
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total across all runs when run_count >= 2."
+    },
+    "backend_metadata": {
+      "type": "object",
+      "description": "Optional backend-specific fields (thoa_job_id, etc.). Not signed.",
+      "additionalProperties": true
+    },
+    "operator": {
+      "type": "object",
+      "description": "Operator identity envelope. Leaderboard-contributing verdicts require signed mode; anonymous is excluded from consensus.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["mode", "pubkey", "signature"],
+          "properties": {
+            "mode": { "enum": ["signed"] },
+            "pubkey": { "type": "string", "pattern": "^ed25519:[A-Za-z0-9+/=_-]+$" },
+            "signature": {
+              "type": "object",
+              "required": ["algorithm", "value", "nonce", "chain_tip_hash"],
+              "properties": {
+                "algorithm": { "enum": ["ed25519"] },
+                "signed_fields": { "type": "array", "items": { "type": "string" } },
+                "value": { "type": "string", "pattern": "^[A-Za-z0-9+/=_-]+$", "maxLength": 256 },
+                "nonce": { "type": "string", "minLength": 32, "maxLength": 128, "pattern": "^[a-f0-9]+$" },
+                "chain_tip_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["mode", "anonymous_id"],
+          "properties": {
+            "mode": { "enum": ["anonymous"] },
+            "anonymous_id": { "type": "string", "pattern": "^anonymous-[a-f0-9]{16,32}$" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["mode", "legacy"],
+          "properties": {
+            "mode": { "enum": ["alpha_legacy"] },
+            "legacy": { "enum": [true] }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

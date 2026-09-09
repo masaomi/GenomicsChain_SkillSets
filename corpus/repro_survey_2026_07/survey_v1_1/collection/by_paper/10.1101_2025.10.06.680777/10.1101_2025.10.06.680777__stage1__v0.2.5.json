@@ -1,0 +1,367 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "0fbc675666ddfd4a97137fa3eb59b55819f521dabefc28d83d0502ae80117e01",
+  "canonical_id": {
+    "value": "10.1101/2025.10.06.680777",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.06.680777v1",
+      "biorxiv:2025.10.06.680777v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Secondary analysis of an existing controlled-access cohort: the Hartwig Medical Foundation database release DR347 (n = 7,011), restricted to the 2,596 patients with post-biopsy treatment and RECIST-annotated clinical response, of whom 2,116 also have bulk RNA-seq. The reproduction target is the full statistical pipeline described in Methods: (i) assemble the response-annotated patient subset from the Hartwig clinical metadata; (ii) derive 2,594 binary clinical/genomic/transcriptomic features from the Hartwig WGS/WTS pipeline outputs (gene and pathway drivers, mutational signatures, chromosomal copy-number summaries, somatic summary metrics, CDR3/VDJ metrics, telomere length, HLA features, genetic immune-escape markers, HRD features, RNA gene-set expression, neoepitope burden); (iii) define 56 treatment/tumour-type cohorts; (iv) run 77,836 univariate Fisher's exact tests and Cox proportional-hazards PFS models across those cohorts; (v) apply Benjamini-Hochberg FDR control separately per test family; (vi) build the four-feature multivariate non-response classifier in the 370-patient immune-checkpoint-inhibitor cohort; and (vii) run the Clopper-Pearson exact cohort-size / power analysis. Reproduction target = Figures 1-2 and Supplementary Figures 1-3, plus the reported counts (56 cohorts, 2,594 features, 77,836 tests, 59 and 149 minimum non-responder events, 890 and 2,249 required melanoma cohort sizes). There are no wet-lab steps performed in this study (W = 0); all sequencing and primary variant calling was carried out upstream by Hartwig Medical Foundation and is cited, not described.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis-invocation, derived from the bioRxiv v1 full text. Retrieval note recorded verbatim because it affects auditability: WebFetch on the JATS .source.xml returned HTTP 403; an unauthenticated curl of that same .source.xml URL returned HTTP 200 but served a DIFFERENT paper (10.1101/2025.10.30.685527, a cattle ssSNPBLUP manuscript) - the bioRxiv early-view source endpoint mis-served content. The assessment was therefore made from the .full landing page (curl, HTTP 200, 211,148 bytes HTML -> 45,995 chars text), which carries the complete Main, Methods, Data availability and Code availability sections for the correct DOI. Steps are cut at the level of the named statistical operations in Methods (cohort assembly -> feature derivation -> cohort definition -> Fisher -> Cox -> FDR -> multivariate classifier -> Clopper-Pearson -> KM/log-rank), because the Methods name essentially no executables: the only named software artifact in the entire paper is the Hartwig analysis pipeline cited as reference 15 (WiGiTS, https://github.com/hartwigmedical/hmftools). No programming language, no package, and no version number of any kind appears in the Methods prose. Upstream Hartwig sequencing and variant calling is step-listed once (C2) as a single cited-pipeline invocation rather than decomposed, since the paper describes it only by its output categories.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Cohort extraction from the Hartwig Medical Foundation database: 'We used data from the Hartwig Medical Foundation database (DR347, n = 7,011), focusing on a subset of patients with annotated post-biopsy treatment and clinical response data measured using the RECIST criteria (14) (n = 2,596).' Clinical fields enumerated in prose (primary tumour location, drug name, mechanism of action, treatment type, age, sex, biopsy location, date of biopsy, survival, pretreatment information). The release identifier DR347 is stated, which is a real pin on the data snapshot; access is by data access request only.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access-data",
+        "data-release-id-pinned-DR347",
+        "code-url-in-paper-404",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Upstream WGS/WTS molecular profiling by the Hartwig analysis pipeline: 'Whole genome sequencing (WGS) was available for all 2,596 patients, providing rich molecular profiles including somatic mutations, copy number alterations, structural variants (e.g. gene fusions), gene driver events, pathway level gene driver events, homologous recombination deficiency status, HLA status and copy number, telomere length, viral insertions, and V(D)J sequencing output. Bulk RNA-seq data were available for a subset of patients (n = 2,116) and were summarized using computed gene sets and expressed neoepitope predictions.' The pipeline is cited only via reference 15: 'Hartwig Medical Foundation. WiGiTS: Hartwig analysis pipeline [Internet]. 2023 [cited 2025 Sept 11]. Available from: https://github.com/hartwigmedical/hmftools'. No pipeline version, no release tag, no per-tool version, no reference genome build, no parameter is stated in this paper.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "upstream-pipeline-cited-bare-url",
+        "no-version-pin",
+        "no-reference-build-stated",
+        "no-parameters-stated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Cohort definition: 'Patient cohorts were defined using a combination of primary tumor location, molecular tumor subtype (e.g. Breast ER+/HER-), and post-biopsy treatment characteristics (drug name, mechanism of action, or treatment type). ... A total of 56 cohorts were defined, each containing at least 30 patients and a minimum of 15 responders and 15 non-responders (Supplementary Figure 1b). These 56 cohorts included: 23 drug specific cohorts (14 pan-cancer, 9 tissue specific) 19 drug mechanism cohorts (11 pan-cancer, 8 tissue specific) 14 high-level treatment type cohorts (e.g. chemotherapy, targeted therapy, immunotherapy, hormonal therapy; 4 pan-cancer, 10 tissue-specific)'. Numeric inclusion thresholds are fully stated in prose; the individual cohort membership rules (which drug maps to which mechanism class, which tumour subtypes are split) are deferred to Supplementary Figure 1d.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access-data",
+        "thresholds-stated-in-prose",
+        "membership-map-in-supplement",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Binary biomarker feature derivation: 'We derived a total of 2,594 binary features across clinical, genomic, and transcriptomic domains for systematic association testing. These included 646 gene driver or pathway events, 263 mutational signature features, 88 chromosomal copy number summaries, 68 clinical features, 57 somatic summary metrics, 14 CDR3/VDJ sequences metrics, 12 telomeric length associated features, 8 HLA-related features, 8 markers of genetic immune escape, 8 homologous recombination deficiency features, 1,416 RNA-based gene set expression features, and 6 RNA-based measures of neoepitope burden. All features were binarized based on clinical relevance or quantile-based thresholds. A comprehensive description of feature definitions, thresholds, derivations, and sources is provided in Supplementary Table 2.' The binarization cut-offs themselves are not in prose - the prose gives only the two-word rule 'clinical relevance or quantile-based thresholds' and defers everything to Supplementary Table 2. One threshold leaks into Results prose ('TMB per mega base < 6'). No gene-set database, no gene-set version and no neoepitope prediction tool is named.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "thresholds-deferred-to-supplement",
+        "geneset-database-unnamed",
+        "geneset-version-unpinned",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Univariate Fisher's exact association testing: 'Patient non-response was defined as a binary response using the RECIST clinical response annotations in the Hartwig dataset. Specifically, patients were classified as non-responders if they failed to achieve either a partial response or stable disease lasting longer than six months. To systematically identify features associated with non-response, univariate Fisher's exact tests were performed with each of the 56 defined patient cohorts. ... Fisher's exact was selected specifically to handle sparse response patterns, including cases where no response was observed within a feature group. However, a key limitation of the Fisher's test is its inability to adjust for covariates, and therefore no covariates were included in the testing.' The event-count filter is stated: 'we limited our analysis to those features with at least six total events within a given cohort.' No software implementation of the test is named (no R, no scipy, no function, no one/two-sided declaration).",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "test-implementation-unnamed",
+        "sidedness-unstated",
+        "no-version-pin",
+        "controlled-access-data"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Cox proportional-hazards progression-free-survival modelling: 'For progression-free survival (PFS) analyses, the hazard event was defined as either RECIST progressive disease or death. Time to event was measured from the date of tumour biopsy to earliest occurrence of a hazard event. For censored patients with no hazard event, the follow-up time was calculated from the biopsy date to the last recorded treatment date or response assessment. For pan-cancer cohorts, primary tumour location was included as a covariate in all models. For RNA-based expression features, tumour purity was included as an additional covariate.' Exclusion rule stated: 'In the PFS analyses, features with extreme standard errors due to high collinearity with model covariates were excluded from the results' - the numeric definition of 'extreme' is not given. No Cox implementation (survival/coxph, lifelines, statsmodels) is named and no tie-handling or robustness option is stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "cox-implementation-unnamed",
+        "extreme-SE-cutoff-unspecified",
+        "tie-handling-unstated",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Multiple-testing adjustment: 'After these filters, we performed a total of 77,836 successful univariate tests of both Fisher's exact test and Cox-PH models across the 56 cohorts. To account for multiple testing, we applied the Benjamini Hochberg (BH) method to control the false discovery rate (FDR), with adjustments performed separately for the Fisher's exact tests and Cox-proportional hazards models. ... Therefore, we chose to highlight features with adjusted p-value < 0.1.' The stratification of the correction (separate per test family) and the reporting thresholds (0.1 for the systematic screen, 0.01 for the immunotherapy classifier feature selection) are stated explicitly in prose. Whether the correction was applied globally across all 56 cohorts or within each cohort is not stated. No implementation named.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "fdr-stratification-ambiguous-global-vs-per-cohort",
+        "implementation-unnamed",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Multivariate non-response classifier in the immune-checkpoint-inhibitor cohort: 'we focused on the cohort of patients treated with immune checkpoint inhibitors, of whom 370 had both complete whole genome sequencing and RNA-seq available. From the systematic association testing in this immunotherapy cohort, we selected features the were highly statistically significant for non-response and PFS (Fisher adjusted and Cox proportional hazards adjusted p-values < .01). In total, 17 features passed these significance thresholds, and we performed correlation analyses to identify the independent signals among them. The correlation analysis showed that these non-responders associated features grouped into four independent clusters ... To build the multivariate classifier, we first selected one representative feature from each cluster (low tumor mutational load, low CD effect T-cell expression, high basal cell carcinoma expression, high renin-angiotensin system expression) and computed for each patient the number of these selected non-response associated features that were present.' The correlation metric, the clustering algorithm, the linkage/cut criterion producing exactly four clusters, and the rule for choosing the representative feature within each cluster are all unstated. The KEGG gene sets are named in words ('a KEGG gene set for basal cell carcinoma', 'a KEGG gene set measuring the renin-angiotensin system') but by neither KEGG identifier nor KEGG release.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "correlation-metric-unstated",
+        "clustering-algorithm-unstated",
+        "cluster-cut-criterion-unstated",
+        "representative-selection-rule-unstated",
+        "kegg-ids-and-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Clopper-Pearson cohort-size / power analysis: 'To derive the minimum number of non-responder events needed to determine whether a patient has less than 5% or 2% of response we used the Clopper-Pearson exact method (26). This method provides a 95% confidence interval for the upper bound of probability of response given no responders were observed. The basic assumption for the Clopper-Pearson exact method is that the number of responses for a given biomarker in a cohort would follow a binomial distribution with the number events equal the cohort size and some fixed unknown underlying probability of response.' Reported outputs: 59 non-responder events for <5%, 149 for <2%; and for the melanoma immune-escape example (0 responders, 11 non-response events, 7% prevalence, 166 patients, 51% baseline response rate) an upper 95% bound of 24%, with 890 and 2,249 patients required for the 5% and 2% claims. This step is fully parametric and needs no patient-level data, so the data axis is not access-limited; but no implementation is named and no version is pinned.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "parametric-no-data-needed",
+        "implementation-unnamed",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Kaplan-Meier / log-rank survival visualisation and figure generation: Supplementary Figure 2 legend states 'Kaplan-Meier curves of progression-free survival (PFS) for patients stratified by the presence (red) or absence (blue) of the respective non-response associated and highlighted feature. Reported p-values correspond to the log-rank test comparing the PFS between the presence or absence biomarker groups', and Supplementary Figure 3c reports 'Kaplan Meier plots showing progression free survival in the 370 immunotherapy-treated patients, grouped by the number of non-responders associated biomarkers observed for each patient (0 to 4)'. Log-rank is a named statistical test, so this is step-listed rather than excluded as pure plotting. No plotting library, no survival package, no language and no version is named anywhere in the paper for any figure.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "plotting-stack-unnamed",
+        "logrank-implementation-unnamed",
+        "no-version-pin"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 10,
+    "n_X": 0,
+    "S": 10,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/10 (0%) at Stage 1: no computational step reaches the RI ceiling, and in every case the binding constraint is the version axis, which is 0 for all ten steps. The paper names no programming language, no statistical package, no library and no version number anywhere - not for the Fisher's exact test, not for the Cox model, not for the BH correction, not for the correlation clustering, not for Clopper-Pearson, not for Kaplan-Meier/log-rank, and not for the upstream Hartwig pipeline, which is cited only as a bare 2023 repository URL. There is not a single version string in the Methods. Code scores 1 rather than 2 on every step for a specific and recordable reason: the URL printed in Code availability - 'The source code to reproduce the analysis for the manuscript is available in the following repository: https://github.com/Computational-Immunogenomics/hmf_biomarkers' - returns HTTP 404. The GitHub organisation Computational-Immunogenomics exists (6 public repositories) but contains no repository named hmf_biomarkers. The paper's stated code artifact, as cited, is not retrievable. Data scores 1 on the nine patient-data steps: the Hartwig database is genuinely obtainable but only through an access request ('Access to the genomic, transcriptomic, and clinical metadata from the Hartwig Medical Foundation data can be obtained freely through data access requests to the Hartwig database'), so it is controlled rather than public; the release identifier DR347 is stated, which is a real and unusually good snapshot pin. Only C9 (Clopper-Pearson) scores data=2, being purely parametric. Params is the most uneven axis: the cohort inclusion thresholds (>=30 patients, >=15 responders, >=15 non-responders), the non-response definition (no partial response and no stable disease beyond six months), the >=6-event filter, the FDR thresholds (0.1 systematic, 0.01 classifier) and the Clopper-Pearson settings are stated crisply in prose (params=2), whereas the 2,594 feature binarization cut-offs are deferred entirely to Supplementary Table 2 (params=1), and the correlation metric, clustering algorithm and four-cluster cut criterion behind the multivariate classifier are stated nowhere at all (params=0 for C8), as is every parameter of the upstream Hartwig pipeline (params=0 for C2). Even if a Stage-2 code read fully recovered the code axis, version would remain capped at 1 by prose, so the Stage-1 ceiling of NI cannot be lifted to R-star from this document alone.",
+    "coverage": "10 computational steps assessed from the bioRxiv v1 Methods (sections 'Hartwig Medical Foundation Database', 'Patient Cohorts', 'Derived Biomarkers', 'Non-Response Definitions and Statistical Analysis', 'Multiple Testing Adjustments', 'Multivariate classifier for Immunotherapy cohort', 'Minimum Number of Events to Determine Non-Response Thresholds'). 0 wet-lab steps (W = 0): this study performs no physical experiment; all sequencing, alignment and variant calling was performed upstream by Hartwig Medical Foundation and is referenced (ref 15) rather than described, and is step-listed once as C2 because its outputs are the direct inputs to every downstream analysis. Computational coverage = 10/10. Not step-listed and therefore outside the denominator: the RECIST v1.1 clinical response adjudication itself (a clinical procedure performed at the contributing centres, ref 14), and the biological literature comparison against prior GWAS/resistance studies in the Discussion.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Code availability section (verbatim: 'The source code to reproduce the analysis for the manuscript is available in the following repository: https://github.com/Computational-Immunogenomics/hmf_biomarkers')",
+      "missing": "The code URL printed in the paper does not resolve. Unauthenticated curl -L returns HTTP 404 and the GitHub REST API returns {\"message\":\"Not Found\",\"status\":\"404\"} for repos/Computational-Immunogenomics/hmf_biomarkers. The owning organisation does exist (created 2023-05-14, 6 public repositories: chatGPT_gene_annotation, vignettes-share, FusSpot, non_responders_hartwig, SherlockCell, SwiftCNV) so this is a renamed, moved or never-created repository rather than a deleted account. As printed, the paper's sole code artifact is unretrievable, which is why code=1 rather than 2 on every step.",
+      "how_to_close": "Correct the Code availability URL to the repository that actually holds the analysis, and archive a tagged snapshot of it (Zenodo DOI or GitHub release) so the citation cannot rot again."
+    },
+    {
+      "type": "2a",
+      "where": "All ten computational steps; entire Methods section",
+      "missing": "No version identifier of any kind appears anywhere in the paper. Absent: the programming language and interpreter version; the statistical library implementing Fisher's exact test; the survival library implementing the Cox model, Kaplan-Meier estimator and log-rank test; the multiple-testing library implementing Benjamini-Hochberg; the correlation/clustering library used to derive the four biomarker clusters; the Clopper-Pearson implementation; the plotting stack. The upstream Hartwig analysis pipeline is cited as reference 15 with a bare repository URL ('WiGiTS: Hartwig analysis pipeline [Internet]. 2023 [cited 2025 Sept 11]. Available from: https://github.com/hartwigmedical/hmftools') and no release tag, commit SHA or per-tool version, despite hmftools publishing versioned releases per component. The KEGG gene sets used in the multivariate classifier are named in words only, with no KEGG pathway identifier and no KEGG release. This is why version=0 on every step.",
+      "how_to_close": "Report the language and package versions for every statistical operation, cite the exact hmftools/WiGiTS release used for the DR347 molecular outputs, and pin the gene-set database (KEGG/MSigDB) by identifier and release."
+    },
+    {
+      "type": 7,
+      "where": "Whole computational environment; paper prose and cited repository landing page",
+      "missing": "The paper claims no environment closure whatsoever: no lockfile, no conda/mamba environment YAML, no renv.lock, no session_info, no container image or digest is mentioned in any section. The only environment signal found anywhere is a root-level file named env.yml on the landing page of the repository believed to hold this analysis (see liveness entry for Computational-Immunogenomics/non_responders_hartwig); that filename is the sole basis for capture_claim = env_lock_claimed, and its contents were deliberately NOT read, since Stage 1 is restricted to landing page and README prose. A conda environment YAML is typically an unpinned solve specification rather than a true lock, so this claim is weak and is exactly what Stage 2 should adjudicate. Note also that per Delta-2 the version axis stays at 0 here regardless, because the paper itself pins nothing - the env.yml, if real, would be the only version information in existence for this study.",
+      "how_to_close": "Publish a resolved lockfile (conda-lock, uv.lock, or renv.lock) or a digest-pinned container for the analysis environment, and declare it in the paper's Code availability statement rather than leaving it as an undocumented file in a repository the paper does not correctly cite."
+    },
+    {
+      "type": 5,
+      "where": "Data availability and Methods 'Hartwig Medical Foundation Database' (steps C1-C8, C10)",
+      "missing": "The input data is controlled-access: 'Access to the genomic, transcriptomic, and clinical metadata from the Hartwig Medical Foundation data can be obtained freely through data access requests to the Hartwig database (https://www.hartwigmedicalfoundation.nl/en/data/data-access-request).' No GEO, SRA, ENA, EGA, dbGaP, figshare or Zenodo accession is given, and none exists for this cohort. The mitigating detail, recorded because it is genuinely load-bearing, is that the release is pinned by identifier: DR347, n = 7,011. A reproducer who obtains DR347 gets the same snapshot. What is not recoverable from prose is the derivation of 7,011 -> 2,596 -> per-cohort membership: no patient identifier list, no cohort assignment table and no exclusion log is published, so even a DR347 holder must re-derive the subsetting from the prose rules alone.",
+      "how_to_close": "Publish the patient-identifier-to-cohort assignment table (Hartwig sample IDs are shareable within the access-request framework) and the exclusion log taking 7,011 to 2,596, so that a DR347 holder can verify cohort reconstruction independently of the filtering code."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Derived Biomarkers' (step C4)",
+      "missing": "The binarization thresholds for all 2,594 features are not in the paper prose. The prose states only 'All features were binarized based on clinical relevance or quantile-based thresholds' and defers everything to Supplementary Table 2 ('A comprehensive description of feature definitions, thresholds, derivations, and sources is provided in Supplementary Table 2'). Which quantile, and which features are clinical-relevance-thresholded versus quantile-thresholded, cannot be determined from the text; the only cut-off that surfaces in prose is 'TMB per mega base < 6', and that appears in Results, not Methods. The 1,416 RNA gene-set expression features additionally depend on an unnamed and unversioned gene-set collection.",
+      "how_to_close": "Move the threshold table into machine-readable form (a versioned CSV in the code repository, not a supplementary document), and name and version the gene-set collection behind the 1,416 expression features."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Multivariate classifier for Immunotherapy cohort' (step C8)",
+      "missing": "The clustering that produces the paper's headline four-feature signature is described without any of its parameters: 'we performed correlation analyses to identify the independent signals among them. The correlation analysis showed that these non-responders associated features grouped into four independent clusters with biological meaning'. Unstated: the correlation coefficient used (Pearson/Spearman/phi on binary features), the clustering algorithm, the linkage and the distance cut that yields exactly four clusters rather than three or five, and the rule by which one representative feature was chosen per cluster ('we first selected one representative feature from each cluster'). Since the resulting signature is the paper's main translational claim (0/5 responders at 4 markers, 2/42 at 3 markers), this is the single most consequential parameter gap in the study.",
+      "how_to_close": "State the correlation metric, clustering algorithm, linkage, and the numeric cut used to obtain four clusters, plus the representative-selection criterion, and report the sensitivity of the 0/5 and 2/42 results to those choices."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Multiple Testing Adjustments' (step C7)",
+      "missing": "The scope of the Benjamini-Hochberg correction is ambiguous. Prose says 'we applied the Benjamini Hochberg (BH) method to control the false discovery rate (FDR), with adjustments performed separately for the Fisher's exact tests and Cox-proportional hazards models' after reporting '77,836 successful univariate tests'. It is not stated whether BH was applied once over all tests in a family across all 56 cohorts, or per cohort within each family. With 56 cohorts and 77,836 tests these two choices give materially different adjusted p-values, and every reported significance claim (adjusted p < 0.1 for the screen, < 0.01 for the 17 immunotherapy features) depends on which was done.",
+      "how_to_close": "State explicitly whether FDR control was global per test family or stratified per cohort, and report the number of tests entering each correction."
+    },
+    {
+      "type": 1,
+      "where": "Methods 'Multiple Testing Adjustments' (step C6)",
+      "missing": "The Cox model exclusion rule is stated qualitatively only: 'features with extreme standard errors due to high collinearity with model covariates were excluded from the results'. No numeric standard-error cut-off, no collinearity diagnostic and no count of excluded features is given, so a reproducer cannot reconstruct which of the tests were dropped before the reported 77,836 total.",
+      "how_to_close": "Give the numeric standard-error / collinearity criterion and the number of features excluded per cohort."
+    },
+    {
+      "type": 9,
+      "where": "Methods 'Hartwig Medical Foundation Database' (step C2)",
+      "missing": "The identity of the executing upstream pipeline is not pinned. The paper consumes somatic mutations, copy-number alterations, structural variants, gene and pathway drivers, HRD status, HLA typing and copy number, telomere length, viral insertions, V(D)J output and neoepitope predictions - each of which is produced by a distinct hmftools component (PURPLE, LINX, CHORD, LILAC, TEAL, VIRUSBreakend, NEO and so on) - but names none of these components, none of their versions, and no reference genome build. Whether the DR347 release ships a single fixed pipeline version, and which, is not recorded in the paper.",
+      "how_to_close": "Name the hmftools/WiGiTS release bundled with DR347, list the per-component versions actually used, and state the reference genome build (GRCh37 vs GRCh38) underlying the variant calls."
+    },
+    {
+      "type": 10,
+      "where": "Whole paper",
+      "missing": "No wet-lab steps are performed in this study (W = 0). Recorded explicitly so the denominator is not read as a partial scope: all patient sample collection, sequencing and RECIST response adjudication was performed upstream by the contributing centres and by Hartwig Medical Foundation, is cited rather than described, and is not a reproduction step for this manuscript. The computational denominator S = 10 therefore covers the entire reproduction target.",
+      "how_to_close": "N/A."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository stated in Code availability, verbatim: 'The source code to reproduce the analysis for the manuscript is available in the following repository: https://github.com/Computational-Immunogenomics/hmf_biomarkers'",
+      "http_status": "404 Not Found - the URL printed in the paper does not resolve. curl -L returns HTTP 404; GitHub REST API repos/Computational-Immunogenomics/hmf_biomarkers returns {\"message\":\"Not Found\",\"documentation_url\":\"...\",\"status\":\"404\"}. URL-present in paper, artifact not retrievable at the cited address.",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L with browser UA, plus authenticated gh api. The owning organisation resolves: orgs/Computational-Immunogenomics returns HTTP 200 (id 133587469, created 2023-05-14T15:02:04Z, updated 2024-04-01T09:24:22Z, 6 public repos, 2 followers), so the account is live and the repository name is simply absent from it."
+    },
+    {
+      "artifact": "same-organisation repository https://github.com/Computational-Immunogenomics/non_responders_hartwig - NOT cited by the paper; located while checking the liveness of the cited URL, and identified as the probable renamed target because its README opens with the paper's exact title and links this DOI",
+      "http_status": "200 OK - public, default branch 'main', last push 2026-04-13T09:58:16Z, no description, no license. Recorded as an observation with explicit identity evidence, not as a substitute artifact: the README states verbatim '# Systematic identification of genomic non-response biomarkers to cancer therapies' and 'We share code to run analyses described here: https://www.biorxiv.org/content/10.1101/2025.10.06.680777v1)', and further states 'The underlying study data comes from the Hartwig Medical Database, and data access was obtained through an approved public data request (DR347).' Root listing: .gitignore, 0_clinical, 1_database, 2_biomarkers, 3_signals, README.md, env.yml, helpers, map.py, map.r. README folder descriptions map one-to-one onto this paper's Methods: '0_clinical Process clinical data: define tumor type cohorts, organize treatments, derive outcomes', '1_database Process data to make easy-to-use tables of various tools output across patients', '2_biomarkers Compute genomic biomarkers from processed data (1_database)', '3_signals 0_analysis: Prepare features, define treatment/tumor type cohorts, run systematic testing, clean output / 1_figures: Reproduce the figures shown in the study'.",
+      "checked_at": "2026-07-27",
+      "network_context": "authenticated gh api (repo metadata, root contents listing, README). README PROSE ONLY was read, per Stage-1 scope; no source file and no env.yml content was opened. The README prose names no software version, no language version and no environment; the presence of a root-level env.yml is a filename-level observation from the contents listing. The repository has no license file and no release tag, so there is no archived snapshot."
+    },
+    {
+      "artifact": "upstream pipeline cited as reference 15, verbatim: 'Hartwig Medical Foundation. WiGiTS: Hartwig analysis pipeline [Internet]. 2023 [cited 2025 Sept 11]. Available from: https://github.com/hartwigmedical/hmftools'",
+      "http_status": "URL-present in paper (bare repository URL, no release tag, no commit, no per-tool version). Cited-in-paper access date 2025 Sept 11.",
+      "checked_at": "2026-07-27",
+      "network_context": "recorded from the paper's reference list; the repository was not independently fetched for this assessment because it is an upstream dependency rather than this paper's own analysis artifact. No version pin is available from the paper regardless of repository state."
+    },
+    {
+      "artifact": "data access route stated in Data availability, verbatim: 'Access to the genomic, transcriptomic, and clinical metadata from the Hartwig Medical Foundation data can be obtained freely through data access requests to the Hartwig database (https://www.hartwigmedicalfoundation.nl/en/data/data-access-request).' Release pinned in Methods as DR347, n = 7,011.",
+      "http_status": "stated-in-paper - controlled access via data access request. No repository accession (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo) exists for this cohort and none is claimed.",
+      "checked_at": "2026-07-27",
+      "network_context": "not independently fetched. Recorded as a controlled-access route with an explicit release identifier (DR347), which is a genuine snapshot pin even though the data itself is not public."
+    },
+    {
+      "artifact": "data accessions: none. No GEO, SRA, ENA, ArrayExpress, dbGaP, EGA, figshare or Zenodo accession appears anywhere in the paper.",
+      "http_status": "none - no accession stated",
+      "checked_at": "2026-07-27",
+      "network_context": "full landing-page text searched exhaustively for accession-shaped strings. Absence is the finding; no web search was performed to locate a substitute."
+    },
+    {
+      "artifact": "paper full text source, https://www.biorxiv.org/content/early/2025/10/07/2025.10.06.680777.source.xml (JATS XML endpoint given in the assessment task)",
+      "http_status": "WebFetch: HTTP 403 Forbidden. curl -L with browser UA: HTTP 200, 90,054 bytes - but the returned XML is a DIFFERENT manuscript, doi 10.1101/2025.10.30.685527 ('Marker effect p-values for single-step SNP-BLUP genomic models', Adekale et al., cattle breeding). The bioRxiv early-view source endpoint mis-served content for this DOI on the assessment date.",
+      "checked_at": "2026-07-27",
+      "network_context": "recorded because it affects the provenance of this assessment. The assessment was made instead from https://www.biorxiv.org/content/10.1101/2025.10.06.680777v1.full (curl -L, HTTP 200, 211,148 bytes HTML), which carries the correct DOI, title, author list (Usset, de Ligt, Roerink, Roepman, Cuppen, Martinez-Jimenez) and complete Methods, Data availability and Code availability sections."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "a2d9bfe3a8bf69e4d8d60ba688d14584148ee924b3efbc81425be0e2b98ed3a1",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

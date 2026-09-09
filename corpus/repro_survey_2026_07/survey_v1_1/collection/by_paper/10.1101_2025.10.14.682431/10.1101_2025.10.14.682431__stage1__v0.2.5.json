@@ -1,0 +1,751 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "96b70ac00b758688f2b1603e08fbe87609ee29551d0094e837d2e7dbfeb6cba8",
+  "canonical_id": {
+    "value": "10.1101/2025.10.14.682431",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.14.682431v1",
+      "biorxiv:2025.10.14.682431v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Telomere-to-telomere, fully phased diploid genome assembly and annotation of the zebra finch (Taeniopygia guttata, bTaeGut7): HERRO ONT read correction, Verkko/hifiasm assembly with manual graph curation, haplotype and chromosome assignment, rDNA and mitogenome reconstruction, VGP assembly QC (BUSCO/Merqury/GenomeScope/Hi-C Pretext), 5mC methylation calling, telomere/centromere/repeat/non-B-DNA annotation, EGAPx gene annotation, structural-variant and A/B-compartment analysis, unassembled-region and segmental-duplication characterization, gene-family/microRNA/retrocopy/synteny comparative analyses. Wet-lab work (blood sampling, ONT/HiFi/Hi-C/Illumina library prep and sequencing, cytogenetic karyotyping) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation extracted from the 26 Methods subsections. Where a single Methods subsection describes a tightly coupled tool chain that is invoked as one pipeline (e.g. the VGP Hi-C QC chain BWA-MEM2 -> bellerophon -> PretextMap -> PretextSnapshot, or the pb-CpG-tools 5mC chain), the chain is folded into one step and the axes are scored on the weakest member. Manual/interactive stages (BandageNG graph curation, PretextView SV inspection, manual repeat-library curation, manual primer-coordinate inspection) are retained as steps because they are load-bearing for the published result, and flagged with manual-curation. Wet-lab steps are counted in W and are not verdicted. Assembly-strategy selection was itself partly manual (Supplementary Table 22 records the per-chromosome choice), which is captured in C3/C5.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Read-length and yield statistics for HiFi, ONT, Illumina and Hi-C read sets computed with rdeval (no version stated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "repo-present-but-not-step-specific"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Haplotype-aware error correction of 15 unfiltered ONT R10 runs (323.57 Gb) with HERRO v0.7.3+6e6c45c on an NVIDIA A10 GPU node (hpc_a10), 32 CPU cores",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "gpu-hardware-dependency"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Genome assembly with Verkko v2.2.1 (nine strategies; asm1 = HiFi graph + raw ONT resolution + Hi-C phasing; asm5 = HiFi + HERRO-corrected non-R9 ONT) with fully enumerated MBG parameters (k=1001,w=100,a=1,u=12,t=4,r=15000,R=4000,hpcvariantcov=25,errormasking=collapse-msat,endkmers=no,blunt=no,keepgaps=no,guesswork=yes,copycountfilter=no,onlylocal=no,filterwithinunitig=yes,cleaning=yes,cache=no); u swept 3-50, u=12 chosen by elbow/majority rule",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "params-fully-enumerated",
+        "repo-dir-verkko_consensus"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Auxiliary hifiasm assemblies in Hi-C+UL mode and in experimental ONT-ligation-only mode (used to patch maternal chr32 q-arm and paternal chr34 telomere); no hifiasm version or command line given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "mode-named-but-no-command"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Manual assembly-graph curation in BandageNG, telomere/rDNA graph annotation via marbl remove_nodes_add_telomere.py with a custom human rDNA bait, ONT-UL alignment to the graph with GraphAligner, edge coverage added with gfalign; iterative manual path resolution and consensus",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "manual-curation",
+        "no-version",
+        "no-command",
+        "non-deterministic-human-step"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Haplotype assignment: Meryl hapmers (k=21, homopolymer-compressed and uncompressed) from parental+offspring Illumina, Gaussian-Mixture-Model unitig assignment via https://github.com/gf777/T2T-zebra-finch/blob/main/hapmers_assign_chr.py, manual reassignment where Hi-C and hapmers disagreed, meryl-lookup",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "script-url-given",
+        "no-version-for-meryl",
+        "manual-curation"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Chromosome assignment by mashmap alignment to bTaeGut1.4 (GCF_003957565.2) run with --pi 95/99 -s 10000/100000, plus manual inspection/resolution of microchromosomes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "manual-curation"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Adaptor-contamination screening of the submitted assembly with FCS-adaptor; 4 regions (25-95 bp) masked on chr32 and chrZ; no version, no command",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "no-command",
+        "db-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Haplotype-specific rDNA models with ribotin in Verkko-mode using chicken rDNA KT445934.2 as reference; morph copy-number estimation from ONT k-mer counts normalized by genome size; reconstruction with a custom 'rDNA Morph Mixer' (random morph mixing) — scripts stated to be in https://github.com/gf777/T2T-zebra-finch",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "stochastic-step-no-seed",
+        "repo-dir-rDNA"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Mitogenome assembly with mitohifi v3+Galaxy0 after read selection: minimap2 v2.22 mapping of HiFi/ONT to bTaeGut2 CM020865.2, filtering by DE tag <0.02 and length >10 kbp, 6 HiFi + 30 ONT reads retained",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "galaxy-wrapper-version",
+        "manual-read-selection"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Assembly completeness and summary statistics: BUSCO v5.5.0+galaxy0 and gfastats v1.3.6+galaxy0 (VGP QC pipeline); BUSCO lineage dataset and its version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "galaxy-wrapper-version",
+        "reference-db-unpinned"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "k-mer based QV / completeness / phase-block / switch-error evaluation: Meryl v1.3+galaxy7 on offspring HiFi + parental Illumina, Merqury v1.3+galaxy4, GenomeScope 2.0.1+galaxy0; QV from hybrid 31-mers of Illumina+HiFi",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "galaxy-wrapper-version"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Hi-C contact QC and Pretext maps: BWA-MEM2 v2.2.1+galaxy4 mapping, bellerophon v1.0+galaxy1 multimap handling, PretextMap v0.1.9+galaxy1, PretextSnapshot v0.0.3+galaxy2; diploid map via minimap2 v2.28+galaxy1, gap tracks from gfastats, telomere tracks from seqtk v1.4+galaxy0, bigwigs from deepTools bamCoverage v3.5.4+galaxy0",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "galaxy-wrapper-version",
+        "tool-chain-folded"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "5mC CpG probability calling from HiFi MM/ML tags: samtools merge/sort/index, extracthifi (pbtk), Jasmine (pbjasmine) base-modification calling, pbmm2 alignment, pb-CpG-tools aligned_bam_to_cpg_scores -> BED/BigWig; stated to run in a Conda environment but no environment file, no versions for any tool",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "conda-env-mentioned-no-file",
+        "no-version",
+        "no-command"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Terminal and interstitial telomere annotation: seqtk v1.4 with -d 50000; Teloscope v0.1.0 with -w 200 -s 200 -c TTAGGG -p NNNGGG -d 200 -l 500 and flags -r -g -e -m -i; BEDtools merge -d 200 clustering; ITS filtered at TTAGGG density >0.5; ITS >5 kbp visualized with StainedGlass v0.6 (window 400 bp)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "params-fully-enumerated",
+        "bedtools-unversioned"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Gene annotation of both haplotypes with NCBI EGAPx v0.4.1 using 33 Illumina RNA-seq datasets from SRA BioProjects PRJNA1032078, PRJNA516733, PRJNA977995 plus RefSeq NP_/XP_ protein evidence from human, chicken, song sparrow, barn swallow and other sauropsids",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "protein-evidence-set-not-enumerated",
+        "config-yaml-not-provided"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Repeat annotation: de novo EDTA2 + RepeatModeler, RepeatMasker v4.1.5 for satellite localization, WindowMasker, SRF (on assembly) and TAREAN (on testis ONT reads after seqtk v1.2 subsetting), TEtrimmer v1.5.4 library curation with manual TE-classification correction, EDTA rerun with --curatedlib; RepBase / bTaeGut1.4 / CR1 libraries",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "mixed-version-coverage",
+        "manual-curation",
+        "repeat-library-not-deposited",
+        "repbase-license-gated"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Non-B DNA motif annotation (APR, DR, IR, MR, STR, Z-DNA) with gfa; triplex motifs via gfa subset=1; G-quadruplexes with Quadron, score-NA predictions removed; no versions given for gfa or Quadron",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "partial-params"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Centromere identification: 64 published primer pairs queried with blastn -task blastn-short against both haplotypes, filtering to forward/reverse pairs <1 kbp apart, single-best-bitscore rescue, manual BED inspection; Tgut716A/crowSat1 similarity via Censor web service; scripts stated to be at https://github.com/gf777/T2T-zebra-finch",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "web-server",
+        "manual-curation"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "TIGD4 expression analysis: RNA-seq from BioProject PRJNA768106 aligned to the paternal haplotype with STAR, counted with featureCounts, differential expression with DESeq2 across tissue (brain/testis) and temperature (27/35/43 C); no versions, no parameters, no script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-version",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Initial large-SV discovery: maternal-vs-paternal (and bTaeGut1.4-vs-each) alignment with MashMap (threads=8), dotplot inspection in JBrowse2, confirmation against Hi-C in PretextView; all SVs recorded manually",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "manual-curation",
+        "no-version",
+        "gui-tool"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Quantitative sequence/structural variation with SyRI v1.6.3 (default filtering), visualization with plotsr v1.1.1, genome-wide heterozygosity in 1 Mbp windows / 100 kbp step plotted with ggplot2 in R; code at https://github.com/YingChen94/zebra_finch_T2T_Fig5",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "figure-specific-repo",
+        "r-session-not-pinned"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "A/B compartment and TAD annotation: cutadapt v5.1 trimming, BWA-MEM v0.7.17-r1188 -SP5M alignment, SAMtools stats + rdeval QC, Open2C pairtools parse (--walks-policy mask) / sort / dedup (--max-mismatch 0), cooler cload pairs at 10 kbp + balance + zoomify (10/20/50/100/200 kbp), cooltools expected-cis, eigs-cis phased on a bedtools gene-density track, saddle, insulation at 200 kbp; pairtools/cooler/cooltools/bedtools versions not given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "mixed-version-coverage",
+        "params-fully-enumerated",
+        "repo-dir-3d_annotation"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Identification of previously unassembled regions: FASTGA alignment of the new diploid assembly to GCF_003957565.2, BED filtered to >1 kb, per-gene overlap classification (>=75% => putative novel), BLAST verification against bTaeGut1.4, biotype overlap tabulation, chromosome-stratified two-sided Fisher exact tests with Benjamini-Hochberg FDR <=0.05",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "stats-code-not-provided"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Gene-family evolution across bird species by orthology clustering with OrthoFinder; no version, no species list in Methods prose, no parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-version",
+        "no-params",
+        "input-set-underspecified"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Precursor microRNA repertoire across 132 bird genomes with MirMachine (bitscore-filtered), presence/absence matrix, Jaccard + NMDS via vegan metaMDS (k swept 1-10, max 1000 iterations, k=5 chosen at stress <0.1), Dollo-parsimony gain/loss reconstruction with Claddis map_dollo_changes (100 replicates), miRBase->MirGeneDB nomenclature conversion",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-code-artifact",
+        "no-version",
+        "stochastic-step-no-seed"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Retrocopy identification with an 'improved version' of the RCPedia pipeline: gffread mRNA extraction, LAST lastal -D1000 alignment, filters (>120 bp, >=200 kb from parent, >=1 of last three exon-exon junctions preserved, <40% repeat content by RepeatMasker/simpleRepeats/windowMasker, >=500 kb between same-parent retrocopies, discard >=3-exon overlaps and >5-copy families, <=6 kb alignment merging)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "modified-pipeline-not-deposited",
+        "no-version",
+        "no-code-artifact"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Retrocopy expression validation: simulated paired-end RNA-seq (30 M reads, HiSeq 76 profile) with SANDY v1.0 excluding exonic retrocopy regions, quantification with kallisto v0.48.0 (-b 100) on 7 SRA runs (SRR8551559/61/63/65/67, SRR8695298, SRR8695300), confirmation with STAR v2.7.7a (--outSAMtype BAM SortedByCoordinate --outSAMattributes NH HI AS nM MD XS), >=1 uniquely mapped read required",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "simulation-seed-not-stated"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "TIGD4 synteny across six NCBI assemblies (GCF_048771995.1, GCF_003957555.1, GCF_036370855.1, GCF_009914755.1, GCF_028583425.1, GCF_049634645.1): gffread protein inference, BED parsing, GENESPACE orthology and whole-chromosome synteny plots, local synteny with scripts adapted from https://github.com/cxli233/TidyLocalSynteny; no versions",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "adapted-scripts-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C30",
+      "label": "Phylogenetic distribution of Tgut191A-like repeats across VGP bird genomes: OpenTree tree via rotl API, satellite database via Satellome, BLAST mapping of canonical Tgut191A, monomer extraction with Tandem Repeats Finder, MAFFT alignment, 17 species consensus sequences with HMMER, final RepeatMasker annotation; code at https://github.com/duartetorreserick/tgut191a_analysis_VGP_birds; no versions given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version",
+        "no-params",
+        "analysis-specific-repo"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 10,
+    "n_NI": 20,
+    "n_X": 0,
+    "S": 30,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/30 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "10/30 (33%) steps reach RI at the prose level (C2 HERRO, C3 Verkko, C10 mitohifi, C11 BUSCO/gfastats, C12 Merqury/Meryl/GenomeScope, C13 Hi-C QC/Pretext, C15 telomere/Teloscope, C16 EGAPx, C22 SyRI/plotsr, C28 retrocopy expression). All ten are capped at version=1 because pins are prose-only with no environment closure (no conda env file, no lockfile, no container digest, no release tag), so no step is R★-eligible from prose. The remaining 20 steps fall to NI, dominated by unversioned tools (hifiasm, mashmap, ribotin, meryl, FCS-adaptor, gfa, Quadron, pairtools/cooler/cooltools, OrthoFinder, MirMachine, GENESPACE, Satellome, TRF, MAFFT, HMMER, LAST) and by irreducible manual/interactive curation (BandageNG graph resolution, PretextView SV confirmation, manual repeat-library and primer-coordinate curation, per-chromosome manual assembly selection).",
+    "coverage": "30 computational steps assessed from Methods prose (100% of named computational invocations); 5 wet-lab steps counted in W (blood sampling, ONT simplex/UL sequencing, PacBio HiFi library+sequencing, Hi-C/Illumina parental sequencing, cytogenetic karyotyping) and out of computational-reproduction scope. Data Availability section present and populated with NCBI assembly/SRA accessions; no dedicated Code Availability section — three GitHub repositories are cited inline in Methods only.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment for all 30 computational steps",
+      "missing": "No environment closure of any kind. The paper states only that the 5mC tools 'were installed in a Conda environment' (C14) without providing an environment.yml, lock file, container image, or digest. Version pins exist for roughly a third of the named tools (Verkko v2.2.1, HERRO v0.7.3+6e6c45c, BUSCO v5.5.0+galaxy0, gfastats v1.3.6+galaxy0, Meryl v1.3+galaxy7, Merqury v1.3+galaxy4, GenomeScope 2.0.1+galaxy0, BWA-MEM2 v2.2.1+galaxy4, bellerophon v1.0+galaxy1, PretextMap v0.1.9+galaxy1, PretextSnapshot v0.0.3+galaxy2, minimap2 v2.22/v2.28+galaxy1, seqtk v1.4+galaxy0/v1.2, deepTools bamCoverage v3.5.4+galaxy0, Teloscope v0.1.0, StainedGlass v0.6, EGAPx v0.4.1, RepeatMasker v4.1.5, TEtrimmer v1.5.4, mitohifi v3+Galaxy0, SyRI v1.6.3, plotsr v1.1.1, cutadapt v5.1, BWA-MEM v0.7.17-r1188, SANDY v1.0, kallisto v0.48.0, STAR v2.7.7a) but a comparable number are unversioned (hifiasm, mashmap/MashMap, GraphAligner, gfalign, BandageNG, ribotin, Meryl in the haplotype-assignment step, meryl-lookup, FCS-adaptor, samtools, bedtools, pbtk/extracthifi, jasmine, pbmm2, pb-CpG-tools, EDTA2, RepeatModeler, WindowMasker, SRF, TAREAN, gfa, Quadron, blastn, Censor, STAR/featureCounts/DESeq2 in C20, pairtools, cooler, cooltools, FASTGA, OrthoFinder, MirMachine, vegan, Claddis, RCPedia, gffread, LAST, GENESPACE, rotl, Satellome, BLAST, TRF, MAFFT, HMMER).",
+      "how_to_close": "Publish a conda-lock / pixi.lock or a container image with digest covering the assembly, QC, annotation and downstream analysis stacks, and pin the remaining tools by exact version (and Galaxy tool-shed revision where Galaxy wrappers were used)."
+    },
+    {
+      "type": 3,
+      "where": "C20 TIGD4 expression, C25 gene-family evolution, C26 microRNA evaluation, C27 retrocopy identification; and partially C14, C24, C29",
+      "missing": "No executable artifact for several substantive analyses. C20 (STAR + featureCounts + DESeq2) gives neither script, versions, nor parameters. C25 (OrthoFinder) gives only a tool name. C26 and C27 describe elaborate custom logic (Dollo reconstruction; an 'improved version' of the RCPedia pipeline with ten filtering criteria) without depositing the code. C29 uses scripts 'adapted from' TidyLocalSynteny without publishing the adapted versions.",
+      "how_to_close": "Deposit these analysis scripts in the existing T2T-zebra-finch repository (or a Zenodo archive with a DOI) alongside the input tables, so each figure/claim maps to a runnable script."
+    },
+    {
+      "type": 4,
+      "where": "Repository organization: https://github.com/gf777/T2T-zebra-finch",
+      "missing": "The primary code repository is a collection of directories and 'one liners and scripts' (one-liners.sh plus per-topic folders) with no workflow definition, no entry point, no run order, no configuration, and no README beyond a folder-purpose listing. There is no mapping from Methods step to script, no release tag, and no archival DOI. Two further repositories (YingChen94/zebra_finch_T2T_Fig5, duartetorreserick/tgut191a_analysis_VGP_birds) cover single figures/analyses only and are also untagged.",
+      "how_to_close": "Wrap the assembly and annotation steps in a workflow (Snakemake/Nextflow/WDL) or at minimum provide a numbered run-order with per-step inputs/outputs; cut a release tag and archive to Zenodo so the exact code state behind the manuscript is citable."
+    },
+    {
+      "type": 6,
+      "where": "C3/C5 assembly selection, C6 haplotype assignment, C7 chromosome assignment, C17 repeat-library curation, C19 primer coordinates, C21 structural-variant recording",
+      "missing": "Substantial irreducible manual curation. Per-chromosome selection among eleven candidate assemblies is recorded only as Supplementary Table 22; graph path resolution in BandageNG, unitig reassignment where Hi-C and hapmers disagreed, manual TE reclassification, manual BED inspection of primer hits, and manual recording of structural variants from dotplots are all human decisions with no machine-readable decision log.",
+      "how_to_close": "Publish the curation decision records (per-chromosome source assembly + resolved graph paths as a machine-readable table, the curated repeat library FASTA, the final primer BED, the SV call set) so downstream users can reproduce the curated result even if they cannot reproduce the curation process."
+    },
+    {
+      "type": 5,
+      "where": "C1 rdeval, C4 hifiasm, C8 FCS-adaptor, C14 5mC chain, C20 TIGD4 expression, C25 OrthoFinder, C29 GENESPACE, C30 Tgut191A chain",
+      "missing": "Parameters absent or reduced to a mode name. C4 names 'Hi-C+UL mode' and 'experimental ONT-ligation-only mode' without command lines; C14 describes the pb-CpG-tools chain narratively with no flags; C20 and C25 state no parameters at all; C30 names six tools with no settings.",
+      "how_to_close": "Record the exact command lines (as already done well for Verkko/MBG, Teloscope, mashmap, cooltools and kallisto/STAR) for every remaining step."
+    },
+    {
+      "type": 9,
+      "where": "C9 rDNA morph mixing, C26 Dollo reconstruction (100 replicates), C28 SANDY read simulation",
+      "missing": "Stochastic procedures with no random seed reported: rDNA models are built by 'randomly mixing individual morph sequences', Dollo parsimony reconstruction is repeated 100 times retaining the most commonly supported point, and RNA-seq reads are simulated with SANDY. Re-running will not reproduce identical outputs.",
+      "how_to_close": "Report seeds (or ship the exact generated artifacts: the final rDNA model FASTA, the simulated read set or its seed, the reconstruction output table)."
+    },
+    {
+      "type": 1,
+      "where": "C16 EGAPx protein evidence, C17 repeat libraries, C25 OrthoFinder input, C26 132-genome set",
+      "missing": "Several analysis inputs are described but not enumerated in a machine-readable form in the Methods: the RefSeq NP_/XP_ protein evidence set ('human, chicken, song sparrow, Barn swallow, and additional sauropsid species'), the curated repeat library provided to EDTA via --curatedlib, the bird species set used for OrthoFinder, and the VGP genome versions behind the 132-genome miRNA matrix (referenced to Supplementary Tables 20/23 only).",
+      "how_to_close": "Deposit the actual input files (protein FASTA, curated repeat library, assembly accession lists with versions) alongside the code."
+    },
+    {
+      "type": 8,
+      "where": "C8 FCS-adaptor, C17 RepBase / CR1 / bTaeGut1.4 libraries, C19 Censor, C24 BLAST verification, C30 Satellome database",
+      "missing": "Reference databases used without version or snapshot date: the FCS adaptor database, RepBase (license-gated, 'primarily derived from TaeGut1.0'), the zebra-finch high-frequency repeat and CR1 libraries, the Censor web service, and the Satellome-generated VGP satellite database. These are moving or access-restricted targets.",
+      "how_to_close": "Record database release versions/dates and, where licensing permits, archive the exact database snapshots used."
+    },
+    {
+      "type": 7,
+      "where": "C2 HERRO, C3 Verkko",
+      "missing": "Hardware-coupled steps: HERRO correction is reported on a specific GPU node (NVIDIA A10, 24 GB, 32 cores, ~84 h); Verkko assemblies were run on a 32-core machine capped at 200 GB with consensus reruns on a SLURM grid. Resource requirements are documented narratively but no scheduler profile or resource configuration is provided, and the GPU dependency is a hard barrier for re-execution.",
+      "how_to_close": "Publish the SLURM/Nextflow resource profiles and state the CUDA/driver versions required by HERRO."
+    },
+    {
+      "type": 11,
+      "where": "Code availability statement",
+      "missing": "There is no Code Availability section. Three GitHub URLs appear only inline in Methods subsections (rDNA, centromere, structural-variation figure, Tgut191A), none is archived with a DOI, and no statement declares which code underlies which result.",
+      "how_to_close": "Add an explicit Code Availability statement listing every repository with its commit/tag and an archival DOI."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: blood sampling and animal care; ONT simplex and ultra-long library prep/sequencing (19 libraries, 15 reactions, nuclease flushes); PacBio HiFi shearing/size-selection/sequencing; Arima Hi-C v2 and parental Illumina sequencing; embryonic fibroblast culture, colchicine-modified metaphase harvest, Giemsa karyotyping",
+      "missing": "Wet-lab generation and cytogenetic validation are out of scope for computational reproduction (OOS); counted in W (5 steps), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: https://github.com/gf777/T2T-zebra-finch — cited verbatim in Methods (rDNA: 'Command line arguments and scripts to replicate the process are provided in Github (https://github.com/gf777/T2T-zebra-finch)'; centromere: 'Scripts used in centromere analyses are available here https://github.com/gf777/T2T-zebra-finch'; haplotype assignment script https://github.com/gf777/T2T-zebra-finch/blob/main/hapmers_assign_chr.py). README lists per-topic folders (3d_annotation, TEs/ERVs, centromere_annotation, chrZ/PAK3L, chr_classification, completeness, coverage, data_preprocessing, figures, graph_annotation, hpc_to_ref, patching, rDNA, telomere_annotation, verkko_consensus) plus one-liners.sh. No environment file, no lockfile, no Dockerfile, no release tag, no archival DOI.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + landing-page/README prose read (no source-file reading; that is stage 2)"
+    },
+    {
+      "artifact": "code repo: https://github.com/YingChen94/zebra_finch_T2T_Fig5 — cited verbatim for genome-wide heterozygosity plotting (ggplot2, 1 Mbp window / 100 kbp step)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "code repo: https://github.com/duartetorreserick/tgut191a_analysis_VGP_birds — cited verbatim for the Tgut191A-like repeat distribution analysis across VGP bird genomes",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl"
+    },
+    {
+      "artifact": "tool repo (author-developed, cited inline, not an analysis repo): https://github.com/vgl-hub/teloscope (Teloscope v0.1.0); also cited: https://github.com/vgl-hub/gfalign, https://github.com/asl/BandageNG, https://github.com/marbl/meryl, https://github.com/marbl/MashMap, https://github.com/sanger-tol/PretextMap, https://github.com/sanger-tol/PretextSnapshot, https://github.com/sanger-tol/PretextView, https://github.com/lh3/seqtk, https://github.com/ncbi/egapx, https://github.com/PacificBiosciences/{pbbioconda,pbtk,jasmine,pbmm2,pb-CpG-tools}, https://github.com/aglabx/satellome, https://github.com/cxli233/TidyLocalSynteny, https://github.com/ropensci/rotl",
+      "http_status": "200 OK (teloscope checked; remainder cited in prose, not individually resolved)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl for teloscope; other URLs recorded verbatim from Methods prose"
+    },
+    {
+      "artifact": "data accession (Data Availability, verbatim): 'The reference genome is currently available and annotated in NCBI under accessions GCA_048771995.1 (maternal+Z) and GCA_048772025.1 (paternal autosomes). EGAP gene annotation is available under accession GCF_048771995.1-RS_2025_04. Raw sequencing data for bTaeGut7 (offspring), bTaeGut8 (maternal), and bTaeGut8 (paternal) are available in the NCBI SRA under BioProject accessions PRJNA1241433, PRJNA1241434, and PRJNA1241435, respectively.'",
+      "http_status": "stated-in-paper (accessions given; not individually resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML Data Availability section; note the paper writes 'bTaeGut8 (paternal)' where Methods says the paternal parent is bTaeGut9 — an internal inconsistency in the sample-to-BioProject mapping"
+    },
+    {
+      "artifact": "data accession (Methods, verbatim): RNA-seq for EGAPx annotation from SRA BioProjects PRJNA1032078, PRJNA516733, PRJNA977995 (33 datasets, detailed in Supplementary Table 23); TIGD4 expression from BioProject PRJNA768106; retrocopy expression from runs SRR8551559, SRR8551561, SRR8551563, SRR8551565, SRR8551567, SRR8695298, SRR8695300",
+      "http_status": "stated-in-paper",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML Methods sections"
+    },
+    {
+      "artifact": "reference assemblies used as inputs: bTaeGut1.4 GCF_003957565.2, bTaeGut2 mitogenome CM020865.2, chicken rDNA GenBank KT445934.2, and six synteny assemblies GCF_048771995.1, GCF_003957555.1, GCF_036370855.1, GCF_009914755.1, GCF_028583425.1, GCF_049634645.1; GenomeArk (www.genomeark.org) referenced for prior zebra finch assemblies; UCSC session for 5mC tracks: https://genome.ucsc.edu/s/clee03/bTaeGut7_pat_ACTB",
+      "http_status": "stated-in-paper (URL-present for GenomeArk and the UCSC session)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML Methods sections; UCSC session URLs are user-owned and not guaranteed persistent"
+    },
+    {
+      "artifact": "code availability statement: NONE — the paper has no Code Availability section; code URLs appear only inline in Methods",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML back-matter scan: Supporting information, Data Availability, Author contributions, Acknowledgments, Conflict of Interest, generative-AI declaration, References — no code-availability heading"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "cb5dea5b0236eed49420c9708c605b5ef4696cc5661145ee1f85bbf18edb873b",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

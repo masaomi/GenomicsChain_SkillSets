@@ -1,0 +1,349 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "7b680974b1b452e671a5ef0798b31776201a8a256ab017028d41254b05be89cb",
+  "canonical_id": {
+    "value": "10.1101/2025.11.09.687458",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.09.687458v1",
+      "biorxiv:2025.11.09.687458v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Re-generation of the manuscript figures (Figures 2-5) from the multimodal DiMeLo-seq + mGpC accessibility experiment in GM12878: dorado basecalling/alignment of ONT pod5 to T2T-CHM13v2.0, read QC filtering, liftover and interval preparation of public reference tracks, LMNB1 and CTCF region definitions from ENCODE references, and dimelo-toolkit parsing/plotting driven by the four analysis notebooks in github.com/streetslab/multimodal-dimelo. Wet-lab steps (methyltransferase validation assay, DiMeLo-seq + M.CviPI nuclei protocol, nanopore library prep/sequencing) are out of computational-reproduction scope (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the Methods subsections 'Basecalling and postprocessing', 'Genomic data file manipulation', 'LMNB1 data analysis', 'CTCF data analysis', plus the dimelo-toolkit package that is the paper's headline contribution. dorado basecalling and dorado post-processing (trim/align/demux/summarize) are split because the model complex is pinned for the former and only 'base settings' is stated for the latter. The three UCSC utilities named in the multimodal-dimelo README (liftOver, bigWigToBedGraph, bedGraphToBigWig) are folded into one liftover step. Paper is a tool paper (dimelo-toolkit) carried by a wet-lab protocol extension, hence routed 'mixed' rather than 'tool-methods': there is a concrete figure-reproduction target, not only a software artifact.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Basecalling with ONT dorado v1.0.2, super-accuracy models for canonical bases, 5mC_5hmC and 6mA (model complex: sup@v5.0.0,5mC_5hmC@v3,6mA@v3)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "generated-data-upon-request",
+        "no-raw-data-accession",
+        "basecalling-scripts-in-repo",
+        "exact-tool-and-model-pin"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "dorado post-processing (trimming, aligning, demultiplexing, summarization) using 'base settings'; alignment to T2T-CHM13v2.0 reference",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "generated-data-upon-request",
+        "params-underspecified",
+        "reference-genome-named-not-pinned-by-checksum"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Read selection from dorado summary (alignment_mapq == 60, mean_qscore_template > 10) and filtering with samtools (no version) to final BAMs; methylation call threshold probability > 0.95",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "generated-data-upon-request",
+        "no-tool-version",
+        "thresholds-explicit"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Liftover of publicly available files (BED, bigWig, etc.) from GRCh38 to T2T-CHM13v2.0 using UCSC command line utilities (liftOver, bigWigToBedGraph, bedGraphToBigWig; no versions stated, paths user-configured via config.toml)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "public-third-party-input",
+        "no-tool-version",
+        "external-binary-user-supplied-path",
+        "chain-file-unspecified"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Interval operations (region merging, filtration, etc.) with BEDtools v2.31.1 plus custom code available on GitHub (third_party_data.ipynb / utils.py)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "public-third-party-input",
+        "code-public-untagged-main",
+        "exact-tool-pin",
+        "params-in-notebook-not-in-prose"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "LMNB1 analysis: reference TSSs ranked by GM12878 bulk RNA-seq expression (ENCFF978HIY); top/bottom expression quartiles labelled active/inactive; accessible = 1000 bp windows at active TSSs, inaccessible = two flanking 500 bp windows; high/low CpG regions = CpG islands within 1000 bp of inactive/active TSSs; on/off-target = cLADs/ciLADs from Altemose et al.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "generated-data-upon-request",
+        "public-reference-accession-cited",
+        "region-definitions-explicit",
+        "no-tool-version"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "CTCF analysis: top 3000 peaks from reference GM12878 ChIP-seq peaks (ENCFF797SDL) overlapping known CTCF motifs; on-target = 400 bp windows at strong sites, off-target = two flanking 1300 bp windows",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "generated-data-upon-request",
+        "public-reference-accession-cited",
+        "region-definitions-explicit",
+        "motif-source-underspecified"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "dimelo-toolkit parsing, vector extraction and preset multimodal plotting (modkit backend) driven by CTCF_analysis.ipynb, LMNB1_analysis.ipynb, crosstalk_analysis.ipynb, motif_analysis.ipynb; haplophasing helper scripts in repo",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "generated-data-upon-request",
+        "code-public-untagged-main",
+        "tool-version-not-pinned-in-prose",
+        "figure-repo-installs-latest-dimelo-via-pip"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Methyltransferase functional validation assay on 360 bp dsDNA oligo (AciI/MboI digest, three buffer conditions, Tapestation readout)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-OOS"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "DiMeLo-seq + mGpC accessibility on unfixed GM12878 nuclei (LMNB1 ab16048 / CTCF ab188408 primary, pA-Hia5 secondary, M.CviPI 12 U + 10 mM DTT activation, Monarch gDNA extraction)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "wet-lab-OOS"
+      ]
+    },
+    {
+      "step_id": "W3",
+      "label": "Nanopore library preparation and sequencing (SQK-LSK114 or SQK-NBD114.24, P2Solo, FLO-PRO114M v10.4.1 flow cells, MinKNOW versions 24.06.14-24.11.10)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "wet-lab-OOS",
+        "instrument-software-version-range-not-single-pin"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 1,
+    "n_NI": 1,
+    "n_X": 6,
+    "S": 8,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/8 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "1/8 (13%) RI at the stage-1 ceiling; at most 2/8 (25%) if the C4 UCSC-utility version gap were closed. The binding constraint is data, not code: the paper's Data Availability states raw .pod5 and basecalled/aligned BAM files are 'available upon request' with no accession, and the figure repository README repeats 'currently available by request'. Six of eight computational steps therefore consume study data that cannot be obtained without author contact and are capped at X regardless of code quality. Code for both the package (dimelo-toolkit) and the figures (multimodal-dimelo) is public, and version pins exist for dorado v1.0.2 (with model complex), BEDtools v2.31.1, python 3.11 and modkit 0.2.4 - but the conda environment.yml pins only two packages and the remaining Python dependencies come from an unpinned 'pip install .', so version stays at 1 with no environment closure.",
+    "coverage": "8 computational steps assessed from Methods prose plus the two repository landing pages/READMEs; 3 wet-lab steps counted (W) but out of computational-reproduction scope. Both a Code Availability and a Data Availability statement are present in the paper.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "All study-generated sequencing data (C1, C2, C3, C6, C7, C8)",
+      "missing": "Data Availability states verbatim: 'Raw .pod5 files and basecalled and aligned BAM files available upon request for GM12878 LMNB1 antibody+pA-hia5+M.CviPI (Figure 2), GM12878 CTCF antibody+M.CviPI high read coverage (Figure 3, 4), and CTCF antibody+pA-hia5+M.CviPI incubation time experiments (Figure 5).' No SRA/ENA/GEO/dbGaP/EGA/Zenodo accession is given. The multimodal-dimelo README repeats 'currently available by request' and instructs the user to place downloaded BAMs in data/processed.",
+      "how_to_close": "Deposit pod5 and modBAM files under an SRA/ENA BioProject (or Zenodo for the derived modBAMs) and cite the accession, so the figure notebooks can be run without author contact."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for both repositories",
+      "missing": "environment.yml in each repo pins only python=3.11 and nanoporetech::modkit==0.2.4. No lockfile (conda-lock/pixi.lock), no container image or digest, no requirements.txt with pins; the figure repo's setup.py path 'pip install .' explicitly brings in 'the latest dimelo package as well as some other required libraries', so the Python dependency set (including dimelo-toolkit itself) floats over time. samtools, the UCSC utilities and bedtools are user-installed external binaries whose paths are supplied through config.toml.",
+      "how_to_close": "Ship a solved lock (conda-lock / pixi.lock) or a container digest covering python deps plus samtools/bedtools/UCSC utilities, and pin the dimelo-toolkit dependency to a released version rather than latest."
+    },
+    {
+      "type": 4,
+      "where": "Code artifact identity for both repositories (C5, C8)",
+      "missing": "The paper cites bare repository URLs (https://github.com/streetslab/dimelo-toolkit, https://github.com/streetslab/multimodal-dimelo) with no commit SHA, tag, release or archival DOI. dimelo-toolkit has releases (v0.1.0, v0.2.0, v0.2.1) but the paper does not say which one was used; multimodal-dimelo has no tags or releases at all and its default branch has been pushed to after the preprint date (pushed_at 2026-07-13), so the analysis state at submission is not recoverable.",
+      "how_to_close": "Tag the figure repository at the manuscript state, archive both repos to Zenodo/Software Heritage, and cite the version/DOI in Code Availability."
+    },
+    {
+      "type": 5,
+      "where": "C2 dorado post-processing; C4 liftover; C7 CTCF motif set",
+      "missing": "dorado post-processing is described only as 'using base settings' with no command lines. The liftover step names no chain file and no per-utility parameters. 'known CTCF motifs' (ref 39) is not resolved to a concrete motif file, scan tool or score threshold in the prose.",
+      "how_to_close": "Publish the exact dorado and UCSC command invocations (or the driving script) and state the chain file and the CTCF motif source file/threshold."
+    },
+    {
+      "type": 3,
+      "where": "C3, C6, C7 tool versions",
+      "missing": "samtools is cited by reference only with no version; the UCSC command line utilities are cited with no version; the dimelo-toolkit version used for the figures is not stated in the prose even though the package is the paper's headline artifact.",
+      "how_to_close": "State versions for samtools, the UCSC utilities and dimelo-toolkit in Methods, and pin them in the environment file."
+    },
+    {
+      "type": 6,
+      "where": "C4, C6, C7 third-party reference inputs",
+      "missing": "Reference inputs are named but not frozen: T2T-CHM13v2.0 (no checksum/URL), ENCODE ENCFF978HIY and ENCFF797SDL (accessions given, ENCODE release not pinned), CpG islands and reference TSS sets cited by literature reference, and cLADs/ciLADs from Altemose et al. cited without a file identifier. third_party_data.ipynb downloads these at run time, so the resolved content can drift.",
+      "how_to_close": "Record checksums (or archive copies) of every downloaded reference file and pin ENCODE portal releases."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: methyltransferase validation assay, DiMeLo-seq + M.CviPI nuclei protocol, nanopore library prep and sequencing",
+      "missing": "Wet-lab generation steps are out of scope for computational reproduction (OOS); counted in W, not verdicted for readiness.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the basecalling-to-figure analysis."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (package): stated in Code Availability verbatim - 'dimelo-toolkit, along with installation instructions, documentation, and tutorials, can be found at https://github.com/streetslab/dimelo-toolkit'. URL-present. Public, default branch main, pushed_at 2026-05-29, releases v0.1.0 / v0.2.0 / v0.2.1 present, no LICENSE file detected, contains README.md, environment.yml, setup.py, tutorial.ipynb, dimelo/.",
+      "http_status": "200 OK (GitHub API, unauthenticated repo metadata)",
+      "checked_at": "2026-07-27",
+      "network_context": "gh api repos/streetslab/dimelo-toolkit; landing page + README prose only, no source-line reading (stage1)"
+    },
+    {
+      "artifact": "code repo (figures): stated in Code Availability verbatim - 'Code and instructions for generating the figures for this paper can be found at https://github.com/streetslab/multimodal-dimelo'. URL-present. Public, pushed_at 2026-07-13, NO releases and NO tags, contains README.md, environment.yml, setup.py, config.toml.example, four analysis notebooks (CTCF_analysis, LMNB1_analysis, crosstalk_analysis, motif_analysis), third_party_data.ipynb, basecalling/, haplophasing/, data/, figures/.",
+      "http_status": "200 OK (GitHub API, unauthenticated repo metadata)",
+      "checked_at": "2026-07-27",
+      "network_context": "gh api repos/streetslab/multimodal-dimelo; landing page + README prose only, no source-line reading (stage1)"
+    },
+    {
+      "artifact": "study data accession: NONE. Data Availability states data are 'available upon request'; no GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession appears anywhere in the full text (JATS scan for GSE/SRP/PRJ/ERP/figshare/zenodo returned no matches).",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full-text regex scan for accession patterns and repository hosts"
+    },
+    {
+      "artifact": "third-party data identifiers cited in prose: ENCODE ENCFF978HIY (GM12878 bulk RNA-seq, used for TSS expression ranking) and ENCFF797SDL (GM12878 CTCF ChIP-seq peaks); reference assembly T2T-CHM13v2.0. These are public third-party resources, not deposited study accessions.",
+      "http_status": "not individually resolved (prose-cited public identifiers)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited ENCODE portal identifiers; downloaded at run time by third_party_data.ipynb per README"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "104ece427ee4e196e3b0899cf7faaa2cbcf0445495f1a72c3e41be823e5af93b",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

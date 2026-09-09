@@ -1,0 +1,568 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "15ace21e4c1f335ca74c22dbd5b92d20e0644b0539667bbdb9a42fa0c3d58774",
+  "canonical_id": {
+    "value": "10.1101/2025.11.14.688503",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.14.688503v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "De novo genome assembly and sex-marker development for white sturgeon (Acipenser transmontanus): (1) k-mer based genome-size and ploidy inference (jellyfish + GenomeScope; FastK + Smudgeplot at k=21/23/31/41), (2) a phased allelic assembly produced by the NRGene DeNovoMAGIC v3 assembler as a vendor service, (3) BUSCO-style completeness assessment with Compleasm v0.2.7 against orthoDB v12 Actinopterygii, (4) RADseq and RNAseq variant calling in two outbred F1 families (Hisat2 v2.2.1 -> bcftools v1.22 -> vcftools v0.1.17 -> STACKS v2.68 populations), (5) linkage map construction in the commercial JoinMap5 GUI and scaffolding of the phased assembly with ALLMAPS from JCVI 1.4.2 plus geneticmap.py LD evaluation, (6) whole-genome comparison to the sterlet RefSeq assembly GCF_902713425.1 with minimap v2.28-r1209 and D-GENIES v1.5, and (7) identification of a Z/W homologous region by NCBI blastn plus MUMmer v4 nucmer against the Kuhl et al. (2021) sterlet sex-specific regions, followed by GT-seq amplicon marker design and genotyping with an unreleased custom pipeline. Substantial wet-lab work (blood/fin/RNA sampling, UV-irradiated-sperm gynogenetic cross, RADseq and RNAseq library construction, GT-seq amplification, abdominal-biopsy sex phenotyping) is upstream of every computational step and is recorded as W (OOS).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v2 full text (retrieved by curl of https://www.biorxiv.org/content/10.1101/2025.11.14.688503v2.full; WebFetch of both the .source.xml and the .full URL returned HTTP 403). Sections read: Abstract, Methods (Initial genome assembly; F1 family sequencing and variant calling; Linkage map construction and phased assembly scaffolding; Comparison to the sterlet assembly; Genetic markers for phenotypic sex), Results, Data Availability. The paper has NO Code Availability section and names NO code repository of any kind; the single github.com URL appearing in the document (https://github.com/thegenemyers/FASTK) is a bibliography entry for the FastK tool, not an author code deposit, so there was no repo landing page or README to read at Stage 1. Verdicts are capped at RI by the Stage-1 ceiling; env_capture_class is 'n/a' for every step.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "k-mer tallying with jellyfish (Marcais & Kingsford 2011) at k = 21, 23, 31, 41 bp on the <=470bp-insert 2x250bp NRGene library, as input to GenomeScope. No jellyfish version stated; no command line given beyond the k values",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "GenomeScope haploid genome-size / heterozygosity estimation run with assumed ploidy 2N and 4N at each of k = 21, 23, 31, 41 (Supplemental Table 1). No GenomeScope version (v1 vs v2 not distinguished), no model-fitting parameters, no seed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "k-mer tallying with FastK (Myers 2020) at k = 21, 23, 31, 41 bp as input to Smudgeplot. No FastK version or commit stated (the paper cites only the github.com/thegenemyers/FASTK URL in the bibliography)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Smudgeplot analysis of heterozygous k-mers (hetmers) at k = 21, 23, 31, 41 producing the 4N/8N ploidy inference (Figure 1, Supplemental Figure 1). No Smudgeplot version, no coverage cutoff (L/U) values, no seed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Phased (allelic) de novo assembly with the DeNovoMAGIC v3 assembler, run by NRGene (Ness Ziona, Israel) as a commercial service from paired-end, mate-pair proximity-ligation and 10X Chromium libraries. The assembler is proprietary and not obtainable; no parameters, no config, no run log reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Assembly completeness assessment with Compleasm v0.2.7 (Huang & Li 2023) using the Actinopterygii ortholog set from orthoDB v12 (7,207 genes), applied to the phased white sturgeon assembly and to the sterlet RefSeq assembly GCF_902713425.1 for comparison. Tool version, database version and lineage all stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C7",
+      "label": "Mapping of Fraser River RADseq reads (226 offspring + 2 parents, SbfI, NextSeq 500 2x150bp) to the genome assembly with Hisat2 v2.2.1 (Kim et al. 2019) using --no-spliced-alignment",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C8",
+      "label": "Joint SNP calling across all Fraser River individuals and prospective parents with bcftools v1.22 (Danecek et al. 2021). Version pinned, but no mpileup/call subcommand, no ploidy model, no depth or quality arguments given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C9",
+      "label": "Filtering of the Fraser River VCF with vcftools v0.1.17 (Danecek et al. 2011) to separate diploid vs haploid mapping families and retain SNPs with minor allele frequency > 0.1 and missing genotypes in < 50% of segregants within a mapping family. Input VCF is an intermediate that is not deposited but is regenerable from the SRA raw data",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "Conversion of filtered VCF genotypes to JoinMap format using the populations pipeline of STACKS v2.68 (Catchen et al. 2011). Version pinned; no populations flags (-r, --min-maf, map-type, whitelist) stated; the popmap assigning individuals to the haploid vs diploid Fraser River sibships is not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C11",
+      "label": "Quality trimming of Snake River RNAseq reads (92 offspring + 2 parents, NextSeq2000 2x150bp) with BBmap (Bushnell 2015). No version, no trimming parameters (adapter set, quality threshold, minimum length) stated at all",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Mapping of trimmed Snake River RNAseq reads to the phased assembly with HiSat2 (v2.2.1 pinned earlier in Methods for the RADseq step) treated as unstranded cDNA, retaining secondary alignments and keeping only properly paired alignments. Exact index-build and splice-aware settings not restated for this second invocation",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Variant scoring of the Snake River RNAseq alignments with bcftools (v1.22 pinned earlier) assuming diploidy, then filtering to minimum quality 20, minimum depth 10 reads, maximum missing data 10%, and minimum allele frequency 0.1. Filter thresholds fully stated; filtering tool for this second family not explicitly named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C14",
+      "label": "GT-seq genotyping (Campbell et al. 2015) of parents and offspring of both F1 families for the 291-SNP anonymous autosomal panel of Delomas et al. (2021), minimum 20 reads, NextSeq 500 1x75bp, used to assign reduced vs normal ploidy in the Fraser River family. The genotyping pipeline is a custom, unreleased pipeline cited only to Delomas et al. (2021); no version; the GT-seq read data are not separately accessioned in the Data Availability statement",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Linkage analysis per mapping family in JoinMap5 (commercial GUI, Stam 1993) using maximum-likelihood mapping under 'Haploid' for the reduced-ploidy Fraser River sibship and 'outbred F1 (CP)' for the other two; high-confidence framework maps built from markers whose segregation pattern was observed 5 or more times, then additional markers added if > 80% of individuals had genotypes identical to a framework marker in coupling and repulsion phase. Only major version 'JoinMap5' given (no 5.x), no seed for the ML mapping, no LOD/recombination thresholds, and the resulting maps are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Scaffolding of the phased assembly with ALLMAPS from the JCVI utility libraries 1.4.2 (Tang et al. 2015) using the three linkage maps, with per-position weights scaled to genotype mismatches (mismatches/weight: 0/20, 1/8, 2/4, 3/2, 4/1) and a multi-round priority order (haploid map first, then diploid map, then the RNAseq-derived map). Version and weighting scheme fully stated; the input map files are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C17",
+      "label": "Evaluation of the resulting scaffolds with the geneticmap.py LD function of JCVI 1.4.2. Version inherited from C16; no arguments, window size, or output thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C18",
+      "label": "Whole-genome alignment of the scaffolded white sturgeon assembly to the sterlet RefSeq assembly GCF_902713425.1, and of the white sturgeon assembly to itself, with minimap v2.28-r1209 (Li 2016) using -asm20. Exact tool build and the divergence preset are both stated; both assemblies are public",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C19",
+      "label": "Visualisation of the minimap2 alignments with D-GENIES v1.5 (Cabanettes & Klopp 2018), a web service. Version stated; no filtering/identity thresholds or export settings given, and the hosted-service nature means the underlying alignment-processing environment is not under the reader's control",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Search of the phased white sturgeon assembly for sequences homologous to the sterlet sex-specific and flanking regions of Kuhl et al. (2021) using NCBI blastn (Camacho et al. 2009) with minimum e-value 1e-5 and 50% similarity, yielding two putative Z and one putative W scaffold. Thresholds stated, but no BLAST+ version, no word size / task (blastn vs megablast), and the extracted sterlet query regions are given no accession or coordinates",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Confirmation of flanking-region and sex-specific-region homology by MUMmer v4 nucmer (Marcais et al. 2018) with the full command line 'nucmer --mum --nosimplify -c 100 -g 1000'. Command line fully stated; only major version 'v4' given, no 4.x.y patch level",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Manual alignment inspection in Geneious (Biomatters) to identify the ~5 kbp Z/W homologous region ('zwhr') nested inside the otherwise unalignable sex-specific region and to call the SNP variants distinguishing the putative Z and W scaffolds. Commercial interactive GUI, no version, no alignment algorithm or settings, no recorded decision criteria for delimiting the island of homology",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Genotyping of the two new sex-marker amplicons (zwhr and p455160ex, both <100bp) added to the GT-seq panel (Supplemental File 1), sequenced on an Illumina NextSeq 2000 1x100bp and scored with the custom pipeline of Delomas et al. (2021), then compared against biopsy/hatchery-record sex phenotypes across five populations. The scoring pipeline is unreleased and unversioned; the primer/probe panel is available as Supplemental File 1; the amplicon read data are not separately accessioned",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W1",
+      "label": "Whole blood collection from an adult female white sturgeon (Snake River population near Hagerman, Idaho) and submission to NRGene (Ness Ziona, Israel) for paired-end, mate-pair (proximity-ligation) and 10X Chromium (microfluidic fragment barcoding) library construction and sequencing (Table 1)",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Fraser River F1 family production at Vancouver Island University: ultraviolet-irradiated sperm used to fertilise eggs from a female white sturgeon, producing a mixed reduced- and normal-ploidy family (226 offspring + 2 parents); irradiation was incomplete, so ploidy class had to be recovered genetically",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "RADseq library construction from fin-tissue genomic DNA of the Fraser River family using a single 8bp-recognition-site restriction enzyme (SbfI) following Baird et al. (2008) and Micheletti et al. (2018), barcoded and sequenced on an Illumina NextSeq 500 (2x150bp)",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Snake River F1 family sampling at the Idaho Springs Foods hatchery: dorsal fin punches from parents and whole bodies of 92 larvae (~3cm) preserved in RNAlater at -20C, cervical-dislocation euthanasia, total RNA isolation with the Direct-zol RNA Miniprep Plus Kit (Zymo Research), RNA integrity assessed by High Sensitivity RNA ScreenTape (Agilent) with RIN >= 7 required",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "mRNA isolation (NEB Poly(A) mRNA Magnetic Isolation Module) and RNAseq library preparation with half-volume NEBNext Ultra II RNA Library Prep Kit for Illumina: 8-minute fragmentation for >= 350bp fragments, 13 PCR enrichment cycles, no pre-PCR bead clean and two-to-three post-PCR bead cleans; equimolar pools of two sets of 46 offspring + 2 parents sequenced on an Illumina NextSeq2000 P3 300-cycle kit (2x150bp)",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "GT-seq amplification and sequencing of the 291-SNP panel (Campbell et al. 2015; Delomas et al. 2021) on an Illumina NextSeq 500 (1x75bp) for parents and offspring of both F1 families, and of the revised panel including the two new sex markers on a NextSeq 2000 (1x100bp) for the phenotypic-sex test panel",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Primer design for the two <100bp sex-marker amplicons (zwhr, p455160ex) and phenotypic sex determination by abdominal biopsy and/or hatchery cross records for known-sex sturgeon from the Columbia River below McNary Dam, Snake River (Hagerman), Kootenai River, lower Fraser River and Sacramento River populations",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 10,
+    "n_NI": 12,
+    "n_X": 1,
+    "S": 23,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/23 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 10/23 computational steps (43%). The binding constraint here is the CODE axis first and the VERSION axis second. There is NO Code Availability statement and NO author code repository anywhere in the paper - the only github.com URL in the document is the FastK bibliography entry - so no step can exceed code = 1 (reconstructable from prose for standard open tools), and four steps fall to code = 0 (C5 NRGene DeNovoMAGIC v3 vendor service, C14 and C23 the unreleased custom GT-seq genotyping pipeline of Delomas et al. 2021, C22 manual Geneious curation). Version pinning is unusually good for the mid-pipeline tools - Compleasm v0.2.7, Hisat2 v2.2.1, bcftools v1.22, vcftools v0.1.17, STACKS v2.68, JCVI 1.4.2, minimap v2.28-r1209, D-GENIES v1.5 are all exactly pinned - and those pins are exactly the 10 steps that reach the RI ceiling. 12/23 steps fall to NI, almost all on version = 0: the entire k-mer/ploidy front end (jellyfish, GenomeScope, FastK, Smudgeplot - no versions at all despite fully stated k values and ploidy assumptions), BBmap (no version and no trimming parameters), blastn (thresholds given, no BLAST+ version), MUMmer 'v4' and JoinMap5 (major version only), DeNovoMAGIC 'v3' (major only AND proprietary AND no parameters), and the two custom-pipeline GT-seq steps. 1/23 is blocked (X): the Geneious manual alignment inspection that defines the zwhr region has no version, no settings, and no recorded decision criteria, yet it is the step that produces the paper's central sex-marker claim. There is no environment closure of any kind - no lockfile, no container, no conda specification, no sessionInfo - so capture_claim is exact_pins_partial and version stays at 1 everywhere it is credited. Note the Delta-5 symmetry caveat: a 0 static_readiness under-claims by construction, because Tier-1 cannot credit an undeclared-but-present dependency specification.",
+    "coverage": "23 computational steps and 7 wet-lab steps assessed from the bioRxiv v2 full text (Abstract, Methods subsections 'Initial genome assembly', 'F1 family sequencing and variant calling', 'Linkage map construction and phased assembly scaffolding', 'Comparison to the sterlet assembly', 'Genetic markers for phenotypic sex', plus Results and Data Availability). Computational coverage |S|/(|S|+|W|) = 23/30 = 77%. This is a genome-resource paper in which sampling, gynogenetic crossing, library construction and phenotypic sexing are load-bearing and irreproducible by construction; the computational reproduction entry point is the SRA raw data (PRJNA1271479 for linkage-map reads, PRJNA1358253 for assembly reads and the deposited assembly).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper - there is no 'Code Availability' section",
+      "missing": "No analysis code is deposited or linked anywhere. The Data Availability statement covers sequence data only ('Raw data for linkage map creation are available from the NCBI Short Read Archive (PRJNA1271479). The final assembly and raw data used to construct it are available from NCBI Genome and Short Read Archive, respectively (PRJNA1358253).') and says nothing about code. No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage deposit exists for the k-mer analyses, the variant-calling and filtering commands, the JoinMap-format conversion, the ALLMAPS weighting scheme, the blastn/nucmer sex-region search, or the GT-seq scoring. Every one of the 23 computational steps is therefore code <= 1, reconstructable-from-prose at best.",
+      "how_to_close": "Deposit the driver scripts and command lines for all analysis steps in a public repository, tag a release, archive it to Zenodo for a versioned DOI, and add a Code Availability statement citing that DOI."
+    },
+    {
+      "type": 2,
+      "where": "Steps C1, C2, C3, C4, C5, C11, C15, C20, C21, C22, C23 (version = 0), and the whole analysis environment (all 23 steps)",
+      "missing": "Two distinct version defects. (a) No version at all for jellyfish, GenomeScope, FastK, Smudgeplot, BBmap, NCBI blastn/BLAST+, Geneious, or the Delomas et al. (2021) GT-seq pipeline; major-version-only for DeNovoMAGIC 'v3', JoinMap5, and MUMmer 'v4'. (b) No environment closure of any kind: no conda/mamba environment file, no conda-lock/pixi lock, no container image or digest, no requirements.txt, no sessionInfo, no HPC module list. The exact pins that do exist (Compleasm 0.2.7, Hisat2 2.2.1, bcftools 1.22, vcftools 0.1.17, STACKS 2.68, JCVI 1.4.2, minimap 2.28-r1209, D-GENIES 1.5) are prose-only and have no dependency closure behind them, so capture_claim is exact_pins_partial and version is capped at 1.",
+      "how_to_close": "Add a versions table naming an exact version for every tool invoked (including jellyfish, GenomeScope, FastK, Smudgeplot, BBmap, BLAST+, JoinMap 5.x, MUMmer 4.x.y and Geneious), and ship a conda-lock / pixi lockfile or a container digest covering the full toolchain."
+    },
+    {
+      "type": 11,
+      "where": "Steps C5 (DeNovoMAGIC v3 / NRGene), C15 (JoinMap5), C19 (D-GENIES web service), C22 (Geneious)",
+      "missing": "Four proprietary dependencies sit on the critical path. The primary assembly (C5) was produced by NRGene as a paid service with the closed-source DeNovoMAGIC v3 assembler; the assembler cannot be obtained, and no parameters, configuration or run log are reported, so the assembly itself is a black box that a reader can only download, never regenerate. Linkage map construction (C15) uses the commercial JoinMap5 GUI. The synteny visualisation (C19) is a hosted web service. The zwhr delimitation (C22) is manual work in commercial Geneious.",
+      "how_to_close": "For the assembly, publish the vendor run parameters and provide an open-tool reference assembly path (e.g. hifiasm/Supernova equivalent) or at minimum an assembly-level provenance record. For JoinMap5 and Geneious, provide equivalent open-tool scripts (e.g. Lep-MAP3 / R/qtl, MAFFT+scripts) or export and deposit the exact input and output files so the manual step becomes auditable."
+    },
+    {
+      "type": 5,
+      "where": "Steps C14 and C23 - GT-seq genotyping",
+      "missing": "Both GT-seq steps are scored with 'a custom pipeline (Delomas et al., 2021)'. No repository, no version, no commit, no per-locus scoring rules beyond 'a minimum of 20 reads'. This pipeline produces (a) the ploidy assignments that determine which Fraser River offspring enter the 'haploid' versus 'diploid' linkage map, and (b) the sex-marker genotypes that carry the paper's diagnostic-marker claim, so it is load-bearing twice over.",
+      "how_to_close": "Deposit the GT-seq genotyping pipeline (or cite the exact public release/commit of the Delomas et al. 2021 implementation) together with the locus-scoring thresholds and the allele-ratio rules used for ploidy assignment."
+    },
+    {
+      "type": 13,
+      "where": "Reference assemblies and ortholog database (steps C6, C18, C20, C21)",
+      "missing": "Mixed. Good: the sterlet RefSeq assembly is pinned by accession (GCF_902713425.1) and the ortholog set is pinned by release (orthoDB v12, Actinopterygii, 7,207 genes). Missing: the Kuhl et al. (2021) sterlet male and female assemblies from which the ~10kbp male-specific and ~16kbp female-specific regions plus flanking sequence were 'extracted' are given no accession, no version and no coordinates, so the blastn query sequences (C20) and the nucmer reference (C21) cannot be regenerated. The new white sturgeon assembly is deposited under PRJNA1358253 but no assembly accession (GCA_/GCF_) or version is stated in the text.",
+      "how_to_close": "State the accessions and coordinates of the extracted sterlet sex-specific and flanking regions (or deposit them as a FASTA supplement), and state the GCA_ accession and version of the deposited white sturgeon assembly in the Data Availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Steps C9, C10, C14, C15 - sample-to-run correspondence",
+      "missing": "No deposited sample metadata table maps SRA runs under PRJNA1271479 to (i) the Fraser River versus Snake River family, (ii) parent versus offspring, and critically (iii) the reduced-ploidy ('haploid') versus normal-ploidy ('diploid') Fraser River subsets. That ploidy partition is itself an inferred quantity (from the 291-SNP GT-seq panel plus the RADseq data) and it determines the JoinMap crossing model per sibship. Without the partition table, the vcftools family separation (C9), the STACKS popmap (C10) and the three linkage maps (C15) cannot be reconstructed.",
+      "how_to_close": "Deposit a sample sheet linking every SRA run accession to family, generation, and assigned ploidy class, plus the per-individual evidence used for the ploidy call."
+    },
+    {
+      "type": 6,
+      "where": "Steps C5 (assembly) and C15 (linkage mapping) - sub-pipeline externalisation",
+      "missing": "Two of the largest analytical stages are executed outside any scriptable pipeline: the assembly was externalised to a commercial vendor, and the linkage maps were built through interactive decisions in a GUI (framework marker selection at 'observed 5 or more times', then marker addition at '> 80% of individuals identical to a framework marker'). The thresholds are stated but the resulting maps, the marker sets, and the intermediate JoinMap project files are not deposited, so every downstream scaffolding result (C16, C17) rests on artefacts that exist only on the authors' machines.",
+      "how_to_close": "Deposit the three linkage maps, the marker genotype matrices, and the JoinMap project exports as supplementary data, and provide the ALLMAPS input bed/map files so C16 can be re-run from published inputs."
+    },
+    {
+      "type": 4,
+      "where": "Steps C2, C4 (model fitting), C15 (maximum-likelihood mapping)",
+      "missing": "No RNG seeds or convergence settings are reported for the GenomeScope non-linear model fitting, the Smudgeplot smudge inference, or the JoinMap5 maximum-likelihood mapping. The headline haploid genome-size range (1.514-1.622 Gbp) and the 4N/8N ploidy conclusion both come from these fits, and the linkage-map ML step drives the scaffolding order.",
+      "how_to_close": "Report seeds and convergence/iteration settings for all model-fitting and ML steps, or report the analysis as distributional (repeat runs and give the spread) rather than as point estimates."
+    },
+    {
+      "type": 10,
+      "where": "Steps W1-W7",
+      "missing": "Seven wet-lab stages are out of computational scope but are prerequisites for every C step: NRGene library construction, the UV-irradiated-sperm gynogenetic Fraser River cross, SbfI RADseq library prep, Snake River larval sampling and RNA isolation, NEBNext RNAseq library prep, GT-seq amplification, and abdominal-biopsy sex phenotyping. The gynogenetic cross in particular is not deterministically repeatable (irradiation was incomplete by the authors' own account), and the phenotypic sex calls used to validate the markers come from biopsy and hatchery records that are not deposited.",
+      "how_to_close": "Nothing closes this for a computational reproducer; record it as OOS. The phenotypic sex calls and biopsy records should nevertheless be deposited as a supplementary table so the marker-validation step (C23) can be re-scored."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: NONE. The paper has no Code Availability section and states no repository. Full-text search for github/gitlab/bitbucket/zenodo/software-heritage URLs returned exactly one hit, https://github.com/thegenemyers/FASTK, which is the bibliography entry for the FastK tool (Myers 2020), not an author deposit",
+      "http_status": "none - no author code URL stated in the paper",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text regex search of the curl-retrieved bioRxiv v2 .full HTML; no web search performed for a repository that the paper does not claim"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1271479 - cited verbatim in Data Availability: 'Raw data for linkage map creation are available from the NCBI Short Read Archive (PRJNA1271479).'",
+      "http_status": "200 OK (URL-present; https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1271479 resolves). Run-level listing and per-sample metadata not enumerated at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to ncbi.nlm.nih.gov, HTTP status only"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1358253 - cited verbatim: 'The final assembly and raw data used to construct it are available from NCBI Genome and Short Read Archive, respectively (PRJNA1358253).' No GCA_/GCF_ assembly accession or assembly version is given in the text",
+      "http_status": "200 OK (URL-present; https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1358253 resolves). Linked assembly accession not enumerated at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to ncbi.nlm.nih.gov, HTTP status only"
+    },
+    {
+      "artifact": "reference assembly: sterlet (Acipenser ruthenus) NCBI RefSeq GCF_902713425.1 (Du et al. 2020), used as the Compleasm comparison target and the minimap2 alignment reference",
+      "http_status": "stated-in-paper (accession given verbatim with version suffix; not fetched at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "ortholog database: orthoDB v12 Actinopterygii ortholog set (7,207 orthologous genes), used by Compleasm v0.2.7",
+      "http_status": "stated-in-paper (release version and lineage set size given verbatim; no download date or file checksum; not fetched at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "sex-region query sequences: the ~10 kbp male-specific and ~16 kbp female-specific 'unalignable' regions plus flanking sequence extracted from the Kuhl et al. (2021) sterlet male and female assemblies",
+      "http_status": "none - no accession, no assembly version, no coordinates, and no supplementary FASTA are given for the extracted regions",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text read of the 'Genetic markers for phenotypic sex' Methods subsection"
+    },
+    {
+      "artifact": "GT-seq marker panel: 'Supplemental File 1. GT-seq panel for white sturgeon, revised Sept. 2025' (listed under Supplemental Files); the underlying 291-SNP anonymous autosomal panel is cited to Delomas et al. (2021)",
+      "http_status": "stated-in-paper (supplementary file listed on the bioRxiv v2 page; contents not retrieved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "supplement not downloaded at stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c80462fc263ad9b3ba04e8702e8813b99de1e700a2a2a8396e454c5e8f2007a4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

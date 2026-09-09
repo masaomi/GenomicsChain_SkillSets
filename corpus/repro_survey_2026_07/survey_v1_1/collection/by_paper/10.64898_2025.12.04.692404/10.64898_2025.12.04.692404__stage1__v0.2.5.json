@@ -1,0 +1,377 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "8c3da7e7cc788a1b199dd13fe8f35f33c54b871417f4a04411b0bfe2fde87881",
+  "canonical_id": {
+    "value": "10.64898/2025.12.04.692404",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.04.692404v1",
+      "biorxiv:2025.12.04.692404v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Interpretability analysis of convolutional neural networks in population genetics: (i) re-training of pg-gan-architecture GAN discriminators (20 seeds x 3 1000 Genomes populations CEU/CHB/YRI = 60 discriminators) and of a second family of 60 CNNs retrained directly on the real-vs-simulated binary task; (ii) discoal-simulated selective-sweep datasets (5 classes x 1000 replicates) fed to two pretrained sweep-detection networks from Whitehouse et al. (a single-channel ResNet and a graph CNN over Relate-inferred marginal tree sequences, with seriation-based haplotype sorting via Google OR-tools); (iii) classical summary statistics (pi, unique-haplotype count, binned LD r2, folded SFS, iHS, Garud H) and diploSHIC statistics over 11 subwindows; (iv) extraction of last-hidden-layer 'learned features', Pearson correlations and OLS regressions of statistics on features; (v) SHAP (Permutation Explainer and deep SHAP) feature attribution and PCA feature grouping; (vi) 'model-of-the-model' decision trees and random forests predicting the CNN output from summary statistics. No wet-lab component.",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool / analysis invocation described in Methods sections 2.1-2.4 plus the Results sections that name a distinct computation (e.g. deep SHAP, PCA). 13 computational steps, 0 wet-lab steps. The paper has NO 'Data availability' and NO 'Code availability' section; the only artifact statement is a single sentence in the Introduction: 'Our code for interpreting the GAN-style CNNs is available open-source at https://github.com/mathiesonlab/ss-interpret.' Scope wording ('for interpreting the GAN-style CNNs') is narrower than the full analysis, which is why the discoal / Relate / diploSHIC / OR-tools branch is scored on deferral to prior work rather than on the repo.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "1000 Genomes Project (CEU/CHB/YRI) haplotype-matrix preparation: 50kb genomic regions, middle 36 SNPs (Table 1 says 32 SNPs), biallelic-only, major=0/minor=1 encoding, inter-SNP distances rescaled to [0,1] as a second duplicated channel; n_haps CEU=198, CHB=206, YRI=216",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "pg-gan GAN training producing the first CNN family (discriminators), 20 repeats per population x 3 populations = 60 discriminators, architecture 'the same as [61,86] but optimized for stability' (Table 1); a small unspecified subset discarded for constant output",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Retraining of the discriminator architecture directly on the real-vs-simulated binary classification task (second CNN family, 60 CNNs, one discarded); training set = equal amounts of simulated data from each successfully trained GAN; dropout between final dense layers (Table 1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Randomly initialised (untrained) CNN/GCN controls used for the trained-vs-untrained comparison; error bars 'across 5 seeds' (Figure 3 caption)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "discoal selective-sweep simulation: 5 classes (hard-centre, hard-off-centre, soft-centre, soft-off-centre, neutral), 1000 replicates each (5000 total), 208 haploid individuals, JPT population-size model of [7], fixation time t~U(0,2000) generations, s~U(0.005,0.1), soft-sweep f0~U(1/N,0.2); 'in the same manner as in [67,88]'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Relate marginal tree-sequence / ARG inference supplying the GCN input (cited as '[75]'; no command line, no parameters, no version, no mutation/recombination-rate settings given in this paper)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Genotype-matrix formatting for the ResNet: shape (1, #individuals, #polymorphisms), zero-padded to the maximum observed polymorphism count; row sorting by cosine distance using seriation as in [60] via Google OR-tools [56]",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Inference with the two pretrained sweep-detection networks from Whitehouse et al. [88]: single-channel ResNet [33] (last layer dim 64) and custom GCN over inferred tree sequences plus tree summary statistics (last layer dim 256, PCA-reduced); architectures 'described in detail in [88]' and summarized in Table 2 — no weights URL, no repository given in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Classical population-genetic summary statistics on the pg-gan windows: pairwise heterozygosity pi, number of unique haplotypes, LD r2 averaged in 15 inter-SNP-distance bins within the 50kb window [86], folded SFS (1..n/2), iHS [84], Garud H1/H2 etc. [25]; repo README notes a dependency on pylibseq (unversioned in prose)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "diploSHIC [41] summary statistics for the sweep networks: 15 statistics (pi, ZnS, Garud H, HapCount, Tajima's D, thetaH, Fay and Wu's H, maxFDA, Kim and Nielsen's omega, distVar/distSkew/distKurt) computed over 11 subwindows ('the software's default value') spanning the simulated region; no diploSHIC version, no command line",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Extraction of last-hidden-layer 'learned features' and Pearson correlation between each feature and each summary statistic, on a combined real+simulated dataset; features clustered by similarity of correlation profile (Figure 2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Ordinary-least-squares linear regression predicting each summary statistic from the learned features, reported as R2 (Figure 3); no train/test split, regularisation or CV scheme stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "SHAP attribution on the learned features (SHAP python package [49], Permutation Explainer; deep SHAP in Figure S6), visualised as beeswarm summary plots; plus PCA dimensionality reduction of learned features (Figure 7, PC1 33.66% variance) and the decision-tree / random-forest 'model-of-the-model' predicting CNN output from summary statistics (Figures 8-9); no SHAP/scikit-learn versions, no tree depth / n_estimators / seed given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 8,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 13,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/13 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Under-claims by construction: Tier-1 cannot credit an undeclared-but-present dependency.",
+    "inference_inclusive_upper_bound": "RI ceiling on 8/13 computational steps (62%). Those 8 are the steps covered by the public repository https://github.com/mathiesonlab/ss-interpret (data preparation, both CNN families, untrained controls, classical summary statistics, feature extraction/correlation, OLS regression, SHAP/PCA/tree modelling), whose README declares an interpreter pin ('environment should be python 3.12 with tensorflow') and points at a requirements.txt. That is a bare requirements file without channel/index or platform declaration, so under the Step-8 symmetric env-closure gate version is capped at 1 (version_subtier exact_pins_partial) and no step can exceed RI even at stage 2. The remaining 5/13 steps cap at NI because the paper defers them entirely to prior work with no version and no code pointer: discoal simulation ('in the same manner as in [67,88]'), Relate ARG inference, OR-tools seriation sorting, the two pretrained Whitehouse et al. sweep networks, and diploSHIC statistics. No lockfile, conda environment, container image or release tag is claimed anywhere in the paper or the README. Every training/simulation step is stochastic with no seed shown consumed, so distributional-match is the best achievable comparison for C2, C3, C4, C5 and C13.",
+    "coverage": "13/13 named computational steps assessed from the bioRxiv v1 JATS full text (Methods 2.1-2.4 plus the Results sections naming deep SHAP and PCA) and the GitHub landing-page README prose. 0 wet-lab steps; computational coverage 13/13 = 100%. The paper has no Data availability and no Code availability section - the single code sentence sits in the Introduction.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole computational environment (steps C1-C4, C9, C11-C13)",
+      "missing": "No environment lockfile, conda/mamba spec, conda-lock/pixi file, or container digest is claimed anywhere. The strongest capture claim is the README sentence 'Environment should be python 3.12 with tensorflow (see requirements.txt). Note the comment about pylibseq.' A bare requirements.txt with an interpreter pin but no package channel/index and no declared platform does not provide environment closure under the v0.2.5 symmetric gate, so version is capped at 1 for every step. No TensorFlow version, no scikit-learn version, no SHAP version, no numpy version and no pylibseq version appear in the paper prose; pylibseq is additionally flagged by the README as needing a manual comment/workaround, which is exactly the kind of undeclared build constraint Tier-1 cannot credit.",
+      "how_to_close": "Ship a conda-lock / pixi / uv lockfile or a container image referenced by sha256 digest that pins the interpreter, the package index/channel and the target platform(s), and cite it from a proper Code availability statement."
+    },
+    {
+      "type": 12,
+      "where": "Paper-level artifact statements (no Data availability, no Code availability section)",
+      "missing": "The paper contains no Data availability section and no Code availability section. The only artifact sentence is in the Introduction: 'Our code for interpreting the GAN-style CNNs is available open-source at https://github.com/mathiesonlab/ss-interpret.' The three UPenn Box download links carrying the actual 200,000-window real/simulated dataset, the trained CNNs, and the pg-gan simulator parameters/discriminators exist ONLY in the repository README and are never mentioned in the paper. Box share links are institution-hosted, mutable, non-versioned and carry no DOI or checksum, so the analysis inputs have no citable, persistent identifier.",
+      "how_to_close": "Add explicit Data availability and Code availability sections to the manuscript; deposit the X.npy/y.npy arrays, the trained CNN weights and the pg-gan discriminators/parameters in Zenodo (or a comparable DOI-issuing archive) with checksums, and cite the DOI plus a tagged repository release rather than a rolling default branch."
+    },
+    {
+      "type": 6,
+      "where": "Steps C5, C6, C7, C8, C10 (the sweep-network branch)",
+      "missing": "The entire sweep-detection branch is externalised to prior work by citation only. discoal simulation is described as done 'in the same manner as in [67,88]' with no command line and no repository; Relate is cited as '[75]' with no parameters at all; the seriation/OR-tools sorting is deferred to [60]; the ResNet and GCN architectures are deferred to [88] ('described in detail in [88]') with no weights URL; diploSHIC is invoked with only its default 11 subwindows stated. The README's own scope sentence confirms the split - the repository covers 'the analysis in [work]' with scripts/ reproducing the figures, but the paper's code sentence is narrower still ('code for interpreting the GAN-style CNNs').",
+      "how_to_close": "Publish the discoal command lines (or the generating script), the Relate invocation and its rate/parameter settings, the seriation sorting script, the diploSHIC command, and a direct link to the Whitehouse et al. network weights and their originating repository at a fixed commit."
+    },
+    {
+      "type": 3,
+      "where": "Steps C5, C6, C7, C8, C10",
+      "missing": "No version pin exists for discoal, Relate, Google OR-tools, diploSHIC, or the pretrained ResNet/GCN model artifacts. Version = 0 for these steps, which is what caps them at NI rather than RI.",
+      "how_to_close": "Pin an exact release (or commit hash) for discoal, Relate, OR-tools and diploSHIC, and identify the pretrained sweep networks by repository commit plus a checksum of the weight files."
+    },
+    {
+      "type": 4,
+      "where": "Steps C2, C3, C4, C5, C13",
+      "missing": "Every training and simulation step is stochastic and no random seed is shown to be consumed. The paper refers to 'seed 0', 'seed 3 for YRI', 'seeds 7 and 12' and to error bars 'across 5 seeds' as labels for training runs, but never states the seed values passed to the framework, nor the seeding of discoal, nor the seed for the SHAP Permutation Explainer (which the Methods explicitly acknowledge 'introduces randomness into the process, reducing reproducibility of computed importance scores'). The README further warns 'If you are reproduce CNN trainings, you may have to adjust filtered runs in utils.py', confirming that the discard set of constant-output discriminators is run-dependent. Best achievable comparison is distributional match, not exact reproduction.",
+      "how_to_close": "Record and publish the concrete seeds consumed by the GAN training, the retraining, the untrained controls, the discoal simulations and the SHAP permutation explainer, together with the resulting discard list of constant-output discriminators."
+    },
+    {
+      "type": 13,
+      "where": "Analysis input distribution (all steps consuming the real/simulated dataset, trained CNNs, and pg-gan artifacts)",
+      "missing": "The three primary inputs are distributed out-of-band via unversioned UPenn Box share links (upenn.box.com/s/lh3ayj..., /s/ndf9pf..., /s/i1sv1f...) with no DOI, no version, no checksum and no stated size beyond 'large filesize!'. Nothing in the workflow pins these artifacts; they are user-downloaded into a local path. At stage 2 this is the classic prose-DOI-only / mutable-source pattern (class B at best, class C if the link contents change). Tier-1 records this without assigning A/B/C.",
+      "how_to_close": "Move the datasets to a DOI-issuing archive with per-file checksums and have the download step in scripts/ fetch the versioned artifact programmatically rather than assuming a manually unzipped directory."
+    },
+    {
+      "type": 2,
+      "where": "Repository reference (https://github.com/mathiesonlab/ss-interpret)",
+      "missing": "The repository is cited as a bare URL with no commit hash, no tag and no release. The README describes the work as 'Code and figures for the analysis in [work]' - the citation placeholder is still unfilled, so the repository does not yet identify which paper version it corresponds to. A future default-branch change silently invalidates the reference.",
+      "how_to_close": "Tag a release matching the preprint, archive that tag to Zenodo for a DOI, cite the DOI or the commit hash in the manuscript, and fill in the '[work]' placeholder in the README."
+    },
+    {
+      "type": 1,
+      "where": "Step C1 (input window definition)",
+      "missing": "Internal inconsistency in the input specification: Methods 2.1 states 'genomic regions of length 50kb, with the middle 36 SNPs extracted' while the Table 1 caption states 'a haplotype alignment with 32 SNPs from a 50kb region'. Which value was used is not resolvable from prose. No 1000 Genomes release/build, no accession, no chromosome set, no filtering/masking criteria and no phasing source are given for the CEU/CHB/YRI panels beyond the citation '[1]'.",
+      "how_to_close": "State the 1000 Genomes release and genome build, the accession or download URL, the region-selection and filtering criteria, and reconcile the 36-SNP vs 32-SNP discrepancy."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: https://github.com/mathiesonlab/ss-interpret - stated verbatim in the Introduction as 'Our code for interpreting the GAN-style CNNs is available open-source at https://github.com/mathiesonlab/ss-interpret .' (also present as a standalone element in the JATS front matter). No commit, tag or release cited.",
+      "http_status": "200 OK (landing page and raw README.md on branch main both resolve; top level shows figdata/, figs/, pg_gan/, scripts/, unused/, cca.py, compare_discs.py, compute_preds_lf.py, compute_ss.py, correlation.py, dataset.py, dtree.py, summary_stats.py, train.py, utils.py, sweep.yaml, requirements.txt, .gitignore)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + WebFetch; raw.githubusercontent.com/mathiesonlab/ss-interpret/main/README.md"
+    },
+    {
+      "artifact": "data: real/simulated dataset, 200000 windows per population (X.npy, y.npy, computed/*_preds_lf.npz) - README only, NOT mentioned in the paper: https://upenn.box.com/s/lh3ayj272l1si4mc85jx5fosjbp3dqif",
+      "http_status": "200 OK (Box share page resolves; no DOI, no version, no checksum, no accession)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA, redirect-following"
+    },
+    {
+      "artifact": "data: trained CNNs - README only: https://upenn.box.com/s/ndf9pfnsjw4tknyrz3a0sizxxjz5ov0o",
+      "http_status": "200 OK (Box share page resolves; no DOI, no version, no checksum)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA, redirect-following"
+    },
+    {
+      "artifact": "data: pg-gan data (simulator parameters, discriminators) - README only: https://upenn.box.com/s/i1sv1fxkfl9at3k5u9zjn4dgaotta8sn",
+      "http_status": "200 OK (Box share page resolves; no DOI, no version, no checksum)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA, redirect-following"
+    },
+    {
+      "artifact": "data accession (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo): none. The only primary-data reference in the paper is the 1000 Genomes Project cited as reference [1] (populations CEU, CHB, YRI) with no accession, release or URL. No Data availability section exists.",
+      "http_status": "none - nothing stated to check; absence recorded as a finding, no web search performed",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "paper full text (bioRxiv v1 JATS source XML)",
+      "http_status": "403 via WebFetch; 200 OK via unauthenticated curl with browser UA (192188 bytes, article-type='article', DOI 10.64898/2025.12.04.692404, posted 09.12.2025)",
+      "checked_at": "2026-07-27",
+      "network_context": "https://www.biorxiv.org/content/early/2025/12/09/2025.12.04.692404.source.xml"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "798e169f4f41a153049c2954d8ebedb2d8574e9a6c834a7a6a5143de8538cdaa",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

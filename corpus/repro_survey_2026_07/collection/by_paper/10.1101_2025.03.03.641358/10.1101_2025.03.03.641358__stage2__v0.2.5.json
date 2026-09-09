@@ -1,0 +1,293 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage2 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.03.03.641358",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.03.03.641358v3",
+      "biorxiv:2025.03.03.641358v3",
+      "europepmc:PPR986271"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational whole-genome-sequencing analysis pipeline for 686 S. aureus isolates (raw Illumina reads in ENA PRJEB59751): read QC/trimming (TrimGalore), taxonomic ID/contamination (Kraken2, Mash), de novo assembly (SKESA), reference variant calling vs NC_007795.1 (Snippy), annotation (Prokka), pangenome (Roary), core-genome phylogeny (FastTree2), MLST (ABRicate MLST), AMR gene detection (ABRicate over CARD/ResFinder/VFDB; DeepARG), SCCmec/mecA typing (staphopia-sccmec, minimap2, SCCmec_CLA workflow), spa typing (spaTyper), and pangenome-wide GWAS (Scoary). Whole pipeline implemented in CWL and executed on a local Arvados system; source/workflow/config repo at github.com/bio-ontology-research-group/mrsa-sequences.",
+  "step_source": "cwl",
+  "granularity_note": "Stage-2 code-check read the mrsa-sequences repo at line level: workflows/ (CWL CommandLineTool defs + input JSONs), dockers/roary2svg/Dockerfile, requirements.txt, setup.py, runinvenv.sh, analyzer/ DB-postprocessing scripts (card_data.py, resfinder_data.py, deeparg_data.py, meca.py, cluster_mec.py), run_rgi.sh, run_resfinder.sh, db/ (mecA.fasta, metadata.rdf.gz). Coarse one-step-per-named-tool granularity preserved from Stage-1. IMPORTANT code-vs-prose divergences found: (a) the committed CWL covers a SUBSET of the paper's tools plus extra tools the paper does not list (augur, iqtree, odgi/seqwish/pggb graph-pangenome, deepgoplus, rgi, circos, snp-dists); (b) several paper-named tools have NO invocation in the repo — Mash, spaTyper, and Scoary are absent entirely (no CWL, no script), DeepARG appears only as result post-processing (deeparg_data.py) with no in-repo invocation/container, FastTree2 is replaced in code by iqtree 1.6.9, ABRicate-MLST is replaced by Torsten Seemann mlst 2.19.0, and staphopia-sccmec is replaced by a custom minimap2-vs-db/mecA.fasta method; (c) minimap2 CWL pins 2.17 whereas the paper states 2.24-r1122 (version mismatch); (d) the SCCmec_CLA external workflow (cdnstp/SCCmec_CLA) is not referenced anywhere in the repo (not in CWL, not in README) — floating. Wet-lab steps (culture, VITEK-2 AST, DNA isolation, library prep, NovaSeq sequencing, collection) remain layer W, not verdicted.",
+  "funnel_stage": "stage2-code-verified",
+  "stage2_candidate": true,
+  "capture_claim": "container_digest_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "TrimGalore v0.4.4 adapter trimming / read QC of raw Illumina NovaSeq reads",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Kraken v2.0.8-beta taxonomic identification / contamination screening",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["kraken-db-unpinned-local-path", "container-tag-not-digest"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Mash v2.3 sketch-based taxonomic identification / distance",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": ["tool-absent-from-repo"]
+    },
+    {
+      "step_id": "C4",
+      "label": "SKESA v2.4.0 de novo genome assembly",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest", "docker-image-staphb-skesa-2.4.0"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Snippy v4.6.0 variant calling against reference genome NC_007795.1",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest", "ref-accession-NC_007795.1-pinned-in-snippy.json"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Prokka v1.14.6 genome annotation of assembled contigs",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Roary v3.13.0 pangenome construction from Prokka GFFs",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["container-tag-not-digest"]
+    },
+    {
+      "step_id": "C8",
+      "label": "FastTree2 v2.1.10 core-genome phylogenetic tree from core alignment",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["tool-divergence-code-uses-iqtree-1.6.9-not-fasttree2"]
+    },
+    {
+      "step_id": "C9",
+      "label": "ABRicate v1.0.1 MLST assignment (MLST tool / PubMLST scheme)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["tool-divergence-code-uses-mlst-2.19.0-not-abricate-mlst", "container-tag-not-digest"]
+    },
+    {
+      "step_id": "C10",
+      "label": "ABRicate v1.0.1 AMR gene detection against CARD v5.1.1 database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["card-db-bundled-in-mutable-container", "run_rgi.sh-uses-rgi-5.1.1-tag-and-hardcoded-local-path", "container-tag-not-digest"]
+    },
+    {
+      "step_id": "C11",
+      "label": "ABRicate v1.0.1 AMR gene detection against ResFinder v4.0 database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["resfinder-db-mounted-from-unversioned-local-host-path", "container-tag-not-digest"]
+    },
+    {
+      "step_id": "C12",
+      "label": "DeepARG v1.0.2 deep-learning AMR gene prediction",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["deeparg-invocation-absent-only-postprocessing-in-analyzer"]
+    },
+    {
+      "step_id": "C13",
+      "label": "ABRicate v1.0.1 virulence-factor detection against VFDB (no VFDB DB version/snapshot given)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "C_mutable_latest",
+      "version_subtier": "floating",
+      "subflags": ["db-version-unpinned", "vfdb-bundled-in-abricate-container-abricate.json-db=vfdb"]
+    },
+    {
+      "step_id": "C14",
+      "label": "staphopia-sccmec v1.0.0 mecA / SCCmec typing",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["tool-divergence-code-uses-custom-minimap2-vs-db-mecA.fasta-meca.py"]
+    },
+    {
+      "step_id": "C15",
+      "label": "minimap2 v2.24-r1122 mecA cassette detection against a local SCCmec database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "A_verified_in_code",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["minimap2-version-mismatch-code-2.17-vs-paper-2.24-r1122", "mecA-db-in-repo-git-pinned-db/mecA.fasta", "container-tag-not-digest"]
+    },
+    {
+      "step_id": "C16",
+      "label": "SCCmec_CLA cassette-arrangement typing workflow (github.com/cdnstp/SCCmec_CLA; no version/commit pinned)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "C_mutable_latest",
+      "version_subtier": "floating",
+      "subflags": ["external-workflow-not-referenced-anywhere-in-repo-floating-master"]
+    },
+    {
+      "step_id": "C17",
+      "label": "spaTyper v4.6.1 spa (protein A) typing with its associated database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": ["tool-absent-from-repo"]
+    },
+    {
+      "step_id": "C18",
+      "label": "Scoary pangenome-wide association study (bacterial GWAS) on Roary gene presence/absence (no version pinned)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "B_pin_prose_only",
+      "version_subtier": "floating",
+      "subflags": ["tool-version-unpinned", "tool-absent-from-repo"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 13,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 18,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) — unexecuted; declared environment statically valid but not verified as the env that produced the results. NO step reaches R★: Lever 1 (software_env_lock) is FALSE, so the version axis is capped at 1 for every step and no declared-environment closure exists to validate. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "RI ceiling on 13/18 computational steps (down from 15 at Stage-1). The code-check confirmed in-code tool-version pins for the steps that have real CWL CommandLineTool defs (trim_galore 0.4.4, kraken2 2.0.8_beta, skesa 2.4.0, snippy 4.6.0 with reference accession NC_007795.1 pinned in snippy.json, prokka 1.14.6, roary 3.13.0, abricate 1.0.1, mlst 2.19.0, minimap2 2.17) — this is an UPGRADE from prose-only to verified-in-code for the version dimension, and CWL+input-JSON now expose invocation params (params axis bumped to 2 for those steps). BUT every container reference is a MUTABLE tag (e.g. quay.io/biocontainers/abricate:1.0.1--h1341992_0, staphb/skesa:2.4.0, kerstenbreuer/trim_galore:0.4.4_1.14_0.11.7) or a floating :latest (coolmaksat/circos:latest, finlaymaguire/rgi:latest, coolmaksat/snippy:latest, coolmaksat/roary2svg:latest, commonworkflowlanguage/cwltool_module) — NONE pinned by @sha256 digest. The container_digest_claim is REFUTED: there is no image digest, no conda-lock, no pixi/renv lock anywhere; requirements.txt uses plain pip == pins WITHOUT hashes and pins only the Arvados/cwltool harness, not the bioinformatics tools; the single Dockerfile (dockers/roary2svg) is FROM ubuntu:18.04 (mutable) and curls master. Two steps DOWNGRADED RI→NI because their paper-named tool is absent from the repo entirely (Mash C3, spaTyper C17). Three steps stay NI (VFDB unpinned C13, SCCmec_CLA unreferenced/floating C16, Scoary unpinned+absent C18). Additional code-vs-prose divergences: FastTree2→iqtree 1.6.9, ABRicate-MLST→mlst 2.19.0, staphopia-sccmec→custom minimap2+db/mecA.fasta, minimap2 2.17(code) vs 2.24-r1122(paper). No step exceeds RI without a validated, digest/lock-closed environment capture.",
+    "coverage": "18 computational steps re-assessed from repo code (CWL + input JSON + analyzer scripts + Dockerfile + requirements.txt). 6 wet-lab steps (W) out of scope. Raw reads (ENA PRJEB59751) are the reproducible entry point; the phenotype/RDF metadata Zenodo DOI (10.5281/zenodo.1425085) is still 404.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "n/a — no static lock present. All CWL DockerRequirement.dockerPull refs are mutable tags (many version+build biocontainer tags, several :latest) with NO @sha256 digest; no conda-lock/pixi/renv/poetry lock; requirements.txt is plain pip == pins WITHOUT hashes and covers only the Arvados/cwltool runner harness, not the bioinformatics toolchain; sole Dockerfile (roary2svg) is FROM ubuntu:18.04 (mutable) + curls github master."
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "All CWL DockerRequirement.dockerPull references across workflows/ + dockers/roary2svg/Dockerfile + requirements.txt",
+      "missing": "The container_digest claim is refuted by code inspection. Environment references are pinned only by mutable image tags (e.g. quay.io/biocontainers/abricate:1.0.1--h1341992_0, kraken2:2.0.8_beta--pl526h6bb024c_0, staphb/skesa:2.4.0, kerstenbreuer/trim_galore:0.4.4_1.14_0.11.7) or floating :latest tags (coolmaksat/circos:latest, finlaymaguire/rgi:latest, coolmaksat/snippy:latest, coolmaksat/roary2svg:latest, commonworkflowlanguage/cwltool_module). No @sha256 digest anywhere; no conda-lock/pixi/renv/poetry.lock; requirements.txt has no hashes and pins only cwltool/arvados-cwl-runner infra; the lone Dockerfile is FROM ubuntu:18.04 (mutable) and curls github master (roary2svg.pl). Lever 1 is therefore FALSE and no step can reach R★.",
+      "how_to_close": "Repin every dockerPull by @sha256 digest (or ship a conda-lock/pixi lock per platform), pin the base image and the curl'd script in dockers/roary2svg by digest/commit, and add hashes to (or replace) requirements.txt; then demonstrate a validated environment capture."
+    },
+    {
+      "type": 5,
+      "where": "Code-vs-prose tool divergences: C3 Mash, C8 FastTree2, C9 ABRicate-MLST, C12 DeepARG, C14 staphopia-sccmec, C15 minimap2, C17 spaTyper, C18 Scoary",
+      "missing": "The committed repo does not implement the paper's stated toolset faithfully. Mash, spaTyper and Scoary have NO invocation in the repo (absent); DeepARG appears only as result post-processing; FastTree2 is replaced by iqtree 1.6.9; ABRicate-MLST is replaced by mlst 2.19.0; staphopia-sccmec is replaced by a custom minimap2-vs-db/mecA.fasta method; minimap2 CWL pins 2.17 while the paper states 2.24-r1122. A reader cannot reproduce the paper's stated pipeline from this repo without resolving these substitutions.",
+      "how_to_close": "Commit the CWL/scripts for the missing tools (Mash, spaTyper, Scoary, DeepARG invocation, staphopia-sccmec) at pinned versions, reconcile FastTree2 vs iqtree and ABRicate-MLST vs mlst and minimap2 2.17 vs 2.24 between Methods and code, and pin the SCCmec_CLA external workflow to a commit."
+    },
+    {
+      "type": 3,
+      "where": "External DB/reference acquisition (C2 Kraken2 DB, C10 CARD, C11 ResFinder, C13 VFDB, C16 SCCmec_CLA)",
+      "missing": "No external database is obtained via an in-code pinned accession/release/checksum (Lever 2 FALSE). Kraken2 DB is a local unversioned minikraken directory path (kraken.json: /home/kulmanm/data/dbs/minikraken); CARD is bundled in the mutable rgi:5.1.1 image and run via run_rgi.sh with a hardcoded host path; ResFinder is mounted from an unversioned local host path (run_resfinder.sh); VFDB is whatever ships inside abricate:1.0.1 (abricate.json db=vfdb); SCCmec_CLA is an external floating repo not referenced in code. Only the Snippy reference accession NC_007795.1 (C5) and the in-repo db/mecA.fasta (C15, git-content-pinned) are genuinely pinned — insufficient for the ALL-class-A requirement.",
+      "how_to_close": "Fetch each DB by pinned release/accession + checksum inside the workflow (Kraken2 DB build date/hash, CARD release, ResFinder release, VFDB snapshot date), and pin SCCmec_CLA to a commit."
+    },
+    {
+      "type": 7,
+      "where": "runinvenv.sh (repo root) and hardcoded operator paths in run_rgi.sh / run_resfinder.sh / input JSONs",
+      "missing": "Portability/secret-hygiene finding (out of the reproducibility rubric but material): runinvenv.sh contains a hardcoded ARVADOS_API_TOKEN and ARVADOS_API_HOST, and several scripts/JSONs embed absolute operator paths (/home/kulmanm/..., /opt/data-mrsa/...). The pipeline as committed is bound to the authors' private Arvados host and cannot be run elsewhere without rewriting these.",
+      "how_to_close": "Remove/rotate the committed API token, externalize host paths to parameters, and provide portable input templates."
+    },
+    {
+      "type": 8,
+      "where": "Sample/phenotype metadata Zenodo record cited as DOI 10.5281/zenodo.1425085",
+      "missing": "The cited Zenodo DOI still resolves to HTTP 404 today (2026-07-23; likely a manuscript typo). The repo ships db/metadata.rdf.gz (an in-repo RDF metadata file) but no code references a different/working Zenodo record. ENA raw-read accession PRJEB59751 is live (200).",
+      "how_to_close": "Correct the Zenodo DOI in the manuscript to the live phenotype/RDF metadata record (or cite the in-repo db/metadata.rdf.gz)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/bio-ontology-research-group/mrsa-sequences (CWL workflows/, dockers/roary2svg/Dockerfile, analyzer/, uploader/, db/, requirements.txt, setup.py) — read at line level (Stage-2)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "gh api + unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "external workflow repo: github.com/cdnstp/SCCmec_CLA (default branch master, HEAD f9d374a; NOT referenced by any pinned commit in mrsa-sequences)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "gh api + unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "data accession: ENA study PRJEB59751 (raw Illumina NovaSeq reads) — summary metadata only, no reads downloaded",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ebi.ac.uk ENA browser summary API"
+    },
+    {
+      "artifact": "data accession: Zenodo phenotype/RDF metadata cited as DOI 10.5281/zenodo.1425085",
+      "http_status": "404 Not Found (DOI does not resolve — likely typo in manuscript)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl -L, doi.org redirect"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage2 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "ae5b86cb1a666aea4a2eaa74ed79824726f521fee4f113e89a6c10c7e5897a51",
+    "chain_record": "not-yet-recorded",
+    "supersedes": "90e59d3cc1708be80abb13a541c91767a7ec18aeec94c2255da4512ce1b9d525"
+  }
+}

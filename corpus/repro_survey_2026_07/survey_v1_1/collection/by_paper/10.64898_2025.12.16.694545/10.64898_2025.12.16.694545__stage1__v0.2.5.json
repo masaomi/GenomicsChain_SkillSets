@@ -1,0 +1,518 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "fe940b715f95d82a322b6e2837b023a914c0393c8318ab2440d5ca95c8efa5de",
+  "canonical_id": {
+    "value": "10.64898/2025.12.16.694545",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.16.694545v1",
+      "biorxiv:2025.12.16.694545v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "A bacterial genome-wide association study (bGWAS) of carbapenem resistance in Acinetobacter baumannii carried out entirely on public data with no wet-lab component. The reproduction target is the whole chain from public-archive retrieval to association statistics and structural interpretation: (1) curation of A. baumannii genomes with carbapenem-specific AST phenotypes via the BV-BRC command-line interface plus 201 additional CRAB isolates from a published Oceania epidemiology study, yielding 1,814 genomes; (2) read retrieval with sra-tools, adapter/quality trimming with fastp, QC summarisation with MultiQC and de novo assembly with SPAdes, with 249 assemblies downloaded directly from NCBI; (3) two-stage assembly QC with QUAST (>80% reference coverage, N50 >20 kb against AB5075) and CheckM (completeness >=99%, contamination <=5%), yielding the final n=1,601 cohort; (4) core-genome SNP alignment with Snippy against AB5075, variant-site extraction with SNP-sites, recombination masking with Gubbins, maximum-likelihood phylogeny in RAxML (GTR+Gamma, 500 bootstraps), tree rendering in R with ggtree/ggtreeExtra, population structure with RhierBAPS and sequence typing with mlst; (5) a multi-reference strategy mapping reads with Snippy against seven reference genomes (ATCC19606, ATCC17978, K09, AB5075, FJ03, FJ16, FJ20) followed by joint genotyping in GATK, major-allele imputation of missing genotypes, unitig extraction with unitig-caller/Bifrost, FaST-LMM association testing in Pyseer with geography and isolation year as fixed covariates and a phylogeny-derived kinship matrix as random effect, SnpEff annotation and Bonferroni correction on unique patterns; and (6) structural interpretation of the significant variants using AlphaFold-predicted models superposed on PDB crystal structures (5dl8, 6EUS, 8H1S) with reported RMSD values. The headline claims to reproduce are the 999 significant unitigs, the 606+/-64 significant SNPs per reference, and the specific loci OXA-23, OXA-66 Leu167Val, AdeL, OprD Leu382Pro, DcaP delta-Ser338, LptD and PqiB.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation, built from the bioRxiv v1 JATS source XML (fetched with curl and a browser User-Agent; WebFetch returned HTTP 403 on the JATS URL). The Methods section is compact but unusually complete on tool identity and version: 19 named third-party tools carry an explicit version string in prose. Steps C1-C22 come from the METHODS section; step C23 (structural analysis) is described only in RESULTS, not in METHODS, and is included because it produces figures 3-5 and the mechanistic interpretation. The declared code repository (https://github.com/sekhongurprit/GWAS) has NO README at all (GitHub readme API returns 404), so no README prose could be read; code-axis scores rest on the Methods prose plus the visible root file listing (14 files: GVCF.sh, Metadata.tsv, all.sh, assembly.sh, figure_GWAS.R, figures.R, patric.sh, process_gvcf.sh, process_snp.sh, process_snp_annotations.sh, process_unitig.sh, qc.sh, run_pyseer.sh, snp_result_table.sh). Where a visible script name plainly corresponds to a Methods step the code axis is scored 2; where the mapping cannot be inferred from file names alone it is scored 1. This paper is pure-computational: there are no wet-lab steps, W=0.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "capture_claim_note": "The paper pins exact versions for nearly every named third-party tool in prose: BV-BRC CLI v1.035, sra-tools v3.1.0, fastp v0.22.0, MultiQC v1.14, SPAdes v3.15.5, QUAST v5.2.0, CheckM v1.2.2, Snippy v4.6.0, SNP-sites v2.5.1, Gubbins v3.3.1, RAxML v8.2.12, R v4.3.3, ggtree v3.10.1, ggtreeExtra v1.12.0, RhierBAPS v1.1.4, mlst v2.23.0, GATK v4.5.0.0, unitig-caller v1.3.0, Pyseer v1.3.11, SnpEff v5.0e. That is an unusually dense pin set. But no environment closure of any kind is claimed: the GitHub repository contains no conda environment.yml, no conda-lock, no Dockerfile or container digest, no requirements.txt, no renv.lock, no Snakemake/Nextflow definition, no release or tag (GitHub releases API returns an empty array), no license, and no README. The repository is cited by bare default-branch URL, and its last push (2026-03-28) postdates the preprint (2025-12-18), so the cited state is mutable and unidentifiable. 'release_snapshot' was considered and rejected because there is no tag, no DOI and no archival deposit. Under protocol v0.2.6, exact_pins_partial is NOT on the positive Stage-2 gate (Delta-2 caps the version axis at 1 from the prose read, so a code check yields no R-star gain), hence stage2_candidate=false; this paper can reach Stage 2 only through the orchestrator's stratified audit draw.",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Genome and AST metadata curation with the BV-BRC command-line interface - verbatim: 'Using the BV-BRC command-line interface (v1.035) [30], publicly available A. baumannii genomes were queried, yielding 11,824 genome identifiers ... AST records were filtered for carbapenems (doripenem, ertapenem, imipenem, and meropenem) ... AST results for a subset of genomes (n = 45) indicated resistance to some carbapenems but susceptibility to others; therefore, these genomes were excluded'. Version pinned, drug list and exclusion rule explicit; the repository file patric.sh plainly corresponds to this step. No BV-BRC database release date is given, and BV-BRC content changes over time",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "db-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Retrieval of raw sequencing reads from SRA with sra-tools v3.1.0 - verbatim: 'Sequence reads were retrieved from the Sequence Read Archive (SRA) using Sra-tools (v3.1.0) [32]'. Version pinned; the per-isolate SRA/Assembly accessions are enumerated in Metadata.tsv, which is both a supplementary file and a file in the repository, so the input set is fully identified. No fasterq-dump/prefetch options are given, but the invocation is effectively parameterless",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Adapter and quality trimming with fastp v0.22.0 - verbatim: 'Raw reads were quality-filtered and adapter-trimmed using Fastp (v0.22.0) [33]'. Version pinned and qc.sh in the repository plainly corresponds, but no fastp options are stated at all: no quality threshold, no length cutoff, no adapter sequences, no deduplication or polyG-trim setting. Eight isolates are separately reported as retaining adapter contamination, which makes the trimming settings consequential rather than cosmetic",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Read-quality summarisation with MultiQC v1.14 - verbatim: 'quality summaries were assessed using MultiQC (v1.14) [34]'. Version pinned; output is Supplementary Figure S2 (n=1,557). MultiQC is an aggregation step run with defaults and the invocation is not parameter-sensitive for the reported summary",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "De novo assembly with SPAdes v3.15.5 - verbatim: 'Trimmed reads were assembled de novo using SPAdes (v3.15.5) [35]'. Version pinned and assembly.sh plainly corresponds, but no SPAdes options are given: no --isolate/--careful mode, no k-mer list, no coverage cutoff. Assembly settings propagate into every downstream QC threshold, the unitig set and the assembly-derived genotypes, so this omission is load-bearing for the 1,601-genome cohort definition",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Direct download of pre-computed genome assemblies from NCBI for the 249 isolates lacking raw SRA data - verbatim: 'For isolates lacking raw SRA data, genome assemblies were downloaded directly from NCBI [36]'. No tool is named, no version, no download date, no assembly-accession version suffix policy (GCA_x.1 vs .2), and no procedure. The assemblies concerned enter the GWAS genotype matrix alongside the SPAdes-assembled ones",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "db-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Stage-1 assembly QC with QUAST v5.2.0 - verbatim: 'QUAST was used to assess assembly statistics relative to the AB5075 reference genome, and assemblies with >80% reference coverage and N50 >20,000 bp were retained'. Version pinned, reference named, and both numeric acceptance thresholds stated; 153 assemblies were excluded at this stage. qc.sh plainly corresponds",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Stage-2 assembly QC with CheckM v1.2.2 - verbatim: 'CheckM was then applied to estimate completeness and contamination based on lineage-specific marker genes; assemblies with <99% completeness or >5% contamination were excluded'. Version pinned and both thresholds stated; 52 further assemblies excluded, yielding n=1,601. The CheckM workflow (lineage_wf vs taxonomy_wf) and the marker-set database release are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "db-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Core-genome SNP alignment with Snippy v4.6.0 against AB5075 - verbatim: 'Core genome SNP alignments were generated using Snippy (v4.6.0) with AB5075 as the reference genome'. Version pinned and reference named. No snippy/snippy-core options (minfrac, mincov, mapqual) are given, but the invocation is a standard default-mode run and the reference is unambiguous",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Variant-site extraction with SNP-sites v2.5.1 - verbatim: 'Variant sites were extracted using SNP-sites (v2.5.1) [39]'. Version pinned; SNP-sites in its default mode is a deterministic extraction with no consequential tuning parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Recombination detection and masking with Gubbins v3.3.1 - verbatim: 'Recombinant regions were detected and masked using Gubbins (v3.3.1) [40]'. Version pinned, but no options at all: no --iterations, no --tree-builder, no --min-snps, no --filter-percentage. Gubbins output is the input to the phylogeny that in turn defines the kinship matrix used for population-structure correction in the GWAS, so the recombination-masking settings propagate directly into the association p-values",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Maximum-likelihood phylogeny with RAxML v8.2.12 - verbatim: 'The recombination-corrected alignment was used to infer a maximum-likelihood phylogeny in RAxML (v8.2.12) under the GTR+Gamma substitution model with 500 bootstrap replicates [41]'. Version, substitution model and bootstrap replicate count all stated. No random-number seed is given, so the bootstrap search is not bitwise reproducible",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Tree visualisation and annotation in R v4.3.3 with ggtree v3.10.1 and ggtreeExtra v1.12.0 - verbatim: 'The resulting tree was visualized and annotated in R (v4.3.3) using the ggtree (v3.10.1) and ggtreeExtra (v1.12.0) packages [42, 43]'. R runtime and both package versions pinned - the only place in the paper where a language runtime is pinned. The repository files figures.R and figure_GWAS.R plainly correspond. Produces Figure 1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Population-structure inference with RhierBAPS v1.1.4 - verbatim: 'The population structure was inferred using RhierBAPS (v1.1.4) [44, 45]'. Version pinned, but no parameters: no n.pops, no max.depth / number of hierarchical levels, no n.extra.rounds, no random seed. The resulting ten BAPS lineages are a headline result (Figure 1, Supplementary Figures S4-S5) and RhierBAPS is stochastic, so the omitted settings and seed directly affect the reported clustering",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "seed-unstated"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Multilocus sequence typing with mlst v2.23.0 - verbatim: 'Multilocus sequence typing (MLST) was performed using mlst (v2.23.0)'. Version pinned and the tool auto-selects the scheme by default, but for A. baumannii two schemes exist (Oxford and Pasteur) and the paper does not state which was used, nor the PubMLST database download date. ST2/ST3/ST25 assignments are reported in Figure 1 and differ between schemes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "db-release-unpinned",
+        "scheme-ambiguous"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Multi-reference read alignment with Snippy v4.6.0 against seven reference genomes - verbatim: 'Raw sequence reads and genome assemblies (SRA data not available) were processed with Snippy (v4.6.0) to generate reference-aligned BAM files for each of the seven reference genomes'. All seven references are named with BioSample accessions (ATCC19606 SAMN12389466, ATCC17978 SAMN02604331, K09 SAMN12769618, AB5075 SAMN31681936, FJ03 SAMN38749311, FJ16 SAMN37733145, FJ20 SAMN37736705), which makes the reference set fully identified. Snippy invocation options are not given, and the handling of the assembly-only isolates (snippy --ctgs) is not spelled out",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Joint genotyping with GATK v4.5.0.0 - verbatim: 'Variant calling was performed using joint genotyping in GATK (v4.5.0.0) [47]'. Version pinned and GVCF.sh / process_gvcf.sh plainly correspond, but no GATK sub-tool chain is named (HaplotypeCaller -ERC GVCF, CombineGVCFs/GenomicsDBImport, GenotypeGVCFs), no ploidy setting for a haploid organism, and no variant-filtering expressions or hard-filter thresholds are given. Ploidy in particular changes the genotype matrix wholesale for a bacterial dataset",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "Imputation of missing genotypes - verbatim in full: 'Missing genotypes were imputed using the major allele at the corresponding site'. The rule is stated but no implementation is named, no version, no missingness threshold above which a site or sample is dropped instead of imputed, and no report of how much of the matrix was imputed. With a mean of 257,803 SNPs per reference across 1,601 isolates, the imputation rate is a material determinant of the association statistics",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "Unitig extraction with unitig-caller v1.3.0 wrapping Bifrost - verbatim: 'Bifrost, wrapped as unitig-caller (v1.3.0), was used to extract unitigs [48]'. Version pinned for the wrapper and process_unitig.sh plainly corresponds. The wrapped Bifrost version is not separately pinned, the mode (--call vs --simple) is not stated, and no k-mer size or minimum-frequency filter is given; 1,971,690 unitigs are reported as the total",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "wrapped-dep-unpinned"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Association testing with Pyseer v1.3.11 (FaST-LMM) - verbatim: 'GWAS was performed using the factored spectrally transformed linear mixed model (FaST-LMM) implemented in Pyseer (v1.3.11) [49]. The model incorporated geographic origin and isolation year as fixed covariates, and a phylogeny-derived kinship matrix as a random effect'. Version, model class, both fixed covariates and the random effect are all specified, and run_pyseer.sh plainly corresponds. Minor-allele-frequency bounds and the --max-dimensions setting are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "Variant annotation with SnpEff v5.0e - verbatim: 'SNPs were annotated with SnpEff (v5.0e) [50]'. Version pinned and process_snp_annotations.sh plainly corresponds, but no annotation database is identified for any of the seven reference genomes - neither a pre-built SnpEff database name nor the GFF/GenBank files used to build custom databases - and no options are given. The paper itself reports that this step produced ambiguous output: 'Both the acquired carbapenemase, OXA-23 and the intrinsic OXA-51 family member, OXA-66 were annotated with identical labels across reference genomes ... The genes were reassigned to their families based on sequence alignment', and that manual reassignment procedure is not described either",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "db-release-unpinned"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Multiple-testing correction - verbatim: 'Bonferroni correction was applied using the number of unique unitig and SNP patterns evaluated in the respective analyses', with the Results giving 'Bonferroni-adjusted significance thresholds of 5 x 10^-8 for unitigs and 2.5 x 10^-7 for SNPs'. The rule and both resulting thresholds are explicit, but no tool or script is named for the pattern-counting step (pyseer ships count_patterns.py; the paper does not say it was used) and no version is attached",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C23",
+      "label": "Structural interpretation of significant variants with AlphaFold models and PDB superposition - described only in RESULTS, not in METHODS. Verbatim examples: 'The AlphaFold-predicted structure showed an RMSD of 1.03 A to the crystal structure (PDB ID: 5dl8)'; 'Structural superposition of the AlphaFold-predicted model and the crystal structure yielded an RMSD of 0.2 A'; 'Structural superposition of the AlphaFold-predicted LptD model onto the homologous crystal structure (PDB ID: 8H1S; RMSD 1.8 A; 30% Sequence Identity)'; 'Excerpt of AlphaFold-generated multiple-sequence alignment (MSA)'. No AlphaFold version or variant (AlphaFold2 / AlphaFold3 / ColabFold / AlphaFold DB entry) is stated, no MSA database or search settings, no superposition tool or algorithm, no per-residue confidence values, and no sequence-similarity search tool for the reported percent-identity and query-coverage figures. This step produces Figures 3, 4 and 5 and the entire mechanistic argument of the paper",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "methods-omitted"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 13,
+    "n_NI": 8,
+    "n_X": 2,
+    "S": 23,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/23 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 13/23 computational steps (C1 BV-BRC, C2 sra-tools, C4 MultiQC, C7 QUAST, C8 CheckM, C9 Snippy core-SNP, C10 SNP-sites, C12 RAxML, C13 ggtree rendering, C15 mlst, C16 Snippy multi-reference, C19 unitig-caller, C20 Pyseer), NI on 8/23 (C3 fastp, C5 SPAdes, C11 Gubbins, C14 RhierBAPS, C17 GATK, C18 major-allele imputation, C21 SnpEff, C22 Bonferroni), X on 2/23 (C6 NCBI assembly download, C23 AlphaFold structural analysis). Two things are worth separating. First, this paper is at the strong end of the version axis for prose-only reporting: 19 tools plus the R runtime and two R packages carry explicit version strings, and the input data are wholly public with per-isolate accessions shipped in Metadata.tsv, so the data axis is 2 on every single step. Nothing here is gated by embargo or by controlled access. Second, and decisively, the version axis is nonetheless capped at 1 across the board because no environment closure exists anywhere - the repository has no README, no license, no release or tag, and no conda/container/lock artifact of any kind - so no step can exceed RI at Stage 1 and none of the pins is resolvable to a reproducible install. The binding constraint on the ten sub-RI steps is the parameter axis: six version-pinned tools are invoked with no options stated at all (fastp, SPAdes, Gubbins, RhierBAPS, GATK, SnpEff), and two of those - Gubbins and RhierBAPS - feed the recombination-masked phylogeny and the BAPS lineage assignment that jointly define the kinship correction underlying every reported p-value, while GATK's unstated ploidy setting determines the genotype matrix for a haploid organism. The worst case is C23: the structural analysis that produces Figures 3-5 and the paper's entire mechanistic interpretation appears only in the Results narrative and has no Methods paragraph, no AlphaFold version and no superposition procedure.",
+    "coverage": "23 computational steps assessed from the bioRxiv v1 JATS Methods prose plus, for C23 only, the Results narrative. Zero wet-lab steps: the study is entirely a reanalysis of public archive data (BV-BRC, SRA, NCBI Assembly, PDB), so W=0 and S=23. The paper explicitly states 'the identified associations are based on genomic signals and require experimental validation', confirming no wet-lab layer. No README prose was available at any point: the declared repository https://github.com/sekhongurprit/GWAS returns 404 on the GitHub readme API and has no wiki content, so code-axis judgements rest on Methods prose plus the visible 14-file root listing.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (C1-C23); repository root",
+      "missing": "No environment closure of any kind. The repository https://github.com/sekhongurprit/GWAS contains 14 files (GVCF.sh, Metadata.tsv, all.sh, assembly.sh, figure_GWAS.R, figures.R, patric.sh, process_gvcf.sh, process_snp.sh, process_snp_annotations.sh, process_unitig.sh, qc.sh, run_pyseer.sh, snp_result_table.sh) and nothing else: no environment.yml, no conda-lock, no Dockerfile or container digest, no requirements.txt, no renv.lock, no Snakemake or Nextflow definition, no Makefile. Version pinning stops at individual prose version strings, which is exact_pins_partial, not a lock. Note that the version pinning itself is unusually complete for a prose-only paper (19 tools + R 4.3.3 + 2 R package versions), which makes the absence of a resolvable environment the single highest-leverage gap: a conda-lock generated from the versions already stated in the Methods would move this paper materially.",
+      "how_to_close": "Ship a conda-lock (or a container image with digest) covering the whole BV-BRC / sra-tools / fastp / MultiQC / SPAdes / QUAST / CheckM / Snippy / SNP-sites / Gubbins / RAxML / R+ggtree / RhierBAPS / mlst / GATK / unitig-caller / Pyseer / SnpEff stack at the versions already named in the Methods, and declare the platform it was resolved for."
+    },
+    {
+      "type": 5,
+      "where": "Declarations section 3 (Data); repository landing page",
+      "missing": "The code artifact is cited as a bare default-branch GitHub URL with no version identity: verbatim, 'The SRA/Assembly accessions (\"Metadata.tsv\"), BASH and R scripts used for workflow automation and data analysis are available at https://github.com/sekhongurprit/GWAS'. The repository has no README (GitHub readme API returns HTTP 404), no license (license field null, so the scripts are technically not reusable), no releases or tags (releases API returns an empty array), and no DOI or archival deposit (no Zenodo, no Software Heritage). Its last push, 2026-03-28, postdates the 2025-12-18 preprint, so the state the paper refers to no longer exists at that URL and cannot be recovered. There is also no mapping from the 14 script files to the Methods steps or to the figures; the largest file, all.sh at 78 kB, is undescribed.",
+      "how_to_close": "Add a README that maps each script to its Methods step and figure, add a license, cut a tagged release corresponding to the manuscript state, mint a DOI-bearing archival snapshot (Zenodo or Software Heritage), and cite that DOI rather than the mutable default-branch URL."
+    },
+    {
+      "type": 1,
+      "where": "C3 (fastp), C5 (SPAdes), C11 (Gubbins), C14 (RhierBAPS), C17 (GATK), C21 (SnpEff)",
+      "missing": "Six steps name a version-pinned tool and give no invocation parameters whatsoever. Specifically: fastp quality/length cutoffs, adapter sequences and polyG/deduplication settings; SPAdes mode (--isolate/--careful), k-mer list and coverage cutoff; Gubbins --iterations, --tree-builder, --min-snps and --filter-percentage; RhierBAPS n.pops, hierarchical depth and n.extra.rounds; the GATK sub-tool chain (HaplotypeCaller/GenomicsDBImport/GenotypeGVCFs), the ploidy setting for a haploid organism, and all variant-filtering expressions; the SnpEff annotation database and options. Gubbins and RhierBAPS are the most consequential because their outputs define the recombination-corrected phylogeny and the BAPS lineages, which together produce the kinship matrix that corrects every p-value reported in the study.",
+      "how_to_close": "Publish the full command lines for every step (they exist in the deposited shell scripts but are not readable as prose, and the repository has no README pointing to them), and state the GATK ploidy setting explicitly."
+    },
+    {
+      "type": 6,
+      "where": "C14 (RhierBAPS), C12 (RAxML), C18 (imputation)",
+      "missing": "No random seed is reported for any stochastic step. RhierBAPS is a stochastic Bayesian clustering whose output - the ten BAPS lineages - is a headline result (Figure 1) and also feeds the population-structure correction; RAxML performs 500 bootstrap replicates with no stated seed; and the imputation step reports neither the fraction of the genotype matrix imputed nor the missingness threshold above which a site or sample was dropped rather than imputed. Reported quantities that depend on these settings include the ten-lineage partition, the 999 significant unitigs and the 606+/-64 significant SNPs per reference.",
+      "how_to_close": "Record the random seeds for RhierBAPS and RAxML, and report the per-reference imputation rate together with the site- and sample-level missingness thresholds applied before imputation."
+    },
+    {
+      "type": 3,
+      "where": "C1 (BV-BRC), C6 (NCBI Assembly), C8 (CheckM markers), C15 (mlst/PubMLST), C21 (SnpEff databases), C23 (PDB, AlphaFold DB)",
+      "missing": "No release identifier or access date is given for any external database. BV-BRC is queried without a release or date although the paper's entire cohort definition (11,824 identifiers, 19,413 resistant / 5,344 susceptible AST entries) derives from that snapshot and BV-BRC is continuously updated; the 249 NCBI assemblies have no download date and no assembly-version policy; CheckM's lineage marker-set release is unstated; the mlst PubMLST database version is unstated and the paper does not even say whether the Oxford or the Pasteur A. baumannii scheme was used, although ST2/ST3/ST25 assignments are reported; the SnpEff annotation databases for the seven references are not identified at all; and for C23 no AlphaFold DB version or model source is given. The specific numbers reported in the first Methods paragraph are not recoverable without the BV-BRC snapshot date.",
+      "how_to_close": "Record the BV-BRC release/query date and deposit the raw query output, state the NCBI Assembly download date with full versioned accessions, name the CheckM marker-set and SnpEff database releases, and state which MLST scheme and PubMLST database version were used."
+    },
+    {
+      "type": 4,
+      "where": "Methods, first paragraph; RESULTS, structural analysis section",
+      "missing": "Two procedures that determine reported results have no Methods description at all. (a) The entire structural-interpretation workflow (C23) - AlphaFold prediction, MSA generation, superposition and RMSD computation against PDB 5dl8, 6EUS and 8H1S, and the sequence-identity/query-coverage figures (35%, 25%, 97%, 30%) - appears only in the Results narrative and figure legends. No AlphaFold version or variant, no MSA settings, no superposition tool, no similarity-search tool. (b) The manual reassignment of OXA-23 and OXA-66 after SnpEff produced identical labels: verbatim, 'The genes were reassigned to their families based on sequence alignment' - no alignment tool, no identity threshold, no procedure - even though the OXA-23 vs OXA-66 distinction is the paper's principal positive control.",
+      "how_to_close": "Add a Methods subsection for the structural analysis naming the AlphaFold implementation and version, the MSA and superposition procedures, and the similarity-search tool and parameters; and describe the OXA family reassignment procedure with its alignment tool and identity criterion."
+    },
+    {
+      "type": 6,
+      "where": "Methods, Acquisition paragraph; Results, dataset paragraph",
+      "missing": "The cohort arithmetic does not close from the prose alone. The Methods state a final acquisition set of 1,814 genomes (1,018 resistant, 796 susceptible); the Results state that 1,565 isolates had raw reads and were assembled while 249 assemblies came from NCBI (1,565 + 249 = 1,814), but then give the QC input as n=1,806 rather than 1,814, with no statement of what happened to the missing 8. Supplementary Figure S2 is captioned n=1,557, a third number, while the Results separately mention 'all but eight isolates, which contained non-biological reads (adapter contamination)'. Whether the eight adapter-contaminated isolates were dropped, and at which step, is not stated explicitly, and 1,565 minus 8 = 1,557 does not reconcile with 1,806 = 1,814 minus 8 without an unstated assumption.",
+      "how_to_close": "State the exclusion accounting explicitly at each filtering step with the surviving n, and provide a per-isolate disposition column in Metadata.tsv recording the step at which each excluded isolate was dropped."
+    },
+    {
+      "type": 5,
+      "where": "Supplementary Table S1 and Figure 2 underlying results",
+      "missing": "No intermediate or result artifacts are deposited. The GWAS summary statistics (per-unitig and per-SNP effect sizes, standard errors and p-values across all seven references), the unitig call matrix, the per-reference VCFs, the recombination-masked core alignment and the final phylogeny (Newick) are not available; only a curated significant-variant table is provided as Supplementary Table S1 and only per-isolate accessions as Metadata.tsv. Independent verification of the reported thresholds (5e-8, 2.5e-7), the 999 significant unitigs and the 606+/-64 significant SNPs therefore requires a full re-run from raw reads for 1,601 genomes against seven references.",
+      "how_to_close": "Deposit the full pyseer summary statistics per reference, the recombination-masked alignment and the final Newick tree in a DOI-bearing archive so that the association results can be checked without re-running assembly and variant calling."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: GitHub, verbatim from Declarations section 3 (Data) - 'The SRA/Assembly accessions (\"Metadata.tsv\"), BASH and R scripts used for workflow automation and data analysis are available at https://github.com/sekhongurprit/GWAS'. The same URL also appears as a bare link in the article front matter. Repository resolves and is public. Description: 'Analysis Scripts used in A. baumannii GWAS'. Root listing (14 files): GVCF.sh (2223 B), Metadata.tsv (65140 B), all.sh (78414 B), assembly.sh (3585 B), figure_GWAS.R (17627 B), figures.R (19583 B), patric.sh (3154 B), process_gvcf.sh (2986 B), process_snp.sh (6170 B), process_snp_annotations.sh (1045 B), process_unitig.sh (855 B), qc.sh (1626 B), run_pyseer.sh (1378 B), snp_result_table.sh (1703 B). No README (readme API 404), no license (license: null), no releases or tags (releases API returns []), 6 commits on main, created 2025-11-25, last pushed 2026-03-28 (i.e. after the 2025-12-18 preprint posting), 0 stars, 0 forks, repo size 57 kB. No environment file of any kind present.",
+      "http_status": "200 OK (repo page and API); readme API 404; releases API 200 with empty array",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L and api.github.com, github.com"
+    },
+    {
+      "artifact": "data accession set: SRA / NCBI Assembly, verbatim from Declarations section 3 - 'All data used in present study is publically available. The SRA/Assembly accessions (\"Metadata.tsv\") ... are available at https://github.com/sekhongurprit/GWAS'. Methods add: 'Sequence reads were retrieved from the Sequence Read Archive (SRA) using Sra-tools (v3.1.0)' and 'For isolates lacking raw SRA data, genome assemblies were downloaded directly from NCBI'. No single umbrella BioProject accession is given; the per-isolate accessions are enumerated only inside Metadata.tsv (65 kB, present in the repository and as Supplementary Information). Individual accessions were not fetched at Stage 1; the SRA service itself resolves.",
+      "http_status": "200 OK (SRA service); per-isolate accessions listed in Metadata.tsv, not individually verified at stage 1",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L, www.ncbi.nlm.nih.gov"
+    },
+    {
+      "artifact": "external resource: BV-BRC, verbatim from Methods - 'Using the BV-BRC command-line interface (v1.035) [30], publicly available A. baumannii genomes were queried, yielding 11,824 genome identifiers. These identifiers were subsequently queried for experimental AST results'. The CLI version is pinned but no BV-BRC data release or query date is given and no URL appears in the paper. Not fetched.",
+      "http_status": "stated-in-paper (named resource with pinned client version, no release/date, no URL; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "reference genomes: seven A. baumannii references given by BioSample accession, verbatim from Methods - 'The selected references included ATCC19606 (susceptible clinical isolate; BioSample SAMN12389466), ATCC17978 (clinical meningitis isolate; BioSample SAMN02604331), K09 (environmental isolate from soil; BioSample SAMN12769618), AB5075 (hypervirulent clinical isolate; BioSample SAMN31681936) [46], and three isolates from a recent CRAB epidemiological study in the Oceania region: FJ03, FJ16, and FJ20 (BioSamples SAMN38749311, SAMN37733145, SAMN37736705, respectively) [31]'. BioSample identifiers are given rather than versioned assembly accessions (GCA/GCF with version suffix). Not individually fetched.",
+      "http_status": "stated-in-paper (BioSample accessions given, no versioned assembly accessions; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "reused published dataset: 201 carbapenem-resistant Oceania isolates, verbatim from Methods - 'An additional 201 carbapenem-resistant isolates from a recent molecular epidemiological study from the Oceanic region were incorporated [31]', where reference 31 is Baleivanualala SC et al., Lancet Reg Health West Pac 40:100896 (2023). No accession is given in this paper for that subset beyond what is inside Metadata.tsv.",
+      "http_status": "stated-in-paper (citation only, no accession in text; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "external structural resources: PDB entries 5dl8, 5dl6, 5dl7, 6EUS, 8H1S and AlphaFold-predicted models, cited only in the Results narrative and figure legends (e.g. 'The AlphaFold-predicted structure showed an RMSD of 1.03 A to the crystal structure (PDB ID: 5dl8)'). No AlphaFold version, no AlphaFold DB accession, no model files deposited. Not fetched.",
+      "http_status": "stated-in-paper (PDB IDs given; AlphaFold models neither versioned nor deposited; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "27632f1eaefd5c6509be704008363ebba518bbf24e4b7d89d27a2bbe196b6a20",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

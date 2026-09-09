@@ -1,0 +1,182 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage2 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.07.652452",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.07.652452v1",
+      "biorxiv:2025.05.07.652452v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Genome-wide codon usage bias (CUB) analysis across the fungal order Sordariales. Reproduce, from published Sordariales genomes (dataset of Hensen et al. 2023): (1) high-quality CDS filtering; (2) amino-acid frequency, RSCU, GC3, GC12 computation; (3) automatic clustering of genomes by amino-acid composition and RSCU; (4) ancestral-state reconstruction of GC3 over a kingdom-wide fungal phylogeny; (5) ribosomal-gene identification (translate -> InterProScan/Pfam) for a CAI reference set; (6) effective number of codons (ENC) and codon adaptation index (CAI) per genome; (7) neutrality plots (GC12 vs GC3 regression slope) and ENC/GC3 plots to separate selection from mutational bias; (8) family-level statistics (pairwise Wilcoxon + Bonferroni, Pearson correlation, phylogenetically independent contrasts).",
+  "step_source": "prose-methods + repo-scripts",
+  "granularity_note": "Stage-2 line-level code-check of github.com/NoahH35/CodonUsageBias (custom bash + R). All conda-env/*.yml files read at line level, plus prep_dataset.sh, gene_filtering.sh, create-conda-envs.sh, README. Coarse one-step-per-tool granularity from Stage-1 preserved (code did not reveal step mis-identification). env_capture_class re-scored from actual code: (i) steps whose toolchain has an exact version pin PRESENT in a conda YAML (agat=0.8.0, seqkit=2.4.0, fastx_toolkit=0.0.14, codonw=1.4.4, seqtk=1.3) are marked B_pin_prose_only — the pin exists in an environment.yml but is NON-lock-grade (no build strings, no transitive closure, no conda-lock), so caps at RI, cannot reach A; (ii) steps whose toolchain is fetched mutable/latest or is entirely absent from every env file (BioKIT via `pip install jlsteenwyk-biokit -U` = latest; all R packages in r-env.yml carry NO version pin; pheatmap/phytools/ape are not even listed in r-env.yml; InterProScan absent from all env files) are marked C_mutable_latest. NOTE code/prose version conflicts: prose says CodonW V1.4.2 but codonw-environment.yml pins codonw=1.4.4; prose says BioKIT V0.1.2 but the env installs latest via pip -U; prose says seqkit but seqtk-environment.yml also ships a separate seqtk=1.3 (seqkit itself is pinned 2.4.0 inside agat-environment.yml). create-conda-envs.sh hardcodes /home/noah/mambaforge and downloads Mambaforge-Linux-x86_64 (latest) -> linux-64 only. README: blast & bedtools rely on cluster environment-modules NOT in the conda-envs. Input genomes are NOT obtained in code at all: README requires the user to pre-populate Genefiltering/CDS_filtered with per-genome .gff+.faa; provenance is Hensen et al. 2023 (prose/citation only). No R-step tool reaches A; no external DB/reference is pinned in code -> both levers FALSE. Code-check CONFIRMS (does not raise) the Stage-1 RI ceiling.",
+  "funnel_stage": "stage2-code-verified",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "High-quality CDS extraction & filtering from annotated Sordariales genomes (custom bash scripts in Genefiltering/): keep spliced CDS with length >=100 bp, no partial codons, no internal stop codons, both start and stop codons. Code: gene_filtering.sh uses agat_sp_extract_sequences.pl / agat_sp_filter_feature_from_kill_list.pl (agat=0.8.0) + seqkit fx2tab (seqkit=2.4.0) + awk; fasta folding via fasta_formatter (fastx_toolkit=0.0.14)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only"
+    },
+    {
+      "step_id": "C2",
+      "label": "Amino-acid composition, RSCU, GC3 and GC12 per-genome computation with BioKIT V0.1.2 (also used for per-gene GC1/GC2/GC3 in neutrality plots). Code: biokit installed via `pip install jlsteenwyk-biokit -U` (mutable latest), not version-locked",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C3",
+      "label": "Automatic clustering of genomes by amino-acid composition and RSCU with the pheatmap R package. Code: r-env.yml does NOT list pheatmap; resolved as latest at env-create time",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C4",
+      "label": "Ancestral-state reconstruction of GC3 over a 689-species kingdom-wide fungal phylogeny (Wint et al. 2022) with phytools V0.6.44 (ContMap function). Code: r-env.yml does NOT list phytools; not captured in any env file",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C5",
+      "label": "Translation of genes for ribosomal-gene identification with seqkit translate. Code: seqkit=2.4.0 pinned inside agat-environment.yml (non-lock exact pin)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only"
+    },
+    {
+      "step_id": "C6",
+      "label": "Protein-domain annotation with InterProScan (-appl Pfam) to compile the set of PFAM eukaryotic ribosomal genes used as the CAI reference set. Code: InterProScan is absent from every conda-env/*.yml and carries no version anywhere in the repo",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C7",
+      "label": "Effective number of codons (ENC) and codon adaptation index (CAI) per genome-wide CDS with CodonW V1.4.2 (-totals setting; correspondence analysis on ribosomal genes as CAI reference). Code: codonw-environment.yml pins codonw=1.4.4 (non-lock; CONFLICTS with prose V1.4.2)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "B_pin_prose_only"
+    },
+    {
+      "step_id": "C8",
+      "label": "Neutrality plots: per-gene GC12 vs GC3 regression slope estimation with the ggpubr R package. Code: r-env.yml lists r-ggpubr with NO version (mutable latest at env-create)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C9",
+      "label": "ENC/GC3 plots (expected-ENC curve, dNC per-gene selection metric) and figure generation with the ggplot2 R package. Code: r-env.yml lists r-ggplot2 with NO version (mutable latest)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C10",
+      "label": "Phylogenetically independent contrasts to correct trait correlations for phylogenetic dependence with the ape R package. Code: r-env.yml does NOT list ape; not captured",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    },
+    {
+      "step_id": "C11",
+      "label": "Family-level statistics in R V4.4.1 / RStudio: Shapiro-Wilk normality, pairwise Wilcoxon rank-sum (pairwise.wilcox.test, Bonferroni adjustment), Pearson correlation (cor.test). Code: r-env.yml lists r-base with NO version pin (prose V4.4.1 not enforced)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "C_mutable_latest"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 10,
+    "n_NI": 1,
+    "n_X": 0,
+    "S": 11,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/11 (0%) R★ — unexecuted; declared environment statically valid but not verified as the env that produced the results. Code-check CONFIRMS the Stage-1 ceiling: NO step reaches R★ because the env-lock CLAIM does not hold at line level.",
+    "inference_inclusive_upper_bound": "RI ceiling on 10 of 11 computational steps; 1 step (C6, InterProScan) is NI (absent from every env file). Stage-2 line-level verdict: the repo's env-lock claim is NOT a static lock. conda-env/*.yml are bare environment.yml files with only top-level pins (agat=0.8.0, seqkit=2.4.0, fastx_toolkit=0.0.14, codonw=1.4.4, seqtk=1.3, python=3.8) — no build strings, no transitive closure, no conda-lock/pixi.lock/container digest. r-env.yml pins NO versions at all (r-base, r-ggplot2, r-ggpubr, r-tidyverse, ... all bare) and omits pheatmap/phytools/ape entirely. BioKIT is installed via `pip install ... -U` (latest). create-conda-envs.sh installs trnascan-se/busco via loose `mamba install` and downloads Mambaforge (latest) with hardcoded /home/noah paths (linux-64 only). Prose/code version conflicts exist (CodonW V1.4.2 vs env 1.4.4; BioKIT V0.1.2 vs pip -U latest). Input genomes are NOT obtained in code (README requires manual pre-population of CDS_filtered; provenance is Hensen et al. 2023 by citation only) -> Lever 2 FALSE. Both orthogonal levers resolve FALSE from actual repo contents.",
+    "coverage": "11 computational steps assessed at line level against all conda-env/*.yml + prep_dataset.sh, gene_filtering.sh, create-conda-envs.sh, README (repo fetched via gh API, checked 2026-07-23). No wet-lab steps (W=0). Data/genome files never downloaded (scope guardrail).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "linux-64 only and PARTIAL even there: create-conda-envs.sh downloads Mambaforge-Linux-x86_64 with hardcoded /home/noah paths; blast & bedtools rely on cluster environment-modules excluded from the conda-envs; InterProScan, pheatmap, phytools, ape are not present in any env file; all conda YAMLs are bare (no build strings / no lock)."
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment (repo conda-env/ read at line level)",
+      "missing": "Env-lock CLAIM does not hold: all conda-env/*.yml are bare environment.yml (top-level version pins only, NO build strings / NO transitive closure / NO conda-lock or container digest). r-env.yml pins NO versions at all and omits pheatmap/phytools/ape. BioKIT installed via `pip install jlsteenwyk-biokit -U` (mutable latest). trnascan-se/busco installed via loose `mamba install`. Mambaforge fetched as 'latest'. Version conflicts: env codonw=1.4.4 vs prose V1.4.2; BioKIT V0.1.2 prose vs pip -U latest. blast/bedtools/InterProScan absent from the envs. -> Lever 1 (software_env_lock) FALSE; exact_pins_partial.",
+      "how_to_close": "Ship a resolved conda-lock (or pinned container digest) for a declared platform covering ALL tools (agat, seqkit, fastx, codonw, seqtk, biokit at an exact version, R base + every R package incl. pheatmap/phytools/ape, blast, bedtools, InterProScan), reconcile the codonw 1.4.4/1.4.2 and BioKIT version discrepancies, remove hardcoded /home/noah paths, and replace `pip -U` / `mamba install <loose>` with pinned installs."
+    },
+    {
+      "type": 1,
+      "where": "Input genome data (Genefiltering/CDS_filtered; README + Methods)",
+      "missing": "No external DB/reference is obtained in code. README instructs the user to manually place per-genome .gff+.faa into Genefiltering/CDS_filtered before running; genome/phylogeny provenance is Hensen et al. 2023 (ref 21) / Wint et al. 2022 (ref 34) by citation only. No accession list, no download manifest, no checksum, no in-code fetch. -> Lever 2 (in_code_db_pin_classA) FALSE (env_capture_class B_pin_prose_only for the data axis at best).",
+      "how_to_close": "Provide a versioned accession list / download manifest (or a Zenodo snapshot) mapping each Sordariales genome + outgroup to its source accession + checksum, fetched by a script in the repo, so the input set is reconstructable and pinned in code."
+    },
+    {
+      "type": 6,
+      "where": "Workflow orchestration (repo README + prep_dataset.sh)",
+      "missing": "README states the scripts 'were not designed to function as a fully-automated pipeline' and are 'a series of individual steps with manual quality control'. prep_dataset.sh ends by asking the user to manually copy ribosomal fasta files into CUB_analysis/assemblies/<species>; blast/bedtools commands must be manually edited for the local cluster. No single deterministic driver.",
+      "how_to_close": "Provide an end-to-end runnable driver (Snakemake/Nextflow or a fully-scripted bash entrypoint) documenting each manual QC/copy step with exact expected inputs/outputs so the pipeline runs deterministically."
+    },
+    {
+      "type": 12,
+      "where": "Repository provenance (github.com/NoahH35/CodonUsageBias)",
+      "missing": "Repo has NO license and NO tagged release / DOI; the paper links a floating HEAD (last push 2025-03-31T14:38:23Z). No citable commit or archive snapshot is referenced.",
+      "how_to_close": "Add an OSI license and mint a tagged release / Zenodo archive with a DOI; cite the exact commit or archive DOI in the paper."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/NoahH35/CodonUsageBias (custom bash + R; conda-env/ with agat-, biokit-, codonw-, fastx-, seqtk-environment.yml + r-env.yml + create-conda-envs.sh + conda-setup.md; Genefiltering/ + CUB_analysis/ script dirs; README present; no license; default branch main; last push 2025-03-31T14:38:23Z)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "GitHub REST API (gh api, git tree + contents) — env/code files only; no data artifacts fetched (scope guardrail)"
+    },
+    {
+      "artifact": "input genome dataset + Sordariales phylogeny (Hensen et al. 2023, ref 21) and kingdom-wide fungal phylogeny/GC3 (Wint et al. 2022, ref 34)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "referenced via citation only; no accession and no in-code fetch in the repo (user must manually supply genomes)"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage2 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "57b08af655be71f1cb082b7ef99b43ec536d1dbcfdcc84460de7f3236017abb0",
+    "chain_record": "not-yet-recorded",
+    "supersedes": "3a2b303b60fa4660af78d3930ffc20c58f290dc7aa2e9c94f920b24a53298edc"
+  }
+}

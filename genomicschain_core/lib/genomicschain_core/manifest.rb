@@ -73,20 +73,30 @@ module KairosMcp
       FileHasher.walk(dir, exclude: exclude)
     end
 
-    # Tier-2 executed-R verdict record (design v0.3 §7.3'). A DISTINCT record
+    # Tier-3 executed-R verdict record (design v0.3 §7.3'). A DISTINCT record
     # type from job_manifest — assembled + validated on its own path so a
     # metadata-only (hashes-only) submit does not fail-close against the
     # job_manifest required/minItems constraints.
-    def self.build_tier2_verdict(data)
+    def self.build_tier3_verdict(data)
+      Tier3Builder.build(data)
+    end
+
+    def self.validate_tier3!(record)
+      Tier3Validator.validate!(record)
+    end
+
+    def self.build_tier1_report(data)
+      Tier1Builder.build(data)
+    end
+
+    # Tier-2 code-reading adjudication record: same recording path as the
+    # other two, its own record type and schema.
+    def self.build_tier2_adjudication(data)
       Tier2Builder.build(data)
     end
 
     def self.validate_tier2!(record)
       Tier2Validator.validate!(record)
-    end
-
-    def self.build_tier1_report(data)
-      Tier1Builder.build(data)
     end
 
     def self.validate_tier1!(record)
@@ -97,11 +107,11 @@ module KairosMcp
       ReportBodyValidator.validate!(report)
     end
 
-    # Canonical Tier-2 result hash over the sorted list
+    # Canonical Tier-3 result hash over the sorted list
     # [{relative_path, sha256, size_bytes}] of fetched outputs (design v0.3
     # §1a'). Avoids the basename-collision of the legacy dir hash.
-    def self.tier2_result_hash(output_files)
-      Tier2Builder.compute_result_hash(output_files)
+    def self.tier3_result_hash(output_files)
+      Tier3Builder.compute_result_hash(output_files)
     end
 
     # DoS gate. Call before any expensive operation that touches params.
@@ -206,7 +216,13 @@ module KairosMcp
         case obj
         when Hash
           obj.keys.map(&:to_s).sort.each_with_object({}) do |k, acc|
-            v = obj[k] || obj[k.to_sym]
+            # key? not ||: `false || obj[k.to_sym]` is nil, so every false in a
+            # signed payload, a digest subject or a stored evidence envelope
+            # used to serialise as null (found 2026-09-09 when the Tier-2
+            # record's lever booleans came back null; the same path had been
+            # nulling tier3's leaderboard_eligible and all_identical, and the
+            # corpus report_content_hash covers levers that are false).
+            v = obj.key?(k) ? obj[k] : obj[k.to_sym]
             acc[k] = sort_recursive(v)
           end
         when Array
@@ -266,8 +282,8 @@ module KairosMcp
       end
     end
 
-    module Tier2Validator
-      SCHEMA_PATH = File.expand_path('../../schemas/tier2_verdict.schema.json', __dir__)
+    module Tier3Validator
+      SCHEMA_PATH = File.expand_path('../../schemas/tier3_verdict.schema.json', __dir__)
 
       def self.validate!(record)
         require 'json-schema'
@@ -277,7 +293,7 @@ module KairosMcp
           version: :draft4
         )
         return true if errors.empty?
-        raise SchemaViolation, "tier2_verdict schema violation: #{errors.first[:message]}"
+        raise SchemaViolation, "tier3_verdict schema violation: #{errors.first[:message]}"
       end
 
       def self.schema
@@ -285,18 +301,34 @@ module KairosMcp
       end
     end
 
-    module Tier2Builder
-      TIER2_RECORD_VERSION = '0.2'
+    module Tier3Builder
+      TIER3_RECORD_VERSION = '0.3'
 
-      # Assemble a tier2_verdict record from gc_tier2_execute output.
-      # @param data [Hash] verdict identity + operator + expected_output +
-      #                    optional hashes-only input/output files. String or
+      EXECUTION_VERDICTS  = %w[completed env_failed data_blocked outputs_unusable].freeze
+      COMPARISON_VERDICTS = %w[no_target_declared match_exact match_normalized mismatch not_attempted].freeze
+
+      # Assemble a tier3_verdict record from gc_tier3_execute output.
+      #
+      # Record 0.3 carries TWO verdict axes instead of one. "Did it run" and
+      # "did it match" are independent questions, and the 2026-08-14 corpus
+      # survey found 0/5 gate-passing papers declaring any comparison target —
+      # so "ran, nothing to compare against" is the COMMON outcome and needs a
+      # word of its own rather than being filed as an inconclusive comparison.
+      #
+      # expected_output is therefore OPTIONAL. environment_provenance and
+      # inputs_provenance are REQUIRED and never defaulted: a record that does
+      # not say whose environment ran cannot be turned into an honest
+      # certificate, and silently guessing is the exact failure this split
+      # exists to prevent.
+      #
+      # @param data [Hash] verdict identity + operator + optional expected_output
+      #                    + optional hashes-only input/output files. String or
       #                    symbol keys accepted.
       def self.build(data)
         d = data.transform_keys(&:to_s)
 
         operator_in = d['operator']
-        raise ManifestError, "operator field is required for tier2_verdict" if operator_in.nil?
+        raise ManifestError, "operator field is required for tier3_verdict" if operator_in.nil?
 
         output_files = normalize_hash_files(d['output_files'])
         result_hash = d['result_hash']
@@ -305,28 +337,57 @@ module KairosMcp
         end
         raise ManifestError, "result_hash or non-empty output_files required" if result_hash.nil?
 
-        expected = (d['expected_output'] || {}).transform_keys(&:to_s)
-        raise ManifestError, "expected_output.sha256 required" if expected['sha256'].nil?
+        exec_verdict = d['execution_verdict']
+        cmp_verdict  = d['comparison_verdict']
+        unless EXECUTION_VERDICTS.include?(exec_verdict)
+          raise ManifestError,
+                "execution_verdict must be one of #{EXECUTION_VERDICTS.join(', ')} (got #{exec_verdict.inspect})"
+        end
+        unless COMPARISON_VERDICTS.include?(cmp_verdict)
+          raise ManifestError,
+                "comparison_verdict must be one of #{COMPARISON_VERDICTS.join(', ')} (got #{cmp_verdict.inspect})"
+        end
+
+        env_prov = d['environment_provenance']
+        in_prov  = d['inputs_provenance']
+        raise ManifestError, 'environment_provenance is required (never defaulted)' if env_prov.nil?
+        raise ManifestError, 'inputs_provenance is required (use "unknown" if undetermined)' if in_prov.nil?
+
+        run_count = (d['run_count'] || 1).to_i
+        raise ManifestError, "run_count must be >= 1 (got #{run_count})" if run_count < 1
+
+        expected = d['expected_output'] && d['expected_output'].transform_keys(&:to_s)
+        if cmp_verdict == 'no_target_declared' && expected && expected['sha256']
+          raise ManifestError,
+                'comparison_verdict=no_target_declared contradicts a supplied expected_output.sha256'
+        end
 
         record = {
-          'record_type'            => 'tier2_verdict',
-          'record_version'         => TIER2_RECORD_VERSION,
-          'mcp_tool_name'          => 'gc_tier2_submit',
+          'record_type'            => 'tier3_verdict',
+          'record_version'         => TIER3_RECORD_VERSION,
+          'mcp_tool_name'          => 'gc_tier3_submit',
           'mcp_tool_version'       => KairosMcp::VERSION,
           'subject_ref'            => d['subject_ref'],
           'jobspec_digest'         => d['jobspec_digest'],
-          'verdict'                => d['verdict'],
+          'execution_verdict'      => exec_verdict,
+          'comparison_verdict'     => cmp_verdict,
+          'environment_provenance' => env_prov,
+          'inputs_provenance'      => in_prov,
+          'run_count'              => run_count,
           'trust_tier'             => d['trust_tier'] || 'self_reported',
           'result_hash'            => result_hash,
-          'expected_output'        => expected,
-          'expected_output_sha256' => expected['sha256'],
-          'comparator_id'          => d['comparator_id'],
-          'comparator_version'     => d['comparator_version'],
           'backend_id'             => d['backend_id'],
           'started_at'             => d['started_at'] || Time.now.utc.iso8601,
           'elapsed_seconds'        => d['elapsed_seconds'] || 0,
           'operator'               => Builder.build_operator(operator_in, d)
         }
+        if expected && expected['sha256']
+          record['expected_output']        = expected
+          record['expected_output_sha256'] = expected['sha256']
+        end
+        record['comparator_id']       = d['comparator_id'] if d['comparator_id']
+        record['comparator_version']  = d['comparator_version'] if d['comparator_version']
+        record['self_consistency']    = normalize_self_consistency(d['self_consistency']) if run_count > 1
         record['backend_result_hash'] = d['backend_result_hash'] if d['backend_result_hash']
         record['input_files']         = normalize_hash_files(d['input_files']) if d['input_files']
         record['output_files']        = output_files if output_files
@@ -357,6 +418,31 @@ module KairosMcp
           out['size_bytes']    = h['size_bytes']    if h['size_bytes']
           out
         end
+      end
+
+      # self_consistency is what run_count > 1 actually buys. It reports the
+      # NUMBER of runs and whether they agreed; it never asserts "stable" or
+      # "deterministic", because how much N agreeing runs are worth depends on
+      # the pipeline (a tool that picks one of two answers at random agrees
+      # with itself half the time at N=2) and that judgement belongs to the
+      # reader, not to this record.
+      def self.normalize_self_consistency(raw)
+        h = (raw || {}).transform_keys(&:to_s)
+        runs = (h['runs'] || 0).to_i
+        raise ManifestError, 'self_consistency.runs must be >= 2' if runs < 2
+        if h['all_identical'].nil?
+          raise ManifestError, 'self_consistency.all_identical is required'
+        end
+
+        out = {
+          'runs' => runs,
+          'all_identical' => h['all_identical'] ? true : false,
+          'comparator_id' => (h['comparator_id'] || 'exact_sha256').to_s
+        }
+        out['run_result_hashes'] = Array(h['run_result_hashes']).map(&:to_s) if h['run_result_hashes']
+        out['first_divergence']  = h['first_divergence'] if h['first_divergence']
+        out['variation']         = h['variation'] if h['variation']
+        out
       end
     end
 
@@ -396,6 +482,85 @@ module KairosMcp
 
       def self.schema
         @schema ||= JSON.parse(File.read(SCHEMA_PATH))
+      end
+    end
+
+    module Tier2Validator
+      SCHEMA_PATH = File.expand_path('../../schemas/tier2_adjudication.schema.json', __dir__)
+
+      def self.validate!(record)
+        require 'json-schema'
+        errors = JSON::Validator.fully_validate(
+          schema, record,
+          errors_as_objects: true,
+          version: :draft4
+        )
+        return true if errors.empty?
+        raise SchemaViolation, "tier2_adjudication schema violation: #{errors.first[:message]}"
+      end
+
+      def self.schema
+        @schema ||= JSON.parse(File.read(SCHEMA_PATH))
+      end
+    end
+
+    # Assembles a tier2_adjudication record. Identities and counts only: the
+    # adjudication body and the scan stay with the operator and are bound by
+    # adjudication_digest / codescan_evidence_digest. stage_transition.applied
+    # is forced false — the rubric's human sign-off applies a transition, a
+    # signed proposal does not.
+    module Tier2Builder
+      TIER2_RECORD_VERSION = '0.1'
+
+      def self.build(data)
+        d = data.transform_keys(&:to_s)
+        operator_in = d['operator']
+        raise ManifestError, 'operator field is required for tier2_adjudication' if operator_in.nil?
+
+        levers = (d['levers'] || {}).transform_keys(&:to_s)
+        counts = (d['counts'] || {}).transform_keys(&:to_s)
+        st = (d['stage_transition'] || {}).transform_keys(&:to_s)
+
+        record = {
+          'record_type' => 'tier2_adjudication',
+          'record_version' => TIER2_RECORD_VERSION,
+          'mcp_tool_name' => 'gc_tier2_submit',
+          'mcp_tool_version' => KairosMcp::VERSION,
+          'subject_ref' => d['subject_ref'],
+          'canonical_id_value' => d['canonical_id_value'],
+          'tier1_report_content_hash' => d['tier1_report_content_hash'],
+          'tier1_rubric_version' => d['tier1_rubric_version'],
+          'tier1_funnel_stage' => d['tier1_funnel_stage'],
+          'codescan_evidence_digest' => d['codescan_evidence_digest'],
+          'codescan_rubric_version' => d['codescan_rubric_version'],
+          'adjudication_rubric_version' => d['adjudication_rubric_version'],
+          'adjudication_digest' => d['adjudication_digest'],
+          'levers' => {
+            'declared_lock' => levers['declared_lock'] ? true : false,
+            'byte_fixed_lock' => levers['byte_fixed_lock'] ? true : false,
+            'in_code_db_pin_classA' => levers['in_code_db_pin_classA'] ? true : false,
+            'headline' => levers['headline']
+          },
+          'counts' => {
+            'rules_in_code' => counts['rules_in_code'],
+            'rules_unique' => counts['rules_unique'],
+            'tier1_steps' => counts['tier1_steps'],
+            'steps_linked' => counts['steps_linked'],
+            'steps_unlinked' => counts['steps_unlinked'],
+            'proposed_demotions' => counts['proposed_demotions'],
+            'demotion_proposal_is_a_lower_bound' => true
+          },
+          'ambiguous_links' => d['ambiguous_links'].to_i,
+          'discrepancy_codes' => Array(d['discrepancy_codes']).map(&:to_s),
+          'toolchain' => (d['toolchain'] || {}).transform_keys(&:to_s),
+          'stage_transition' => { 'from' => st['from'], 'to' => st['to'], 'applied' => false },
+          'trust_tier' => d['trust_tier'] || 'self_reported',
+          'operator' => Builder.build_operator(operator_in, d)
+        }
+        record['adjudication_toolchain'] = d['adjudication_toolchain'].transform_keys(&:to_s) if d['adjudication_toolchain']
+        record['repository'] = d['repository'].transform_keys(&:to_s) if d['repository']
+        record['submission_key'] = d['submission_key'] if d['submission_key']
+        record
       end
     end
 

@@ -1,0 +1,597 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "0ac998fb93867e62e97b7a9ff3f45c7972225d01a88ef9c168b2bd5df13da124",
+  "canonical_id": {
+    "value": "10.64898/2025.11.30.691444",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Regeneration of the genomic analyses reported in the paper from raw sequence: Micro-C chromatin interaction analysis in mouse granulosa cells at 0h vs 6h post-hCG (alignment, valid-pair extraction, contact matrices, loop/TAD/A-B-compartment calling), enhancer definition by loop-anchor x TSS x ATAC intersection, motif and TF-occupancy enrichment at enhancer classes, and AR/GR/H3K27ac ChIP-seq peak calling plus differential binding, annotation, GO enrichment and signal heatmaps. Wet-lab animal work, library preparation and sequencing are out of scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file (no Snakefile/Nextflow/CWL/WDL/Makefile) exists because no code repository is stated anywhere in the paper. Steps were therefore derived at one-step-per-named-tool-invocation from the Methods subsections 'Micro-C', 'Enhancer identification', 'ChIP-seq', 'Additional datasets' and 'Statistical analysis'. Two HOMER invocations on different input sets (enhancer classes vs ChIP-seq peaks) are kept as separate steps because their inputs and backgrounds differ. Merge/sort/deduplication of pairs is kept separate from pairtools parse because the paper names parameters only for parse.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C01",
+      "label": "Micro-C read QC with FastQC (Dovetail Genomics Micro-C pipeline)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C02",
+      "label": "Micro-C alignment to mm10 with BWA-MEM, parameters \"-5SP-T0\"",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C03",
+      "label": "Valid ligation event identification with pairtools, \"parse --min-mapq 40 --walks-policy 5unique --max-inter-align-gap 30\"",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C04",
+      "label": "Merge of technical/biological replicate pairs, sorting and deduplication (tool unnamed)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C05",
+      "label": "Multi-resolution contact matrix generation with Juicertools (5-50 kb bins)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C06",
+      "label": "Chromatin loop calling with HICCUPS at 5/10/25 kb, default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C07",
+      "label": "Differential loop identification with HICCUPSdiff",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C08",
+      "label": "TAD identification with Arrowhead at 5/10/50 kb, default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C09",
+      "label": "A/B compartment calling with CALDER at 25 kb, default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C10",
+      "label": "mm10 TSS coordinate retrieval via biomaRt",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C11",
+      "label": "Loop-anchor x TSS overlap with ChIPpeakAnno (maxgap = 0); promoter-end vs enhancer-end classification",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C12",
+      "label": "Putative enhancer definition: prior granulosa ATAC-seq peaks overlapped with enhancer-end anchors (ChIPpeakAnno)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Motif enrichment at enhancer classes with HOMER (no parameters or background stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C14",
+      "label": "Consensus TF binding site construction: ReMap 2022 mm10 ChIP-seq peaks across all tissues merged with BEDTools",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C15",
+      "label": "TF-occupancy per enhancer class: overlap, percentage, z-score and hierarchical clustering (custom, method unspecified)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C16",
+      "label": "ChIP-seq alignment to mm10 with Bowtie2 (no parameters stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C17",
+      "label": "ChIP-seq peak calling following the MACS2 algorithm, p-value cut-off 1e-10",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Differential binding with DiffBind using the DESeq2 linear model, FDR <= 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C19",
+      "label": "Genomic distribution of peaks with ChIPseeker (no parameters or annotation source stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C20",
+      "label": "Gene Ontology enrichment with clusterProfiler (no ontology, universe or cutoff stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C21",
+      "label": "Signal heatmap generation with deepTools2 (no parameters, normalisation or window stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C22",
+      "label": "Motif enrichment at AR/GR ChIP-seq peaks with HOMER (no parameters or background stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C23",
+      "label": "Differential expression of reused public microarray datasets (oviduct, mammary) with NCBI GEO2R at default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Statistical analysis in GraphPad Prism 9 or R: one-way ANOVA; Wilcoxon signed-rank with Benjamini-Hochberg; Pearson correlation; thresholds p <= 0.001 and |mean logFC| >= 0.585",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Contact matrix and track visualisation with Juicebox and the UCSC Genome Browser",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "W01",
+      "label": "Mouse husbandry, eCG/hCG superovulation, timed ovary collection and granulosa cell isolation (CBAF1 and Pgr-tm1Bwo lines)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W02",
+      "label": "PGRKO genotyping from ear/tail biopsies",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W03",
+      "label": "RNA extraction, cDNA synthesis and Taqman quantitative real-time PCR",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W04",
+      "label": "Western blot for AR, GR and beta-actin",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W05",
+      "label": "Micro-C library construction (Dovetail Micro-C kit) and shallow + deep sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W06",
+      "label": "AR, GR and H3K27ac ChIP-seq performed by Active Motif (antibodies #39781, sc-8992, #39133)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 18,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 25,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/25 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "18/25 (72%) readiness upper bound = (n_R* 0 + n_RI 18)/S 25. This is a prose-only ceiling, not a claim of reproducibility: RI is the maximum verdict attainable at stage 1, and every RI here rests on re-implementing the analysis from prose because no analysis code is deposited and no sequence data accession exists yet.",
+    "coverage": "computational coverage 25/31 steps (81%); 6 wet-lab steps OOS. 要調査率 n_NI/S = 7/25 (28%); 不能率 n_X/S = 0/25 (0%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "whole paper - there is no Code availability section",
+      "missing": "No analysis code is deposited or linked anywhere in the manuscript. No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears in the text. Every computational step must be re-implemented from Methods prose.",
+      "how_to_close": "Deposit the Micro-C, enhancer-definition and ChIP-seq analysis scripts in a public repository with a versioned release/DOI and cite it in a Code availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Data availability statement",
+      "missing": "Verbatim: \"The datasets generated and/or analysed during the current study will be made available upon publication in a peer-reviewed journal.\" No GEO/SRA/ENA/ArrayExpress/dbGaP/EGA accession is given for the newly generated Micro-C libraries or the AR/GR/H3K27ac ChIP-seq. No sample-to-file mapping is available, so replicate structure (2 biological x 2-3 technical Micro-C libraries; 3-4 ChIP replicates per treatment/genotype) cannot be reconstructed.",
+      "how_to_close": "Deposit raw and processed Micro-C and ChIP-seq data in GEO/SRA with a sample table mapping each accession to timepoint, genotype and replicate; cite the series accession in the preprint."
+    },
+    {
+      "type": 9,
+      "where": "C15 (TF occupancy z-score and hierarchical clustering), C13/C22 (HOMER), C19-C21",
+      "missing": "The bespoke analysis that converts per-TF enhancer-overlap percentages into z-scores and a clustered heatmap is not described beyond its outline (no distance metric, no linkage method, no normalisation) and no script is provided.",
+      "how_to_close": "Release the R/python script that computes the occupancy matrix, the z-score and the clustering, including the clustering call with its arguments."
+    },
+    {
+      "type": 5,
+      "where": "C14-C15 consensus TF binding site set",
+      "missing": "The merged non-redundant per-TF consensus binding site set derived from ReMap 2022 across all mouse tissues is a derived custom database; it is not deposited and the BEDTools merge invocation is not given.",
+      "how_to_close": "Deposit the consensus BED files (or the script plus the exact ReMap download URL) alongside the paper."
+    },
+    {
+      "type": 2,
+      "where": "all computational steps",
+      "missing": "2a - no version number is given for any bioinformatics tool: FastQC, BWA-MEM, pairtools, Juicertools, Juicebox, HICCUPS/HICCUPSdiff/Arrowhead (Juicer suite), CALDER, biomaRt, ChIPpeakAnno, HOMER, BEDTools, Bowtie2, MACS2, DiffBind, DESeq2, ChIPseeker, clusterProfiler, deepTools2, GEO2R. Names such as MACS2, Bowtie2 and deepTools2 carry a major version in the tool name only, which is not a pin. The R version is not stated; only GraphPad Prism 9 carries an exact version. Version axis therefore scores 1/floating for 24 of 25 C-steps (2b floating-version-lower-bound).",
+      "how_to_close": "State exact tool versions in Methods and ship an environment lock (conda-lock / renv.lock / container digest) with the code."
+    },
+    {
+      "type": 13,
+      "where": "C10 (biomaRt), C14 (ReMap 2022), C02/C16 (mm10), C23 (GEO datasets)",
+      "missing": "External reference resources are named but not pinned for retrieval: the Ensembl/biomaRt release used for mm10 TSS coordinates is not stated; the ReMap 2022 download URL/file and the tissue set actually retrieved are not stated; the mm10 assembly source and index build are not stated (no checksum); reused GEO datasets are listed only in Supplementary Table 1, which is outside the assessed text. Under the Delta-B taxonomy these would be prose-DOI-only at best (class B) but cannot be classified at stage 1 without code.",
+      "how_to_close": "Record the Ensembl release, the exact ReMap 2022 file URL with checksum, the mm10 FASTA source, and put GEO accessions in the main-text Data availability section."
+    },
+    {
+      "type": 6,
+      "where": "Micro-C analysis (C01-C09) and ChIP-seq analysis (C16-C22)",
+      "missing": "Two sub-pipelines are externalised to vendors and not versioned or linked: \"Data analysis followed the Dovetail Genomics Micro-C pipeline\" and ChIP-seq \"was performed by Active Motif ... Peak calling from read count followed the algorithm for MACS2\". The vendor pipeline version, its wrapper scripts and any vendor-specific defaults are unavailable, so the described steps are an approximation of what was actually run.",
+      "how_to_close": "Cite the vendor pipeline version/commit and release the wrapper actually executed, or re-run and document an in-house equivalent."
+    },
+    {
+      "type": 11,
+      "where": "C24 statistical analysis",
+      "missing": "GraphPad Prism 9 is commercial software; the split of which tests were run in Prism versus in R is not stated, so part of the statistical path is behind a paid, GUI-only dependency (license-gated, version capped at 1).",
+      "how_to_close": "Re-express the reported tests as R/python scripts, or state precisely which figure panels were computed in Prism."
+    },
+    {
+      "type": 10,
+      "where": "W01-W06",
+      "missing": "Six wet-lab steps (mouse husbandry and superovulation, genotyping, qPCR, western blot, Micro-C library prep, vendor ChIP-seq) are non-computational and excluded from |S|. They are the origin of every primary dataset, so computational coverage is 25/31 (81%).",
+      "how_to_close": "Not applicable - out of scope for Tier-1 computational assessment."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "JATS XML full text: https://www.biorxiv.org/content/early/2025/12/02/2025.11.30.691444.source.xml",
+      "http_status": "200 (164339 bytes; WebFetch returned 403, curl with browser UA returned 200)",
+      "checked_at": "2026-07-28",
+      "network_context": "assessor host, direct https, no proxy"
+    },
+    {
+      "artifact": "Code repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage)",
+      "http_status": "none - no code repository URL is stated anywhere in the paper; no Code availability section exists",
+      "checked_at": "2026-07-28",
+      "network_context": "no URL to resolve; no web search performed (absence is the finding)"
+    },
+    {
+      "artifact": "Sequence data accession for the newly generated Micro-C and AR/GR/H3K27ac ChIP-seq",
+      "http_status": "none - Data availability states verbatim \"The datasets generated and/or analysed during the current study will be made available upon publication in a peer-reviewed journal.\" No GEO/SRA/ENA/ArrayExpress/dbGaP/EGA identifier appears in the text.",
+      "checked_at": "2026-07-28",
+      "network_context": "no accession to resolve"
+    },
+    {
+      "artifact": "Reused public datasets (Gene Expression Omnibus, listed in Supplementary Table 1)",
+      "http_status": "stated-in-paper, no identifier in main text - accessions live only in Supplementary Table 1, which was not retrievable from the JATS XML body",
+      "checked_at": "2026-07-28",
+      "network_context": "supplement not fetched; flagged needs-supplement"
+    },
+    {
+      "artifact": "ReMap 2022 database (mm10, all tissues) - external reference resource",
+      "http_status": "URL-absent - the database is named with its year-version but no download URL, file name or checksum is given",
+      "checked_at": "2026-07-28",
+      "network_context": "no URL to resolve"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "floating",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "618dbe11205d72a170dd6ac4f04da6d1f456f8283141b2a260a332f9d35a873c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

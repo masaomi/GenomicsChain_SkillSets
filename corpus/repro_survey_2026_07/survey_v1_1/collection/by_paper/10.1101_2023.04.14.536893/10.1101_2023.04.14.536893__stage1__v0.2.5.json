@@ -1,0 +1,451 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "6b9ee679b6900d9cb38e402189ae07107d609665a82efc94dd9f8c3bfd90cce2",
+  "canonical_id": {
+    "value": "10.1101/2023.04.14.536893",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2023.04.14.536893v6",
+      "biorxiv:2023.04.14.536893v6"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "mvSuSiE — a multi-trait extension of the Sum of Single Effects (SuSiE) fine-mapping model, shipped as the R package mvsusieR, together with the two computational evaluations that constitute the paper's evidence. (1) A simulation benchmark run under DSC 0.4.3.5: UK Biobank imputed genotypes (N = 248,980, 975 curated regions) with phenotypes simulated from mvSuSiE models under a 2-trait scenario and two 20-/16-trait scenarios ('Trait-specific + Shared Effects' = Scenario A, 'Complex Shared Effects' = Scenario B), summary statistics recomputed with PLINK 2.00a2LM --glm and in-sample LD with LDstore 1.1, then fine-mapped with mvSuSiE (mvsusieR 0.0.3.0518, git commit 9f28916), SuSiE (susieR 0.12.12), CAFEH 1.0, PAINTOR 3.1 and flashfm 0.0.0.9000 wrapping FINEMAP 1.4.1. (2) An applied analysis of 16 UK Biobank blood cell traits: sample QC from 502,492 down to 248,980, quantile normalisation and Mahalanobis outlier removal, PLINK 2 --glm association testing with a stated covariate set, region selection into 975 disjoint fine-mapping regions, joint mvSuSiE and per-trait SuSiE fine-mapping, and two downstream enrichment analyses (GREGOR 1.4.0 over 19 regulatory annotations with a Fisher's-exact recomputation, and gchromVAR 0.3.2 over hematopoietic chromatin accessibility with ashr 2.2-57 shrinkage). There are no wet-lab steps: the Ethics statement records 'This work used publicly available data sets and so ethical approval was not required.'",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, extracted from the bioRxiv v6 JATS XML source (fetched by curl after WebFetch returned HTTP 403) plus the GitHub landing page and README prose of github.com/stephenslab/mvsusieR only. No workflow file was read; the simulation study is orchestrated by DSC (Dynamic Statistical Comparisons) 0.4.3.5, whose DSC-script files live in the Zenodo-archived companion repositories and were NOT opened at stage 1. All 14 steps are computational (layer C); W = 0. Two facts dominate the scoring in opposite directions. (a) Version reporting in this paper is unusually complete: the Code availability statement enumerates exact versions for essentially every dependency (susieR 0.12.12, mashr 0.2.59, flashr 0.6-8, PAINTOR 3.1, BayesSUR 2.0-1, flashfm 0.0.0.9000, FINEMAP 1.4.1, msCAVIAR 0.1, CAFEH 1.0, hyprcoloc 1.0, moloc 0.1.0, MFM 0.2-1, gchromVAR 0.3.2, GREGOR 1.4.0, R 4.1.0, Python 3.7.4, PLINK 2.00a2LM 64-bit Intel Feb 21 2009, LDstore 1.1, DSC 0.4.3.5), the mvSuSiE simulation code is pinned to a git commit id (mvsusieR 0.0.3.0518, commit 9f28916), a 'Computing environment' subsection names the OS and the BLAS (Scientific Linux 7.4, Intel Xeon E5-2680v4, R 4.1.0 linked to OpenBLAS 0.3.13), and all four analysis repositories are archived as citable Zenodo software releases. (b) Nothing in the paper or the mvsusieR README CLAIMS an environment lock: no conda-lock, no renv.lock, no Docker/Singularity image, no requirements.txt is mentioned. Under the rubric's symmetric env-closure gate, exact pins without interpreter+channel+platform closure cap Version at 1, so every step caps at RI regardless of how good the other three axes are. A pixi.toml file is visible in the mvsusieR repository file listing, but the README prose does not discuss it and stage 1 is prose-only, so it is recorded as a stage-2 question, not credited here. Data axis: UK Biobank individual-level genotypes and phenotypes are scored 2 as controlled-access-legitimate (the resource URL and the exact UK Biobank data field ids 22027/22021/22009/31/21022/54/22000 are given, and the UK Biobank Access Management System is a documented DAC path), flagged controlled-access and not penalised; no UK Biobank application number is stated, which is recorded as a gap. The derived PLINK association statistics are separately deposited open on Zenodo, so the two steps that consume only summary data score data = 2 outright.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "UK Biobank sample and phenotype curation — subsetting the 502,492 v3 imputed genotype samples by sex mismatch / pregnancy / missing analysis fields / blood-related disease in hospital in-patient data (15 named conditions) / heterozygosity-and-missingness outliers (field 22027) / relatedness (field 22021) / 'White British' ancestry (field 22009), leaving 257,605; quantile normalisation of the 16 blood cell traits to standard normal; Mahalanobis-distance multivariate outlier removal at the [0.99,1] chi-square-16df quantile, removing 8,625 for a final N = 248,980; positions on hg19",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Association testing of the 16 blood cell traits — PLINK version 2.00a2LM (64-bit Intel, Feb 21 2009) --glm with flags 'hide-covar no-x-sex omit-ref --vif 100', on all autosomal biallelic SNPs with MAF >= 0.1% and INFO >= 0.6; covariates sex (field 31), age at recruitment (21022), age x age, assessment centre (54), genotype batch (22000) and the top 10 UK-Biobank-supplied genotype PCs (22009), built with R model.matrix and quantitative covariates standardised to mean 0 variance 1; z-scores and p-values taken from the T_STAT and P columns",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Selection of the 975 fine-mapping regions — for each trait, take every association with PLINK two-sided t-test p < 5e-8, define a region as all SNPs within +/-250 kb, iteratively merge overlapping regions, then merge across traits until disjoint; extended MHC (chr6:25-36 Mb) excluded; resulting region sizes 411 kb to 8.73 Mb (mean 961 kb, median 686 kb) and 93 to 36,605 SNPs (mean 4,776, median 3,514); full listing in Supplementary Table 4",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Data-driven prior covariance and residual covariance estimation for mvSuSiE — the mixture of 15 sharing-pattern covariance matrices U_k and the 16x16 residual correlation matrix C estimated from the UK Biobank blood cell traits (Supplementary Figs. 4-5, Supplementary Table 8) using the mash/flash machinery (mashr 0.2.59, flashr 0.6-8); full specification of the prior variants is deferred to the Supplementary Note",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "needs-supplement",
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Phenotype simulation from mvSuSiE models on real UK Biobank genotypes (N = 248,980) — three scenarios (2-trait with effect correlation rho in {0,0.5,1} and residual correlation c12 in {0,0.4,0.8}; Scenario A with 20 independent traits and a 19-component covariance mixture; Scenario B with 16 correlated traits and the 15-component mixture estimated from real data); number of causal SNPs S drawn from {1,2,3,4,5} with probabilities {0.3,0.3,0.2,0.1,0.1} (S = 2 fixed in the 2-trait case), causal indices uniform, effects from the multivariate-normal mixture, residual variance sigma^2 solved so the largest per-trait PVE is 0.05%, X and Y column-centred and scaled; regions restricted to 1,000-5,000 SNPs and 400 kb-1.6 Mb",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "distributional-only",
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Summary-statistic and in-sample LD computation for the simulated data sets — PLINK 2.00a2LM --glm applied to the raw (uncentred, unscaled) genotypes, extracting BETA, SE, T_STAT and P; the JxJ in-sample LD matrix R = D^{-1/2} X'X D^{-1/2} with D = diag(X'X) computed using LDstore version 1.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "mvSuSiE on the simulated data sets — mvsusie_rss from mvsusieR version 0.0.3.0518 (git commit id 9f28916), inputs the JxR z-score matrix, in-sample LD and N, settings L = 10, max_iter = 1000, estimate_prior_variance = TRUE, estimate_prior_method = 'EM', precompute_covariances = TRUE, n_thread = 4, all other options default; several prior variants and residual-covariance settings compared per the Supplementary Note",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "SuSiE baseline on the simulated data sets — susie_rss from susieR version 0.12.12, run once per trait on z-scores + in-sample LD + N, with L = 10, estimate_residual_variance = TRUE, max_iter = 1000, remaining arguments default; cross-trait evidence summarised by the ad hoc 'maximum PIP' metric across traits",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "PAINTOR 3.1 comparison (2-trait simulations only) — run on z-scores plus in-sample LD with a single 'dummy' annotation whose entries are all 1, enumerating all configurations up to 2 causal SNPs, the -mcmc option deliberately not used (documented as producing all-zero PIPs, cross-referenced to PAINTOR_V3.0 issue #5), all other options at defaults; N is not an accepted input",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "flashfm comparison (2-trait simulations only) — FLASHFMwithFINEMAP from R package flashfm version 0.0.0.9000, which internally calls FINEMAP version 1.4.1 with '--sss --n-configs-top 1000 --n-causal-snps 10'; NCORES = 4, all other flashfm settings default; inputs effect estimates, standard errors, minor allele frequencies, a zero vector of trait means and N",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "CAFEH comparison — fit_cafeh_summary from CAFEH 1.0 installed under Python 3.7.4, taking effect estimates, standard errors, LD matrix and N, all optional arguments at software defaults (K = 10); credible sets with purity below 0.5 filtered out to match the SuSiE/mvSuSiE convention; PIPs and study PIPs read via get_pip and get_study_pip",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Fine-mapping of the 16 UK Biobank blood cell traits with mvSuSiE and SuSiE — mvsusie_rss on the z-score matrix Z and LD matrix R with L = 10, N = 248980, precompute_covariances = TRUE, estimate_prior_variance = TRUE, estimate_prior_method = 'EM', max_iter = 1000, n_thread = 1; susie_rss per trait with n = 248980, L = 10, max_iter = 1000, estimate_prior_variance = TRUE, refine = TRUE; credible sets with purity < 0.5 discarded",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "controlled-access",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Regulatory-annotation enrichment with GREGOR version 1.4.0 — settings pop = 'EUR', r2_threshold = 0.7, ld_window_size = 10000, min_neighbor = 10, job_number = 10, over 19 annotations (enhancer/promoter and TFBS, genomic structural elements, multi-tissue eQTLs at several FDRs, Pol II binding in EPC-treated HESCs, and PLZF/FOSL2/NR2F2/FOXO1 binding intervals; BED files deposited in one of the Zenodo repositories); GREGOR's own p-values discarded as unreliable (some exceeded 1) and replaced by Fisher's exact tests on the intermediate 2x2 overlap tables; positive sets defined by 95% CS membership plus global PIP > 0.7 (mvSuSiE cross-trait), CS membership plus lfsr < 0.01 (mvSuSiE per trait), CS membership or PIP > 0.7 (SuSiE per trait), union across traits (SuSiE cross-trait); procedure detailed in the notebook 20231106_GREGOR_functional_enrichment.ipynb",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Hematopoietic cell-type enrichment with gchromVAR — gchromVAR R package version 0.3.2, following the steps in the package vignette, weighting the overlap of fine-mapped SNPs with accessible-chromatin regions by the SuSiE or mvSuSiE PIPs; z-scores from computeWeightedDeviations refined by adaptive shrinkage in ashr version 2.2-57, reporting posterior z-scores (posterior mean / posterior sd) and lfsr; inclusion thresholds PIP > 0.01 per trait for SuSiE (100,090 SNPs) and global PIP > 0.01 with trait lfsr < 0.01 for mvSuSiE (39,884 SNPs)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 14,
+    "n_NI": 0,
+    "n_X": 0,
+    "S": 14,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/14 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification). Unexecuted; declared environment statically valid but not verified as the env that produced the results — and here the under-claim is explicit: the paper pins exact versions for every named tool and names the OS, CPU and BLAS, but claims no lockfile, container or conda environment in prose, so Version is capped at 1 by the symmetric env-closure gate and no step can reach R★ from prose alone. n_exact_capture_unexecuted = 0, n_fetch_required = 0 (env_capture_class is 'n/a' throughout at stage 1 by protocol).",
+    "inference_inclusive_upper_bound": "14/14 (100%) RI ceiling — every one of the 14 computational steps reaches RI, and none falls to NI or X. This is the strongest prose-level profile the rubric can award short of environment closure. Data: UK Biobank individual-level data is controlled-access-legitimate (scored 2, flagged controlled-access) with all seven consumed data field ids named, and the derived PLINK association statistics are additionally deposited open at zenodo.8088040, so a reproducer without UK Biobank approval can still re-run the summary-data half (C3, C12 z-score input, C13). Code: all four analysis repositories exist as citable Zenodo software releases (mvsusieR 0.1.8 at zenodo.17296669, finemap-uk-biobank 1.0 at zenodo.8400278, mmbr-rss-dsc at zenodo.8087907 -> current 10620615, mvarbvs at zenodo.8094982 -> current 10635799), which is what rescues the two GitHub URLs printed in the article front matter that now return 404 (stephenslab/finemap-uk-biobank and zouyuxin/mmbr-rss-dsc). Version: exact pins everywhere plus a git commit id for the simulation-time mvsusieR and a stated OpenBLAS 0.3.13 / Scientific Linux 7.4 / R 4.1.0 stack — but no lockfile or image is claimed, so 1 not 2. Params: settings are given at an unusually high resolution (PLINK flag strings, FINEMAP argument strings, GREGOR key-value settings, every susie_rss / mvsusie_rss argument), with only C4 (prior-covariance estimation) and parts of C7 deferred to the Supplementary Note. The single lever that would move this paper is environment closure: shipping the pixi.lock/conda-lock/renv.lock or a digest-referenced image covering R 4.1.0 + OpenBLAS 0.3.13 + the Python 3.7.4 CAFEH stack would take Version from 1 to 2 and make most of these steps R★-eligible at stage 2. Because the code is Zenodo-archived and the mvsusieR repository already contains a pixi.toml not discussed in the README, this paper is a genuine stage-2 candidate rather than a paper that would gain nothing from code inspection.",
+    "coverage": "14/14 computational steps assessed (100% computational coverage; W = 0, no wet-lab steps — the Ethics statement records that only publicly available data sets were used). Scored from the bioRxiv v6 JATS-XML Methods, Data availability and Code availability sections plus the github.com/stephenslab/mvsusieR landing page and README prose only. No code was read line-by-line, no DSC script was opened, no Zenodo archive was downloaded, and nothing was executed.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment — Code availability statement and the 'Computing environment' Methods subsection; mvsusieR README",
+      "missing": "No environment lock is claimed anywhere. The paper gives exact versions for every named tool (susieR 0.12.12, mashr 0.2.59, flashr 0.6-8, PAINTOR 3.1, BayesSUR 2.0-1, flashfm 0.0.0.9000, FINEMAP 1.4.1, msCAVIAR 0.1, CAFEH 1.0, hyprcoloc 1.0, moloc 0.1.0, MFM 0.2-1, gchromVAR 0.3.2, GREGOR 1.4.0, R 4.1.0, Python 3.7.4, PLINK 2.00a2LM, LDstore 1.1, DSC 0.4.3.5, ashr 2.2-57), plus the runtime stack ('Linux machines (Scientific Linux 7.4) with 4 Intel Xeon E5-2680v4 (\"Broadwell\") processors, and with R 4.1.0 linked to the OpenBLAS 0.3.13 optimized numerical libraries'), but no conda-lock, renv.lock, pixi.lock, requirements.txt or container digest is mentioned in the paper or in the mvsusieR README. Exact pins without interpreter+channel+platform closure cap Version at 1 for all 14 steps, which is the sole reason no step is R★-eligible. Note for stage 2: a pixi.toml file is visible in the mvsusieR repository file listing but is not discussed in the README, so it could not be credited at stage 1 — if a resolved pixi.lock accompanies it, Version could move to 2 for the mvsusieR-dependent steps.",
+      "how_to_close": "Ship the resolved lock (pixi.lock / conda-lock / renv.lock) that pins the interpreter, the package source channels and the declared platform for the R 4.1.0 + OpenBLAS 0.3.13 stack and for the Python 3.7.4 CAFEH stack, or publish a container image referenced by digest, and cite it from the Code availability statement alongside the existing Zenodo DOIs."
+    },
+    {
+      "type": 3,
+      "where": "Article front-matter related-URL list (four GitHub links printed above the Introduction)",
+      "missing": "Two of the four advertised GitHub repositories return HTTP 404 as of 2026-07-28: https://github.com/stephenslab/finemap-uk-biobank and https://github.com/zouyuxin/mmbr-rss-dsc. These are exactly the repositories holding the UK Biobank data-preparation code and the DSC simulation harness — i.e. the code for steps C1, C2, C3, C5, C6 and the whole benchmark. The two surviving links are https://github.com/stephenslab/mvsusieR (200) and https://github.com/gaow/mvarbvs (200).",
+      "how_to_close": "Redundancy-rescue applies and the gap does not lower any score: both dead repositories survive as open, authoritative Zenodo software depositions cited in the Code availability statement — 'stephenslab/finemap-uk-biobank: finemap-uk-biobank 1.0' at 10.5281/zenodo.8400278 (concept -> 8400279) and 'stephenslab/mmbr-rss-dsc' at 10.5281/zenodo.8087907 (concept -> current 10620615). The authors should nevertheless restore or redirect the GitHub URLs printed in the article front matter, since a reader following those links gets no pointer to the archives."
+    },
+    {
+      "type": 1,
+      "where": "UK Biobank access — Data availability statement and Ethics statement",
+      "missing": "The Data availability statement cites only 'UK Biobank data, https://www.ukbiobank.ac.uk'. No UK Biobank application/project number is given, and the Ethics statement asserts 'This work used publicly available data sets and so ethical approval was not required', which understates that UK Biobank individual-level genotype and phenotype data are controlled-access and require an approved application. A reproducer can identify the exact variables (data fields 31, 54, 21022, 22000, 22009, 22021, 22027; genotype release v3; the haematology data collection) but cannot verify that they are requesting the same approved dataset. Scored as controlled-access-legitimate (data = 2, not penalised) because the resource resolves and the UK Biobank Access Management System is a documented DAC path.",
+      "how_to_close": "State the UK Biobank application number and the exact data-field list (or a released data dictionary) in the Data availability statement, and correct the Ethics statement to record the controlled-access approval under which the data were used."
+    },
+    {
+      "type": 4,
+      "where": "Simulation of phenotypes and of causal-SNP configurations (step C5), and the EM-based prior-variance estimation inside mvSuSiE (steps C7, C12)",
+      "missing": "The simulation is stochastic throughout — S drawn from {1,2,3,4,5} with stated probabilities, causal indices drawn uniformly at random, effects drawn from multivariate-normal mixtures, Y drawn from the model — and no random seed or seeding scheme is stated in the Methods prose. DSC does manage per-replicate seeds internally, but nothing in the prose shows a seed being set or consumed, so comparison to the published figures is distributional rather than exact.",
+      "how_to_close": "State in the Methods (or the DSC script header cited from the Methods) the seed or the DSC seed-management setting used, so a reproducer can distinguish a distributional match from an exact match; alternatively deposit the realised simulated data sets alongside the association statistics already at zenodo.8088040."
+    },
+    {
+      "type": 13,
+      "where": "GREGOR 1.4.0 reference resources (step C13) and gchromVAR chromatin-accessibility input (step C14)",
+      "missing": "GREGOR requires a reference LD panel and a control-SNP matching database keyed to pop = 'EUR', obtained out of band from http://csg.sph.umich.edu/GREGOR/; no version, build or download date for that reference bundle is stated. For gchromVAR, the hematopoietic accessible-chromatin regions are described only as 'following the steps described in the gchromVAR R package vignette' with a citation to reference [41]; no accession, DOI or snapshot date is given for the peak set or the count matrix in this paper, so the data axis for C14 is scored 1 rather than 2. Both are prose-level pointers at best, i.e. type-13 out-of-band unpinned reference distribution; whether the archived code pins them is a stage-2 class-A/B/C question.",
+      "how_to_close": "Cite the GREGOR reference-bundle version and download date (or mirror it in one of the Zenodo depositions alongside the 19 BED annotation files already deposited), and give an explicit accession or DOI for the hematopoietic ATAC-seq peak set and counts consumed by gchromVAR rather than deferring to the package vignette."
+    },
+    {
+      "type": 6,
+      "where": "Simulation orchestration — 'We used DSC version 0.4.3.5 to perform the simulations' (Computing environment); benchmark definition lives in the Zenodo-archived mmbr-rss-dsc and mvarbvs repositories",
+      "missing": "The executable definition of the benchmark (which method-module runs on which simulate-module output, how many replicates, how jobs are scheduled) is externalised into DSC scripts that are not reproduced or summarised in the paper; the Methods describe the scenarios statistically but not the DSC pipeline structure. The number of simulated replicates per scenario is not stated in the Methods prose. This is not a missing artifact — the DSC code is archived — but the paper alone does not determine the benchmark.",
+      "how_to_close": "State the replicate counts per scenario in the Methods and name the specific DSC script file(s) and the Zenodo record that defines the benchmark, as was done for the GREGOR notebook (20231106_GREGOR_functional_enrichment.ipynb)."
+    },
+    {
+      "type": 2,
+      "where": "mvSuSiE version drift between the simulation study and the released package (steps C7, C12 vs. Code availability)",
+      "missing": "The simulations were run with 'mvsusieR (version 0.0.3.0518, git commit id 9f28916)', whereas the Code availability statement points readers to mvsusieR 0.1.8 (zenodo.17296669) as the released implementation. The two are separated by a large version gap and the paper does not state whether 0.1.8 reproduces the 0.0.3.0518 numerics. The applied UK Biobank fine-mapping (C12) does not name which of the two it used.",
+      "how_to_close": "State explicitly which mvsusieR version produced each set of results (simulations vs. UK Biobank analysis), and record whether the released 0.1.8 reproduces the published simulation output, or archive the 9f28916 tree as its own Zenodo deposition."
+    },
+    {
+      "type": 2,
+      "where": "Supplementary Note dependency for prior specification (steps C4, C7)",
+      "missing": "The mvSuSiE prior variants compared in the simulations, the canonical-covariance construction, and the residual-covariance V settings are all deferred to the Supplementary Note rather than stated in the Methods; the 19- and 15-component covariance mixtures are shown only in Supplementary Figs. 4-5 and Supplementary Table 8. The params axis for C4 is therefore 1 at prose level.",
+      "how_to_close": "Deposit the estimated U_k mixtures and V matrices as machine-readable files in the existing Zenodo record and cite them from the Methods, so the prior does not have to be reconstructed from supplementary figures."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (primary, stated in Code availability): https://github.com/stephenslab/mvsusieR — 'The mvsusieR R package implementing our methods is available on GitHub at https://github.com/stephenslab/mvsusieR'. BSD 3-Clause; README install line 'remotes::install_github(\"stephenslab/mvsusieR\")'; README notes the mashr dependency requires the GNU Scientific Library (GSL); a pixi.toml is visible in the file listing but is not discussed in the README; releases exist.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of the landing page (HTTP 200) plus one WebFetch read of the rendered landing page and README prose"
+    },
+    {
+      "artifact": "code archive: https://doi.org/10.5281/zenodo.17296669 — 'mvsusieR 0.1.8 is also available via Zenodo'. Zenodo API title 'stephenslab/mvsusieR: mvsusieR 0.1.8', resource_type Software, access_right open.",
+      "http_status": "200 OK via https://zenodo.org/api/records/17296669 (the doi.org redirect to zenodo.org/doi/10.5281/zenodo.17296669 returns 403 to unauthenticated curl — bot filtering, not a dead record)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to doi.org (403 at the HTML endpoint) and to the Zenodo REST API (200, JSON parsed)"
+    },
+    {
+      "artifact": "code archive: https://doi.org/10.5281/zenodo.8400278 — 'code for preparing the UK Biobank data'. Zenodo API title 'stephenslab/finemap-uk-biobank: finemap-uk-biobank 1.0', resource_type Software, access_right open, resolved DOI 10.5281/zenodo.8400279.",
+      "http_status": "200 OK via https://zenodo.org/api/records/8400278 (doi.org HTML endpoint 403 to unauthenticated curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to the Zenodo REST API, JSON parsed"
+    },
+    {
+      "artifact": "code archive: https://doi.org/10.5281/zenodo.8087907 — 'code for performing the fine-mapping simulations'. Zenodo API title 'stephenslab/mmbr-rss-dsc: Release of repository to accompany journal r[elease]', resource_type Software, access_right open, current version DOI 10.5281/zenodo.10620615.",
+      "http_status": "200 OK via https://zenodo.org/api/records/8087907 (doi.org HTML endpoint 403 to unauthenticated curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to the Zenodo REST API, JSON parsed"
+    },
+    {
+      "artifact": "code archive: https://doi.org/10.5281/zenodo.8094982 — 'additional code for the fine-mapping simulations and the fine-mapping analyses of the UK Biobank blood cell traits'. Zenodo API title 'gaow/mvarbvs: Add mvSuSiE prior and analysis pipelines', resource_type Software, access_right open, current version DOI 10.5281/zenodo.10635799.",
+      "http_status": "200 OK via https://zenodo.org/api/records/8094982 (doi.org HTML endpoint 403 to unauthenticated curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to the Zenodo REST API, JSON parsed"
+    },
+    {
+      "artifact": "data deposition: https://doi.org/10.5281/zenodo.8088040 — 'PLINK association test statistics from the UK Biobank blood cell traits' (Data availability). Zenodo API title 'PLINK association test statistics of UK Biobank blood traits', resource_type Dataset, access_right open, resolved DOI 10.5281/zenodo.8088041.",
+      "http_status": "200 OK via https://zenodo.org/api/records/8088040 (doi.org HTML endpoint 403 to unauthenticated curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to the Zenodo REST API, JSON parsed"
+    },
+    {
+      "artifact": "controlled-access data source: https://www.ukbiobank.ac.uk — 'UK Biobank data' (Data availability). Individual-level genotypes (release v3) and the haematology data collection; access via the UK Biobank Access Management System. No application number is stated in the paper.",
+      "http_status": "403 Forbidden to unauthenticated curl (bot filtering; the resource is the live UK Biobank portal, not a dead link)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with a browser user-agent"
+    },
+    {
+      "artifact": "code repo (front-matter related-URL, holds the UK Biobank data-preparation code for C1-C3): https://github.com/stephenslab/finemap-uk-biobank",
+      "http_status": "404 Not Found — redundancy-rescue: the same repository is archived open at 10.5281/zenodo.8400278 as 'finemap-uk-biobank 1.0'",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with a browser user-agent"
+    },
+    {
+      "artifact": "code repo (front-matter related-URL, holds the DSC simulation harness for C5-C11): https://github.com/zouyuxin/mmbr-rss-dsc",
+      "http_status": "404 Not Found — redundancy-rescue: the same repository is archived open at 10.5281/zenodo.8087907 as 'stephenslab/mmbr-rss-dsc'",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with a browser user-agent"
+    },
+    {
+      "artifact": "code repo (front-matter related-URL, analysis pipelines): https://github.com/gaow/mvarbvs — also archived at 10.5281/zenodo.8094982",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with a browser user-agent"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/10/24/2023.04.14.536893.source.xml (JATS XML, v6)",
+      "http_status": "200 OK, 227,668 bytes; title-phrase check 'Sum of Single Effects' matched 4 times, 'fine-mapping of multiple traits' matched — correct paper confirmed",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch returned HTTP 403; refetched with unauthenticated curl and a browser user-agent into /tmp/stage1_10.1101_2023.04.14.536893/paper.xml"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "release_snapshot",
+  "stage2_candidate": true,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "2f82ca0f2e379cd2dfbaf588ed1f1235fda7a7e44e7035da0e01cafecde542f3",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

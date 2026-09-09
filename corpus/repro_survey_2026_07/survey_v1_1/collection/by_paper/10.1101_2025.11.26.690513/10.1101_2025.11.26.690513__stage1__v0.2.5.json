@@ -1,0 +1,482 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "01c1613866608adadce18b55425eb957eca09ab0df9209f1794845fef9751533",
+  "canonical_id": {
+    "value": "10.1101/2025.11.26.690513",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.26.690513v1",
+      "biorxiv:2025.11.26.690513v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Palaeogenomic analysis of 20 ancient individuals from the Chonos Archipelago: demultiplexing and nf-core/eager read processing and mapping to hs37d5, genetic sex determination (Sex.DetERRmine), pseudohaploid genotyping at the enrichment targets (pileupCaller/sequenceTools), aDNA damage profiling (DamageProfiler), uniparental marker analysis (mitochondrial mapping to rCRS, Haplocheck, Geneious manual curation and consensus calling, Haplogrep 3 on PhyloTree 17 FU 1.2, haploCart, YHaplo), kinship detection (BREADR), runs of homozygosity (hapROH with Plink 1.9 SNP-count filtering), conditional heterozygosity (Popstats --pi), population structure (Plink 1.9 LD pruning, EMU PCA, ADMIXTURE 1.3, PONG), f3/f4/qpAdm statistics (ADMIXTOOLS 7.0.2 and v5.1), and MDS/heatmap visualisation in R (cmdscale, pheatmap). Ancient DNA extraction, partial-UDG single-stranded library preparation, Prime Plus and Twist target enrichment, and NovaSeq sequencing are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS XML Methods section (retrieved by curl -A; WebFetch of the .source.xml returned HTTP 403). The paper has NO Data availability statement and NO Code availability statement anywhere in the full text: a full-text search for 'availab', 'accession', 'deposit', ENA/EGA/SRA/BioProject/PRJEB/PRJNA/Zenodo/figshare/Dryad returned no data repository, no accession number, and no author analysis-code repository. The single 'Github' string in the text is the bibliographic reference to Schiffels' sequenceTools (a tool dependency, cited without URL, commit, or release). Because the newly generated sequence data has no stated accession and no stated access route, the Data axis is 0 for every computational step, which caps every step at verdict X regardless of the (frequently good) version pinning in the prose. Comparative datasets are cited by reference and enumerated in Table S2, which was not retrievable in the JATS full text. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Demultiplexing of all ancient DNA sequencing data with bcl2fastq 2.19.1 — version pinned, no parameters or sample sheet published",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Read processing and nuclear mapping with the nf-core/eager pipeline v2.4.5 — reads >=25 nt mapped to GRCh37+decoy (hs37d5) with bwa-aln v0.7.17-r1188 using 'ancient DNA parameters' (given only by citation, not enumerated) and a mapping-quality filter of 30; no nextflow.config, profile, or run command published",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Genetic sex determination with Sex.DetERRmine v1.1.2 — version pinned, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Pseudohaploid genotype calling at the enrichment target sites with pileupCaller from sequenceTools v1.5.2 in random-haploid mode — version pinned and calling mode stated; the target SNP panel file (1.2M Twist targets) is not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Ancient DNA damage assessment with DamageProfiler (read length distributions, 5' C>T and 3' G>A misincorporation fractions) — no version, no parameters",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Mitochondrial genome mapping to the revised Cambridge Reference Sequence with nf-core/eager v2.4.5 — pipeline version pinned, but the mitochondrial run configuration and parameters are not stated separately from the nuclear run",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Y chromosome haplogroup calling for the 10 male individuals with YHaplo — no version, no parameters, no ISOGG tree release stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Mitochondrial contamination estimation and preliminary haplogroup assignment with Haplocheck 1.3.3 — version pinned, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Manual inspection of mitochondrial read pileups and consensus FASTA generation in Geneious 11.1.5 / Geneious Prime — polymorphisms called at >=3X coverage and variant frequency >=0.7, consensus threshold 50%, N called below 3X. Human-in-the-loop GUI step: thresholds are stated but there is no script, no saved Geneious workflow, and the resulting consensus FASTAs are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Mitochondrial haplogroup assignment with Haplogrep 3 on PhyloTree 17 - Forensic Update 1.2 — tool major version and phylogeny release both stated; no patch version, no quality-threshold parameters",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Independent mitochondrial haplogroup assignment with the genome-graph method haploCart — no version, no parameters, no reference graph release stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Manual reconciliation in Geneious of individuals whose Haplogrep 3 and haploCart assignments disagreed, by inspecting haplogroup-diagnostic SNPs — human curation step, no recorded decision criteria and no curated output",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Kinship detection with BREADR (pairwise mismatch rate) on pairwise combinations of Chono individuals with >=100,000 SNPs, filter length 1e4 for count computation, relationships up to the 10th degree via test_degree — parameters well stated but no version pinned and no R driver script published",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Sample filtering for the ROH analysis with Plink 1.9 --missing, retaining individuals with >=400,000 SNPs covered in the 1240k target set",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Runs of homozygosity inference with hapROH on ancient Southern Cone individuals, using the 1000 Genomes reference panel and e_model=\"haploid\" — key parameter and reference panel stated, but no hapROH version and no 1000 Genomes release/build stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Conditional heterozygosity for all ancient Southern Cone groups with n>1 using the Popstats package, 'September 27, 2018 version', with the --pi flag and otherwise default settings — date-stamped rather than tagged version; no commit hash",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Linkage-disequilibrium pruning of the merged genotype data with Plink 1.9 --indep-pairwise 200 25 0.4, yielding 170,094 SNPs — version and all three parameters stated, output SNP count reported",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Principal components analysis with EMU using a minor allele frequency filter of 0.01 — MAF parameter stated, but no EMU version, no iteration/eigenvector count, and no RNG seed",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Unsupervised population structure inference with ADMIXTURE 1.3, K=2 to K=12 with 10 replicates each; cross-validation used for K selection. Note a prose inconsistency: Methods state '10 replicates each' while Results state the software 'was iterated in unsupervised mode 20 times', and Figure 2A reports 'the mode of 10/10 iterations'. No RNG seeds are recorded",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Visualisation and replicate-mode summarisation of the ADMIXTURE results with PONG v1.5 at a similarity threshold of 0.9 between replicates",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Outgroup f3 statistics f3(Mbuti; Chono, X) and pairwise individual f3(Mbuti; Ind1, Ind2) with ADMIXTOOLS 7.0.2 qp3Pop, parameter inbreed: YES",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "Multidimensional scaling of the 1 - f3(Mbuti; Ind1, Ind2) matrix with the cmdscale function of the R stats package, k=10 — parameter stated, but no R version and no plotting script published",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Clustering heatmaps of pairwise f3 relatedness drawn with the R package pheatmap — no version, no clustering method/distance parameters, no plotting script",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "f4 statistics with ADMIXTOOLS 7.0.2 qpDstat, f4mode: YES and inbreed: YES — version and both parameters stated; the population/individual configuration lists are in supplementary tables not retrievable in the JATS full text",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "Admixture modelling with qpAdm from ADMIXTOOLS v5.1, allsnps: YES, with a fixed set of 6 outgroups (Mbuti.DG, CHB.DG, China_Tianyuan, Russia_Ust_Ishim_HG.DG, USA_Ancient_Beringian.SG, USA_Anzick_realigned.SG). Note that qpAdm is run from ADMIXTOOLS v5.1 while f3/f4 are run from ADMIXTOOLS 7.0.2 — two different package versions in the same analysis chain, stated but not explained",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 0,
+    "n_X": 25,
+    "S": 25,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/25 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/25. The inference-inclusive upper bound is also 0 R★ and 0 RI: the paper contains no Data availability statement, no accession number, and no stated access route for the newly generated ancient genome data, so the Data axis is 0 at every one of the 25 computational steps and the axis-min forces verdict X throughout. This is not a version-pinning failure — version pinning is comparatively good here: 15/25 steps carry exact prose pins (bcl2fastq 2.19.1, nf-core/eager v2.4.5, bwa-aln v0.7.17-r1188, Sex.DetERRmine v1.1.2, sequenceTools v1.5.2, Haplocheck 1.3.3, Geneious 11.1.5, Haplogrep 3 on PhyloTree 17-FU 1.2, Plink 1.9, Popstats 2018-09-27, ADMIXTURE 1.3, PONG v1.5, ADMIXTOOLS 7.0.2 and v5.1). 10/25 steps have no version at all (DamageProfiler, YHaplo, haploCart, BREADR, hapROH, EMU, R stats/cmdscale, pheatmap, and the two manual Geneious curation steps). Had the data been deposited, the version pins alone would place roughly 15 steps at an RI ceiling; the missing deposition removes the entire denominator. No lockfile, container, or conda specification is claimed, and no author analysis-code repository exists, so even at Stage 2 no step could exceed RI.",
+    "coverage": "25 computational steps assessed from the bioRxiv v1 JATS Methods (Data processing, Uniparental markers, Genetic relatedness, Comparative datasets, Runs of homozygosity, Conditional heterozygosity, Population structure, Outgroup f3 statistics and population clustering, f4 statistics, qpAdm). 4 wet-lab steps (ancient DNA extraction from tooth root powder with bleach pre-wash, partial-UDG single-stranded library preparation, Prime Plus enrichment + NovaSeq 6000 paired-end sequencing, Twist Biosciences enrichment + NovaSeq X paired-end sequencing) counted in W and out of computational-reproduction scope. Radiocarbon dating and archaeological site description are prior work (reference 14) and not counted.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "Whole paper — no Data availability statement",
+      "missing": "There is no Data availability section anywhere in the bioRxiv v1 full text. No accession number, BioProject, ENA/EGA/SRA study, controlled-access repository, or deposition commitment is stated for the newly generated data from the 20 ancient individuals (FASTQ, BAM, the pseudohaploid genotype set, or the 12 recovered mitogenomes). A full-text search for 'availab', 'accession', 'deposit', ENA, EGA, SRA, BioProject, PRJEB, PRJNA, Zenodo, figshare and Dryad returned nothing. The comparative dataset composition is deferred to Table S2, which is not retrievable in the JATS full text, so even the reference panel assembly cannot be reconstructed. This single gap sets Data=0 on all 25 computational steps and is the dominant defect of the paper.",
+      "how_to_close": "Deposit the raw reads and the BAMs in ENA or EGA (controlled access is acceptable and appropriate for Indigenous ancestral remains under a documented data-access committee), deposit the 12 mitogenomes in GenBank, deposit the pseudohaploid genotype file (EIGENSTRAT/PLINK) and the merged comparative dataset definition, and add an explicit Data availability statement giving accessions and the access procedure."
+    },
+    {
+      "type": 5,
+      "where": "Whole paper — no Code availability statement",
+      "missing": "The paper cites no author analysis-code repository (no GitHub, GitLab, Bitbucket, Zenodo, or Software Heritage URL). No nf-core/eager nextflow.config or profile, no pileupCaller invocation, no BREADR/hapROH/pheatmap/cmdscale R driver scripts, no ADMIXTOOLS parameter files (qp3Pop/qpDstat/qpAdm popfile and parfile), no ADMIXTURE/PONG driver, and no plotting scripts are provided. The only 'Github' mention in the text is the bibliographic reference 'Schiffels, S. sequenceTools (Github)', a tool dependency cited without URL, commit, or release tag.",
+      "how_to_close": "Publish the pipeline configuration, parameter files (especially the ADMIXTOOLS parfiles and population lists), and all R analysis and plotting scripts in a public repository, tag a release, archive it to Zenodo, and cite the DOI in a Code availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment",
+      "missing": "No environment lockfile, container image or digest, conda environment specification, or nf-core/eager profile is claimed anywhere. nf-core/eager v2.4.5 does ship containerised tool versions, but the paper claims neither the execution profile (docker/singularity/conda) nor an image digest, so at Stage 1 this remains an unverified implicit claim and capture_claim is exact_pins_partial. Downstream of the pipeline, the ADMIXTOOLS / Plink / ADMIXTURE / R stack has no dependency closure at all, and the R version itself is never stated.",
+      "how_to_close": "State the nf-core/eager execution profile and pin the container image digest; ship a conda-lock or container digest for the downstream stack (ADMIXTOOLS 7.0.2 and 5.1, Plink 1.9, ADMIXTURE 1.3, EMU, PONG 1.5, hapROH, Popstats, R with BREADR/pheatmap/stats)."
+    },
+    {
+      "type": 3,
+      "where": "Steps C5, C7, C11, C13, C15, C18, C22, C23",
+      "missing": "No version pin for DamageProfiler, YHaplo, haploCart, BREADR, hapROH, EMU, the R stats package (no R version stated anywhere in the paper), or pheatmap. For YHaplo the ISOGG tree release is also unstated, and for haploCart the reference graph release is unstated — both are database-like dependencies whose content changes assignments.",
+      "how_to_close": "Pin an exact version (or commit/release tag) for every named tool and R package, state the R version, and pin the reference tree/graph releases used by YHaplo and haploCart."
+    },
+    {
+      "type": 1,
+      "where": "Steps C1, C2, C5, C6, C7, C11, C15, C18, C19, C23",
+      "missing": "Parameter under-specification: the bwa-aln 'ancient DNA parameters' are given only by citation (reference 45) rather than enumerated (-n, -l, -k values); the mitochondrial nf-core/eager run parameters are not stated separately from the nuclear run; DamageProfiler, YHaplo, haploCart and pheatmap have no stated parameters; hapROH has no stated 1000 Genomes release or minimum-SNP/ROH-length settings beyond e_model; EMU has no iteration or eigenvector count; ADMIXTURE has no RNG seeds recorded, which matters because the replicate mode across runs is the reported result.",
+      "how_to_close": "Enumerate every non-default flag inline (not only by citation), record RNG seeds for all replicate-based analyses (ADMIXTURE, EMU), and state the exact reference panel releases."
+    },
+    {
+      "type": 6,
+      "where": "Steps C9 and C12 — Geneious manual curation",
+      "missing": "Two human-in-the-loop GUI steps sit in the middle of the mitochondrial analysis chain: manual pileup inspection and consensus FASTA generation in Geneious 11.1.5 / Geneious Prime (C9), and manual reconciliation of individuals whose Haplogrep 3 and haploCart haplogroup assignments disagreed by inspecting diagnostic SNPs (C12). C9 states its thresholds (>=3X, variant frequency >=0.7, consensus threshold 50%) but produces no deposited output; C12 records no decision criteria at all and no list of which individuals were reconciled or how. Every reported mitochondrial haplogroup depends on these steps.",
+      "how_to_close": "Deposit the 12 consensus mitogenome FASTAs, publish the per-individual reconciliation decisions with the diagnostic SNPs used, and replace the manual step with a scripted consensus caller with stated thresholds."
+    },
+    {
+      "type": 3,
+      "where": "Step C25 versus steps C21 and C24 — split ADMIXTOOLS versions",
+      "missing": "qpAdm is run from ADMIXTOOLS v5.1 while qp3Pop and qpDstat are run from ADMIXTOOLS 7.0.2 within the same analysis chain. Both are pinned, so this is not a missing-version gap, but it is an undeclared two-environment dependency: reproducing the paper requires building two distinct ADMIXTOOLS installations, and the paper neither notes this nor justifies the split.",
+      "how_to_close": "State explicitly that two ADMIXTOOLS installations are required, give the build provenance for each, and note whether the qpAdm results were checked for consistency under 7.0.2."
+    },
+    {
+      "type": 8,
+      "where": "Step C19 — ADMIXTURE replicate count, Methods versus Results",
+      "missing": "Methods state ADMIXTURE was 'run unsupervised from K=2 to K=12 with 10 replicates each'; the Results state the software 'was iterated in unsupervised mode 20 times for K values between 2 and 12'; Figure 2A reports 'the mode of 10/10 iterations'. The three statements cannot all be true, and no seeds are recorded, so the reported ADMIXTURE mode cannot be reconstructed even in principle.",
+      "how_to_close": "Correct the inconsistency, state the replicate count once, and record the RNG seeds (or ship the replicate Q matrices) so the PONG mode is reproducible."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 4)",
+      "missing": "Ancient DNA extraction from tooth root powder with a bleach pre-wash, partial-UDG single-stranded DNA library preparation, Prime Plus (Daicel Arbor Biosciences) enrichment followed by NovaSeq 6000 2x100bp sequencing, and Twist Biosciences enrichment followed by NovaSeq X 2x100bp sequencing are physical steps, out of scope for computational reproduction; counted in W and not verdicted. Note that the assay choice is analytically load-bearing (Prime Plus data is used only for uniparental markers because of a documented allelic bias, Twist data only for genome-wide analyses), so the per-library assay assignment is required metadata for any computational reproduction.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the reproducible entry point would be deposited per-library FASTQ/BAM annotated with the enrichment assay used, once accessions exist."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author analysis code)",
+      "http_status": "none — no author analysis-code repository is stated in the paper; there is no Code availability statement",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text search of the bioRxiv v1 JATS XML for github/gitlab/bitbucket/zenodo/software-heritage URLs; the only match was the bibliographic string 'Schiffels, S. sequenceTools (Github)' (reference 47), a tool dependency cited without URL or commit"
+    },
+    {
+      "artifact": "data accessions (newly generated data: raw reads/BAMs for 20 ancient individuals, pseudohaploid genotypes, 12 mitogenomes)",
+      "http_status": "none — no accession, BioProject, ENA/EGA/SRA study, or repository of any kind is stated anywhere in the paper, and there is no Data availability statement",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML full text; searched for 'availab', 'accession', 'deposit', ENA, EGA, SRA, BioProject, PRJEB, PRJNA, Zenodo, figshare, Dryad"
+    },
+    {
+      "artifact": "comparative genomic datasets (ancient and modern American and worldwide panels, references 1, 12, 17, 25, 29, 56-75)",
+      "http_status": "stated-in-paper by literature citation only — 'Full details of each comparative dataset are detailed in Table S2'; Table S2 is supplementary and was not retrievable in the JATS full text, so no accession is enumerated in the retrievable prose",
+      "checked_at": "2026-07-27",
+      "network_context": "bioRxiv v1 JATS XML full text; supplementary documents not retrieved"
+    },
+    {
+      "artifact": "reference genomes / panels: GRCh37+decoy (hs37d5), revised Cambridge Reference Sequence (reference 49), PhyloTree 17 - Forensic Update 1.2, 1000 Genomes reference panel for hapROH, 1240k / 1.2M target SNP sets",
+      "http_status": "stated-in-paper (named, and PhyloTree is release-pinned; hs37d5, rCRS build, 1000 Genomes release and target SNP panel files are named without accession or URL; not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    },
+    {
+      "artifact": "commercial/GUI dependencies: Geneious 11.1.5 and Geneious Prime (licensed desktop software), Daicel Arbor Biosciences Prime Plus and Twist Biosciences enrichment kits",
+      "http_status": "stated-in-paper (Geneious version pinned; licence-gated, no open substitute stated)",
+      "checked_at": "2026-07-27",
+      "network_context": "not fetched at stage 1"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "76ea29543bd365a7298de4cf479ac94395ece803d8871016592a25291898562c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

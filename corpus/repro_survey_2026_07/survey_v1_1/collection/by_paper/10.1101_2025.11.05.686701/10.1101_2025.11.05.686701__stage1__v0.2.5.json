@@ -1,0 +1,382 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "13fc3f02b710e0707196c1f7ffd3aa1a60d7983cc6730600d9a35c4a3d7bb5f6",
+  "canonical_id": {
+    "value": "10.1101/2025.11.05.686701",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.05.686701v1",
+      "biorxiv:2025.11.05.686701v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "A pure simulation study of the impact of incomplete taxon sampling (ghost lineages, triplet-based taxon exclusion) on inference of gene flow. The whole reproduction target is computational: sequence datasets are generated with the BPP 'simulate' option under MSC-I / MSC-M models for one, two, three (triplet), four and six species; the simulated data are then analysed with BPP (MCMC under MSC-I, including a Savage-Dickey density-ratio Bayes-factor test of introgression), and with the summary methods HyDe (run hyde.py), SNaQ in the PhyloNetworks package (on RAxML gene trees), and the f-branch approach in Dsuite. An analytic/numerical asymptotic calculation of the limiting theta estimate under a two-epoch population-size model is also part of the target. There is no wet-lab component and no empirical dataset.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list taken from the 'Materials and Methods' section, whose five subsections are: 'Comparison of models of gene flow for a species triplet and inference of ghost introgression', 'One species: estimation of theta ... when theta changes over time', 'Two species: estimation of the rate of gene flow between sister species using BPP', 'Four species: estimation of the rate of gene flow using BPP and summary methods', and 'Six species: inference of gene flow on a species phylogeny using BPP and f-branch'. Simulation and analysis are counted as separate steps where the paper states distinct settings for each. No code repository is stated anywhere in the paper, so there was no README to read; the only URL in the Methods is the upstream tool repository https://github.com/pblischak/HyDe cited as the source of the run hyde.py script, which is the tool's own distribution, not study code. The only availability statement is 'Supplementary Material and Data Availability': 'Supplemental information is available at https://doi.org/10.5061/dryad.cvdncjtgt.'",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Simulation of triplet datasets under the three competing gene-flow models (ghost introgression, inflow C->B, outflow B->C) using the 'simulate' option in BPP: tau_R = 2*theta, tau_S = theta, tau_H = tau_y = 0.5*theta, theta = 0.01, tau_0 = 3*theta for the ghost model, phi = 0.2, L = 250 or 1000 loci, S = 4 sequences per species per locus, n = 500 sites, 100 replicates, JC mutation model; distant outgroups added at stated divergence times for HyDe (one) and SNaQ (two)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "simulation-params-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "BPP MCMC analysis of the simulated triplet data under the general MSC-I model of Fig. 2d to estimate the three introgression probabilities (phi_H, phi_x, phi_y): JC model, theta ~ G(2, 200), tau_0 ~ G(2, 67), uniform-Dirichlet on other node ages, thetamodel = linked-msci, burn-in 4e4 iterations, 1e5 samples taken every 2 iterations, ~1.5 h per dataset on one thread",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "mcmc-settings-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Savage-Dickey density-ratio Bayes-factor test of each introgression probability against the null phi = 0, computed from the MCMC sample under the general model, with epsilon = 0.01*sigma = 0.00289 and the prior phi ~ U(0,1); the implementing script is not named or deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-analysis-no-script-deposited",
+        "formula-stated-in-prose",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "HyDe analysis of the simulated data using the script run hyde.py from https://github.com/pblischak/HyDe on a concatenated alignment of pooled site-pattern counts, one sequence per species per locus, one distant outgroup added; no version, commit, or command-line options are given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-tool",
+        "no-version-pin",
+        "no-command-line-stated",
+        "upstream-repo-url-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Gene-tree inference for each locus with RAxML 'with default settings' (no version, no substitution model, no bootstrap/search settings stated), as input to SNaQ",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "default-settings-only",
+        "no-version-pin",
+        "no-model-stated"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "SNaQ network inference implemented in the PhyloNetworks package on the RAxML gene trees, with two distant outgroups included; no version, no hmax, no number of runs/seeds stated, ranking of the three introgression models by pseudo-likelihood",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-tool",
+        "no-version-pin",
+        "no-run-settings-stated",
+        "julia-env-unpinned"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Asymptotic/numerical calculation of the limiting MLE theta* as a function of tau under the two-epoch size models (a) theta_0 = 0.01, theta_1 = 0.001 and (b) theta_0 = 0.001, theta_1 = 0.01, with S = 2 sequences of n = infinity or 500 sites and L -> infinity (eqs. 5 and 12); no script deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "analytic-derivation-in-paper",
+        "no-script-deposited",
+        "no-version-pin"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "One-species simulation and BPP estimation of theta under a constant-theta model when theta actually changes over time: S = 4 sequences, L = 250 or 1000 loci, n = 500 sites, 100 replicates, JC model, theta ~ G(2, 200) (mean 0.01) for scenario a and theta ~ G(2, 2000) (mean 0.001) for scenario b, burn-in 4e4, 1e5 samples every 2 iterations, ~0.5 h per analysis on one thread",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "priors-and-mcmc-stated"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Two-species simulation under MSC-I and MSC-M (Fig. 4a,b) and BPP analysis under MSC-I: theta_0 = 0.001 (thin) / theta_1 = 0.01 (thick), tau_R = 10*theta_0, tau_S = 2*theta_0, tau_T = theta_0, tau_x = tau_y = 1.5*theta_0, eleven phi values (0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8) and nine migration rates M (0, 0.01, 0.03, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5), 100 replicates, L = 250 or 1000, S = 4, n = 500; priors tau_R ~ G(2, 200), theta ~ G(2, 2000), phi ~ beta(1,1); burn-in 4e4, 1e5 samples every 2 iterations, ~1 h on four threads; plus the reference run with thetamodel = linked-all and one theta = 0.001 for all species",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "priors-and-mcmc-stated"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Four-species simulation under MSC-I and MSC-M (Fig. 5a,b) and BPP analysis under MSC-I: theta_0 = 0.001 / theta_1 = 0.01 with an unsampled ghost species splitting branch T-B, tau_R = 4*theta_0, tau_S = 3*theta_0, tau_T = 2*theta_0, tau_U = theta_0, tau_x = tau_y = 1.5*theta_0, L = 250 or 1000, S = 4, n = 500, 100 replicates; priors theta ~ G(2, 400), tau_R ~ G(2, 500), phi ~ beta(1,1); burn-in 4e4, 1e5 samples every 2 iterations; plus the one-theta-for-all reference set",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "priors-and-mcmc-stated"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Analysis of the four-species simulated data with the summary methods HyDe and SNaQ (equivalent to PhyloNet/MPL) to infer gene flow and estimate the introgression probability phi; no versions and no run settings stated for either method in this subsection",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-tool",
+        "no-version-pin",
+        "no-run-settings-stated"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Six-species simulation under the MSC-I model of Fig. 1a and BPP analysis plus the Savage-Dickey Bayesian test: theta_0 = 0.001 / theta_1 = 0.01, tau_R = 5*theta_0, tau_S = 4*theta_0, tau_T = 3*theta_0, tau_U = 2*theta_0, tau_V = theta_0, tau_x = tau_y = 2.5*theta_0, tau_u = tau_v = 1.5*theta_0, tau_z = tau_w = 0.5*theta_0, phi_y = 0.3, phi_u = 0.2, phi_w = 0.1, L = 250 or 1000, S = 4, n = 500, 100 replicates; priors theta ~ G(2, 400), tau_R ~ G(2, 400), phi ~ beta(1,1); burn-in 4e4, 1e5 samples every 2 iterations, ~1.5 h on four threads; plus the one-theta-for-all reference set",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "no-version-pin",
+        "no-control-file-deposited",
+        "priors-and-mcmc-stated"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "f-branch analysis of the six-species simulated data implemented in the Dsuite software, with the correct species tree of Fig. 1a provided; triplet estimates obtained with f4 / HyDe and assembled onto ancestral branches; no Dsuite version, no command line, and no Jackknife/block settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-tool",
+        "no-version-pin",
+        "no-command-line-stated"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 13,
+    "n_X": 0,
+    "S": 13,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/13 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/13 (0%). Every one of the 13 computational steps caps at NI because the version axis is 0 throughout: not a single version number, commit hash, release tag, conda environment, container or lockfile is given for BPP, HyDe, RAxML, SNaQ/PhyloNetworks or Dsuite, and RAxML is cited only as 'default settings'. The simulation and MCMC settings are, by contrast, unusually complete (all taus, thetas, phis, priors, burn-in, sample counts and replicate numbers are stated), so the data and params axes are strong; the binding constraint is entirely the absent software identification plus the absent study code. Because version cannot exceed 0 from prose here, no step is R-star-eligible even if stage-2 code verification were performed.",
+    "coverage": "13 computational steps assessed from Methods prose; 0 wet-lab steps (pure simulation study, no empirical data). The paper has no Code Availability statement and names no study repository; the sole availability statement is 'Supplementary Material and Data Availability: Supplemental information is available at https://doi.org/10.5061/dryad.cvdncjtgt', and that DOI does not resolve (404 at doi.org and at datadryad.org on 2026-07-27), so no study artifact could be reached at stage 1.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "All 13 computational steps (Materials and Methods; no repository exists)",
+      "missing": "No version, build, commit or release is given for any software used: BPP (cited only as Flouri et al. 2018, 2020, 2023 and Yang 2015), HyDe (run hyde.py from the upstream GitHub, no commit or release), RAxML (Stamatakis 2014, 'default settings'), SNaQ / PhyloNetworks (Solis-Lemus and Ane 2016), Dsuite (Malinsky et al. 2021). There is no lockfile, container, conda environment file or any other environment description anywhere in the paper.",
+      "how_to_close": "State the exact version (or commit SHA) of BPP, HyDe, RAxML, PhyloNetworks/Julia and Dsuite used, and ship a conda/pixi lock or container image digest covering them; this is the single change that would lift all 13 steps from NI to RI."
+    },
+    {
+      "type": 3,
+      "where": "All 13 computational steps; especially C1/C2/C8/C9/C10/C12 (BPP control files) and C3/C7 (custom Savage-Dickey and asymptotic-theta calculations)",
+      "missing": "No study code is deposited or referenced. The paper names no repository and has no Code Availability statement. The BPP simulate and MCMC control files, the driver scripts that ran 100 replicates x 2 data sizes across five model configurations, the Savage-Dickey Bayes-factor computation from the MCMC sample, the numerical evaluation of eqs. 5 and 12, and the plotting code for Figs. 3-8 all exist only as prose descriptions.",
+      "how_to_close": "Deposit the BPP control files, the replicate-driver scripts, the Bayes-factor and asymptotic-theta code, and the figure scripts in a public repository with a tagged, archived release cited from the paper."
+    },
+    {
+      "type": 1,
+      "where": "All simulated datasets (C1, C8, C9, C10, C12) and all MCMC output/posterior summaries",
+      "missing": "The simulated sequence alignments and the BPP MCMC output are not deposited. The only availability statement points to https://doi.org/10.5061/dryad.cvdncjtgt for 'supplemental information', and that DOI is unresolvable (404), so even the supplementary figures could not be retrieved. The simulation parameters are fully stated, so the data are in principle regenerable, but nothing generated by the study is retrievable.",
+      "how_to_close": "Activate the Dryad deposit (or replace the dead DOI) and include the simulated alignments or, at minimum, the seeds plus control files needed to regenerate them bit-identically, together with the MCMC output used for the tables and figures."
+    },
+    {
+      "type": 6,
+      "where": "C4 HyDe (https://github.com/pblischak/HyDe) and the software cited for C5, C6, C11, C13",
+      "missing": "The only URL in the paper points at the default branch of a third-party tool repository, with no commit, tag or release named. The state of that branch today is not the state used by the authors, and the same holds for RAxML, PhyloNetworks and Dsuite, which are cited by publication only.",
+      "how_to_close": "Cite an immutable identifier (release tag, DOI-archived snapshot, or commit SHA) for every third-party tool, rather than a moving branch URL or a methods-paper citation."
+    },
+    {
+      "type": 5,
+      "where": "C5 (RAxML), C4/C11 (HyDe), C6/C11 (SNaQ), C13 (Dsuite)",
+      "missing": "RAxML is run with unspecified 'default settings' - no substitution model, no starting-tree or search settings, no seed. HyDe is invoked via run hyde.py with no arguments given (no bootstrap count, no significance-correction settings beyond the 5% p-value threshold mentioned in Results). SNaQ has no hmax, no number of independent runs, and no seed. Dsuite f-branch has no command line, no jackknife block size, and no statement of whether f4 or HyDe was used as the underlying triplet estimator for the reported analysis. No random seeds are reported for any simulation or MCMC run, so replicate-level results cannot be reproduced exactly.",
+      "how_to_close": "Report the full command line for each third-party invocation and the random seeds (or seed-generation rule) for the simulations and the MCMC chains."
+    },
+    {
+      "type": 8,
+      "where": "Availability statement: https://doi.org/10.5061/dryad.cvdncjtgt",
+      "missing": "The single deposited-artifact identifier in the paper is dead: doi.org returns 'DOI Not Found' and the Dryad search API returns zero records for the suffix cvdncjtgt (checked 2026-07-27). Whatever supplemental material or data the statement promises is unreachable.",
+      "how_to_close": "Publish/activate the Dryad deposit and verify that the DOI resolves before the preprint is posted or revised."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE STATED. The paper contains no Code Availability statement and names no study repository. The only repository URL in the whole article is https://github.com/pblischak/HyDe, cited verbatim as: 'analyzed using several summary methods including HyDe, implemented using the script run hyde.py from https://github.com/pblischak/HyDe (Blischak et al., 2018)' - i.e. the upstream distribution of a third-party tool, not code produced by this study. No commit, tag or release is cited.",
+      "http_status": "200 OK (github.com/pblischak/HyDe, third-party tool repo)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to github.com; HTTP status only, landing page read as prose (stage-1). No study-code repository exists to check."
+    },
+    {
+      "artifact": "data / supplement archive: https://doi.org/10.5061/dryad.cvdncjtgt - stated verbatim in the section 'Supplementary Material and Data Availability': 'Supplemental information is available at https://doi.org/10.5061/dryad.cvdncjtgt.' This is the paper's only artifact identifier. It does not resolve.",
+      "http_status": "404 Not Found (doi.org returns 'DOI Not Found'; https://datadryad.org/dataset/doi:10.5061/dryad.cvdncjtgt also 404; Dryad search API returns 0 records for 'cvdncjtgt')",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to doi.org (followed redirects), datadryad.org dataset page, and datadryad.org/api/v2/search"
+    },
+    {
+      "artifact": "sequence data accessions (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA): NONE. All data analysed in the study are simulated with the BPP 'simulate' option; the paper reports no empirical dataset and no sequence-database accession.",
+      "http_status": "n/a (no accession stated)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - determined from the paper text (Materials and Methods; availability statement)"
+    },
+    {
+      "artifact": "supplementary material bundled with the preprint: supplements/686701_file13.pdf ('Supplemental Figures'), attached to the bioRxiv record itself.",
+      "http_status": "not fetched (stage-1 prose triage; referenced in the JATS XML as a bioRxiv-hosted supplementary media file)",
+      "checked_at": "2026-07-27",
+      "network_context": "identified from the JATS XML supplementary-material element retrieved from biorxiv.org"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "43c692b5bf547520094588a2df0ca461ff0a89051762c192745e54d14541f66e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

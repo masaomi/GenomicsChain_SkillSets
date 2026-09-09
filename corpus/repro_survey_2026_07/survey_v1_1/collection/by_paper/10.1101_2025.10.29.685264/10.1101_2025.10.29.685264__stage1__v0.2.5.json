@@ -1,0 +1,606 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "cf4d1f246f2139ecb697ce485fc4f1514a4179243d12a0f8575a20c89f070757",
+  "canonical_id": {
+    "value": "10.1101/2025.10.29.685264",
+    "kind": "doi",
+    "aliases": [
+      "biorxiv;2025.10.29.685264v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The comparative-genomics pipeline that maps four trehalose-breakdown pathways across 868 eukaryotic and 2,645 prokaryotic (2,583 bacterial + 62 archaeal) genomes: NCBI/GTDB/KEGG data assembly, prokaryotic 16S species tree, eukaryotic euBac concatenated species tree, PFAM/phmmer/needle-based KO assignment, delta-statistic phylogenetic-signal test, phytools ancestral-state reconstruction, RANGER-DTL HGT reconciliation, and Barrnap 16S copy-number comparison. The E. coli Keio-knockout growth-curve assay is wet-lab and OOS.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse prose-derived step list: one step per named tool / analysis invocation in Materials and Methods. No workflow file (Snakemake/Nextflow/CWL/Make) exists — the paper states no code repository at all, so there is no executable artifact to decompose. Multi-tool sub-steps that are described as a single operation (e.g. MUSCLE alignment immediately followed by hmmbuild) are kept as one step and scored by axis-min across the tools involved.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C01",
+      "label": "Genome assembly/proteome retrieval from NCBI FTP (~900 euk, ~12,000 prok accessions) and non-redundant dataset construction (one representative genome per species, highest gene count) -> 868 eukaryotes + 2,645 prokaryotes; plus expanded 264-archaeal-genome set",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C02",
+      "label": "Retrieval of one 16S rRNA sequence per prokaryotic genome from GTDB using an in-house Python script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C03",
+      "label": "Multiple sequence alignment of prokaryotic 16S rRNA with MUSCLE v5, default settings; alignment with maximum column confidence retained",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C04",
+      "label": "Alignment trimming with trimAL, -gappyout",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C05",
+      "label": "Prokaryotic species tree with IQ-TREE v2, model GTR+F+I+R10 chosen by -m TEST, ultrafast bootstrap 8,000, three independent runs with seeds 356708/16225/17225, highest-logLik tree retained",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C06",
+      "label": "Rooting the prokaryotic tree with Archaea as outgroup using root.tree() from phytools v2.3-0 in R",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C07",
+      "label": "Selection of 25/37 euBac marker genes (>90% organism presence) and BlastP search against the protein database, E-value cutoff 0.01, top 500 hits extracted",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C08",
+      "label": "MUSCLE v5 alignment of the 500 hits per euBac gene and profile-HMM construction with hmmbuild (HMMER v3.3.2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C09",
+      "label": "hmmsearch (HMMER v3.3.2) extraction of euBac proteins from eukaryotes plus outgroup Halobaculum salinum, followed by in-house Python script that rewrites NCBI protein identifiers to organism names and removes organism redundancy",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Per-euBac-gene MUSCLE v5 alignment and trimming of phylogenetically informative regions with BMGE",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C11",
+      "label": "Per-gene substitution-model selection with IQ-TREE ModelFinder (-m TEST) on each trimmed euBac file",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C12",
+      "label": "Concatenation of the 25 trimmed euBac alignments with catfasta2phyml.pl and construction of a gene partition file with per-gene best models",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C13",
+      "label": "Partitioned maximum-likelihood eukaryotic species tree in IQ-TREE with Halobaculum salinum as outgroup (-o) and 1,000 ultrafast bootstrap replicates (-bb 1000)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Visualization and pruning of species trees on the iTOL web server, with iTOL annotation datasets generated by an in-house Python script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Retrieval of reference protein sequences for six KEGG Ortholog groups (K01194, K22934, K02819, K01226, K05342, K22248) and construction of a local trehalose-breakdown enzyme database",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Proteome domain annotation with InterProScan v5.36 against the PFAM database; PFAM domain IDs per KO group taken from KEGG (listed in supplementary material)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "phmmer sequence search of each PFAM-filtered protein against the local KO database",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C18",
+      "label": "Global alignment of all hits to their target sequences with the Needleman method of EMBOSS v6.6 (needle), 50% identity threshold, KO-group assignment of passing proteins",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C19",
+      "label": "Pathway presence/absence calling from KO-group presence (two-step pathways require both KO groups) and mapping onto the species trees",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Phylogenetic-signal correlation via the delta statistic (Borges et al. 2019 source code) with phytools v2.3-0 in R: midpoint-rooted tree, 100 iterations, presence/absence randomization control, mitochondrial COX1 control; distributions plotted with ggplot2 v3.5.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Ancestral state reconstruction of KO-group presence/absence with phytools v2.3-0 make.simmap(), midpoint.root(), 100 stochastic simulations, ER/SYM/ARD models compared by AIC weights (ER selected), posterior probability > 0.7 called as presence",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Plotting of ancestral-state posterior probabilities onto the midpoint-rooted tree with the ggtree R package",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C23",
+      "label": "Per-KO-group gene-tree construction for HGT analysis: MUSCLE alignment of HMMER-predicted proteins, IQ-TREE with ModelFinder (-m TEST) and ultrafast bootstrap 1,000",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Horizontal-gene-transfer reconciliation with RANGER-DTL 2.0: OptRoot (default settings) rooting of gene trees against the 16S prokaryotic species tree, 100 simulations at each transfer cost T = 1, 2, 3 (300 total), AggregateRanger support values",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "In-house Python script to extract nodes with the most transfer events, back-trace the most frequent recipient per mapping, and render donor-recipient connections on iTOL",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C26",
+      "label": "rRNA gene prediction across all 2,583 bacterial genomes with Barrnap (.fna + .gff from NCBI FTP) and in-house Python parsing to quantify 16S rRNA gene copies per genome",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Comparison of 16S copy-number distributions between bacterial groups encoding different trehalose-breakdown genes: Wilcoxon rank-sum tests and ggplot2 v3.5.1 plots in R",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C28",
+      "label": "Analysis of bird/mammal/reptile microbiome data obtained from The Animal Microbiome Database (AMDB, http://leb.snu.ac.kr/amdb)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "W01",
+      "label": "Wet-lab: E. coli Keio-collection knockouts (treB, treC, treA, treF) vs BW25113 wild type, M9 + 2% trehalose growth curves, OD600 hourly for 24 h, three biological replicates",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 19,
+    "n_NI": 9,
+    "n_X": 0,
+    "S": 28,
+    "W": 1,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/28 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Under-claims by construction: Tier-1 prose-only cannot credit an undeclared-but-present dependency, and no environment lock or container is claimed anywhere in this paper.",
+    "inference_inclusive_upper_bound": "19/28 (68%) readiness upper bound (R-star + RI). Not 'reproducible' - this is the fraction of computational steps whose data, code-reconstructability, software identity and parameters are all at least partially documented in prose.",
+    "coverage": "28/29 steps assessed as computational (|S|=28 of |S|+|W|=29, 97% computational coverage). 1 wet-lab step (E. coli growth-curve assay) is OOS and excluded from |S|. 要調査率 n(NI)/|S| = 9/28 (32%); 不能率 n(X)/|S| = 0/28.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper - there is no Code Availability statement and no author code repository of any kind",
+      "missing": "No GitHub/GitLab/Zenodo/Software Heritage deposit for the analysis pipeline. The only repository URLs in the paper are third-party tools the authors used (github.com/inab/trimal, github.com/nylander/catfasta2phyml, github.com/tseemann/barrnap). The Data Availability statement reads in full: 'All necessary data is available at https://figshare.com/s/04c1bad8d8c6281f1891 . Supplementary materials are available to download.' - data only, no code.",
+      "how_to_close": "Deposit the full analysis pipeline (all in-house Python scripts, the R scripts for phytools/ggtree/ggplot2/delta-statistic, and the driver scripts orchestrating BLAST/HMMER/InterProScan/EMBOSS/IQ-TREE/RANGER-DTL) in a versioned public repository with a release tag or Zenodo DOI, and add a Code Availability statement."
+    },
+    {
+      "type": 9,
+      "where": "C01, C02, C09, C14, C19, C25, C26 - every step that hinges on undeposited author-written code",
+      "missing": "Seven distinct pieces of private code are named but never released: 'custom automated scripts' for NCBI retrieval and representative-genome selection; 'an in-house Python script' for GTDB 16S extraction; 'an in-house Python script' for protein-ID rewriting and organism de-duplication; 'An in-house python script' for iTOL dataset generation; the pathway presence/absence caller; 'An in-house python script' for HGT node extraction and iTOL connection rendering; 'An in-house Python script' for Barrnap output parsing.",
+      "how_to_close": "Publish these scripts. They sit at the join points of the pipeline, so their absence breaks the chain even though the surrounding third-party tool invocations are well documented."
+    },
+    {
+      "type": 5,
+      "where": "C15, C17, C18 - the local KO reference database",
+      "missing": "The 'local database of trehalose breakdown enzymes' built by merging protein sequences from six KEGG KO groups is not deposited, and no KEGG release date/version is given. The six KO IDs are listed (K01194, K22934, K02819, K01226, K05342, K22248), so the database is reconstructable in principle, but not byte-identically - KEGG KO membership drifts over time.",
+      "how_to_close": "Deposit the merged FASTA of the local KO database alongside the KEGG release identifier used."
+    },
+    {
+      "type": 13,
+      "where": "C01, C02, C15, C16, C26, C28 - all external reference-resource consumption",
+      "missing": "No pin on any external database: NCBI FTP retrieval has no download date and no enumerated accession list; GTDB is cited (Parks et al. 2022) but no release number is given; the KEGG Orthology download has no release date; InterProScan v5.36's bundled PFAM version is not stated; AMDB has no version or accession. Every one of these is a rolling resource. At Stage 1 these cannot be classified A/B/C (no code to read), so env_capture_class is 'n/a' throughout, but on prose alone they read as mutable-latest.",
+      "how_to_close": "State the retrieval date and release identifier for each external resource, and ship the exact accession list of the 868 + 2,645 genomes actually analysed."
+    },
+    {
+      "type": 1,
+      "where": "C01 - dataset definition",
+      "missing": "The final analysed set (868 eukaryotes, 2,583 bacteria, 62 archaea, plus a separate 264-archaeal-genome expansion) is described by a selection rule ('one representative genome per species ... highest gene count') but no accession list appears in the paper text. Whether the list is inside the figshare deposit could not be determined from prose alone.",
+      "how_to_close": "Publish the genome-accession-to-species mapping table as a first-class supplementary file with a stable identifier."
+    },
+    {
+      "type": 2,
+      "where": "C03, C04, C05, C07, C08, C10, C11, C12, C13, C17, C22, C23, C26 - unversioned or major-version-only tools",
+      "missing": "No version at all for: trimAL, BlastP/BLAST+, BMGE, catfasta2phyml.pl, phmmer invocation, ggtree, Barrnap, iTOL. Major-version-only for MUSCLE ('v5') and IQ-TREE ('v2'), which do not identify a specific release. R and Python interpreter versions are never stated. Exact-ish pins exist only for HMMER v3.3.2, InterProScan v5.36, EMBOSS v6.6, phytools v2.3-0, ggplot2 v3.5.1 and RANGER-DTL 2.0 - hence capture_claim = exact_pins_partial, not release_snapshot.",
+      "how_to_close": "Ship a conda/pixi lock file or a container digest covering the whole toolchain, including the R and Python interpreters."
+    },
+    {
+      "type": 4,
+      "where": "C13, C20, C21, C23, C24 - stochastic steps without seeds",
+      "missing": "Seeds are given only for the three prokaryotic IQ-TREE runs (356708, 16225, 17225). No seed is reported for the eukaryotic partitioned tree's 1,000 ultrafast bootstraps, the 100 delta-statistic randomization iterations, the 100 make.simmap stochastic character-mapping simulations, the HGT gene-tree bootstraps, or the 300 RANGER-DTL simulations. These steps can only be matched distributionally.",
+      "how_to_close": "Record and report the RNG seed for every stochastic invocation, or deposit the exact output trees/tables so downstream steps can be checked independently."
+    },
+    {
+      "type": 6,
+      "where": "C14, C25 - figure generation externalized to a web service",
+      "missing": "Tree visualization, pruning and donor-recipient connection rendering are performed interactively on the iTOL web server. The pruning operations that determine which taxa appear in the published figures are not captured in any script or configuration file.",
+      "how_to_close": "Export and deposit the iTOL annotation datasets and the pruned Newick trees actually used for each figure."
+    },
+    {
+      "type": 3,
+      "where": "C28 - AMDB",
+      "missing": "http://leb.snu.ac.kr/amdb returned HTTP 502 when checked on 2026-07-28. No authoritative mirror is cited and no AMDB citation appears in the reference list, so no redundancy-rescue is available.",
+      "how_to_close": "Deposit the extracted AMDB subset used, or cite an archived snapshot."
+    },
+    {
+      "type": 10,
+      "where": "W01 - E. coli Keio-knockout growth-curve assay",
+      "missing": "Wet-lab step, out of scope for NASEM-2019 computational reproducibility. Recorded as OOS and excluded from |S|. Documentation quality is good (strain identities, Keio collection provenance, medium composition, temperature, shaking speed, starting OD, sampling interval, replicate count), but the raw OD600 measurements are not identified as a separate deposit.",
+      "how_to_close": "Not required for the computational score. Depositing the raw OD600 time-series would strengthen the wet-lab record."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository (any author-owned repo)",
+      "http_status": "none - the paper states no code repository. No Code Availability statement exists. Not searched for on the web (absence is the finding).",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a - nothing to check"
+    },
+    {
+      "artifact": "data deposit: https://figshare.com/s/04c1bad8d8c6281f1891 (verbatim from Data Availability: 'All necessary data is available at https://figshare.com/s/04c1bad8d8c6281f1891 . Supplementary materials are available to download.')",
+      "http_status": "202 (reachable; figshare anonymous private-share link, JS-gated - content not enumerable from a headless fetch). Note this is a /s/ share URL, not a DOI-bearing citable figshare record.",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with browser UA, from a general-internet host"
+    },
+    {
+      "artifact": "third-party tool repo (not author code): https://github.com/inab/trimal",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with browser UA"
+    },
+    {
+      "artifact": "third-party tool repo (not author code): https://github.com/nylander/catfasta2phyml",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with browser UA"
+    },
+    {
+      "artifact": "third-party tool repo (not author code): https://github.com/tseemann/barrnap",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with browser UA"
+    },
+    {
+      "artifact": "external reference resource: The Animal Microbiome Database, http://leb.snu.ac.kr/amdb",
+      "http_status": "502",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with browser UA, 25 s timeout"
+    },
+    {
+      "artifact": "external reference resources cited without version: ftp.ncbi.nlm.nih.gov/, GTDB (Parks et al. 2022), genome.jp/kegg/",
+      "http_status": "stated-in-paper (not individually probed; no accession list, release number or retrieval date given to probe against)",
+      "checked_at": "2026-07-28",
+      "network_context": "n/a"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "81bfc0db8c83c17143155d2418eba8808fd39bca5e831d45e2eeed25ffc33c3e",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "supersedes_metric_version": null,
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

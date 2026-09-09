@@ -1,0 +1,446 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "65ee43b9037416c079bb7a55ac2eb8683236143a11173a2e0f24c0b865c1260e",
+  "canonical_id": {
+    "value": "10.64898/2025.12.22.696044",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.22.696044v1",
+      "biorxiv:2025.12.22.696044v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Genomic analysis comparing an improved short-nascent-strand sequencing protocol (iSNS-seq) with traditional SNS-seq (tSNS-seq) in S. cerevisiae: Bowtie2 alignment to sacCer3 plus custom spike-in 'chromosomes', SAMtools dedup/filter, MACS3 peak calling, bedGraph->bigWig coverage tracks, reprocessing of published ORC ChIP-seq / OK-seq / FORK-seq datasets into comparable origin call sets (OEM/RFD via sciaratools2 + switchblade), benchmarking against OriDB known origins with a custom python script (originsense.py), UMAP feature analysis of peak properties, transcription-level correlation in R, and reanalysis of published Drosophila tSNS-seq and C. elegans tSNS tiling-array data with DeepTools. Wet-lab work (oligo lambda-exo kinetics assays, SNSmimic/BKGmimic construct synthesis, yeast genomic DNA extraction, sucrose-gradient size selection, lambda-exo/RecJf enrichment, NEBNext library prep and NovaSeq sequencing) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation from the 'Sequence data analysis', 'Benchmarking against known replication origins', 'Enriched feature analyses', 'Transcriptome analysis' and 'Analysis of other genome-wide tSNS studies' Methods sections. IGV visualization is folded into the bigWig conversion step; AWK reformatting is folded into the OK-seq OEM step; SAMtools/BEDtools invocations inside the reanalysis steps are folded into their parent step. Wet-lab procedures counted in W, not verdicted. IMPORTANT liveness finding recorded below: the paper's blanket code statement points to https://github.com/MiikoSokka/iSNS-seq, which returns HTTP 404 (the GitHub user exists but this repository does not); only the second, narrower repository https://github.com/JohnUrban/iSNS-seq (cited in-line for the OK-seq, FORK-seq and benchmarking steps) resolves. Per protocol, this is recorded verbatim and reflected in the code axis; no substitute repository was searched for.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Alignment of iSNS-seq/tSNS-seq fastq to sacCer3 reference with SNSmimic and BKGmimic spike-ins added as extra 'chromosomes', Bowtie 2.5.3 (--maxins 1000, --local, --dovetail, --soft-clipped-unmapped-tlen, -D 500, -R 3, -N 0, -L 19, -i C,1,0, --score-min C,40,0)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primary-code-repo-404",
+        "custom-reference-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "SAMtools 1.22.1 duplicate marking and filtering (remove unmapped/duplicate/low-quality/orphan reads; keep concordant pairs, -F1028 -f3 -q2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primary-code-repo-404"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Peak calling per replicate with MACS 3.0.3 callpeak, no control file (-f BAMPE --mfold 2 100 -q 0.05, --bdg fragment-pileup bedGraph used as coverage track)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primary-code-repo-404"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "bedGraph -> bigWig conversion with UCSC bedGraphToBigWig 2.10 and visualization in IGV (IGV version unstated)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primary-code-repo-404",
+        "gui-tool",
+        "partial-version"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Reprocessing of published ORC ChIP-seq (NCBI SRA SRR1261246, SRR1261247) with the same Bowtie2/SAMtools pipeline and MACS 3.0.2 peak calling (--mfold 2 100 --keep-dup 1 -q 0.001)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "repo-present-unpinned",
+        "version-differs-from-C3"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "OK-seq (SRA SRR364781, SRR364782) origin definition via OEM: bowtie2 (--very-sensitive-local --soft-clipped-unmapped-tlen), SAMtools (view -q 2 -F 4 -f 3), BEDtools genomecov -bga -strand +/- -pc, varStepBdgToSingleStepBdg.py from sciaratools2, AWK reformatting, strandSwitchMetrics.py from the switchblade suite for RFD/OEM in 10 kb windows, positive-zone maxima as origin summits",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "repo-present-unpinned",
+        "external-repos-no-commit"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "FORK-seq origin definition from published single-molecule nanopore initiation events: BEDtools clusterBed -d 5000, groupby (-grp 4 -opCols 1,2,3,4 -ops distinct,min/mean/median,max,count), AWK mid-point computation, median mid-point selected as single-bp origin, 500 bp flanks, rank sort by number of initiation events",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "repo-present-unpinned",
+        "input-file-from-prior-study"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Known-origin reference set from the OriDB database ('confirmed'/'likely'/'dubious' classes); no OriDB release version or access date stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "db-version-unpinned",
+        "repo-present-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Random-shuffle null model: peak intervals randomly reassigned to new positions on the same chromosome; shuffling tool, seed and iteration count not stated in prose",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "tool-unnamed",
+        "no-seed"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Benchmarking of SN / PPV / F-score and binomial expected-overlap statistics across iSNS-seq, tSNS-seq, ORC, OK-seq, FORK-seq and shuffled sets, using the top 390 rank-sorted peaks with 500 bp flanks, automated by custom python script originsense.py (https://github.com/JohnUrban/iSNS-seq); no script version/commit, no python or dependency versions stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "repo-present-unpinned",
+        "no-language-runtime-version"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Enriched-feature matrix and UMAP: BEDtools nuc GC content per narrowPeak region, BEDtools closest -t all distance-to-nearest-feature from peak summits, features from ensGene.v101.gtf downloaded from UCSC, Z-score normalization + one-hot encoding, python umap-learn 0.5.7 (n_neighbors=30, min_dist=0.15, metric='manhattan', random_state=42), replicates combined and analysis run blind to replicate",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "primary-code-repo-404",
+        "annotation-version-pinned",
+        "bedtools-unpinned"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Transcription-level correlation: poly(A) transcriptome GSE162197 converted to bedGraph and averaged over six replicates, log2 transform + z-scoring, zero-value rows removed, two-tailed Spearman rank correlation with exact p-values disabled, regression/scatterplots in R with ggplot2; R and ggplot2 versions unstated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "primary-code-repo-404",
+        "no-language-runtime-version"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Drosophila tSNS-seq reanalysis: SRA SRR1791682 mapped with Bowtie2 to dm3 using the original study's parameters (-N 1 -L 22), SAMtools sorting, BEDtools genomecov -bga -split read depth, bigWig conversion, comparison with published S2 peak calls (GEO GSE65692), and Liftoff mapping of Drosophila r6.64 annotations to dm3; Liftoff/BEDtools/SAMtools versions unstated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "primary-code-repo-404",
+        "tool-versions-absent"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "C. elegans tSNS NimbleGen tiling-array reanalysis (GEO GSE86651, platform GPL16504): use of pre-computed log2(Cy5/Cy3) ratios plus independent recomputation from raw 'pair' files with median normalization, averaging across replicates, BLAST validation of probe coordinates against genome build WS180, annotations from WormBase; no tool versions, no BLAST parameters, no WormBase release stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "primary-code-repo-404",
+        "tool-versions-absent",
+        "db-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "tRNA-gene metaprofile heatmaps/profiles with DeepTools computeMatrix (--regionBodyLength 150 --beforeRegionStartLength 3000 --afterRegionStartLength 3000; --binSize 1 for Drosophila, --binSize 10 for pre-computed C. elegans ratios, --binSize 50 for raw log2 ratio heatmaps/profiles); DeepTools version unstated, plotting command not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "primary-code-repo-404",
+        "tool-versions-absent"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 9,
+    "n_X": 0,
+    "S": 15,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/15 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "6 of 15 computational steps (C1-C5, C11) reach RI at stage-1: raw data are publicly deposited (ENA PRJEB95115; reused SRA/GEO accessions), parameters are unusually complete in prose, and exact version pins exist for the core pipeline (Bowtie 2.5.3, SAMtools 1.22.1, MACS 3.0.3/3.0.2, bedGraphToBigWig 2.10, umap-learn 0.5.7, ensGene.v101 annotation). Those steps stay at RI rather than R-star because there is no environment closure (no lockfile, container digest, conda env, or tagged release) and because the code axis cannot exceed 'reconstructable' at prose level. The remaining 9 steps cap at NI on the version axis: BEDtools, DeepTools, Liftoff, BLAST, R/ggplot2, python, and the sciaratools2 / switchblade helper repositories are all cited without versions or commits, and OriDB / WormBase releases are unpinned. A material ceiling is the code-liveness failure: the paper's blanket statement 'all code used to perform the analyses described in this study is available at https://github.com/MiikoSokka/iSNS-seq' resolves to HTTP 404, so the only reachable code covers the comparison/benchmarking analyses (JohnUrban/iSNS-seq), not the primary iSNS-seq/tSNS-seq processing, UMAP, or transcriptome steps.",
+    "coverage": "15 computational steps assessed from Methods prose plus the reachable repository landing page and README prose (JohnUrban/iSNS-seq, code/README.md); 6 wet-lab steps counted (W) but out of computational-reproduction scope. Data availability statement present and specific; code availability is stated in Methods and Data availability but the primary URL is dead.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "Primary code availability statement (Methods 'Analysis of other genome-wide tSNS studies' and Data availability)",
+      "missing": "The stated blanket code repository https://github.com/MiikoSokka/iSNS-seq returns HTTP 404 (user MiikoSokka exists with 9 public repositories, none named iSNS-seq). The primary processing steps (C1-C4), the UMAP feature analysis (C11), the transcriptome correlation (C12) and the Drosophila / C. elegans reanalyses (C13-C15) therefore have no reachable code artifact.",
+      "how_to_close": "Publish (or make public) the MiikoSokka/iSNS-seq repository, or redirect the statement to the reachable JohnUrban/iSNS-seq repository and add the missing alignment, peak-calling, UMAP, R correlation and DeepTools scripts there."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 15 computational steps; JohnUrban/iSNS-seq code/README.md dependency list",
+      "missing": "No conda environment, lockfile, container image or digest, requirements file, or tagged release anywhere. The reachable repository's README lists dependencies as bare names only ('bowtie2, bedtools, samtools, picard, awk') with no versions and no install specification; the repository has zero releases. Prose pins exist only for Bowtie 2.5.3, SAMtools 1.22.1, MACS 3.0.3 and 3.0.2, bedGraphToBigWig 2.10, umap-learn 0.5.7. BEDtools, DeepTools, Liftoff, BLAST, picard, python, R and ggplot2 are entirely unversioned.",
+      "how_to_close": "Ship a pinned environment (conda-lock / pixi.lock / Docker image digest) covering every named tool, and cut a versioned release or archive the repository to Zenodo so a specific code state can be cited."
+    },
+    {
+      "type": 2,
+      "where": "Helper code dependencies C6 (sciaratools2, switchblade)",
+      "missing": "varStepBdgToSingleStepBdg.py (https://github.com/JohnUrban/sciaratools2) and strandSwitchMetrics.py from the switchblade suite (https://github.com/JohnUrban/switchblade) are cited by repository URL only, with no commit hash, tag, or release. Both URLs resolve (HTTP 200) but point at moving default branches.",
+      "how_to_close": "Cite a commit SHA or tagged release (or vendor the exact script versions into the analysis repository)."
+    },
+    {
+      "type": 1,
+      "where": "C1 custom reference genome",
+      "missing": "Reads were aligned to a modified sacCer3 in which the SNSmimic and BKGmimic spike-in sequences were appended as extra 'chromosomes'. The resulting FASTA / bowtie2 index is not deposited; only the oligo/primer sequences appear in Supplementary Table S1, and the sacCer3 assembly release is not pinned.",
+      "how_to_close": "Deposit the exact modified reference FASTA (or a build script plus the sacCer3 accession/release used) alongside the code."
+    },
+    {
+      "type": 1,
+      "where": "C7 FORK-seq input, C8 OriDB, C14 WormBase/WS180",
+      "missing": "The FORK-seq initiation-event file is taken from a prior publication without an accession or download URL; the OriDB origin set is used without a release version or access date; C. elegans genome build WS180 and its annotations are 'downloaded from WormBase' without a release identifier or URL.",
+      "how_to_close": "Record accession/URL plus retrieval date and release version for each external reference resource, or deposit the exact input files used."
+    },
+    {
+      "type": 5,
+      "where": "C9 shuffle null model; C14 BLAST probe validation; C15 plotting",
+      "missing": "The shuffling implementation, random seed and number of shuffles are not stated (only 'peak intervals were randomly reassigned to new positions on the same chromosome'); BLAST program and parameters used to validate GPL16504 probe coordinates are not stated; the DeepTools plotting command (plotHeatmap/plotProfile) and its options are not given, only computeMatrix.",
+      "how_to_close": "State the shuffle tool, seed and replicate count; give the BLAST program/parameters; include the plotting commands."
+    },
+    {
+      "type": 7,
+      "where": "Data availability statement (Zenodo link) and ENA accession consistency",
+      "missing": "The Zenodo processed-data link is written as 'https://10.5281/zenodo.17781404', i.e. a DOI rendered as a hostname, which is not a resolvable URL as printed (the record itself exists and is public). The paper states ENA project PRJEB95115 ('SNSseq_Yeast_MethodComparison') while the reachable repository README states PRJEB95028 (title matching the paper) and lists all four per-sample accessions as 'TBD'; both ENA studies resolve, so which one holds the four libraries is ambiguous from prose alone.",
+      "how_to_close": "Correct the Zenodo link to https://doi.org/10.5281/zenodo.17781404, reconcile the ENA project accession between paper and repository, and fill in the per-sample run accessions."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: oligo lambda-exo kinetics assays, SNSmimic/BKGmimic PCR construct synthesis, yeast genomic DNA extraction (W303), sucrose-gradient size selection, tSNS/iSNS lambda-exo and RecJf enrichment plus Klenow second-strand synthesis, NEBNext Ultra II library prep and NovaSeq 6000 sequencing",
+      "missing": "Wet-lab generation steps are out of scope for computational reproduction (OOS); counted in W, not verdicted. A detailed protocols.io entry (https://dx.doi.org/10.17504/protocols.io.kxygx4xo4l8j/v1, HTTP 200) is provided for the bench protocol.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the sequence/data analysis."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (primary, stated twice in paper): https://github.com/MiikoSokka/iSNS-seq - 'Unless otherwise specified, all code used to perform the analyses described in this study is available at https://github.com/MiikoSokka/iSNS-seq.'",
+      "http_status": "404 Not Found",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L to github.com and GitHub REST API /repos/MiikoSokka/iSNS-seq (message: 'Not Found'); /users/MiikoSokka/repos returns 9 public repositories, none named iSNS-seq"
+    },
+    {
+      "artifact": "code repo (secondary, cited in-line three times for OK-seq, FORK-seq and benchmarking steps): https://github.com/JohnUrban/iSNS-seq - description 'scripts and files to help reproduce analyses from iSNS-seq paper.'; default branch main, created 2025-08-05, last push 2025-11-04, no license, 0 releases; top level README.md + code/ (code/README.md, code/analyses/{fork,geckocorrection,known_origins,okseq,orc}, code/scripts/{geckocorrection,originsense,other_utilities,switchblade})",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + GitHub REST API; README prose read only (no source line-by-line reading at stage 1)"
+    },
+    {
+      "artifact": "code repo (helper, cited by URL for varStepBdgToSingleStepBdg.py): https://github.com/JohnUrban/sciaratools2 - no commit or tag cited in the paper",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L to github.com"
+    },
+    {
+      "artifact": "code repo (helper, cited by URL for strandSwitchMetrics.py / switchblade suite): https://github.com/JohnUrban/switchblade - no commit or tag cited in the paper",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L to github.com"
+    },
+    {
+      "artifact": "data accession (newly generated raw sequencing): ENA at EMBL-EBI, PRJEB95115 - 'The raw sequencing data for this study have been deposited in the European Nucleotide Archive (ENA) at EMBL-EBI under accession number PRJEB95115.'; ENA portal returns study title 'SNSseq_Yeast_MethodComparison'",
+      "http_status": "200 OK (ENA portal API, study record returned)",
+      "checked_at": "2026-07-27",
+      "network_context": "https://www.ebi.ac.uk/ena/portal/api/search?result=study&query=study_accession=\"PRJEB95115\""
+    },
+    {
+      "artifact": "data accession (conflicting, stated only in the repository README): ENA PRJEB95028 - README: 'can be found at the European Nucleotide Archive (ENA) at EMBL-EBI project accession ID: PRJEB95028.'; ENA portal returns study title identical to the paper title; per-sample accessions listed as 'TBD' for tSNS rep1/rep2 and iSNS rep1/rep2",
+      "http_status": "200 OK (ENA portal API, study record returned)",
+      "checked_at": "2026-07-27",
+      "network_context": "https://www.ebi.ac.uk/ena/portal/api/search?result=study&query=study_accession=\"PRJEB95028\""
+    },
+    {
+      "artifact": "data archive (processed data): Zenodo 10.5281/zenodo.17781404, 'Processed data for: Improved short nascent strand sequencing (iSNS-seq)...' (dataset); files: iSNS_rep1/rep2 and tSNS_rep1/rep2 _peaks.narrowPeak and _treat_pileup.bw (8 files). Paper prints the link as 'https://10.5281/zenodo.17781404' (DOI as hostname), which is not resolvable as printed.",
+      "http_status": "200 OK (https://zenodo.org/records/17781404 and Zenodo REST API)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl to zenodo.org; the malformed in-paper URL was not itself resolvable"
+    },
+    {
+      "artifact": "reused public accessions cited in prose: SRA SRR1261246, SRR1261247 (ORC ChIP-seq); SRA SRR364781, SRR364782 (OK-seq); SRA SRR1791682 (Drosophila S2 tSNS-seq); GEO GSE65692 (S2 origin peak calls); GEO GSE162197 (poly(A) transcriptome); GEO GSE86651 + platform GPL16504 (C. elegans tSNS tiling arrays)",
+      "http_status": "not individually checked (public NCBI identifiers cited in prose)",
+      "checked_at": "2026-07-27",
+      "network_context": "prose-cited public accessions; no per-accession resolution performed at stage 1"
+    },
+    {
+      "artifact": "protocol: protocols.io https://dx.doi.org/10.17504/protocols.io.kxygx4xo4l8j/v1 (detailed iSNS-seq bench protocol; wet-lab, OOS)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "972fa2e9567a86996e96178861ed120bd752abca22b34a11d4b39bcc942e916a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

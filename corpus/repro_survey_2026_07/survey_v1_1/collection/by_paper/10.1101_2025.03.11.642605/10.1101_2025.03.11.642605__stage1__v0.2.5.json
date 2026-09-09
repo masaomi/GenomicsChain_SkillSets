@@ -1,0 +1,395 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "ad1f79f1d8ca4793b12a8ebd1697e0f2086b8eb4fee79a8d88eed5f6b75c3398",
+  "canonical_id": {
+    "value": "10.1101/2025.03.11.642605",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.03.11.642605v3",
+      "biorxiv:2025.03.11.642605v3",
+      "BIORXIV/2025/642605"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "The complete 'compound processing potential' (CPP) comparative analysis: from raw/previously-generated shotgun metagenome reads of four published case-study datasets (Sun & Badgley 2019 post-mining restoration-gradient soils; Australian Microbiome Initiative disturbed vs natural soils as prepared in Liddicoat et al. 2024; Forslund et al. 2015 gut metagenomes for the Karlsson 2013 Swedish and Qin 2012 Chinese T2D cohorts) through QA/QC, human-read removal, SUPER-FOCUS SEED-subsystem functional profiling, the purpose-built ModelSEED-based function-to-reaction-to-compound redistribution that yields per-compound CPP (%), and then the statistical layer (Kendall's tau ordinal trend tests, Wilcoxon rank-sum T2D-vs-normal tests, compound-wide association scans with BH FDR handling, overlap analysis on ModelSEED compound identifiers, O:C/H:C/N:C chemical-ratio mapping and cluster summed-CPP analysis, AMI corroboration, and supplementary PCoA/PERMANOVA/beta-dispersion) reproducing Figures 1-5, Table 1 and Figures S1-S40. There is NO wet-lab component: all four datasets are previously published metagenomes re-analysed here (W=0).",
+  "step_source": "prose-methods",
+  "granularity_note": "Steps are derived from the Methods prose (sections 2.1 Case study data, 2.2 Metagenome functional profiling via CPP, 2.3 Statistical Analysis) supplemented by the repository README prose (github.com/liddic/cpp3d_t2d), which is the only place software versions and data accessions appear - the paper's own Data availability statement contains ONLY the sentence 'Code used to support this study is available from: https://github.com/liddic/cpp3d_t2d' and no accession is stated anywhere in the paper body. Table 1 ('Description of case study metagenome datasets') is delivered as a bitmap graphic in the JATS XML, so its per-dataset sample counts / accessions are not machine-readable from the text. Granularity is COARSE: one step per named tool invocation or per named statistical analysis, not one step per figure. The HPC preprocessing chain (retrieval, QA/QC, human-read removal, SUPER-FOCUS) is 4 steps; the R analysis chain is 10 steps. Per protocol v0.2.6 this is Stage-1 prose triage: no workflow source was read line-by-line, so env_capture_class is 'n/a' everywhere and no step may be scored R-star.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Raw metagenome sequence retrieval / access for the four case-study datasets on Flinders University DeepThought HPC and Pawsey Setonix HPC ('raw metagenomic sequences were accessed'). README states the sources as NCBI SRA accessions PRJEB1786 and PRJNA422434, MG-RAST project mgp16379, and the Australian Microbiome Initiative data portal.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement",
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "QA/QC of raw reads ('trimmed for quality control ... to obtain good quality sequences'). Tools appear ONLY in the README software list (FastQC v0.11.9, Fastp v0.23.2); the paper prose names neither tool nor any threshold, and no trimming parameter value (quality cutoff, length cutoff, adapter set) is stated in the paper or the README.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Human-read removal from the gut datasets: reads mapping with Bowtie2 (v2.4.1 per README) to the human genome GRCh38.p14 / hg38 were excluded ('low levels were observed'). Reference build is named exactly; no Bowtie2 mode, sensitivity preset, or filtering flag is stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Functional profiling: 'good quality read 1 sequences were classified to SEED subsystem functional annotations and relative abundances using SUPER-FOCUS software' (README: SUPER-FOCUS v0.0.0, aligner Diamond v0.9.19, Python v3.8.5). The SUPER-FOCUS reference database build/release is not stated anywhere; the Discussion notes 'The SUPER-FOCUS and ModelSEED resources we used have not been actively updated in recent years'.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Function-to-reaction mapping: 'Every SUPER-FOCUS function (output row) was translated to one or more corresponding chemical reaction(s) using a purpose-built R-script algorithm based on ModelSEED database lookup tables (from https://github.com/ModelSEED/ModelSEEDDatabase; accessed 10 Aug 2022)'. Matching rules are fully stated in prose: full functional-hierarchy match (subsystem-class, -subclass, -name, -role), EC-number detection, or SUPER-FOCUS function-name match within ModelSEED reactions (name/alias), subsystems (role), or reaction-pathways (external reaction name).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Reaction-to-compound linkage and CPP computation using ModelSEED 'reactions.tsv' and 'compounds.tsv': function-level relative abundances (summing to 100% per sample) divided equally across sub-functions and reactions, divided again across corresponding compounds with stoichiometric-coefficient weighting and equal treatment of reactants and products, then collated and summed per unique compound to give CPP (%). Paper states 'all software parameters and supporting R code for CPP calculations are available at' the repository. Recovery reported as typically 65-70% of the initial 100%.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Elemental-ratio computation for carbon-containing compounds (O:C, H:C, N:C from chemical formulae) and the 3-D chemical mapping visualisation (O:C by H:C panels, N:C rendered as three depth-slices, compound-class zones adapted from Rivas-Ubach et al. 2018 / Wu et al. 2018).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Kendall's tau rank-correlation trend tests of CPP against ordinal revegetation-age classes for the 30 pre-selected soil/gut-relevant compounds (Table S1) in the restoration-gradient soils; trends with ecosystem degradation interpreted as the inverse of trends with increasing revegetation age. R v4.2.2 per README.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Wilcoxon rank-sum (Mann-Whitney) difference tests of CPP in T2D versus normal health for the 30 selected compounds, in the Swedish (SWE) and Chinese (CHN) cohorts. Stated preprocessing and test settings: log10-transformed CPP % values after zero replacement with half the minimum non-zero CPP % across all samples; one-sided (directional) tests keyed on whether the T2D median exceeds or falls below the normal median; non-parametric choice justified by unequal group variance and to avoid normality assumptions.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Compound-wide association scans over all compounds in each CPP dataset with the same trend-evaluation methods, plus stated inclusion filters and multiple-testing policy: soils exclude compounds lacking relative-abundance data for at least a quarter of samples; gut includes a compound only if at least one of the T2D or normal groups has at least 50% non-zero CPP values; Benjamini-Hochberg FDR correction applied to the restoration-gradient soils, and explicitly NOT applied to the compound-wide T2D gut data ('none were low enough to withstand Benjamini and Hochberg P-adjustment ... therefore, P-adjustment was not performed ... to retain the most interesting (potentially significant) results'). Yields n=757 increasing / n=1,365 decreasing compounds in soils.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Overlap analysis between restoration-gradient and T2D (SWE) trending compounds, 'based on matching ModelSEED compound identifiers', retaining compounds with consistent direction of CPP change with degradation and with T2D; 286 of 304 overlapping compounds are carbon-containing and are visualised through chemical-ratio mapping (Figure 3).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Identification of 'prominent localized clusters of consistently trending compounds' within the O:C/H:C/N:C mapping space and analysis of their collective (summed) CPP trends (e.g. the sugar group: Kendall's tau ~restoration = -0.844, P<0.001; Wilcoxon W = 985, P = 0.002 in T2D SWE; the BCFA-ACP group: tau = 0.741, W = 518, P = 0.023). The prose does not state how cluster boundaries were delimited (no clustering algorithm, distance metric, or threshold is named - the rectangular compound-class zones are described as 'a visual guide only').",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Corroboration of the parallel CPP trends in the Australian Microbiome Initiative disturbed-versus-natural soils ('CPP trends for identified compounds were then assessed in disturbed versus natural AMI soils'), using SUPER-FOCUS functional profiles previously prepared in Liddicoat et al. 2024. The statistical test used for this corroboration is not named in the main-text Methods (deferred to Supplementary Material and the repository); the AMI raw data are reachable only through the Bioplatforms Australia data portal, for which no accession is given and which returns 401 unauthenticated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Supplementary community-scale comparison of conventional functional-potential (%) data versus CPP (%) data for the restoration-gradient and Swedish-cohort datasets: principal coordinates analysis (PCoA) ordinations on Bray-Curtis distances, PERMANOVA for between-group differences, and beta-dispersion homogeneity testing, using the vegan R package (cited in the reference list as 'vegan: Community Ecology Package. R package version 2.5-7'). Results in Supplementary Material / Figure S2.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 13,
+    "n_NI": 1,
+    "n_X": 0,
+    "S": 14,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/14 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "13/14 (93%) readiness upper bound - NOT 'reproducible'. This is an unusually well-documented secondary-analysis paper: a public MIT-licensed code repository is named in the paper's Data availability statement (github.com/liddic/cpp3d_t2d, 200 OK), the README names the four data sources with SRA/MG-RAST accessions, and the README gives an exact software version list (Python v3.8.5, FastQC v0.11.9, Fastp v0.23.2, Bowtie2 v2.4.1, Diamond v0.9.19, SUPER-FOCUS v0.0.0, R v4.2.2). Those pins are scattered prose pins with NO environment closure - no lockfile, no conda environment file, no container image or digest, no renv.lock, no R package manifest beyond the vegan citation, no release tag and no Zenodo DOI - so every step is capped at version=1 (subtier exact_pins_partial) and therefore at RI under the Stage-1 ceiling. The single NI is C2 (QA/QC trimming), where no parameter value of any kind is stated in either the paper or the README. Under-claim caveat applies symmetrically: a Stage-1 report cannot credit pins or environment capture that exist only inside the repository scripts, which are not read at this stage.",
+    "coverage": "14 computational steps assessed (4 HPC preprocessing + 10 R analysis/statistics), 0 wet-lab steps; computational coverage |S|/(|S|+|W|) = 14/14 = 100%. Steps reconstructed from Methods sections 2.1-2.3 plus the repository README prose. Table 1 (dataset description, incl. per-dataset sample counts) is a bitmap in the JATS XML and could not be read as text, so dataset-level detail is under-captured here.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment for all 14 steps (README software list; paper body states no version at all)",
+      "missing": "Exact version pins exist but environment closure does not. The README lists 'Python (v3.8.5), FastQC (v0.11.9), Fastp (v0.23.2), Bowtie2 (v2.4.1), Diamond (v0.9.19), SUPER-FOCUS (v0.0.0), R (v4.2.2)' - scattered prose pins with no package source/channel/index, no declared platform, and no coverage of the R package dependency set (only vegan 2.5-7 appears, and only as a bibliographic citation in the reference list, not as a manifest). The repository top level shows no Dockerfile, no environment.yml, no conda-lock, no renv.lock, no requirements.txt, and no release tag or Zenodo DOI. The SUPER-FOCUS pin 'v0.0.0' is not a resolvable release identifier.",
+      "how_to_close": "Ship a real environment lock for a declared platform (conda-lock / renv.lock / container image with digest) covering both the HPC preprocessing stack and the R analysis stack, and cut a tagged release archived to Zenodo so the exact analysis-time code state is citable."
+    },
+    {
+      "type": 13,
+      "where": "C4 (SUPER-FOCUS reference database), C5-C6 (ModelSEED lookup tables), C3 (human genome reference)",
+      "missing": "External reference resources are not pinned to an immutable artifact. ModelSEED tables are cited as 'from https://github.com/ModelSEED/ModelSEEDDatabase; accessed 10 Aug 2022' - an access DATE against a live, mutable default branch, with no commit SHA, tag, or release; the same tables ('reactions.tsv', 'compounds.tsv') drive the entire function-to-reaction-to-compound redistribution that defines CPP. The SUPER-FOCUS reference database build/release is never stated. The human genome reference is the one well-pinned resource (GRCh38.p14 / hg38). The paper itself flags the risk: 'The SUPER-FOCUS and ModelSEED resources we used have not been actively updated in recent years and may be missing the latest functional annotations.'",
+      "how_to_close": "Record the ModelSEEDDatabase commit SHA (or deposit the exact reactions.tsv/compounds.tsv snapshot used) and the SUPER-FOCUS database build identifier, and have the workflow fetch each by a fixed version or digest rather than by date-of-access prose."
+    },
+    {
+      "type": 5,
+      "where": "C2 (QA/QC trimming) and C12 (cluster delimitation); secondarily C3 (Bowtie2 flags), C4 (SUPER-FOCUS invocation options), C13 (AMI corroboration test)",
+      "missing": "No parameter value is stated for QA/QC: the paper says only that sequences were 'trimmed for quality control', and the README says only that 'QA/QC was performed to obtain good quality sequences' - no quality threshold, length cutoff, adapter set, or which of FastQC/Fastp did what. For C12 the prose says 'prominent localized clusters ... were identified' without naming a clustering method, distance metric, or cutoff, and explicitly describes the plotted compound-class rectangles as 'a visual guide only'. For C3/C4 the tools and the reference build are named but no invocation flags are given. For C13 the statistical test used on the AMI soils is deferred to the Supplementary Material.",
+      "how_to_close": "State the trimming parameters and aligner/profiler invocation flags in the Methods (or point to the exact script lines), and specify the cluster-identification procedure - or state plainly that clusters were delimited by visual inspection, which is itself reproducible information."
+    },
+    {
+      "type": 1,
+      "where": "C1 and C13 (dataset identification and sample-to-group mapping)",
+      "missing": "The paper body contains NO data accession; the Data availability statement reads in full 'Code used to support this study is available from: https://github.com/liddic/cpp3d_t2d'. Accessions appear only in the repository README, and only for three of the four datasets (SRA PRJEB1786, SRA PRJNA422434, MG-RAST project mgp16379); the Australian Microbiome Initiative soils are pointed at by an organization portal URL that returns 401 unauthenticated, with no accession, sample list, or documented access path. Table 1, which describes the case-study datasets and their sample counts, is embedded as a bitmap graphic in the JATS XML rather than as text, so the run-to-group and sample-to-revegetation-age-class mapping is not machine-readable from the paper. The README does not state which accession corresponds to which cohort.",
+      "how_to_close": "Add a Data availability statement to the paper listing every accession, and deposit a sample metadata table (run accession -> dataset -> group / revegetation-age class) in the repository so the exact sample set analysed is recoverable without re-deriving it from the source publications."
+    },
+    {
+      "type": 7,
+      "where": "C1-C4 (HPC preprocessing workflows in the per-dataset repository sub-folders)",
+      "missing": "The environment is hardcoded to the authors' HPC systems. The README states verbatim: 'Metagenomics data were processed on Flinders University DeepThought HPC and Pawsey Setonix linux high performance computers. ... Note that folder/filepath structures used will need to be adjusted to run on other HPCs.' The repository is also explicitly declared non-portable and frozen: 'This repository documents code used in the above article, and is not intended for ongoing code development.'",
+      "how_to_close": "Parameterise input/output roots and scheduler settings via a config file, or wrap the preprocessing in a portable workflow manager so the pipeline can run outside the two named HPC sites."
+    },
+    {
+      "type": 12,
+      "where": "Repository state (no immutable snapshot of the analysis-time code)",
+      "missing": "The code is deposited and public (MIT), but there is no release, no tag, and no Zenodo/Software Heritage DOI on the repository landing page - only a moving default branch. The single analysis script is dated by filename only ('cpp3d-t2d-R-code-Nov2025.R'). The paper cites the repository by bare URL, so the code state that produced the published figures cannot be recovered by identifier.",
+      "how_to_close": "Tag the analysis-time commit, archive it to Zenodo, and cite the versioned DOI in the paper's Data/Code availability statement."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (stated in paper, Data availability, verbatim): 'Code used to support this study is available from: https://github.com/liddic/cpp3d_t2d'. Also cited twice inside Methods 2.2 and 2.3 and once in the v3 revision note. Landing page shows sub-folders ami/, ancillary-files/, forslund-t2d-chn/, forslund-t2d-swe/, sunbad-resto/, plus LICENSE (MIT), README.md and cpp3d-t2d-R-code-Nov2025.R. No releases, no tags, no Zenodo DOI badge visible.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; README also fetched raw at https://raw.githubusercontent.com/liddic/cpp3d_t2d/main/README.md (200 OK, 3911 bytes) and read verbatim. api.github.com was unreachable from this sandbox, so release/tag absence rests on the rendered landing page only."
+    },
+    {
+      "artifact": "method companion repo (stated in README, not in the paper): https://github.com/liddic/cpp3d ('This study uses microbial metagenome functional profiling at the resolution of individual compounds, as outlined in cpp3d')",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent"
+    },
+    {
+      "artifact": "data accession (stated in repository README only, NOT in the paper): NCBI Sequence Read Archive PRJEB1786",
+      "http_status": "200 OK (via ENA browser API summary endpoint)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to https://www.ebi.ac.uk/ena/browser/api/summary/PRJEB1786"
+    },
+    {
+      "artifact": "data accession (stated in repository README only, NOT in the paper): NCBI Sequence Read Archive PRJNA422434",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to https://www.ncbi.nlm.nih.gov/bioproject/PRJNA422434; only HTTP reachability was checked, contents were not verified against the cohorts described in the paper"
+    },
+    {
+      "artifact": "data accession (stated in repository README only, NOT in the paper): MG-RAST project mgp16379",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to https://www.mg-rast.org/mgmain.html?mgpage=project&project=mgp16379; MG-RAST serves a JavaScript shell, so a 200 here confirms the service is up, not that the project resolves"
+    },
+    {
+      "artifact": "data source (stated in repository README only, NOT in the paper): Australian Microbiome Initiative portal, https://data.bioplatforms.com/organization/australian-microbiome - no accession given",
+      "http_status": "401 Unauthorized",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; the Bioplatforms Australia portal requires registration/login. Recorded as gated-without-accession, not as link rot."
+    },
+    {
+      "artifact": "external reference resource (stated in paper Methods 2.2, verbatim): 'ModelSEED database lookup tables (from https://github.com/ModelSEED/ModelSEEDDatabase; accessed 10 Aug 2022)'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L; the repository is live but mutable - no commit SHA, tag, or release is cited by the paper, only the access date"
+    },
+    {
+      "artifact": "environment capture artifacts: NONE. No Dockerfile, environment.yml, conda-lock, renv.lock, requirements.txt, pixi.lock or image digest appears in the repository top-level listing or is mentioned in the paper or README. No release/tag/Zenodo DOI.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "repository landing-page listing + verbatim README read; not verified by recursive tree walk (that is Stage 2)"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/11/15/2025.03.11.642605.source.xml (JATS XML, v3, 236,987 bytes)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; identity verified by grepping the fetched XML for the title phrase 'Degraded ecosystem soil' (3 hits) and 'branched-chain fatty acids' before scoring"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "supersedes_metric_version": null,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "6e6223bb2a1f5ff70cd410ce38b63c48928917547f873b81b0e5bbce639f5c99",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

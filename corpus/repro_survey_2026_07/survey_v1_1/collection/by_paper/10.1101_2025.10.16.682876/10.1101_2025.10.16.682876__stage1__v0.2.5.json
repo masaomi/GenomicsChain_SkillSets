@@ -1,0 +1,500 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "0cc91640c07e7c5824b30bb0fc22a5ce8bb385311e93ee70baaa5c3dd6c19f59",
+  "canonical_id": {
+    "value": "10.1101/2025.10.16.682876",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.16.682876v1",
+      "biorxiv:2025.10.16.682876v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Cell-type-resolved secondary analysis of a custom Agilent lncRNA/mRNA microarray of postmortem dlPFC from 59 MDD and 41 control subjects: limma preprocessing/quantile normalization, construction of a snRNA-seq reference signature matrix from public GSE144136 with Seurat v5.2.1, CIBERSORTx cell-fraction deconvolution (S-mode), bMIND cell-type-specific expression deconvolution, Wilcoxon differential expression with BH adjustment, lncRNA-mRNA Pearson correlation plus <100 kb same-chromosome proximity classification (silencing vs enhancer activity), and downstream annotation with clusterProfiler (KEGG/GO), GTEx, RNAInter, RNALocate, STRING v12 + Cytoscape v3.10.2/CytoHubba, and PsyGeNET. Postmortem brain collection, TRIzol RNA extraction, and Agilent labeling/hybridization/scanning are wet-lab (W, OOS for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the biorxiv JATS XML MATERIALS & METHODS section (retrieved by curl; WebFetch on the .source.xml endpoint returned HTTP 403). Title-phrase check ('lncRNA-mediated Gene Silencing') matched the fetched XML, so no fetch swap occurred. NO code repository exists: the DATA AND CODE AVAILABILITY section states verbatim 'This paper does not report the original code.', so there is no README landing page to read and no repo-level env-capture claim. The primary microarray data has NO deposited accession: 'All data supporting the findings of this study are available within the article and its supplementary files. Any additional requests for information can be directed to and will be fulfilled by the corresponding author.' Only one external accession is named in the whole paper: GSE144136 (public snRNA-seq, reused as deconvolution reference). Data axis for bulk-microarray-dependent steps is therefore scored 1 ('accidental gating / missing id', per Step-8: the data is undeposited, not lost), not 0. A prose defect worth flagging for the human reviewer: the Methods describe correlation thresholds as 'an R2 value 0.4' and 'an R2 threshold <-0.4' — a squared correlation cannot be negative, so the actual statistic used (r vs r-squared) is ambiguous and blocks exact reconstruction of the silencing/enhancer step (C10).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Postmortem dlPFC cohort assembly from the Maryland Brain Collection (59 MDD / 41 control), brain pH assessment, RIN and demographic characterization (Table S1)",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Total RNA extraction from dlPFC with TRIzol (Invitrogen) per manufacturer instructions (details in supplementary section)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Agilent Quick Amp labeling of 500 ng total RNA, hybridization to a custom-designed array (40,000 annotated human lncRNA probes + 30,000 mRNA probes), scanning on an Agilent G2565CA Microarray Scanner System",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C1",
+      "label": "Raw intensity extraction from scanned array images using Agilent Feature Extraction software (no version, no protocol/grid file, no QC criteria stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Microarray preprocessing/normalization with the limma R package: background correction, quantile normalization, exclusion of probes below the 20th percentile signal intensity, log2 transformation (19,757 mRNAs / 35,003 lncRNAs retained). No limma version, no R version.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "snRNA-seq reference construction from GSE144136 with Seurat (v5.2.1): control/MDD split, QC filter nFeature_RNA>400 & <5000 & nCount_RNA>1000, PCA + tSNE, cell types assigned from prior GEO annotations",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Marker-gene heatmap per cell type plotted with the pheatmap R package (no version, no clustering/scaling parameters, no marker gene list criteria)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "CIBERSORTx (http://cibersortx.stanford.edu) 'create signature matrix' module on annotated snRNA-seq, separately for control and MDD: default settings, Min.Expression = 0.5, 'Disable quantile normalization' left unchecked. Web platform, no version/build date recorded.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "CIBERSORTx 'impute cell fractions' module on the normalized log-transformed bulk lncRNA/mRNA microarray data, S-mode batch correction, 100 permutations for significance. Web platform, no version/build date recorded.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Association of predicted cell-type proportions with demographics: Pearson correlation vs age/PMI/pH; Wilcoxon rank-sum vs sex and cause of death. No package, no version, no multiple-testing correction stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Cell-type-specific expression deconvolution of lncRNAs and mRNAs with the bMIND R package, driven by the CIBERSORTx cell-type abundances. No bMIND version, no prior/hyperparameter/iteration settings stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Differential expression MDD vs control per cell type on the deconvoluted sample-wise matrix: Wilcoxon test, Benjamini-Hochberg adjustment, thresholds |log2FC| >= 0.21 and adjusted p < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "lncRNA regulatory-activity classification: Pearson correlation via cor.test() in R (p<0.05; silencing = up-lncRNA vs down-mRNA with threshold <-0.4, enhancer = up-lncRNA vs up-mRNA with threshold >0.4); proximity called when both transcripts are on the same chromosome and <100 kb apart. Statistic ambiguous (prose says R2 but uses a negative threshold); genomic-coordinate/annotation source for the 100 kb distance is not named.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "KEGG pathway and GO (BP/MF/CC) enrichment with the clusterProfiler R package, visualized via enrichplot::barplot(). No clusterProfiler/enrichplot version, no OrgDb, no KEGG/GO release date, no p-value cutoff, no background universe.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Tissue-wise expression profiling of lncRNAs and regulated genes from the GTEx portal (https://www.gtexportal.org/home/) across 13 named brain tissues. No GTEx release version (e.g. v8/v10) and no access date.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "lncRNA-protein/DNA/RNA interaction retrieval from RNAInter (http://www.rnainter.org/) for the top ten lncRNAs by highest correlation with at least one interacting partner; only the top two highest-scoring interactions per category kept. No RNAInter version/release or access date.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "lncRNA subcellular localization from RNALocate (http://www.rnalocate.org/). No version/release, no access date, no query or filtering parameters.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Protein-protein interaction extraction for lncRNA-regulated mRNAs from the STRING database (v12) with minimum confidence score 0.4",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "PPI network visualization in Cytoscape (v3.10.2) and top-20 hub gene identification per network with the CytoHubba plugin ranked by Maximal Clique Centrality (MCC). CytoHubba plugin version not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Gene-psychiatric-disorder association lookup in PsyGeNET (http://www.psygenet.org/) for lncRNA-up/down-regulated mRNAs; all database entries considered, association score 0-1. No PsyGeNET version/release, no access date.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 14,
+    "n_X": 0,
+    "S": 17,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/17 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 3/17 computational steps (17.6%): C3 (Seurat v5.2.1 on public GSE144136), C15 (STRING v12, confidence 0.4), C16 (Cytoscape v3.10.2 + CytoHubba MCC top-20). These are the only three steps where all four axes reach at least 1, and in each case the version credit comes from a single exact prose pin with no environment closure. The remaining 14/17 steps cap at NI: 11 of them name a tool with no version at all (Agilent Feature Extraction, limma, pheatmap, bMIND, clusterProfiler/enrichplot, CIBERSORTx, GTEx, RNAInter, RNALocate, PsyGeNET, plus base R itself, whose version is never given), and C1/C10 additionally have no reconstructable code path. Stage 2 cannot lift any step here, because there is no code to verify: DATA AND CODE AVAILABILITY states verbatim 'This paper does not report the original code.' Symmetric qualifier: a static_readiness of 0 under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency, and here it also cannot credit an unpublished analysis script that may in fact exist with the authors.",
+    "coverage": "17 computational steps assessed from the biorxiv v1 JATS MATERIALS & METHODS prose (計算被覆率 = 17/20 = 85%). 3 wet-lab steps (postmortem dlPFC cohort assembly, TRIzol RNA extraction, Agilent Quick Amp labeling/hybridization/G2565CA scanning) counted in W as OOS and not verdicted. Supplementary Methods add wet-lab detail only (sample inclusion/exclusion criteria, RNA isolation) and introduce no additional computational step.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "DATA AND CODE AVAILABILITY section",
+      "missing": "No analysis code is deposited or linked anywhere. Verbatim: 'This paper does not report the original code.' There is no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage artifact, therefore no README, no environment specification, and no scripts for any of the 17 computational steps.",
+      "how_to_close": "Deposit the R/shell analysis scripts (limma preprocessing, Seurat reference build, bMIND call, Wilcoxon/BH DE, correlation + 100 kb proximity classification, clusterProfiler calls, figure generation) in a public repository with an archived DOI snapshot."
+    },
+    {
+      "type": 9,
+      "where": "Analysis of lncRNA regulatory activity (C10); expression deconvolution and differential analysis (C7, C8, C9)",
+      "missing": "The correlation/proximity classification and the deconvolution-to-DE glue are custom, unpublished code. The prose is self-contradictory on the correlation statistic ('a R2 value 0.4' vs 'an R2 threshold <-0.4' - a squared correlation cannot be negative), and the genome annotation/coordinate source used to compute the <100 kb same-chromosome distance is never named. The classification of lncRNAs into silencing vs enhancer activity - the paper's central claim - is therefore not reconstructable from prose.",
+      "how_to_close": "Publish the classification script and state explicitly whether Pearson r or r-squared was thresholded, plus the genome build and transcript annotation (e.g. GENCODE release) used for the 100 kb proximity test."
+    },
+    {
+      "type": 2,
+      "where": "Whole software stack (C1, C2, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C17)",
+      "missing": "No version recorded for R itself, limma, pheatmap, bMIND, clusterProfiler, enrichplot, CIBERSORTx, Agilent Feature Extraction, or any of the queried databases except STRING (v12). Only 3 of 17 steps carry any exact pin (Seurat v5.2.1, STRING v12, Cytoscape v3.10.2), and no lockfile, container digest, conda environment, renv.lock, or sessionInfo() output is claimed anywhere in the paper or supplement.",
+      "how_to_close": "Report sessionInfo() / an renv.lock or conda-lock covering the R interpreter, package sources and platform, and state the release version of every external database queried."
+    },
+    {
+      "type": 13,
+      "where": "Database-consuming steps (C11 KEGG/GO, C12 GTEx, C13 RNAInter, C14 RNALocate, C15 STRING, C17 PsyGeNET)",
+      "missing": "Six steps consume external reference resources through web portals with no version pin and no access date; only STRING carries a release (v12). KEGG and GO in particular are rolling resources, so clusterProfiler enrichment results are not reproducible against a moving annotation. Per collection protocol Delta-B, env_capture_class is left 'n/a' at Stage 1 because no executable workflow exists to classify A/B/C - and here none will ever exist, since no code is deposited.",
+      "how_to_close": "Record the release/version and the access date for GTEx, RNAInter, RNALocate, PsyGeNET, KEGG and GO, and deposit the exact downloaded snapshots alongside the analysis code."
+    },
+    {
+      "type": 11,
+      "where": "C1 (Agilent Feature Extraction), C5/C6 (CIBERSORTx), W3 (custom Agilent array)",
+      "missing": "Three proprietary or account-gated, non-installable dependencies. Agilent Feature Extraction is vendor software with no stated version or protocol file. CIBERSORTx is a server-side web platform requiring registration whose build is not pinned and whose server-side behaviour can change; both the signature-matrix and impute-fractions steps depend on it. The array itself is a custom-designed platform whose probe design and annotation are not deposited.",
+      "how_to_close": "Deposit the array design (e.g. GEO GPL platform record with probe sequences and annotation), record the Agilent Feature Extraction version/protocol, and archive the CIBERSORTx signature matrix and cell-fraction output tables so downstream steps do not depend on re-running the web service."
+    },
+    {
+      "type": 5,
+      "where": "Microarray platform (W3) and probe-to-transcript annotation used by C2, C9, C10",
+      "missing": "The custom-designed microarray with probes for 40,000 lncRNAs and 30,000 mRNAs is described only by probe counts. No platform accession, no probe sequences, no probe-to-transcript mapping. Every downstream lncRNA identity in the results - including the reported gene symbols and the 100 kb proximity calls - depends on this undeposited annotation.",
+      "how_to_close": "Deposit the platform (GPL) record and the probe annotation table."
+    },
+    {
+      "type": 1,
+      "where": "Primary bulk microarray data (input to C1, C2, C6, C7, C8, C9, C10)",
+      "missing": "No accession of any kind for the 100-subject dlPFC microarray dataset. Verbatim: 'All data supporting the findings of this study are available within the article and its supplementary files. Any additional requests for information can be directed to and will be fulfilled by the corresponding author.' There is no GEO/ArrayExpress/dbGaP/EGA/figshare/Zenodo deposit, no raw scan files, no per-sample normalized matrix, and no sample-to-array mapping. Scored as data=1 ('missing id', per Step-8) rather than 0, since the data is undeposited rather than demonstrably lost - but in practice it is request-gated and the request path is a personal email, not a DAC.",
+      "how_to_close": "Deposit raw and normalized microarray data with per-sample metadata under a GEO series (or, if consent restricts release, a controlled-access repository with a documented DAC path and a resolving accession)."
+    },
+    {
+      "type": 4,
+      "where": "C3 (Seurat tSNE / PCA), C6 (CIBERSORTx 100 permutations), C8 (bMIND)",
+      "missing": "Three stochastic steps with no random seed reported: tSNE embedding and PCA-based clustering in Seurat, the 100-permutation significance assessment in CIBERSORTx impute-fractions, and the sampling in bMIND's Bayesian deconvolution. Exact reproduction of the cell-type assignment, the fraction p-values, and the deconvoluted expression matrix is therefore not possible; only distributional agreement can be expected (subflag distributional-only).",
+      "how_to_close": "Report set.seed() values (or the seed argument for each call) and the number of PCs / clustering resolution / tSNE perplexity used."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps W1-W3",
+      "missing": "Postmortem dlPFC cohort assembly from the Maryland Brain Collection (IRB-approved, subject-level clinical data in Table S1), TRIzol RNA extraction, and Agilent labeling/hybridization/scanning are physical data-generation steps, out of scope for computational reproduction. Counted in W (3), not verdicted. Note W1 additionally carries genuine human-subject access constraints, so its non-openness is legitimate rather than a defect.",
+      "how_to_close": "N/A for Tier-1 computational readiness. The reproducible entry point would be a deposited normalized expression matrix (see gap type 1)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE. Verbatim from DATA AND CODE AVAILABILITY: 'This paper does not report the original code.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears anywhere in the full text or supplement.",
+      "http_status": "none (no artifact stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "regex scan of the full JATS XML for github/gitlab/bitbucket/zenodo/figshare/software-heritage URLs returned zero matches"
+    },
+    {
+      "artifact": "primary data accession (dlPFC lncRNA/mRNA microarray, 59 MDD + 41 control): NONE. Verbatim: 'All data supporting the findings of this study are available within the article and its supplementary files. Any additional requests for information can be directed to and will be fulfilled by the corresponding author.'",
+      "http_status": "none (no accession stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "regex scan of the full JATS XML for GSE/GSM/SRP/PRJNA/E-MTAB/phs/EGA identifiers returned only GSE144136, which is reused third-party data, not this study's own deposit"
+    },
+    {
+      "artifact": "reused data accession: GEO GSE144136 (snRNA-seq reference, stated-in-paper; no URL given in the text)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE144136"
+    },
+    {
+      "artifact": "analysis platform: CIBERSORTx (URL-present in Methods: http://cibersortx.stanford.edu)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl; note the platform itself is registration-gated and unversioned"
+    },
+    {
+      "artifact": "reference resource: GTEx portal (URL-present: https://www.gtexportal.org/home/)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl; no release version cited by the paper"
+    },
+    {
+      "artifact": "reference resource: RNAInter / RNA Interactome Database (URL-present: http://www.rnainter.org/)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl; no release version or access date cited by the paper"
+    },
+    {
+      "artifact": "reference resource: RNALocate (URL-present: http://www.rnalocate.org/)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl; no release version or access date cited by the paper"
+    },
+    {
+      "artifact": "reference resource: PsyGeNET (URL-present: http://www.psygenet.org/)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl (followed redirects); no release version or access date cited by the paper"
+    },
+    {
+      "artifact": "reference resource: STRING v12 (named with version in Methods; no URL given in the text)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, string-db.org"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c93e6fc5763def55766a45d711071a1820735d866b61152183d2833321d3ab65",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

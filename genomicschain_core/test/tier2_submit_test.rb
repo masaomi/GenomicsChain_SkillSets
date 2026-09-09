@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# Tier2Submit via SubmitCore — Synoptis-only path (design v0.4.1 Step 1).
+# Tier2Submit via SubmitCore — the same Synoptis-only path Tier-1 and Tier-3 use.
 require 'minitest/autorun'
 require 'tmpdir'
 require 'json'
@@ -14,53 +14,18 @@ require_relative 'proofs_sandbox'
 require 'kairos_mcp/skillset'
 require 'genomicschain_core'
 
-GCore = KairosMcp::SkillSets::GenomicschainCore
+GCore2 = KairosMcp::SkillSets::GenomicschainCore
 
-TestVerdictResult = Struct.new(
-  :subject_ref, :jobspec_digest, :verdict, :trust_tier, :result_hash,
-  :backend_result_hash, :expected_output, :expected_output_sha256,
-  :expected_output_source, :expected_output_validated_by,
-  :expected_output_source_citation, :expected_output_target,
-  :comparator_id, :comparator_version, :backend_id, :output_files,
-  :first_divergence, :receipt,
-  keyword_init: true
-)
-
-TestJobSpec = Struct.new(
-  :subject_ref, :env, :data, :pipeline, :backend_id, :resources,
-  keyword_init: true
-) do
-  def canonical_json
-    KairosMcp::Manifest.canonical_json(
-      'subject_ref' => subject_ref,
-      'env' => env, 'data' => data, 'pipeline' => pipeline
-    )
-  end
-
-  def digest
-    KairosMcp::Manifest.canonical_json_sha256(
-      'subject_ref' => subject_ref,
-      'env' => env, 'data' => data, 'pipeline' => pipeline
-    )
-  end
-end
-
-class StubAttestor
+class Tier2StubAttestor
   attr_reader :calls, :registry
 
   def initialize(registry:)
     @registry = registry
     @calls = []
-    @seq = 0
   end
 
   def issue(**kw)
     @calls << kw
-    @seq += 1
-    envelope = JSON.parse(kw[:evidence])
-    # This stub exercises SubmitCore's orchestration, not signing, and holds no
-    # key. The engine now refuses to store a proof it cannot sign, so the
-    # relaxation is stated here rather than defaulted into.
     engine = ::Synoptis::AttestationEngine.new(
       registry: @registry, config: { 'require_signature' => false }
     )
@@ -72,8 +37,8 @@ class StubAttestor
   end
 end
 
-class RaisingAttestor
-  def issue(**); raise GCore::Attestation::SynoptisAttestor::AttestorError, 'attestor down'; end
+class Tier2RaisingAttestor
+  def issue(**); raise GCore2::Attestation::SynoptisAttestor::AttestorError, 'attestor down'; end
 end
 
 class Tier2SubmitCoreTest < Minitest::Test
@@ -102,37 +67,54 @@ class Tier2SubmitCoreTest < Minitest::Test
     chain
   end
 
-  def job_spec
-    TestJobSpec.new(
-      subject_ref: 'repro://656122/C9', env: { 'lock' => 'abc' },
-      data: { 'accessions' => [] }, pipeline: { 'steps' => ['C9'] },
-      backend_id: 'thoa', resources: {}
-    )
+  # The shape gc_tier2_adjudicate emits (panREPET, 2026-09-08, reduced to the
+  # fields the record reads). Per-resource lists are kept short on purpose: the
+  # record never stores them, only their digest.
+  def adjudication(declared_lock: true, byte_fixed: false, demotions: 0, content_hash: 'b' * 64)
+    {
+      'adjudication_rubric_version' => 'codescan-adjudication-0.1.0',
+      'rubric_source' => 'repro_tier1_guide (rubric v0.2.5) § fetch-required',
+      'subject' => {
+        'canonical_id' => '10.1101/2024.06.17.598857',
+        'tier1_rubric_version' => '0.2.5',
+        'tier1_report_content_hash' => content_hash,
+        'codescan_evidence_digest' => 'a' * 64,
+        'codescan_toolchain' => { 'ruby' => '3.4.10', 'ruby_platform' => 'arm64-darwin23', 'psych' => '5.2.2',
+                                  'codescan_rubric_version' => 'codescan-static-0.1.0' },
+        'adjudication_toolchain' => { 'ruby' => '3.4.10', 'ruby_platform' => 'arm64-darwin23' }
+      },
+      'stage_transition' => { 'from' => 'stage1-prose-only', 'to' => 'stage2-code-verified', 'applied' => false,
+                              'note' => 'Proposed.' },
+      'resource_classes' => [{ 'key' => 'GFF', 'locator' => 'x.gff', 'env_capture_class' => 'B_pin_prose_only' }],
+      'step_dispositions' => [{ 'rule' => 'extractCopies', 'env_capture_class' => 'n/a' }],
+      'levers' => {
+        'code_derived' => { 'software_env_lock' => byte_fixed, 'software_env_lock_at_versioned' => declared_lock,
+                            'in_code_db_pin_classA' => false },
+        'tier1_claimed' => { 'software_env_lock' => true, 'in_code_db_pin_classA' => true },
+        'lever1_environment_lock' => {
+          'declared_lock' => { 'value' => declared_lock, 'threshold' => 'versioned' },
+          'byte_fixed_lock' => { 'value' => byte_fixed, 'threshold' => 'immutable' },
+          'headline' => 'ships a declared lock, but its bytes are not fixed'
+        }
+      },
+      'discrepancies' => [{ 'code' => 'resource_read_but_never_declared' }],
+      'counts' => { 'rules_in_code' => 16, 'rules_unique' => 16, 'tier1_steps' => 8, 'steps_linked' => 4,
+                    'steps_unlinked' => 12, 'dispositions' => 16, 'proposed_demotions' => demotions,
+                    'demotion_proposal_is_a_lower_bound' => true },
+      'ambiguous_links' => [{ 'rule' => 'x', 'step_ids' => %w[C1 C2] }],
+      'limits' => ['Steps are linked to rules by NAME.']
+    }
   end
 
-  def verdict_result(js, trust_tier: 'self_reported', comparator_version: '0.1.0',
-                     source: 'paper_declared', validated_by: 'human:masaomi')
-    eo = { 'target' => 'checksum', 'sha256' => 'c' * 64, 'source' => source,
-           'source_citation' => 'doi:10.1038/s41467-018-06108-1', 'validated_by' => validated_by }
-    TestVerdictResult.new(
-      subject_ref: 'repro://656122/C9', jobspec_digest: js.digest,
-      verdict: 'executed_r', trust_tier: trust_tier, result_hash: 'd' * 64,
-      backend_result_hash: nil, expected_output: eo,
-      expected_output_sha256: 'c' * 64, expected_output_source: source,
-      expected_output_validated_by: validated_by,
-      expected_output_source_citation: eo['source_citation'], expected_output_target: eo['target'],
-      comparator_id: 'exact_sha256', comparator_version: comparator_version, backend_id: 'thoa',
-      output_files: [{ 'sha256' => 'a' * 64, 'relative_path' => 'o.txt', 'size_bytes' => 3 }],
-      first_divergence: nil, receipt: nil
-    )
+  def repository
+    { 'url' => 'https://forgemia.inra.fr/urgi-anagen/panREPET', 'commit' => '6d8748a03a7e053cfe2b84364170bf1712c6df0f' }
   end
 
-  def signed_operator(tip_source, vr)
+  def signed_operator(tip_source, params)
     sk = Ed25519::SigningKey.generate
     pk = sk.verify_key
     nonce = SecureRandom.hex(16)
     tip = tip_source.latest_tip_hash
-    params = GCore::Tier2Submit::SIGNED_IDENTITY_FIELDS.each_with_object({}) { |f, h| h[f] = vr[f.to_sym] }
     payload = KairosMcp::Manifest.canonical_json(
       'mcp_tool_name' => 'gc_tier2_submit', 'params' => params, 'nonce' => nonce, 'chain_tip_hash' => tip
     )
@@ -149,35 +131,145 @@ class Tier2SubmitCoreTest < Minitest::Test
     [op, Digest::SHA256.hexdigest(pubkey_str), sk]
   end
 
-  def submit(registry, tip_source, vr, op, pkhash, attestor, jobspec_json: nil, expected_output: nil)
-    GCore::Tier2Submit.submit(
-      verdict_result: vr, operator: op, jobspec_json: jobspec_json || job_spec.canonical_json,
-      bearer_pubkey_hash: pkhash, tip_source: tip_source, attestor: attestor,
-      expected_output: expected_output || vr.expected_output, registry: registry
+  def submit(registry, tip_source, adj, identity, op, pkhash, attestor, repository: nil)
+    GCore2::Tier2Submit.submit(
+      adjudication: adj, identity: identity, repository: repository, operator: op,
+      bearer_pubkey_hash: pkhash, tip_source: tip_source, attestor: attestor, registry: registry
     )
   end
 
   def test_happy_path_records_synoptis_proof_with_manifest_envelope
     with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
-      att = StubAttestor.new(registry: registry)
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj, repository)
+      op, pkhash, = signed_operator(tip_source, identity)
 
-      out = submit(registry, tip_source, vr, op, pkhash, att)
+      out = submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry),
+                   repository: repository)
 
       assert_equal 'recorded', out[:status]
       refute_nil out[:synoptis_proof_id]
-      assert out[:claim].start_with?('tier2:executed_r:')
-      assert out[:claim].end_with?(":#{out[:submission_key]}")
-      assert_equal true, out[:leaderboard_eligible]
-      refute_nil out[:result_evidence_sha256]
+      digest = GCore2::Tier2Submit.adjudication_digest(adj)
+      assert_equal "tier2:declared_lock:0:#{digest}:#{out[:submission_key]}", out[:claim]
 
       proofs = registry.read(:proofs)
       assert_equal 1, proofs.length
-      manifest = GCore::ProofLookup.parse_manifest_from_record(proofs.first)
+      manifest = GCore2::ProofLookup.parse_manifest_from_record(proofs.first)
+      assert_equal 'tier2_adjudication', manifest['record_type']
+      assert_equal '0.1', manifest['record_version']
       assert_equal out[:submission_key], manifest['submission_key']
-      assert_equal out[:result_evidence_sha256], manifest['result_evidence_sha256']
-      assert_equal '0.2', manifest['record_version']
+      assert_equal digest, manifest['adjudication_digest']
+      assert_equal 'a' * 64, manifest['codescan_evidence_digest']
+      assert_equal 'b' * 64, manifest['tier1_report_content_hash']
+      assert_equal 'doi:10.1101/2024.06.17.598857', manifest['subject_ref']
+      assert_equal({ 'declared_lock' => true, 'byte_fixed_lock' => false, 'in_code_db_pin_classA' => false,
+                     'headline' => 'ships a declared lock, but its bytes are not fixed' }, manifest['levers'])
+      assert_equal 4, manifest.dig('counts', 'steps_linked')
+      assert_equal '3.4.10', manifest.dig('toolchain', 'ruby')
+      assert_equal 'self_reported', manifest['trust_tier']
+      assert_equal false, manifest.dig('stage_transition', 'applied')
+      assert_equal repository['commit'], manifest.dig('repository', 'commit')
+      assert_equal 'operator_stated', manifest.dig('repository', 'provenance')
+      refute manifest.key?('resource_classes'), 'per-resource lists stay with the operator'
+      refute manifest.key?('step_dispositions')
+    end
+  end
+
+  # The interpreter is part of what is signed (author's decision 2026-09-09):
+  # the same bytes under a different Ruby gave a different adjudication.
+  def test_toolchain_ruby_is_in_the_signed_identity
+    adj = adjudication
+    identity = GCore2::Tier2Submit.signed_params_for(adj)
+    assert_equal '3.4.10', identity['toolchain_ruby']
+    assert_includes GCore2::Tier2Submit::SIGNED_IDENTITY_FIELDS, 'toolchain_ruby'
+  end
+
+  # Every signed field is derived from the adjudication again. An identity
+  # that claims a lock the adjudication does not show is refused.
+  def test_identity_that_disagrees_with_the_adjudication_is_rejected
+    with_proofs do |registry, tip_source|
+      adj = adjudication(declared_lock: false)
+      forged = GCore2::Tier2Submit.signed_params_for(adj).merge('lever1_declared_lock' => true)
+      op, pkhash, = signed_operator(tip_source, forged)
+      assert_raises(GCore2::Tier2Submit::IdentityMismatch) do
+        submit(registry, tip_source, adj, forged, op, pkhash, Tier2StubAttestor.new(registry: registry))
+      end
+    end
+  end
+
+  # Signing one adjudication and submitting another (a count edited after
+  # signing) trips the digest recompute before anything else.
+  def test_tampered_adjudication_is_a_digest_mismatch
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      tampered = JSON.parse(JSON.generate(adj))
+      tampered['counts']['proposed_demotions'] = 5
+      assert_raises(GCore2::Tier2Submit::DigestMismatch) do
+        submit(registry, tip_source, tampered, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
+      end
+    end
+  end
+
+  # A Tier-2 record must bind to a Tier-1 report identity. The older stage-2
+  # reports carry no report_content_hash; their adjudications are refused,
+  # not recorded with a hole where the binding goes.
+  def test_adjudication_without_tier1_content_hash_is_refused
+    with_proofs do |registry, tip_source|
+      adj = adjudication(content_hash: nil)
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      err = assert_raises(GCore2::Tier2Submit::SubmitError) do
+        submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
+      end
+      assert_match(/tier1_report_content_hash/, err.message)
+    end
+  end
+
+  def test_applied_stage_transition_is_refused
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      adj['stage_transition']['applied'] = true
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      err = assert_raises(GCore2::Tier2Submit::SubmitError) do
+        submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
+      end
+      assert_match(/applied must be false/, err.message)
+    end
+  end
+
+  def test_client_supplied_trust_tier_rejected
+    with_proofs do |registry, tip_source|
+      adj = adjudication.merge('trust_tier' => 'peer_verified')
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      assert_raises(GCore2::Tier2Submit::TrustTierError) do
+        submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
+      end
+    end
+  end
+
+  def test_unsigned_mode_rejected
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      assert_raises(GCore2::Tier2Submit::UnsignedModeError) do
+        submit(registry, tip_source, adj, identity, { 'mode' => 'anonymous' }, 'x' * 64,
+               Tier2StubAttestor.new(registry: registry))
+      end
+    end
+  end
+
+  def test_bearer_pubkey_binding_fail_closed
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, = signed_operator(tip_source, identity)
+      assert_raises(GCore2::Tier2Submit::BearerBindingError) do
+        submit(registry, tip_source, adj, identity, op, nil, Tier2StubAttestor.new(registry: registry))
+      end
     end
   end
 
@@ -186,200 +278,70 @@ class Tier2SubmitCoreTest < Minitest::Test
       Dir.mktmpdir do |chain_dir|
         chain = with_operational_chain(chain_dir)
         before = chain.chain.length
-
-        vr = verdict_result(job_spec)
-        op, pkhash, = signed_operator(tip_source, vr)
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
-
+        adj = adjudication
+        identity = GCore2::Tier2Submit.signed_params_for(adj)
+        op, pkhash, = signed_operator(tip_source, identity)
+        submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
         assert_equal before, chain.chain.length
       end
     end
   end
 
-  def test_operator_supplied_unvalidated_is_not_eligible
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec, source: 'operator_supplied', validated_by: nil)
-      op, pkhash, = signed_operator(tip_source, vr)
-      out = submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
-      assert_equal false, out[:leaderboard_eligible]
-    end
-  end
-
-  def test_recorded_target_must_match_signed
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
-      forged_eo = vr.expected_output.merge('target' => 'file:evil.txt')
-      assert_raises(GCore::Tier2Submit::IdentityMismatch) do
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry),
-               expected_output: forged_eo)
-      end
-    end
-  end
-
-  def test_unsigned_mode_rejected
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      assert_raises(GCore::Tier2Submit::UnsignedModeError) do
-        submit(registry, tip_source, vr, { 'mode' => 'anonymous' }, 'x' * 64,
-               StubAttestor.new(registry: registry))
-      end
-    end
-  end
-
-  def test_jobspec_digest_mismatch_rejected
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
-      assert_raises(GCore::Tier2Submit::JobSpecMismatch) do
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry),
-               jobspec_json: JSON.generate('subject_ref' => 'repro://forged'))
-      end
-    end
-  end
-
-  def test_bearer_pubkey_binding_fail_closed
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, _, = signed_operator(tip_source, vr)
-      assert_raises(GCore::Tier2Submit::BearerBindingError) do
-        submit(registry, tip_source, vr, op, nil, StubAttestor.new(registry: registry))
-      end
-    end
-  end
-
-  def test_non_mvp_trust_tier_rejected_without_reserving_nonce
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec, trust_tier: 'peer_verified')
-      op, pkhash, = signed_operator(tip_source, vr)
-      nonce = op.dig('signature', 'nonce')
-      assert_raises(GCore::Tier2Submit::TrustTierError) do
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
-      end
-      refute KairosMcp::Manifest::Signer.global_reservation.reserved?(nonce)
-    end
-  end
-
-  def test_nonce_released_on_post_admission_failure
-    with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec, comparator_version: 'not-semver')
-      op, pkhash, = signed_operator(tip_source, vr)
-      nonce = op.dig('signature', 'nonce')
-      assert_raises(KairosMcp::Manifest::SchemaViolation) do
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
-      end
-      refute KairosMcp::Manifest::Signer.global_reservation.reserved?(nonce)
-      refute KairosMcp::Manifest::Signer.global_reservation.committed?(nonce)
-    end
-  end
-
   def test_nonce_not_committed_when_synoptis_store_fails
     with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
       nonce = op.dig('signature', 'nonce')
-      out = submit(registry, tip_source, vr, op, pkhash, RaisingAttestor.new)
+      out = submit(registry, tip_source, adj, identity, op, pkhash, Tier2RaisingAttestor.new)
       assert_equal 'recording_failed_retryable', out[:status]
       refute KairosMcp::Manifest::Signer.global_reservation.committed?(nonce)
       assert_equal 0, registry.read(:proofs).length
     end
   end
 
-  def test_nonce_replay_rejected_for_fresh_submission_with_committed_nonce
-    with_proofs do |registry, tip_source|
-      vr1 = verdict_result(job_spec)
-      op1, pkhash, sk = signed_operator(tip_source, vr1)
-      submit(registry, tip_source, vr1, op1, pkhash, StubAttestor.new(registry: registry))
-
-      KairosMcp::Manifest::Signer.instance_variable_set(:@global_reservation, nil)
-      KairosMcp::Manifest::Signer.bootstrap_seen_list!(tip_source: tip_source)
-
-      vr2 = verdict_result(job_spec)
-      vr2 = TestVerdictResult.new(
-        subject_ref: vr2.subject_ref, jobspec_digest: vr2.jobspec_digest,
-        verdict: vr2.verdict, trust_tier: vr2.trust_tier, result_hash: 'e' * 64,
-        backend_result_hash: vr2.backend_result_hash, expected_output: vr2.expected_output,
-        expected_output_sha256: vr2.expected_output_sha256,
-        expected_output_source: vr2.expected_output_source,
-        expected_output_validated_by: vr2.expected_output_validated_by,
-        expected_output_source_citation: vr2.expected_output_source_citation,
-        expected_output_target: vr2.expected_output_target,
-        comparator_id: vr2.comparator_id, comparator_version: vr2.comparator_version,
-        backend_id: vr2.backend_id, output_files: vr2.output_files,
-        first_divergence: nil, receipt: nil
-      )
-      reused_nonce = op1.dig('signature', 'nonce')
-      tip = tip_source.latest_tip_hash
-      params = GCore::Tier2Submit::SIGNED_IDENTITY_FIELDS.each_with_object({}) { |f, h| h[f] = vr2[f.to_sym] }
-      payload = KairosMcp::Manifest.canonical_json(
-        'mcp_tool_name' => 'gc_tier2_submit', 'params' => params,
-        'nonce' => reused_nonce, 'chain_tip_hash' => tip
-      )
-      pk = Ed25519::VerifyKey.new(sk.verify_key.to_bytes) rescue sk.verify_key
-      sig_val = Base64.urlsafe_encode64(sk.sign(payload), padding: false)
-      op2 = op1.merge(
-        'signature' => op1['signature'].merge(
-          'value' => sig_val, 'chain_tip_hash' => tip, 'nonce' => reused_nonce
-        )
-      )
-
-      assert_raises(KairosMcp::Manifest::Signer::NonceReplay) do
-        submit(registry, tip_source, vr2, op2, pkhash, StubAttestor.new(registry: registry))
-      end
-    end
-  end
-
   def test_recovery_returns_existing_proof_without_second_store
     with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
-      att = StubAttestor.new(registry: registry)
-      first = submit(registry, tip_source, vr, op, pkhash, att)
-      second = submit(registry, tip_source, vr, op, pkhash, att)
-
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      att = Tier2StubAttestor.new(registry: registry)
+      first = submit(registry, tip_source, adj, identity, op, pkhash, att)
+      second = submit(registry, tip_source, adj, identity, op, pkhash, att)
       assert_equal first[:synoptis_proof_id], second[:synoptis_proof_id]
       assert_equal true, second[:recovered]
       assert_equal 1, registry.read(:proofs).length
     end
   end
 
-  def test_crash_after_store_nonce_bootstrapped_on_restart
+  # Two different adjudications by the same operator must not share an
+  # idempotency key (SubmitCore derives it from the digest subject).
+  def test_idempotency_key_distinguishes_adjudications
     with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      op, pkhash, = signed_operator(tip_source, vr)
-      nonce = op.dig('signature', 'nonce')
-      submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
+      att = Tier2StubAttestor.new(registry: registry)
+      a1 = adjudication
+      i1 = GCore2::Tier2Submit.signed_params_for(a1)
+      op1, pk1, = signed_operator(tip_source, i1)
+      out1 = submit(registry, tip_source, a1, i1, op1, pk1, att)
 
-      KairosMcp::Manifest::Signer.instance_variable_set(:@global_reservation, nil)
-      KairosMcp::Manifest::Signer.bootstrap_seen_list!(tip_source: tip_source)
-      assert KairosMcp::Manifest::Signer.global_reservation.committed?(nonce)
+      a2 = adjudication(demotions: 3)
+      i2 = GCore2::Tier2Submit.signed_params_for(a2)
+      op2, pk2, = signed_operator(tip_source, i2)
+      out2 = submit(registry, tip_source, a2, i2, op2, pk2, att)
+
+      refute_equal out1[:idempotency_key], out2[:idempotency_key]
+      assert out2[:claim].start_with?('tier2:declared_lock:3:')
     end
   end
 
-  def test_oversized_manifest_rejected_gate_c
+  def test_oversized_adjudication_rejected_by_dos_gate
     with_proofs do |registry, tip_source|
-      vr = verdict_result(job_spec)
-      huge_files = Array.new(3000) do |i|
-        { 'sha256' => 'a' * 64,
-          'relative_path' => "out/deep/nested/path/with/extra/segments/file_#{i}_#{'x' * 40}.txt",
-          'size_bytes' => 3 }
-      end
-      vr = TestVerdictResult.new(
-        subject_ref: vr.subject_ref, jobspec_digest: vr.jobspec_digest,
-        verdict: vr.verdict, trust_tier: vr.trust_tier, result_hash: vr.result_hash,
-        backend_result_hash: vr.backend_result_hash, expected_output: vr.expected_output,
-        expected_output_sha256: vr.expected_output_sha256,
-        expected_output_source: vr.expected_output_source,
-        expected_output_validated_by: vr.expected_output_validated_by,
-        expected_output_source_citation: vr.expected_output_source_citation,
-        expected_output_target: vr.expected_output_target,
-        comparator_id: vr.comparator_id, comparator_version: vr.comparator_version,
-        backend_id: vr.backend_id, output_files: huge_files,
-        first_divergence: nil, receipt: nil
-      )
-      op, pkhash, = signed_operator(tip_source, vr)
-      assert_raises(GCore::Tier2Submit::EvidenceTooLarge) do
-        submit(registry, tip_source, vr, op, pkhash, StubAttestor.new(registry: registry))
+      adj = adjudication
+      adj['resource_classes'] = Array.new(2000) { |i| { 'key' => "k#{i}", 'locator' => 'x' * 40 } }
+      identity = GCore2::Tier2Submit.signed_params_for(adj)
+      op, pkhash, = signed_operator(tip_source, identity)
+      assert_raises(KairosMcp::Manifest::DoSGateTripped) do
+        submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry))
       end
     end
   end

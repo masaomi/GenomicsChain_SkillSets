@@ -1,0 +1,401 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "3fc31d5d7f6bf4c7bf2fcdf446e6567ec762cd557419d23f2c192ea565302e94",
+  "canonical_id": {
+    "value": "10.64898/2025.12.09.693182",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.09.693182v1",
+      "biorxiv:2025.12.09.693182v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Single-nuclei RNA-seq analysis of Litopenaeus vannamei lymphoid organ under WSSV challenge. Computational target: construction of a concatenated host+virus reference (L. vannamei GCF_003789085.1 / ASM378908v1 concatenated with WSSV GCF_003972525.1 / ASM397252v1), Parse Biosciences split-pipe v1.2.1 demultiplexing/alignment/UMI counting, then a Seurat (R) workflow comprising per-sample QC filtering, SCTransform + cell-cycle normalisation, feature selection/scaling/PCA, clustering and UMAP, DoubletFinder doublet removal, anchor-based integration, cluster-marker differential expression (LR test) and control-vs-WSSV differential expression (Wilcoxon), plus figure generation. Shrimp husbandry and RAS setup, WSSV stock expansion and qPCR viral quantification, tissue dissection / TST-based nuclei isolation and Parse fixation, and Evercode WT Mega v2 library preparation + Illumina NovaSeq X Plus sequencing are wet-lab (W, out of computational-reproduction scope). Manual gene-function annotation via NCBI Gene / UniProt / Human Protein Atlas is a human curation activity, not an executable step, and is folded into the DEG steps as an unpinned-resource gap rather than counted separately.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the bioRxiv v1 JATS XML full text (WebFetch returned HTTP 403; XML retrieved via curl with a browser user-agent, 171 KB, 200 OK). The paper has an 'Availability of data and materials' section giving NCBI BioProject PRJNA1307069 and eight BioSample accessions, but NO separate code availability statement; the analysis repository is cited inline in Methods section 2.7 (https://github.com/Roslin-Aquaculture/Parse-snRNAseq_LV-WSSV.git), with a second inherited repository cited for the 10x-derived downstream steps (https://github.com/Roslin-Aquaculture/10x-snRNAseq_LV-HP-atlas.git). Both repositories resolve (HTTP 200). The primary repository's landing page and README were read at Stage 1 (prose only, no file-level inspection): it contains eight R Markdown files corresponding to the Methods stages (QC, integration, UMAP, cluster DEG, resolution adjustment, annotation, DEG by treatment, DEG plots) plus README.md; the README describes the study and workflow but states no software versions, no installation or execution instructions, and no environment specification (no renv.lock, no conda environment, no Dockerfile, no sessionInfo). No releases or tags are documented on the landing page. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Construction of the analysis reference: L. vannamei genome assembly ASM378908v1 (NCBI RefSeq GCF_003789085.1) concatenated with the White spot syndrome virus assembly ASM397252v1 (NCBI RefSeq GCF_003972525.1) annotation - assembly accessions are exact, but no concatenation script is in the cited repository (which holds only R Markdown files) and no annotation release/date or FASTA+GTF build procedure is stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "fetch-pin-prose-only",
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Demultiplexing, alignment, gene annotation and per-cell UMI counting with Parse Biosciences split-pipe v1.2.1 (use_case 'normal'; mode 'comb'; chemistry 'v2'; kit 'WT_mega 96 wells') - version and options exactly stated in prose, but split-pipe is vendor-distributed software not obtainable from a public archive, and no invocation script appears in the cited repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Per-sample quality control and cell filtering in Seurat v4.4.0 (SeuratObject v4.1.4) under R v4.2.0: removal of cells with low UMI or low detected-feature counts and cells with >5% mitochondrial-gene content - the mitochondrial cutoff is stated, but the UMI and feature thresholds 'vary with each sample' and are deferred to the GitHub repository, so they are not readable from the prose",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Normalisation with SCTransform plus cell-cycle handling in Seurat v4.4.0 (vst.flavor 'v2'; method 'glmGamPoi'; assay 'RNA') - parameters stated verbatim and Seurat/R pinned, but the glmGamPoi package itself carries no version and the cell-cycle gene set used for a non-model invertebrate is not specified",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Highly variable gene selection, data scaling, linear dimensional reduction (PCA), dimensionality choice via Elbowplot (dims = 1:15) and graph-based clustering with initial UMAP (resolution = 0.4) in Seurat v4.4.0 - dims and resolution are stated, but the number of variable features, the scaling covariates, the number of PCs computed, the nearest-neighbour settings and the UMAP seed/parameters are not",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Doublet removal with the DoubletFinder package after the initial UMAP - no version pin for DoubletFinder and no parameters at all (pN, pK, expected doublet rate/formation-rate model, homotypic-proportion adjustment, PC set used)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Dataset integration using Seurat integration anchors before downstream analysis - the method is named only as 'integration anchors'; no anchor features, no reference/normalisation method (SCT vs LogNormalize), no dims, no k.anchor/k.filter/k.weight settings are stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Cluster-marker differential expression in Seurat v4.1.0 (SeuratObject 4.0.4) - the paper explicitly downgrades Seurat from v4.4.0 to v4.1.0 at this point to reuse an existing 10x pipeline (https://github.com/Roslin-Aquaculture/10x-snRNAseq_LV-HP-atlas.git); parameters stated verbatim (assay 'SCT'; slot 'data'; only.pos = TRUE; min.pct = 0.25; return.thresh = 0.01; pseudocount.use = 0.001; logfc.threshold = 0.25; test.use = 'LR'; latent.vars = 'sample'); top-20 marker list per cluster",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Control-vs-WSSV differential expression by treatment group in Seurat v4.1.0 (Wilcoxon Rank Sum test on the SCT assay; min.pct = 0.1; return.thresh = 0.01; pseudocount.use = 0.001; logfc.threshold = 0.25) - parameters stated verbatim; downstream gene-function assignment was performed manually against NCBI Gene, UniProt and the Human Protein Atlas with no access date or release version for any of the three resources",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Figure generation with Seurat (heatmaps of top-8 markers, dot plots, feature plots, violin plots, per-group and per-treatment UMAPs, and a dot plot of the top-10 differentially expressed genes by logFC) - the gene counts shown are stated, but scaling, clustering/ordering, colour scales and per-plot arguments are not; plotting code exists in the repository as R Markdown but was not inspected at Stage 1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Shrimp husbandry: adult L. vannamei (6-12 g) held in a recirculating aquaculture system at the Roslin Institute (28 +/- 0.5 C, salinity 25 permille, pH 8.0, commercial pellet diet)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "WSSV stock expansion (bath and feed challenge from CEFAS-sourced material) and viral load quantification by qPCR with Brilliant III SYBR Master Mix against a WSSV standard curve",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "In vivo WSSV challenge of 32 adult shrimp (control/infected x feed/injection), dissection of lymphoid organs, and nuclei isolation with a modified TST-based protocol followed by Evercode Nuclei Fixation v2 (Parse Biosciences) and LUNA-FX7 nuclei counting",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Library preparation with Evercode WT Mega v2 (Parse Biosciences, ~5000 nuclei per sample, six libraries from 17 lymphoid organ pairs) and sequencing by Novogene on Illumina NovaSeq X Plus 25B, PE150, 2% PhiX spike-in, ~1.5 billion reads",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 8,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 10,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 8/10 computational steps (C1 reference build, C2 split-pipe v1.2.1, C3 QC filtering, C4 SCTransform, C5 clustering/UMAP, C8 cluster-marker DEG, C9 treatment DEG, C10 figures). These reach RI - and only RI - because the primary tool versions are exactly pinned in prose (split-pipe v1.2.1; Seurat v4.4.0 with SeuratObject v4.1.4; Seurat v4.1.0 with SeuratObject 4.0.4; R v4.2.0) and at least one operational parameter is stated, but no environment closure of any kind is claimed: the cited repository (https://github.com/Roslin-Aquaculture/Parse-snRNAseq_LV-WSSV.git) contains eight R Markdown files and a README with no renv.lock, no conda environment, no Dockerfile, no sessionInfo, no tag and no release. 2/10 steps cap at NI: C6 (DoubletFinder - no version and no parameters whatsoever) and C7 (anchor-based integration - version pinned via Seurat but zero parameters stated). Under rubric Delta-2 an exact_pins_partial paper is capped at version=1 by the prose read, so no step could exceed RI even if Stage-2 code verification were performed on this repository as it currently stands.",
+    "coverage": "10 computational steps assessed from the bioRxiv v1 JATS XML Methods section 2.7 (reference construction, split-pipe processing, Seurat QC/normalisation/clustering, DoubletFinder, integration, two differential-expression analyses, figure generation). 4 wet-lab step groups counted in W but out of computational-reproduction scope: shrimp husbandry/RAS operation, WSSV stock expansion and qPCR quantification, in vivo challenge plus dissection and TST nuclei isolation/fixation, and Evercode WT Mega v2 library preparation plus NovaSeq X Plus sequencing. Manual gene-function curation against NCBI Gene / UniProt / Human Protein Atlas is not counted as an executable step; it is recorded as an unpinned-resource gap on C9.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole R/Bioconductor software environment and the Linux split-pipe environment (Methods 2.7; repository README)",
+      "missing": "No environment lockfile, container image or digest, conda environment file, renv.lock or sessionInfo output is claimed anywhere in the paper or in the cited repository's README. Exact versions are stated in prose for R (4.2.0), Seurat (4.4.0 and 4.1.0), SeuratObject (4.1.4 and 4.0.4) and split-pipe (1.2.1), but nothing closes the surrounding dependency tree (Matrix, glmGamPoi, sctransform, BLAS/LAPACK, DoubletFinder and its dependencies).",
+      "how_to_close": "Commit an renv.lock (or a conda-lock / pixi lockfile, or a container image referenced by digest) covering the full R stack for both Seurat versions used, and document the split-pipe installation (vendor version, Python version, dependency set) in the README."
+    },
+    {
+      "type": 3,
+      "where": "C6 (DoubletFinder), C4 (glmGamPoi)",
+      "missing": "DoubletFinder is named with no version at all, which caps C6 at NI regardless of anything else. glmGamPoi is invoked as the SCTransform method but carries no version. DoubletFinder in particular has had behaviour-affecting changes across its unversioned GitHub history, so 'DoubletFinder' without a commit or release is not a pin.",
+      "how_to_close": "State exact versions (or, for GitHub-only packages, the commit SHA installed) for DoubletFinder, glmGamPoi and every other R package used, ideally as a versions table in the manuscript backed by a lockfile."
+    },
+    {
+      "type": 4,
+      "where": "C6 (DoubletFinder), C7 (integration anchors), C5 (feature selection / PCA / neighbours)",
+      "missing": "C6 gives no DoubletFinder parameters (pN, pK, expected doublet rate, homotypic adjustment, PC set). C7 gives no integration parameters (anchor features, normalization.method, dims, k.anchor/k.filter/k.weight, reference selection). C5 states only dims = 1:15 and resolution = 0.4, omitting the number of variable features, scaling covariates, number of PCs computed, and the random seed. Cluster identity and the reported 17-cluster / 18,541-cell result are directly sensitive to all three.",
+      "how_to_close": "State the full argument set for each call in the Methods, or reference the exact chunk in the deposited R Markdown that contains it, and fix and report the random seed."
+    },
+    {
+      "type": 5,
+      "where": "C1 (reference construction), C2 (split-pipe invocation)",
+      "missing": "The cited repository contains only R Markdown files covering the Seurat stages. No script is provided for building the concatenated host+virus reference (FASTA/GTF merge, feature-name disambiguation, split-pipe mkref invocation) or for the split-pipe run itself. These two steps must be reconstructed from prose.",
+      "how_to_close": "Add the reference-build and split-pipe shell scripts (with the exact commands and the annotation files or their download commands) to the repository."
+    },
+    {
+      "type": 6,
+      "where": "C3 (per-sample QC thresholds)",
+      "missing": "The manuscript states that the UMI and feature thresholds vary per sample and are 'specified inside the GitHub repository'. The thresholds are therefore not recoverable from the paper alone; at Stage 1 this is a prose gap, and the repository contents were not read at file level.",
+      "how_to_close": "Include the per-sample threshold table as a supplementary table in the manuscript in addition to the repository."
+    },
+    {
+      "type": 7,
+      "where": "C1 (reference annotation), C9 (manual gene-function assignment against NCBI Gene, UniProt, Human Protein Atlas)",
+      "missing": "Genome assembly accessions are exact (GCF_003789085.1, GCF_003972525.1), but the RefSeq annotation release used for each is not stated, and the three annotation web resources used to assign gene function carry no release version and no access date. All four are mutable external resources fetched outside any pinned mechanism.",
+      "how_to_close": "State the RefSeq annotation release number and download date for both assemblies, and record the UniProt release, NCBI Gene retrieval date and Human Protein Atlas version used for curation."
+    },
+    {
+      "type": 9,
+      "where": "Repository https://github.com/Roslin-Aquaculture/Parse-snRNAseq_LV-WSSV and inherited repository https://github.com/Roslin-Aquaculture/10x-snRNAseq_LV-HP-atlas",
+      "missing": "Both repositories are cited by bare URL with no tag, release, commit SHA or archival DOI (no Zenodo/Software Heritage deposit). The repository landing page shows no releases or tags. The code state that produced the published figures is therefore not identifiable, and a future force-push or rewrite would silently break the citation.",
+      "how_to_close": "Cut a tagged release for both repositories at the state used for the manuscript, archive to Zenodo for a DOI, and cite the DOI (or at minimum the commit SHA) in the Methods."
+    },
+    {
+      "type": 10,
+      "where": "C2 (Parse Biosciences split-pipe v1.2.1)",
+      "missing": "split-pipe is proprietary vendor software distributed under registration by Parse Biosciences; it is not available from a public package archive. The version is pinned in prose but the binary is not independently obtainable, so this step is not reproducible by an arbitrary third party even with a perfect environment specification.",
+      "how_to_close": "Beyond stating the version, note the distribution channel and, where licensing permits, provide the intermediate outputs (the per-sample count_matrix.mtx and cell metadata) as a supplementary deposit so downstream steps C3-C10 can be reproduced without the vendor binary."
+    },
+    {
+      "type": 11,
+      "where": "C8, C9 (deliberate Seurat downgrade from v4.4.0 to v4.1.0 mid-pipeline)",
+      "missing": "The paper states that from the cluster-DEG step onward Seurat v4.1.0 / SeuratObject 4.0.4 was used instead of v4.4.0 'to accommodate for an already existing pipeline'. Two mutually incompatible Seurat versions must therefore coexist in the reproduction, and the mechanism for moving the object between them (object serialisation, UpdateSeuratObject, separate R libraries) is not described. No single environment specification can satisfy both halves as written.",
+      "how_to_close": "Document the handoff explicitly: which object was written where, in what format, and how two R library trees (or two containers) were used. Ideally re-run both halves under one Seurat version and report the concordance."
+    },
+    {
+      "type": 12,
+      "where": "C5, C6, C7, C10 (all stochastic steps: UMAP, clustering, DoubletFinder, anchor selection)",
+      "missing": "No random seed is stated anywhere. UMAP embedding, Louvain clustering, DoubletFinder's simulated-doublet sampling and anchor selection are all stochastic; without a seed the reported cluster count (17) and per-cluster cell assignments are not bit-reproducible.",
+      "how_to_close": "Set and report a global seed, and state the seed argument passed to RunUMAP / FindClusters / DoubletFinder."
+    },
+    {
+      "type": 13,
+      "where": "Manuscript structure",
+      "missing": "There is no Code Availability section. The two analysis repository URLs appear only inline in Methods section 2.7; the formal 'Availability of data and materials' statement covers sequence data (BioProject / BioSample accessions) only and does not mention code at all.",
+      "how_to_close": "Add an explicit Code Availability statement naming both repositories with their archival DOIs or tagged releases, and the environment specification."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Code repository (primary analysis pipeline): https://github.com/Roslin-Aquaculture/Parse-snRNAseq_LV-WSSV.git - stated in paper Methods 2.7, URL present. Public; landing page lists 8 .Rmd files plus README.md; README states no versions, no install/run instructions, no environment file; no releases or tags documented.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -sL with browser user-agent, unauthenticated, from assessor host"
+    },
+    {
+      "artifact": "Code repository (inherited 10x downstream pipeline, cited for steps C8-C10): https://github.com/Roslin-Aquaculture/10x-snRNAseq_LV-HP-atlas.git - stated in paper Methods 2.7.2, URL present. No tag, release or commit cited in the paper.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -sL with browser user-agent, unauthenticated, from assessor host"
+    },
+    {
+      "artifact": "Sequence data: NCBI SRA / BioProject PRJNA1307069, BioSamples SAMN50653283, SAMN50653284, SAMN50653285, SAMN50653286, SAMN50653287, SAMN50653288, SAMN50653289, SAMN50653290 - stated in paper (Methods 2.6 and 'Availability of data and materials'), accessions present, public.",
+      "http_status": "200",
+      "checked_at": "2026-07-27",
+      "network_context": "curl -sL against https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1307069, unauthenticated"
+    },
+    {
+      "artifact": "Reference genomes (external, not deposited by the authors): NCBI RefSeq GCF_003789085.1 (L. vannamei ASM378908v1) and GCF_003972525.1 (WSSV ASM397252v1) - stated in paper Methods 2.7.1, accessions present, no annotation release or download date given.",
+      "http_status": "not-checked (accession stated in paper; no URL given by authors)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - recorded verbatim from the manuscript, not resolved"
+    },
+    {
+      "artifact": "Annotation web resources used for manual gene-function assignment: www.ncbi.nlm.nih.gov/gene/, www.uniprot.org/, www.proteinatlas.org/ - stated in paper Methods 2.7.2, URLs present, no version or access date.",
+      "http_status": "not-checked (mutable web resources, no version stated)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - recorded verbatim from the manuscript, not resolved"
+    },
+    {
+      "artifact": "Environment lock / container / conda spec: none stated in the paper and none visible in the primary repository README.",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a - absence recorded, not searched for beyond the cited repository landing page"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "3a490673bbd3f7959d357e013b94ee781da1b75d159a2b8cf6304a13291e9045",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

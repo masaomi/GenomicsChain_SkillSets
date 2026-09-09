@@ -1,0 +1,664 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "e9b93d0f16417cc3e534336d347546fb509540d2fec95ad249097ef4c88ca169",
+  "canonical_id": {
+    "value": "10.64898/2025.12.29.696801",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.29.696801v1",
+      "biorxiv:2025.12.29.696801v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The downstream computational analysis of the ancient individual ODK14 sequenced on ONT PromethION 2 Solo and, in parallel, on Illumina NovaSeq 6000: Dorado basecalling of POD5 squiggle data (incl. 5mC modification calling), read QC/filtering/trimming (Sequali, NanoFilt, Porechop, SeqKit; AdapterRemoval for Illumina), BWA aln alignment to hg19/GRCh37 with aDNA-tuned parameters, duplicate removal and MAPQ filtering, aDNA authentication (mapDamage, DamageProfiler), contamination estimation (MitoSuite mtDNA, ANGSD X-chromosome), damage mitigation (mapDamage --rescale, bamUtil end trimming), 1240K random-haploid genotyping (pileupcaller/sequenceTools), Ry-based biological sex inference including the time-resolved 0-100 min variant, merging with the AADR v54.1 panel (PLINK) and relatedness filtering (READ), mitochondrial haplogroup / consensus and median-joining network (MitoSuite, PopART), Y-lineage inference (Y-LineageTracker), LD pruning + smartPCA (EIGENSOFT), outgroup-f3 (ADMIXTOOLS) with hierarchical clustering, and ADMIXTURE K=2-10 with 10-fold CV. Wet-lab sampling, extraction, library preparation and the sequencing runs themselves are out of scope (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "The paper has a full Materials and Methods section (sections 4.1-4.7) but NO Data Availability section, NO Code Availability section, and no supplementary code. Section-type scan of the JATS XML returned only one typed section ('supplementary-material'); a case-insensitive scan for accession patterns (PRJ*/DRA*/SRR*/ERP*/EGA*/GEO/ArrayExpress/dbGaP/figshare/zenodo) returned zero matches. The step list is therefore derived from the prose at the granularity of one step per named tool invocation, which is the guide's fallback anchor when no workflow file exists. Steps that the prose describes as an analysis but binds to no named tool (read time-binning from Dorado summary files, the Ry ratio computation, hierarchical clustering of pairwise outgroup-f3 values, and the CpG methylation summarisation) are kept as separate C-steps because they are distinct analytical operations whose absence would understate the reproduction burden; they are the steps carrying version=0. MitoSuite is invoked twice for two different purposes (mtDNA contamination estimate in 4.3; haplogroup assignment + consensus generation in 4.4) and mapDamage twice (damage profiling in 4.3; --rescale in the damage-mitigation paragraph), so each appears as two steps. Wet-lab steps (W=6) are taken from sections 4.1-4.3 at the same coarse granularity.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Archaeological sampling: ~50 mg bone powder drilled from the inner cochlear surface of the petrous portion of ODK14 (Odake shell mound, Toyama, Early Jomon) in an aDNA clean room, sterilized dental diamond disc + tungsten carbide bur (Shofu), low rotational speed",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "DNA extraction: silica-based protocol with D buffer optimized for highly fragmented aDNA (ref 54), automated on Beckman Coulter Biomek i5; ONT aliquot left UDG-untreated, Illumina aliquot UDG/USER-treated",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Extract QC: Qubit dsDNA High Sensitivity quantification and Agilent 4200 TapeStation High Sensitivity D1000 fragment-length profiling",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "ONT library preparation: NEBNext Ultra II DNA Library Prep Kit + NEBNext Multiplex Oligos (96 UDI), bead size selection to exclude long/modern fragments, then ONT Ligation Kit SQK-LSK114 with Short Fragment Buffer and NEBNext Companion Module v2",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Illumina library preparation: four double-stranded libraries ODK14_UDG_1-4 with NEBNext Ultra II DNA Library Prep Kit incl. USER treatment, SPRI bead purification, Qubit + TapeStation QC",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Sequencing runs: ONT PromethION 2 Solo with R10.4.1 flow cells (>5,000 active pores required) under MinKNOW MKE_1013_v1_revDK_25Apr2025, ~72 h, POD5 output; Illumina NovaSeq 6000 151-cycle paired-end with 8 bp dual indices",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Basecalling of POD5 squiggle data with Dorado v1.0.2 (https://github.com/nanoporetech/dorado), super-accurate model dna_r10.4.1_e8.2_400bps_sup@v5.2.0, producing BAM",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C2",
+      "label": "5-methylcytosine (5mC) modification calling from the raw nanopore signal by Dorado v1.0.2 and CpG-site summarisation against GRCh37 (3,101 of 1,593,565 CpG sites reported; depth vs methylation-fraction joint distribution, Figs S3-S4)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C3",
+      "label": "BAM to FASTQ conversion with Picard tools v3.4.0 SamToFastq (http://broadinstitute.github.io/picard/)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C4",
+      "label": "ONT read and run-summary QC profiling with Sequali v1.0.1 (per-read Phred distribution, pore translocation speed classification)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C5",
+      "label": "ONT low-quality read filtering with NanoFilt v2.8.0: drop reads with mean Phred < 15 or length < 30 bp",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C6",
+      "label": "ONT adapter trimming with Porechop v0.2.4 (https://github.com/rrwick/Porechop/)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C7",
+      "label": "Post-trimming length filtering with SeqKit v2.10.0: discard reads shorter than 30 bp",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C8",
+      "label": "Illumina NovaSeq 6000 paired-end preprocessing with AdapterRemoval v2.3.4: adapter and low-quality base trimming, merging of overlapping pairs (minimum overlap 11 bp), removal of reads < 30 bp",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C9",
+      "label": "Alignment of QC-filtered ONT and Illumina reads to the human reference genome hg19/GRCh37 with BWA aln v0.7.18 using aDNA-tuned parameters -l 1024 -n 0.01 -o 2",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "Duplicate removal with Picard MarkDuplicates v3.4.0",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C11",
+      "label": "Mapping-quality filtering with Samtools v1.16.1: discard alignments with MAPQ < 30",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C12",
+      "label": "Time-resolved read partitioning: extraction of read identifiers and timestamps from Dorado v1.0.2 summary files and binning into 1-minute intervals (0-100 min), 1-hour intervals (1-10 h) and 10-hour intervals (10-80 h). No tool or script is named for the binning itself",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "aDNA authentication - terminal deamination and fragmentation profiling of UDG-untreated, duplicate-removed ONT alignments with mapDamage v2.2.3",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C14",
+      "label": "Mismatch / edit-distance profiling of mapped reads against the reference with DamageProfiler v1.1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C15",
+      "label": "Mitochondrial contamination estimation from haplogroup-defining sites with MitoSuite v1.0.9",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C16",
+      "label": "Nuclear contamination estimation from X-chromosomal heterozygosity/polymorphism with ANGSD v0.940",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C17",
+      "label": "Damage mitigation step 1 - base quality rescaling at damage-prone positions using mapDamage v2.2.3 --rescale",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C18",
+      "label": "Damage mitigation step 2 - trimming 2 bp from both ends of each read for libraries with substantial terminal damage using bamUtil v1.0.15",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C19",
+      "label": "Genotyping of the 1240K SNP panel in random-haploid mode with pileupcaller (sequenceTools v1.6.0.0, https://github.com/stschiff/sequenceTools) on the damage-mitigated alignments",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C20",
+      "label": "Biological sex inference by the Ry statistic (Skoglund et al. 2013, ref 43) from counts of reads aligned to X and Y, applied both to the full run and to the 0-100 min time-resolved subsets. No tool or script is named; the defining equation is given in the text",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Merging ODK14 genotypes with published comparative data using PLINK v1.90b6.21 on the 1240K panel of the Allen Ancient DNA Resource (AADR v54.1, ref 66) plus recently reported East Asian ancient individuals (ref 67); analyses restricted to transversion sites. Final panel summarised in Supplementary Table 1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C22",
+      "label": "Pairwise relatedness estimation with READ v2.1.1 and exclusion of first-degree relatives within each population group",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C23",
+      "label": "Mitochondrial haplogroup assignment and full-length mtDNA consensus generation from QC-filtered alignments with MitoSuite v1.0.9",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C24",
+      "label": "Median-joining mtDNA network with PopART v1.7 using the ODK14 consensus plus present-day Japanese, Siberian and published Jomon sequences (comparative set in Table S1)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C25",
+      "label": "Y-chromosomal variation analysis / paternal lineage estimation with Y-LineageTracker v1.3.0 (reported as not feasible due to insufficient informative SNPs)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C26",
+      "label": "LD pruning of the merged panel with PLINK v1.90b6.21 --indep-pairwise 50 10 0.1 (same parameters reused for the ADMIXTURE dataset)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C27",
+      "label": "Principal component analysis with smartPCA in EIGENSOFT v8.0.0 on the LD-pruned East Eurasian panel (Table S2)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C28",
+      "label": "Outgroup-f3 statistics f3(X1, X2; Mbuti) computed with ADMIXTOOLS v7.0.2 on the merged panel (results in Table S3)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C29",
+      "label": "Hierarchical clustering of individuals on Euclidean distances derived from pairwise outgroup-f3 values (Fig. 4A dendrogram) and selection of the 15 highest-f3 individuals sharing at least 5,000 SNPs with ODK14 (Fig. 4B). No software, library or linkage method is named",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C30",
+      "label": "Unsupervised model-based ancestry clustering with ADMIXTURE v1.3.0 on the LD-pruned dataset, K = 2 to 10 with 10-fold cross-validation, lowest-CV-error solution selected (K = 3)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 30,
+    "n_X": 0,
+    "S": 30,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/30 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/30 (0%). Every computational step is capped at NI by a single dominating gap: the paper contains NO Data Availability statement and NO sequence-data accession of any kind, so the newly generated ONT PromethION 2 Solo and Illumina NovaSeq 6000 data for individual ODK14 - which every C-step consumes, directly or through the merged panel - has no retrievable identifier (data axis = 0 on all 30 steps). Software documentation is by contrast unusually good for a preprint: 22 distinct tools are named with exact version strings in prose (Dorado v1.0.2 with the full model string dna_r10.4.1_e8.2_400bps_sup@v5.2.0, Picard v3.4.0, Sequali v1.0.1, NanoFilt v2.8.0, Porechop v0.2.4, SeqKit v2.10.0, AdapterRemoval v2.3.4, BWA v0.7.18, Samtools v1.16.1, mapDamage v2.2.3, DamageProfiler v1.1, MitoSuite v1.0.9, ANGSD v0.940, bamUtil v1.0.15, sequenceTools v1.6.0.0, PLINK v1.90b6.21, READ v2.1.1, PopART v1.7, Y-LineageTracker v1.3.0, EIGENSOFT v8.0.0, ADMIXTOOLS v7.0.2, ADMIXTURE v1.3.0), and several steps carry complete parameter strings (BWA aln -l 1024 -n 0.01 -o 2; PLINK --indep-pairwise 50 10 0.1; NanoFilt Q<15 / 30 bp; MAPQ<30; bamUtil 2 bp end trim; ADMIXTURE K=2-10 with 10-fold CV). But these are scattered prose pins with no interpreter, no channel/index, no declared platform and no lockfile or container, so the Version axis is 1 (exact_pins_partial) by the symmetric env-closure gate, and no analysis code is deposited (Code axis 1 = reconstructable from prose, never 2). Stage 2 would not raise any step: there is no author repository to read.",
+    "coverage": "30 computational steps and 6 wet-lab steps; computational coverage 30/36 (83%). Steps derived from Materials and Methods sections 4.1-4.7 at one-step-per-named-tool-invocation granularity, the guide fallback anchor, since no workflow file (Snakefile/Nextflow/CWL/WDL/Makefile) exists or is referenced. Four C-steps (C12 time-binning, C20 Ry computation, C29 hierarchical clustering, and the CpG summarisation inside C2) are analytical operations the prose describes without naming a tool; these carry version=0 and are the only steps where the version axis falls below 1.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "All 30 computational steps; the raw ONT (POD5/BAM/FASTQ) and Illumina (ODK14_UDG_1-4) data for individual ODK14",
+      "missing": "No Data Availability statement and no data accession anywhere in the paper. A case-insensitive scan of the full JATS XML for GEO/SRA/ENA/DDBJ/DRA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession patterns and for the word 'availability' returned only the CC BY-NC-ND licence sentence. The 17.81 Gb ONT run and the 10.1 Gb Illumina run, the 1240K genotype calls for ODK14, and the mtDNA consensus sequence used in the PopART network are all undeposited and unlinked; the sample-to-dataset correspondence for ODK14 therefore cannot be established by any third party.",
+      "how_to_close": "Deposit the raw ONT POD5 or basecalled BAM/FASTQ and the Illumina FASTQ under an INSDC accession (DDBJ/DRA, ENA or SRA - controlled access is acceptable and is not penalised if the accession resolves and a DAC path is documented), deposit the ODK14 1240K genotype file and the mitochondrial consensus, and add a Data Availability statement mapping each accession to the ODK14 individual and to each library (ONT UDG-untreated vs ODK14_UDG_1-4)."
+    },
+    {
+      "type": 12,
+      "where": "All 30 computational steps",
+      "missing": "No analysis code is deposited or linked. The paper contains exactly four external code URLs and all four are third-party TOOL homepages, not author artifacts: https://github.com/nanoporetech/dorado, https://github.com/rrwick/Porechop/, https://github.com/stschiff/sequenceTools and http://broadinstitute.github.io/picard/. There is no Code Availability section, no repository, no Zenodo/Software Heritage archive, and no supplementary scripts; the supplementary material consists of tables and figures only. Command lines are given for some steps but not as an executable artifact.",
+      "how_to_close": "Publish the analysis scripts (the ONT/Illumina preprocessing and alignment driver, the Dorado-summary time-binning code, the Ry computation, the panel-merge and transversion-restriction code, and the plotting code) in a public repository with an archived tagged release (Zenodo DOI), and reference it in a Code Availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 30 computational steps",
+      "missing": "Exact versions are pinned in prose for 22 tools, but there is no environment closure: no interpreter/runtime version (Python for NanoFilt/Porechop, R for the clustering, Java for Picard/DamageProfiler), no conda channel or package index, no declared platform, no conda-lock/pixi.lock/renv.lock/requirements file, and no container image or digest. Subflag exact_pins_partial applies: Version = 1, not 2, under the symmetric env-closure gate. The super-computing environment is credited to the Human Genome Center (Univ. of Tokyo) in the Acknowledgements but is not characterised.",
+      "how_to_close": "Ship a resolvable environment capture for a declared platform - a conda-lock / pixi.lock covering the 22 tools plus their interpreters and channels, or a container image referenced by digest - so the declared environment can be reconstructed rather than reassembled from prose version strings."
+    },
+    {
+      "type": 2,
+      "where": "C12 (time-binning), C20 (Ry statistic), C29 (hierarchical clustering of outgroup-f3 values), and the CpG summarisation within C2",
+      "missing": "These four analytical operations name no tool at all, hence no version can be recorded (version axis = 0). C29 additionally omits the linkage method for the hierarchical clustering and the software/library used; C12 omits how the Dorado summary was parsed; the CpG summarisation omits how modification calls were thresholded into the 3,101 reported sites.",
+      "how_to_close": "Name the software or deposit the scripts for each of these operations, and state the clustering linkage method and the methylation-call thresholds."
+    },
+    {
+      "type": 13,
+      "where": "C9/C11 (reference genome), C21 (comparative panel), C19 (SNP panel)",
+      "missing": "External reference resources are identified in prose only, with no URL, checksum or download provenance. The human reference is given as 'hg19/GRCh37' with no build/patch identifier or source (UCSC hg19 vs GRCh37 primary assembly vs 1000G decoy-containing builds differ in ways that affect alignment and the X/Y read counts feeding Ry). The 1240K SNP panel and the Allen Ancient DNA Resource are versioned in prose (AADR v54.1) but not linked. The 'recently reported ancient individuals from East Asia (ref 67)' are cited bibliographically without accessions. The comparative mtDNA set (Table S1) and the panel composition (Table S2, Table S3) are supplementary tables, not retrievable datasets.",
+      "how_to_close": "State the exact reference-genome file source and checksum, link AADR v54.1 by its versioned download URL/DOI, and give accessions for the published individuals incorporated into the panel. At Stage 2 this becomes an env_capture_class A/B/C decision made from the workflow code; with no code, it cannot be classified beyond prose-only."
+    },
+    {
+      "type": 4,
+      "where": "C30 (ADMIXTURE v1.3.0) and C27 (smartPCA)",
+      "missing": "ADMIXTURE is stochastic and no random seed is reported; the text says only that 'independent runs showed consistent convergence' and that the lowest-CV-error solution was selected, without stating the number of replicate runs per K or the seeds. smartPCA options that materially change the result for a single low-coverage ancient individual (lsqproject, shrinkmode, autoshrink, poplistname) are not reported.",
+      "how_to_close": "Report seeds and replicate counts for ADMIXTURE and the full smartPCA parameter file; absent seeds, the reproduction target for these steps is distributional agreement rather than exact output equality."
+    },
+    {
+      "type": 10,
+      "where": "Materials and Methods 4.1-4.3 (6 W-steps)",
+      "missing": "Sampling, silica-based extraction, ONT and Illumina library preparation, and the sequencing runs are wet-lab and out of scope for NASEM-2019 computational reproducibility. Recorded for coverage accounting only (computational coverage 30/36 = 83%).",
+      "how_to_close": "n/a - OOS by scope split, not a defect."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "author code repository: NONE stated. The paper has no Code Availability section. A case-insensitive scan of the fetched JATS XML for github/gitlab/bitbucket/zenodo/softwareheritage/osf/codeocean returned exactly three github hits, all third-party tool homepages (nanoporetech/dorado, rrwick/Porechop, stschiff/sequenceTools), plus the Picard project page. No author-authored repository is named.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "grep over the fetched source XML (116,641 bytes, HTTP 200); no open-web search for a repository was performed, per protocol"
+    },
+    {
+      "artifact": "data accessions: NONE. No Data Availability section exists; the JATS section-type scan returned only sec-type='supplementary-material'. No GEO/SRA/ENA/DDBJ-DRA/ArrayExpress/dbGaP/EGA/figshare/Zenodo accession pattern occurs anywhere in the full text.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "regex scan of the fetched source XML for PRJ[A-Z]{2}[0-9]+, DRA[0-9]+, SRR[0-9]+, ERP[0-9]+, EGA[SD][0-9]+, and the literal strings accession/availability"
+    },
+    {
+      "artifact": "third-party tool URL stated in Methods 4.3: https://github.com/nanoporetech/dorado (Dorado v1.0.2)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, following redirects, 20 s timeout"
+    },
+    {
+      "artifact": "third-party tool URL stated in Methods 4.3: https://github.com/rrwick/Porechop/ (Porechop v0.2.4)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, following redirects, 20 s timeout"
+    },
+    {
+      "artifact": "third-party tool URL stated in Methods 4.3: https://github.com/stschiff/sequenceTools (pileupcaller, sequenceTools v1.6.0.0)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, following redirects, 20 s timeout"
+    },
+    {
+      "artifact": "third-party tool URL stated in Methods 4.3: http://broadinstitute.github.io/picard/ (Picard tools v3.4.0)",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, following redirects (http upgraded), 20 s timeout"
+    },
+    {
+      "artifact": "external reference resource stated in Methods 4.4: Allen Ancient DNA Resource (AADR) v54.1, 1240K SNP panel - version stated in prose, no URL or DOI given in the paper",
+      "http_status": "n/a (no URL stated in paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "recorded verbatim from prose; no substitute URL was resolved, per the no-invented-artifact rule"
+    },
+    {
+      "artifact": "external reference resource stated in Methods 4.3: human reference genome 'hg19/GRCh37' - no source, build patch, or checksum given",
+      "http_status": "n/a (no URL stated in paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "recorded verbatim from prose"
+    },
+    {
+      "artifact": "paper full text (JATS source XML): https://www.biorxiv.org/content/early/2025/12/29/2025.12.29.696801.source.xml",
+      "http_status": "200 (116,641 bytes; WebFetch returned 403, curl with browser user-agent returned 200)",
+      "checked_at": "2026-07-28",
+      "network_context": "title-phrase check passed: 'On-Site Paleogenomics' and 'Nanopore Sequencing with Ancient DNA' both present, DOI 10.64898/2025.12.29.696801 present - correct paper, not a cross-assessor swap"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "b23cb42b7dd4a22c1cf3d27615376f67fb5b48d566e87ec71dc2ff5e311da484",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

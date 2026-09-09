@@ -1,0 +1,200 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.07.652628",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.07.652628v1",
+      "biorxiv:2025.05.07.652628v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "Computational LGR-detection pipeline of the eLaRodON tool: benchmarking eLaRodON against NanoSV/Sniffles2/NanoVar/SVIM on public Oxford Nanopore data (38 M. tuberculosis SRA genomes + human NA12878), with Flye de novo assemblies + Mauve alignments generating gold-standard LGR sets, minimap2 read alignment (hg19/hg38 + lambda-phage-augmented reference), and custom Python BED generation from GenBank annotations. Wet-lab orthogonal validation (targeted NGS + Sanger on private tumor DNA) is out of computational scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from biorxiv JATS Methods prose (fetched via curl; WebFetch was 403). eLaRodON is the authors' own tool with a live GitHub repo (github.com/aakechin/eLaRodON) shipping a pip package + requirements.txt pinning 5 Python deps (biopython==1.84, pandas==2.2.2, pysam==0.22.1, toml==0.10.2, tqdm==4.66.5) -> exact_pins_partial (Python-only; external tools minimap2/samtools/vcfanno installed via unpinned 'conda install -c bioconda', no lockfile/container). README prose read only (no workflow source line-reading at stage1). Wet-lab validation steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Flye v2.9.5-b1801 de novo assembly of M. tuberculosis ONT reads (gold-standard reference generation)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Mauve whole-genome alignment of de novo assemblies to build gold-standard LGR sets - no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "minimap2 read alignment to human reference hg19 (tool comparison) and hg38+lambda-augmented reference; also junction-fragment re-mapping - no version, no params",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "eLaRodON LGR detection (the authors' tool) on ONT BAMs from public M. tuberculosis + NA12878 data; code on GitHub, pip-installable, requirements.txt pins Python deps",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked", "external-tools-unpinned"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Sniffles2 v2.6.1 comparison SV calling",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "NanoVar v1.8.3 comparison SV calling",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "SVIM v2.0.0 comparison SV calling",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "NanoSV v1.2.4 comparison SV calling",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C9",
+      "label": "Custom Python scripts to identify mobile elements/repeats from GenBank files and generate BED files - no version, availability/pointer not stated in prose",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "SVABA-derived gold-standard human (hg19) SV set - pre-existing external truth set, not run by the authors",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 0 },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["external-precomputed-truthset"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 3,
+    "n_X": 1,
+    "S": 10,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 6/10 computational steps: the version-pinned tools eLaRodON (own repo + pinned Python deps), Flye 2.9.5-b1801, Sniffles2 2.6.1, NanoVar 1.8.3, SVIM 2.0.0, NanoSV 1.2.4. 3/10 steps cap at NI due to unpinned versions (Mauve, minimap2, custom BED Python scripts). 1/10 (SVABA gold-standard set) is X (external precomputed truth set, not executed by authors). R★ not assignable at stage1; even under stage2 no step exceeds RI because capture is exact_pins_partial (Python-only pins; external bioconda tools unpinned; no lockfile/container claimed).",
+    "coverage": "10 computational steps assessed from biorxiv Methods prose. 4 wet-lab validation steps (DNA isolation, PCR primer design/amplification, targeted NGS, Sanger sequencing on private tumor/blood DNA) counted in W but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "eLaRodON environment (repo requirements.txt + README install prose)",
+      "missing": "No environment lockfile, no container, no conda env spec. requirements.txt pins 5 Python packages exactly (biopython==1.84, pandas==2.2.2, pysam==0.22.1, toml==0.10.2, tqdm==4.66.5) = partial capture, no closure. External runtime tools (minimap2, samtools, vcfanno) are installed via unpinned 'conda install -c bioconda' with no versions. Python declared as '3.7+' (floating).",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or container digest pinning the full stack (Python interpreter, the 5 Python deps + transitive, and minimap2/samtools/vcfanno) per platform."
+    },
+    {
+      "type": 3,
+      "where": "Methods prose - unpinned tool versions",
+      "missing": "minimap2 and Mauve are named with no version; the custom Python BED-generation scripts have no version and no repository pointer. These steps cannot reach RI.",
+      "how_to_close": "Record exact versions for minimap2 and Mauve, and deposit/point to the custom Python scripts with a pinned version or commit hash."
+    },
+    {
+      "type": 1,
+      "where": "Data availability + Methods (M. tuberculosis SRA / GenBank accessions)",
+      "missing": "The 38 ONT M. tuberculosis genomes and SRA accession numbers are referenced only via 'Supplemental Table S1' (not enumerated in the prose fetched). Human raw sequencing data are explicitly NOT shareable ('classified as personal information ... cannot be shared, in accordance with Russian regulations'); only some processed data available on reasonable request. NA12878 is a standard public cell line but no specific accession is given in prose.",
+      "how_to_close": "Enumerate the SRA/GenBank accession list in a machine-readable table and provide the exact NA12878 ONT run accession; deposit the derived gold-standard LGR call sets since raw human reads are restricted."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab orthogonal validation (out of computational scope)",
+      "missing": "DNA isolation (tumor tav122/tav171, peripheral-blood tav74), PCR primer design + amplification, targeted NGS, and Sanger sequencing are physical steps (W=4), not verdicted for computational reproduction.",
+      "how_to_close": "N/A for Tier-1 computational readiness."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/aakechin/eLaRodON (authors' own tool; default branch main, last pushed 2026-03-23; pip package 'elarodon'; requirements.txt pins biopython==1.84/pandas==2.2.2/pysam==0.22.1/toml==0.10.2/tqdm==4.66.5; README documents conda-installed unpinned minimap2/samtools/vcfanno; no license file; Python 3.7+)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl + GitHub API; README + requirements.txt prose read only (no workflow source line-reading at stage1)"
+    },
+    {
+      "artifact": "data accession: NCBI SRA - 38 M. tuberculosis ONT genomes; accession numbers stated to be in Supplemental Table S1 (not enumerated in fetched prose)",
+      "http_status": "n/a (accessions not enumerated in prose; supplement not fetched)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv JATS Methods prose"
+    },
+    {
+      "artifact": "data: human NA12878 ONT data (public reference cell line, no explicit accession in prose); raw human tumor/blood sequencing data NOT deposited (restricted under Russian personal-data regulations)",
+      "http_status": "n/a (no accession/URL given)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv JATS Data availability statement"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "14f6532aab95ca74592173b94857be158777621565b47877ec7eb06900cb8a39",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

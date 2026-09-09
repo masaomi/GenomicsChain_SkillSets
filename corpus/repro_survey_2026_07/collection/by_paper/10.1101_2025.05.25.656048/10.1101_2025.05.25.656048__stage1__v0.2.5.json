@@ -1,0 +1,172 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.25.656048",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.25.656048v1",
+      "biorxiv:2025.05.25.656048v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "ICE (Iterative/Imputation-based Cell Enrichment): an R package that detects cells enriched for a weakly/sparsely expressed gene set in scRNA-seq. Pipeline: (1) MAGIC imputation of the single-cell expression matrix; (2) per-cell single-sample GSEA enrichment scores over a predefined gene set (via GSVA); (3) derivative-based cutoff on the sorted ES curve (pracma v2.4.4); (4) iterative marker refinement using Seurat differential-expression top-n markers. Claimed results include raising senescence-detection precision in pancreatic alpha cells from 56% to 98%, identifying senescent muscle FAPs, and marker-specific populations (CDKN1A/p21, CDKN2A/p16, ATF3, MX1) in aging beta cells and AD microglia. Benchmarked against GSEA, GSVA, zscore, PLAGE, UCell, AUCell on public datasets (pancreas GSE84133, stressed beta cells GSE114297, PsychENCODE brain, AD microglia syn52293417).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-computational-stage from Methods prose + GitHub README (github.com/pxulab/ICE) read at prose level only (stage-1); no workflow/package source read line-by-line. Pure-computational tool paper; no wet-lab (W=0). Assessment targets bioRxiv v1 (canonical DOI). Note: a later published version (Genome Biology 2026, doi:10.1186/s13059-026-03997-0) additionally archives source on Zenodo (10.5281/zenodo.18426273) as a release_snapshot, but v1's code/data-availability statement cites only the floating GitHub repo, so v1 capture is 'floating'.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Input loading & normalization (Seurat): public scRNA-seq datasets (pancreas GSE84133; stressed beta GSE114297; PsychENCODE brain; AD microglia syn52293417) plus a shipped example matrix (pancreas_normalized.RDS) and gene set (input_gene_set.tsv) in the ICE package; normalized gene-by-cell matrix used as ICE input",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["capture-static-only", "external-accession-mixed-with-shipped-example"]
+    },
+    {
+      "step_id": "C2",
+      "label": "MAGIC imputation of the single-cell matrix (magic-impute via reticulate/Rmagic): kNN graph on Euclidean distance, Gaussian-kernel affinity, diffusion smoothing to impute dropout; MAGIC parameters described qualitatively (no exact k/t/decay values in prose)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["capture-static-only", "magic-hyperparams-not-fully-pinned", "python-dep-via-unpinned-conda"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Per-cell enrichment scoring: single-sample GSEA over the predefined gene set (GSVA package), running-sum on per-cell ranked expression producing an ES matrix",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["capture-static-only", "gsva-version-unpinned"]
+    },
+    {
+      "step_id": "C4",
+      "label": "Derivative-based cutoff estimation (pracma v2.4.4): sort ES descending, compute forward differences, take cutoff from the initial peak in the derivative trend to separate enriched vs non-enriched cells",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact-pin-no-closure",
+      "subflags": ["only-exact-prose-pin", "capture-static-only"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Iterative marker refinement (Seurat): differential-expression on the initial cell classification, take top-n positive markers to replace the input marker list, recompute ES + cutoff iteratively; n is a user-tunable variable",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["capture-static-only", "seurat-version-unpinned", "top-n-user-variable"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Benchmarking against alternative scoring methods: GSEA, GSVA, zscore, PLAGE (bulk-based) and UCell, AUCell (single-cell-based) compared to ICE on the benchmark datasets",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": ["benchmark-tools-not-in-repo", "no-versions-for-comparison-methods", "no-benchmark-params"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 1,
+    "n_X": 0,
+    "S": 6,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/6 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on the 5 core ICE-pipeline steps (C1-C5): the ICE R package is public (github.com/pxulab/ICE, MIT, R), the README documents a conda + R install path, and the core datasets are public (GEO GSE84133/GSE114297) with a shipped example matrix. Environment is 'floating': the conda env pins only python=3.10, magic-impute is installed unpinned, and R deps (Seurat, GSVA, pracma, Rmagic, ICE) are installed via install.packages/BiocManager/devtools::install_github HEAD with no environment.yml/renv.lock/conda-lock/container. Only one exact prose pin exists (pracma v2.4.4, C4). Because capture is 'floating' (not exact_pins_partial/release_snapshot/env_lock/container), even a perfect stage2 run could not exceed RI — NOT a stage2 R★ candidate. C6 (benchmark comparison methods) is NI: the six alternative scoring tools are not part of the ICE install instructions and carry no version or parameter specification in prose.",
+    "coverage": "6 computational steps assessed from Methods prose + GitHub README (prose only). No wet-lab steps (W=0).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment (GitHub README install instructions + Methods)",
+      "missing": "No environment.yml / renv.lock / conda-lock / container. The documented conda env pins only python=3.10; magic-impute is installed unpinned (conda -c conda-forge -c bioconda), and R packages (dplyr, pracma, Seurat, GSVA, reticulate, Rmagic, ICE) are installed via install.packages/BiocManager/devtools::install_github at HEAD. The only exact version stated anywhere is pracma v2.4.4 (in Methods prose). A Linux LD_PRELOAD libstdc++ workaround is noted, signaling platform fragility.",
+      "how_to_close": "Ship a renv.lock (R) + conda-lock/pixi.lock (Python) or a container digest for a declared platform, pinning MAGIC/magic-impute, Seurat, GSVA, Rmagic, reticulate, and the ICE commit; tag a release and cite the exact commit."
+    },
+    {
+      "type": 1,
+      "where": "Benchmark data access",
+      "missing": "AD microglia data is behind the Synapse database (syn52293417), which typically requires registration/controlled access; the PsychENCODE brain dataset is cited without a direct GEO/SRA accession. GEO accessions GSE84133 (pancreas) and GSE114297 (stressed beta) are openly resolvable.",
+      "how_to_close": "State access conditions for Synapse/PsychENCODE data and provide a direct accession or a fetch/preprocessing script mapping each dataset to the figures it supports."
+    },
+    {
+      "type": 6,
+      "where": "Benchmarking step (C6) reproducibility",
+      "missing": "The six comparison scoring methods (GSEA, GSVA, zscore, PLAGE, UCell, AUCell) are not included in the ICE repository install path and are described without versions or the exact parameters/wrapping used for the benchmark, so the head-to-head comparison figures cannot be reconstructed from prose alone.",
+      "how_to_close": "Provide the benchmark driver script listing each method's package, version, and parameters, ideally in the repository."
+    },
+    {
+      "type": 12,
+      "where": "Repository snapshot / citable version (v1)",
+      "missing": "The bioRxiv v1 code-availability statement cites only the floating GitHub repo (github.com/pxulab/ICE) with no tagged release or archive DOI at preprint time. (A Zenodo archive 10.5281/zenodo.18426273 was minted later for the Genome Biology published version but is not referenced by v1.)",
+      "how_to_close": "Cite a specific commit/tag and mint a Zenodo/Software Heritage snapshot referenced from the manuscript."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/pxulab/ICE (R package; description 'ICE: Iterative-imputation-based Cell Enrichment'; MIT license; default branch main; created 2025-05-07; last push 2025-09-30; README documents conda env 'ice' with python=3.10 + magic-impute, and R install via install.packages/BiocManager/devtools::install_github for Seurat/GSVA/pracma/Rmagic/ICE; ships example pancreas_normalized.RDS + input_gene_set.tsv; no environment.yml/lockfile/container)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "GitHub REST API (api.github.com) + raw README, public repo"
+    },
+    {
+      "artifact": "data accession: GEO GSE84133 (pancreas benchmark dataset)",
+      "http_status": "not-checked (verbatim from Data availability)",
+      "checked_at": "2026-07-23",
+      "network_context": "GEO accession cited in Data availability statement"
+    },
+    {
+      "artifact": "data accession: GEO GSE114297 (stressed beta cell dataset)",
+      "http_status": "not-checked (verbatim from Data availability)",
+      "checked_at": "2026-07-23",
+      "network_context": "GEO accession cited in Data availability statement"
+    },
+    {
+      "artifact": "data accession: Synapse syn52293417 (AD microglia dataset; likely registration/controlled access)",
+      "http_status": "not-checked (verbatim from Data availability)",
+      "checked_at": "2026-07-23",
+      "network_context": "Synapse accession cited in Data availability statement"
+    },
+    {
+      "artifact": "data source: PsychENCODE Consortium (brain dataset; no direct accession given)",
+      "http_status": "not-checked (verbatim from Data availability)",
+      "checked_at": "2026-07-23",
+      "network_context": "Consortium named in Data availability statement without accession"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "d4da168baeed9da824a17a315e44d4b7264757406bd4368d08f81f80c99d45c8",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

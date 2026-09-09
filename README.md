@@ -16,22 +16,49 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 
 | Package | Version | Role |
 |---|---|---|
-| `genomicschain_core` | 0.2.1 | Submit path: digest, admission gates, signing, Synoptis recording |
-| `genomicschain_tier1` | 0.2.0 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
-| `genomicschain_tier2` | 0.3.0 | Tier-2 executed-R — execution backends, output comparator |
+| `genomicschain_core` | 0.5.0 | Submit path: digest, admission gates, signing, Synoptis recording |
+| `genomicschain_tier1` | 0.2.1 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
+| `genomicschain_tier2` | 0.3.0 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
+| `genomicschain_tier3` | 0.5.0 | Tier-3 execution — backends, comparator, cost estimation |
 
-The three version independently but install as a set: `tier1` and `tier2` both
-declare `genomicschain_core >= 0.2.0`.
+The four version independently but install as a set: `tier1` and `tier3` declare
+`genomicschain_core >= 0.2.0`; `tier2` depends on nothing and reads only what is on disk.
 
-### The two tiers
+One numbering, everywhere, since 2026-09-09: Tier-1 reads the paper, Tier-2 reads the
+code, Tier-3 executes. Package names, tool names, schemas and the signed claim prefixes
+(`tier1:`, `tier2:`, `tier3:`) all carry the same number. Documents written before that date call
+execution "Tier-2" and the code-reading package `genomicschain_codescan`; they are not
+rewritten. `trust_tier` on a record is not a tier index but a guarantee level
+(`self_reported` / `peer_verified` / `hardware_attested`).
+
+### The three tiers
 
 **Tier-1** reads a paper and asks what it *claims* about reproducibility — are
 versions pinned, is the environment closed, is the data reachable. It never runs
 anything, so it produces a ceiling: an upper bound on what a code check could
 later confirm, not a reproducibility rate.
 
-**Tier-2** executes a subject on a compute backend and compares the output against
-a validated expectation. That is where a reproduction is actually established.
+**Tier-2** reads the code the paper points at: what the repository declares about
+software, containers and data, how strongly each is pinned, and what that means for
+the Tier-1 report step by step. Still nothing runs. The workflow is parsed, never
+evaluated, so the party being assessed can re-run the scan on their own copy and get
+the same answer.
+
+**Tier-3** executes a subject on a compute backend and, *if the paper declares a
+comparison target*, checks the output against it.
+
+That proviso is not hedging. A survey on 2026-08-14 of the five papers in a
+201-paper corpus that passed the Tier-1 gate found **none** publishing a checksum
+or nominating an artifact to compare against. So the two questions Tier-3 answers
+are reported on separate axes: `execution_verdict` (did it run) and
+`comparison_verdict` (did it match, or was there nothing to match against). A
+record whose comparison axis reads `no_target_declared` is a complete result, and
+it is the common one.
+
+Records also carry `environment_provenance` and `inputs_provenance`, so a
+certificate cannot describe an environment the operator built as the one the
+paper declared, and cannot hide that inputs came from a controlled-access source
+no third party can reach.
 
 ### Tools
 
@@ -39,8 +66,12 @@ a validated expectation. That is where a reproduction is actually established.
 |---|---|---|
 | `gc_tier1_assess` | tier1 | always |
 | `gc_tier1_submit` | core | `anchor_profile: true` only |
+| `gc_tier2_scan` | tier2 | always |
+| `gc_tier2_adjudicate` | tier2 | always |
 | `gc_tier2_submit` | core | `anchor_profile: true` only |
-| `gc_tier2_execute` | tier2 | always |
+| `gc_tier3_submit` | core | `anchor_profile: true` only |
+| `gc_tier3_execute` | tier3 | always |
+| `gc_tier3_estimate` | tier3 | always |
 
 ## Requirements
 
@@ -91,6 +122,7 @@ export KAIROS_DATA_DIR=/path/to/your/.kairos
 kairos-chain skillset install ./genomicschain_core
 kairos-chain skillset install ./genomicschain_tier1
 kairos-chain skillset install ./genomicschain_tier2
+kairos-chain skillset install ./genomicschain_tier3
 kairos-chain skillset list
 ```
 
@@ -156,16 +188,20 @@ that key and have not changed since.
 ```
 genomicschain_core/
   lib/     submit pipeline, manifest, digests, Synoptis attestor
-  tools/   gc_tier1_submit, gc_tier2_submit  (anchor only)
-  schemas/ tier1 report submit gate (v0.2.6), tier2 verdict
+  tools/   gc_tier1_submit, gc_tier2_submit, gc_tier3_submit  (anchor only)
+  schemas/ tier1 report submit gate (v0.2.6), tier2 adjudication, tier3 verdict
   config/  deployment profile + anchor example
   test/
 genomicschain_tier1/
   assets/    report schema v0.2.6
   knowledge/ repro_tier1_guide.md — the rubric
 genomicschain_tier2/
+  lib/     scanner, parsers, pin-strength rubric, adjudicator
+  tools/   gc_tier2_scan, gc_tier2_adjudicate
+  test/
+genomicschain_tier3/
   lib/     execution backends (local, Thoa), comparator, executor
-  tools/   gc_tier2_execute
+  tools/   gc_tier3_execute, gc_tier3_estimate
   test/
 ```
 
@@ -175,15 +211,17 @@ The suites fall into three groups, because some of them test integration with
 sibling SkillSets and therefore need those siblings to exist.
 
 **Run from a clone, no extra paths** — `genomicschain_core/test/b1_manifest_hash_test.rb`,
-`tip_source_test.rb`, and all three of `genomicschain_tier2/test/`:
+`tip_source_test.rb`, all four of `genomicschain_tier3/test/`, and both of
+`genomicschain_tier2/test/`:
 
 ```sh
 cd genomicschain_core && ruby -Ilib -Itest test/b1_manifest_hash_test.rb
-cd genomicschain_tier2 && ruby -Ilib -Itest -I../genomicschain_core/lib test/tools_test.rb
+cd genomicschain_tier2 && ruby -Ilib -Itest test/scanner_test.rb
+cd genomicschain_tier3 && ruby -Ilib -Itest -I../genomicschain_core/lib test/tools_test.rb
 ```
 
 **Run from a clone with synoptis and mmp on the load path** — `tier1_submit_test.rb`,
-`tier2_submit_test.rb`:
+`tier2_submit_test.rb`, `tier3_submit_test.rb`:
 
 ```sh
 cd genomicschain_core

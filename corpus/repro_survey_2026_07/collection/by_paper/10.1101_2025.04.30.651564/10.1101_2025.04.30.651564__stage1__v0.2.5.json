@@ -1,0 +1,322 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.04.30.651564",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.04.30.651564v2",
+      "biorxiv:2025.04.30.651564v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational GRN-inference reproduction: re-run the MOBILE (Multi-Omics Binary Integration via Lasso Ensembles) pipeline on RNA-seq/ATAC-seq/ChIP-seq (H3K27ac, H3K27me3, H3K4me3) from 15 patient-derived glioblastoma lines + normal astrocytes (GEO GSE217349, reused from ref 11), to reproduce (i) upstream mapping/peak-calling/quantification/normalization to rlog2 counts, (ii) Lasso (10,000-iteration robust selection, RLCM) + LOGO GB-specific coefficient matrices for the four epigenetic->transcriptomic pairs, (iii) the Integrated Associations Network (IAN) with GPA/ranked-list outputs, (iv) GSEA/GO enrichment identifying GABA/ECM/immune networks, and (v) TF identification (ARX, GSX2, DLX family) via Panther annotation + HOMER motif analysis. Wet-lab arm (U251/hESC-neuron co-culture proliferation, immunofluorescence) is experimental validation and is out of computational reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods prose (stage-1, prose-only; no workflow source read). NO code/analysis repository is deposited or named anywhere in the paper (no GitHub/GitLab/Zenodo/OSF/figshare/code-availability statement). Standard public tools with exact version pins + documented parameters on public GEO data are treated as reconstructable-from-prose (code axis=1 -> RI ceiling). The core MOBILE integration is NI: MOBILE is cited (ref 37) with NO version pin and the custom feature-filtering / RLCM-thresholding / IAN-construction / ranked-list glue code is not shared. Panther is a mutable, unversioned web DB. Wet-lab steps recorded as layer=W, verdict OOS, excluded from S and from n_* counts.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Read QC with FastQC (0.11.8) on raw RNA-seq/ChIP-seq/ATAC-seq fastq (GSE217349)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "RNA-seq alignment to GRCh38/hg38 with STAR (2.7.6b); genes kept at min row sum 10 reads",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C3",
+      "label": "ChIP-seq & ATAC-seq alignment to GRCh38/hg38 with bowtie2 (2.4.1); ChIP: --very-sensitive --threads 4; ATAC: --k 2 --local --maxins 2000",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "ATAC-seq adapter trimming with cutadapt (2.10); Nextera adaptor CTGTCTCTTATACACATCT removed",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Duplicate removal with Picard MarkDuplicates (2.27.5) on ATAC-seq alignments",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "BAM filtering (high-quality, uniquely-aligned pairs) with samtools 1.12 and pseudo-replicate generation with SAMtools 1.15.1 (~20-50M read pairs each)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Peak calling for ChIP-seq/ATAC-seq with MACS3 (3.0.0b1): -f BAMPE --broad --nomodel --shift -100 --extsize 200 -B -g hs -q 0.05",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Consensus peaks in R (4.4.0) via GenomicRanges (v1.56.2): retain peaks overlapping each pseudo-replicate >50%",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C9",
+      "label": "Read counting within consensus peaks with Rsubread (v2.18.0)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C10",
+      "label": "rlog2 normalization with DESeq2 (v1.12.2, Bioconductor v3.19.1)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C11",
+      "label": "Core multi-omics integration with MOBILE (ref 37, NO version pin): top-5% variance filter, Lasso 10,000 iterations with RLCM stability (>5,000 hits), LOGO GB-specific matrices, IAN construction, GPA/ranked-list outputs, |coef|<0.01 excluded",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["workflow-ref-unpinned", "capture-static-only"]
+    },
+    {
+      "step_id": "C12",
+      "label": "Pathway enrichment with GSEA (4.3.3), C5 GO BP/CC/MF (v2023.1.Hs), p<0.05 FDR<0.1; EnrichmentMap in Cytoscape",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C13",
+      "label": "GO enrichment with clusterProfiler (v4.12.6), p<0.01",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C14",
+      "label": "GO tree plots with ggtree (v3.12.0)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C15",
+      "label": "Integrated-network visualization with Cytoscape (v3.10.1/v3.10.2)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C16",
+      "label": "DEG clustering with pheatmap (v1.0.12) and UpSet intersections with ComplexHeatmap (v2.20.0)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C17",
+      "label": "Violin plots + statistics on rlog2 RNA-seq with ggplot2 (v3.5.1), ggpubr (v0.6.0), rstatix (v0.7.2)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C18",
+      "label": "TF/histone-modifier/chromatin-binding annotation of GPA-genes via Panther Database (no version; mutable web resource)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["mutable-fetch-fatal", "fetch-required"]
+    },
+    {
+      "step_id": "C19",
+      "label": "TFBS motif analysis on GPA-peaks with HOMER (v4.11.1) findMotifsGenome.pl (-size 200 -mask; PWM scan for listed TFs incl. ARX, GSX2, MEF2C)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "W1",
+      "label": "U251 glioblastoma cell culture (Sigma #09063001, STR-authenticated; GFP line via lentiviral integration)",
+      "layer": "W",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "hESC (RC17) directed differentiation to MGE GABAergic interneuron and dorsal-forebrain glutamatergic progenitors (16 days; defined growth factors)",
+      "layer": "W",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Contact co-culture of hESC-derived neurons with GFP-labelled GB cells; proliferation assay",
+      "layer": "W",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Immunofluorescence on neural progenitors and hESC-derived neurons",
+      "layer": "W",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 1 },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 17,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 19,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/19 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 17 of 19 computational steps; 2 steps NI. The upstream mapping/peak-calling/quantification/normalization and downstream enrichment/visualization/motif steps use standard public tools with EXACT version pins and documented parameters on public GEO data (GSE217349), so they are reconstructable-from-prose (RI in principle). Two steps are NI: (C11) the core MOBILE Lasso/LOGO/IAN integration — MOBILE is cited without a version and the custom variance-filter / RLCM-thresholding / IAN-construction / ranked-list glue code is not deposited; and (C18) Panther TF annotation via a mutable, unversioned web database. CRITICAL LIMITER: no analysis/code repository is deposited or named anywhere (no code-availability statement, no GitHub/GitLab/Zenodo/OSF), so even the RI-eligible steps have zero deposited scripts — reproduction requires full re-implementation from prose. Environment capture is exact-pins-in-prose-only (no environment.yml/lockfile/container), so R★ is unattainable without a locked environment even at stage 2.",
+    "coverage": "19 computational steps + 4 wet-lab steps assessed from Methods prose only (stage-1). Data reused from a prior publication (ref 11) and available at GEO GSE217349. Wet-lab co-culture/immunofluorescence arm is experimental validation (layer W, OOS).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 6,
+      "where": "Analysis / pipeline code (entire computational workflow; esp. C11 MOBILE integration, IAN construction, filtering/thresholding)",
+      "missing": "No code-availability statement and no analysis repository of any kind (no GitHub/GitLab/Zenodo/OSF/figshare) is named in the paper. The MOBILE-based multi-omics integration, the top-5% variance filter, the 10,000-iteration Lasso/RLCM stability logic, the LOGO GB-specific comparison, IAN construction, GPA/ranked-list generation, and |coef|<0.01 thresholding are described in prose only, with no deposited scripts or configuration.",
+      "how_to_close": "Deposit the full analysis code (MOBILE wrapper/config + all custom R/Python glue and figure scripts) in a versioned, citable repository (tagged release + Zenodo DOI) and add a code-availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Software environment (Methods prose; ~15 named tools)",
+      "missing": "No environment.yml / conda-lock / container. Exact versions are given in prose for most tools (FastQC 0.11.8, STAR 2.7.6b, bowtie2 2.4.1, cutadapt 2.10, Picard 2.27.5, samtools 1.12 & 1.15.1, MACS3 3.0.0b1, R 4.4.0, GenomicRanges 1.56.2, Rsubread 2.18.0, DESeq2 1.12.2/Bioc 3.19.1, GSEA 4.3.3, Cytoscape 3.10.1/3.10.2, clusterProfiler 4.12.6, ggtree 3.12.0, pheatmap 1.0.12, ComplexHeatmap 2.20.0, ggplot2 3.5.1, ggpubr 0.6.0, rstatix 0.7.2, HOMER 4.11.1) but there is NO env closure. MOBILE and Panther Database carry no version at all. Two different samtools versions (1.12 vs 1.15.1) are used without a lock reconciling them.",
+      "how_to_close": "Ship a lockfile (conda-lock/renv.lock) or container digest covering all tools incl. MOBILE and a pinned Panther/annotation snapshot; record OS/platform."
+    },
+    {
+      "type": 1,
+      "where": "Data (raw + intermediate)",
+      "missing": "Raw RNA-seq/ChIP-seq/ATAC-seq are available at GEO GSE217349 (reused from ref 11) — good. However, no intermediate/processed matrices are deposited (rlog2-normalized consensus-peak counts, RLCM/LOGO coefficient matrices, IAN edge lists, GPA/ranked lists), so downstream steps depend on re-deriving inputs. GSEA gene sets are pinned (C5 v2023.1.Hs); Panther/HOMER genome annotation snapshots are unversioned.",
+      "how_to_close": "Deposit processed matrices and network outputs (Zenodo) with a manifest linking each to its GEO-derived inputs; pin annotation database versions."
+    },
+    {
+      "type": 12,
+      "where": "Repository licensing / citable snapshot",
+      "missing": "No repository exists, hence no license, no tagged release, and no archival DOI for the computational artifacts.",
+      "how_to_close": "Create the repository, add an OSI license, and mint a Zenodo/tagged-release DOI cited in the paper."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession: GEO GSE217349 (raw RNA-seq/ChIP-seq[H3K27ac,H3K27me3,H3K4me3]/ATAC-seq from 15 patient-derived GB lines + normal astrocytes; reused from ref 11) — https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE217349",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "accession named verbatim in DATA AVAILABILITY; liveness not fetched at stage1"
+    },
+    {
+      "artifact": "code repository: NONE — no code-availability statement and no GitHub/GitLab/Zenodo/OSF/figshare repository named anywhere in the paper",
+      "http_status": "n/a",
+      "checked_at": "2026-07-23",
+      "network_context": "absence confirmed by full-text keyword scan of JATS XML (github/gitlab/zenodo/code availab = 0 hits)"
+    },
+    {
+      "artifact": "external published pipeline: MOBILE (Multi-Omics Binary Integration via Lasso Ensembles), cited as ref 37, no version and no URL given in this paper",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "third-party tool; not deposited/linked by these authors"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "c70b2e329a4970ad34277685aaba6bc3137fecdb7d69edd2fec840b37493dbd7",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

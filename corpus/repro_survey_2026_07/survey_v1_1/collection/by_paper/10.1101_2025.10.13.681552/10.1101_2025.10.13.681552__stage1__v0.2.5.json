@@ -1,0 +1,925 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "2701fdcdcb577381248b29bee2955f638bd56dd917f69ef2a9614af98f308490",
+  "canonical_id": {
+    "value": "10.1101/2025.10.13.681552",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.13.681552v1",
+      "biorxiv:2025.10.13.681552v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Whole-genome analysis of uropathogenic E. coli linking CRISPR-Cas subtype to antibiotic susceptibility: Illumina read QC and Shovill assembly of 91 newly sequenced Australian urinary isolates, QUAST/rMLST QC and PROKKA annotation; ONT basecalling (Guppy), Filtlong filtering, Trycycler/Flye/Raven/Miniasm candidate assembly with Medaka + Polypolish polishing for two representative isolates; Roary core-genome alignment and FastTree phylogeny; in silico typing and screening (ClermonTyping phylogroups, PubMLST ST, RGI/CARD ARGs, CRISPRCasTyper arrays, MobileElementFinder, IntegronFinder, Plasmer); construction of a 303-isolate global SRA validation cohort; and the machine-learning layer (elastic net + adaptive lasso via glmnet, XGBoost, rpart decision trees, Youden's J thresholding, AUC/F1 validation) plus Fisher/Dunn statistics. Wet-lab work (isolate collection, EUCAST disc-diffusion susceptibility testing, DNA extraction, Illumina and ONT library preparation and sequencing) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file exists (no repository at all), so steps were derived from Methods prose at one step per named tool/analysis invocation, per guide Step 1. The three parallel long-read candidate assemblers (Flye / Raven / Miniasm+Minipolish) are collapsed into a single step (C10) because the paper states only that 'one of' them was used per subset without giving the mapping. The two visualisation R packages (ggtree, ComplexHeatmap) are collapsed into one figure-production step (C17). Elastic net (C27) and adaptive lasso (C28) are separate steps because each carries its own cross-validation round. Threshold selection and validation-metric computation (C29) is separated from model fitting because it uses an unnamed ROC package.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Clinical E. coli isolate collection from urine samples (Douglass Hanly Moir Pathology, 2023), balanced trimethoprim S/R selection, and phenotypic antimicrobial susceptibility testing by calibrated dichotomous sensitivities disc diffusion with MIC interpretation per EUCAST v13.0 (trimethoprim, ampicillin, amoxicillin-clavulanate, cefalexin, norfloxacin, nitrofurantoin, ESBL production)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [],
+      "notes": [
+        "wet-lab-oos"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Genomic DNA extraction with Gentra Puregene Yeast/Bacteria Kit (Qiagen) and Illumina library preparation / MiSeq benchtop sequencing (Marshall Centre, UWA)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [],
+      "notes": [
+        "wet-lab-oos"
+      ]
+    },
+    {
+      "step_id": "W3",
+      "label": "Phenol-chloroform genomic DNA extraction and quantification for the two long-read representative isolates (R52, R60)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [],
+      "notes": [
+        "wet-lab-oos"
+      ]
+    },
+    {
+      "step_id": "W4",
+      "label": "Oxford Nanopore library preparation (Q20+ ligation kit SQK-LSK114, motor E8.2) on R10.4.1 FLO-MIN114 flow-cells and MinION Mk1B sequencing (Ramaciotti Centre, UNSW)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [],
+      "notes": [
+        "wet-lab-oos"
+      ]
+    },
+    {
+      "step_id": "C1",
+      "label": "Illumina short-read quality trimming with fastp (v0.12.4) using default settings",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "accession-not-yet-resolving",
+        "no-code-repo",
+        "prose-pins-no-env-closure"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "De novo short-read assembly with Shovill (v1.1.0, https://github.com/tseemann/shovill), minimum contig length 500 bp, minimum coverage 5.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "accession-not-yet-resolving",
+        "no-code-repo",
+        "assembler-backend-unstated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Assembly quality assessment with QUAST (v5.2.0); no parameters or reference given (outputs in Supplementary Table 1)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": [
+        "no-params",
+        "no-code-repo"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Species confirmation by ribosomal MLST (rMLST) against the PubMLST database; no database version/date, no query parameters, no local tool named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-version",
+        "no-params",
+        "mutable-reference-db",
+        "reference-db-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Genome annotation with PROKKA (v1.14.6); no parameters, genus/database options unstated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "no-params",
+        "no-code-repo"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Real-time ONT base-calling with Guppy (v6.5.7) in high-accuracy (HAC) mode using the 400 bp/s R10.4.1/E8.2 model",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ],
+      "notes": [
+        "raw-signal-deposition-unstated",
+        "accession-not-yet-resolving",
+        "proprietary-basecaller-ont"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "ONT raw read metrics with NanoStat (v1.6.0); no parameters given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "no-params",
+        "no-code-repo"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "ONT read quality filtering with Filtlong (v0.2.1, github.com/rrwick/Filtlong): discard reads <1 kb and the lowest-quality 5%",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "accession-not-yet-resolving",
+        "no-code-repo"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Subsampling of filtered ONT reads into 12 independent subsets to seed Trycycler (v0.5.4) candidate assembly; no random seed, no genome-size/depth arguments stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": [
+        "stochastic-no-seed",
+        "distributional-only",
+        "partial-params"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Candidate long-read assemblies generated with one of Flye (v2.9.2), Raven (v1.8.3) or Miniasm/Minipolish (v0.3 / v0.1.3); the assignment of assembler to subset and all assembler parameters are unstated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": [
+        "no-params",
+        "assembler-to-subset-mapping-unstated",
+        "stochastic-no-seed"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Trycycler (v0.5.4) consensus reconstruction from the 12 candidate assemblies (cluster / reconcile / MSA / partition / consensus); clustering thresholds and the mandatory interactive cluster-curation decisions are not recorded",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "no-params",
+        "manual-interactive-curation",
+        "irreducible-manual-step"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Long-read polishing of Trycycler consensus contigs with Medaka (v1.2.2, https://github.com/nanoporetech/medaka) using model r1041_e82_400bps_hac_v4.2.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "accession-not-yet-resolving",
+        "no-code-repo"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Short-read polishing with Polypolish (v0.5.0) using trimmed Illumina reads; the required all-alignment BWA step and insert-filter settings are not described",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "partial-params",
+        "upstream-aligner-unstated"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Visualisation of the final hybrid assemblies (R52, R60) with the Proksee web tool; no version, no session/config export, interactive",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-version",
+        "no-params",
+        "web-tool-no-version",
+        "manual-interactive-curation"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Core-genome alignment with Roary (v3.13.0), 'as previously described' (reference 40); identity threshold and core-alignment flags not restated in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": [
+        "params-by-reference",
+        "partial-params"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Approximate maximum-likelihood phylogeny from the core-genome alignment with FastTree (v2.1.11), 'as previously described'; substitution model and support settings not restated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": [
+        "params-by-reference",
+        "partial-params"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Tree and metadata heatmap visualisation in R (RStudio v1.4.1717) with ggtree (v3.2.1) and ComplexHeatmap (v2.15.4); no plotting code deposited, no R interpreter version stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "no-params",
+        "no-code-repo",
+        "r-interpreter-version-unstated",
+        "figure-code-absent"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "E. coli phylogroup assignment in silico with the ClermonTyping web tool (v23.06); options not stated (defaults implied)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "partial-params",
+        "web-tool-invocation-not-scripted"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Multi-locus sequence typing against PubMLST using the Achtman scheme, with the Pasteur scheme as fallback for isolates yielding no ST; no database version/date, no local typing tool or thresholds named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-version",
+        "mutable-reference-db",
+        "reference-db-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Antimicrobial resistance gene identification with RGI (v6.0.2) against CARD; CARD database version and RGI run mode (perfect/strict/loose, --low_quality, aligner) unstated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-params",
+        "reference-db-version-unstated",
+        "fetch-required-unclassified-stage1"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "CRISPR-Cas system detection and subtype classification with CRISPRCasTyper (v1.8.0); no parameters, no bundled-database version stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-params",
+        "reference-db-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Mobile genetic element identification with MobileElementFinder (v1.1.2); no parameters, no MGEdb version stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-params",
+        "reference-db-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Integron identification with IntegronFinder (v2.0.2); no parameters (--local-max / --func-annot) stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [],
+      "notes": [
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Plasmid-contig prediction with Plasmer (v23.04.20); no parameters or model/threshold settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "no-params",
+        "reference-model-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Global validation cohort construction: retrieval of 426 Illumina paired-end urinary E. coli read sets from SRA (accessions in Supplementary Table 3), assembly/QC as for the in-house isolates, then filtering by rMLST plus EnteroBase E. coli criteria (total length 3.7-6.4 Mbp, N50 >=20 kb, <=800 contigs), yielding 303 isolates from 7 countries",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ],
+      "notes": [
+        "cohort-selection-query-absent",
+        "no-version",
+        "mutable-reference-db"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Model feature-matrix construction and predictor filtering: predictors = phylogroups, plasmid types, CRISPR array types and specific ARGs; retain predictors present in >5% of isolates within each dataset; binarise ARG count at >=56 and MGE count at >=21; no script, no package, no R interpreter version, feature matrix not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": [
+        "no-code-repo",
+        "analysis-code-not-deposited",
+        "r-interpreter-version-unstated",
+        "derived-matrix-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "Elastic net logistic regression with glmnet (v4.1-7): equal ridge/lasso weighting (alpha = 0.5), penalty factors removed for CRISPR array-type predictors, regularisation strength selected by 8-fold cross-validation minimising AUC-based CV error; trained on the Australian dataset, no random seed stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": [
+        "stochastic-no-seed",
+        "distributional-only",
+        "no-code-repo",
+        "analysis-code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Adaptive lasso with glmnet: penalty weights derived from the magnitudes of the non-zero elastic-net coefficients (exact weighting function and gamma exponent unstated), hyperparameters re-optimised by a second 8-fold cross-validation on AUC",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": [
+        "stochastic-no-seed",
+        "distributional-only",
+        "weighting-function-unstated",
+        "analysis-code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C29",
+      "label": "Classification-threshold selection by Youden's J statistic and performance evaluation on the global validation cohort (AUC, balanced accuracy, sensitivity, specificity, F1, confusion matrices; Supplementary Table 7); no ROC/AUC package named, no R interpreter version",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": [
+        "no-version",
+        "package-unnamed",
+        "analysis-code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C30",
+      "label": "Extreme gradient boosting with xgboost (v1.6.0.1) and caret (v6.0-94): 8-fold cross-validation, AUC as the primary metric, grid search over learning rate, tree depth, number of boosting rounds and regularisation terms (full grid in Supplementary Table 5); selected optimum hyperparameters and random seed not reported (feature gains in Supplementary Tables 9-10)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ],
+      "notes": [
+        "stochastic-no-seed",
+        "distributional-only",
+        "selected-hyperparameters-unreported",
+        "analysis-code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "Decision-tree modelling with rpart (v4.1.21, https://github.com/bethatkinson/rpart) and caret (v6.0-94): complexity parameter tuned by 8-fold cross-validation maximising AUC; cp grid, selected cp value, minsplit/minbucket and seed not reported",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": [
+        "stochastic-no-seed",
+        "distributional-only",
+        "selected-hyperparameters-unreported",
+        "analysis-code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C32",
+      "label": "Statistical testing: pairwise comparisons by Fisher's exact test with Benjamini-Hochberg correction; gene-count comparisons by Dunn's test with Holm adjustment; alpha = 0.05; performed in R via RStudio v1.4.1717 with no R version and no test-package (e.g. dunn.test/FSA) named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [],
+      "notes": [
+        "no-version",
+        "package-unnamed",
+        "r-interpreter-version-unstated",
+        "analysis-code-not-deposited"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 14,
+    "n_NI": 18,
+    "n_X": 0,
+    "S": 32,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/32 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "14/32 (44%) of computational steps reach RI at the prose level (C1, C2, C6, C8, C9, C12, C13, C15, C16, C18, C27, C28, C30, C31). All of them are capped at version=1 because the pins are prose-only with no environment closure: there is no environment.yml, no conda-lock, no renv.lock, no Dockerfile or image digest, no release tag, and the R interpreter version is never given (only RStudio v1.4.1717, which is the IDE, not R). No step is R-star-eligible from prose. The remaining 18 steps fall to NI, driven by three recurring causes: (a) tools invoked with no parameters at all (QUAST, PROKKA, NanoStat, RGI, CRISPRCasTyper, MobileElementFinder, IntegronFinder, Plasmer, Trycycler consensus, candidate assembly), (b) unversioned live reference databases and services (PubMLST rMLST and MLST, CARD, Proksee web tool), and (c) unversioned/unnamed R components in the analysis and statistics layer (feature-matrix construction, ROC/AUC package, Dunn's-test package). The paper has no code repository and no Code Availability statement, so every step is code=1 (reconstructable from prose) and none is code=2.",
+    "coverage": "32 computational steps assessed from Methods prose (100% of named computational invocations); 4 wet-lab steps counted in W (isolate collection + EUCAST disc-diffusion susceptibility testing, Qiagen DNA extraction + Illumina MiSeq sequencing, phenol-chloroform DNA extraction, ONT SQK-LSK114 library prep + MinION sequencing) and out of computational-reproduction scope. Computational coverage = 32/36 = 89%. A Data Availability section is present (BioProject PRJNA1279687 for newly generated reads; SRA accessions for the global cohort in Supplementary Table 3). There is no Code Availability section anywhere in the paper.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper - no Code Availability section; every computational step (C1-C32)",
+      "missing": "No analysis code is deposited or linked anywhere. The paper contains no Code Availability statement. The four GitHub URLs that do appear in Methods (https://github.com/tseemann/shovill, github.com/rrwick/Filtlong, https://github.com/nanoporetech/medaka, https://github.com/bethatkinson/rpart) are upstream tool homepages, not the authors' analysis code. The entire R modelling layer (feature-matrix construction, elastic net with custom zeroed penalty factors for CRISPR predictors, adaptive-lasso weight derivation, XGBoost grid search, rpart tuning, Youden's J thresholding, metric computation) exists only as prose description.",
+      "how_to_close": "Deposit the assembly/screening shell or Nextflow/Snakemake driver and the R analysis scripts in a public repository archived to Zenodo with a DOI, and add a Code Availability section pointing at the versioned release."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 32 computational steps",
+      "missing": "No environment closure of any kind: no environment.yml, no conda-lock/pixi.lock, no renv.lock, no requirements file, no Dockerfile or container digest, no Galaxy/Bioconda channel declaration, no declared platform. Exact prose pins do exist for most tools (fastp v0.12.4, Shovill v1.1.0, QUAST v5.2.0, PROKKA v1.14.6, Guppy v6.5.7, NanoStat v1.6.0, Filtlong v0.2.1, Trycycler v0.5.4, Flye v2.9.2, Raven v1.8.3, Miniasm v0.3 / Minipolish v0.1.3, Medaka v1.2.2, Polypolish v0.5.0, Roary v3.13.0, FastTree v2.1.11, ggtree v3.2.1, ComplexHeatmap v2.15.4, ClermonTyping v23.06, RGI v6.0.2, CRISPRCasTyper v1.8.0, MobileElementFinder v1.1.2, IntegronFinder v2.0.2, Plasmer v23.04.20, glmnet v4.1-7, xgboost v1.6.0.1, caret v6.0-94, rpart v4.1.21) which is why this is classified exact_pins_partial rather than floating - but scattered prose pins without interpreter, channel and platform cap every step at version=1 under the symmetric env-closure gate.",
+      "how_to_close": "Ship a conda-lock or renv.lock (or a container image with digest) covering the assembly, typing and R modelling stacks, and declare the target platform."
+    },
+    {
+      "type": 2,
+      "where": "C4, C14, C19, C25, C26, C29, C32 - unversioned components",
+      "missing": "Version absent entirely for: the PubMLST rMLST and MLST databases (live, continuously updated, no download date given), the Proksee web tool, the R interpreter itself (only RStudio v1.4.1717 is given, which is the IDE and pins nothing about R or its package library), the package used to compute ROC/AUC and confusion matrices, and the package used for Dunn's test. The global-cohort filtering step inherits the unversioned rMLST dependency.",
+      "how_to_close": "State R version and sessionInfo() output, the PubMLST/rMLST download date or API version, the Proksee version, and name every R package used for metrics and statistics with its version."
+    },
+    {
+      "type": 13,
+      "where": "C4, C19, C20, C21, C22, C24, C25 - external reference databases",
+      "missing": "Reference databases are consumed without pinning: CARD (version not stated although RGI v6.0.2 is), the PubMLST rMLST and Achtman/Pasteur MLST schemes, the CRISPRCasTyper bundled HMM/repeat database, the MobileElementFinder MGEdb, and the Plasmer model/reference set. These are all mutable resources whose content at the time of analysis determines ARG counts, MGE counts and CRISPR subtype calls - i.e. the paper's primary predictors and outcome features. Because there is no code, this cannot be classified A/B/C at Stage 1 (guide: leave env_capture_class = n/a).",
+      "how_to_close": "Record and cite the exact database release (CARD version, MGEdb version, PubMLST download date) or archive the database snapshots used, alongside a download rule that fetches a versioned artifact."
+    },
+    {
+      "type": 4,
+      "where": "C9, C10, C27, C28, C30, C31 - stochastic steps without seeds",
+      "missing": "No random seed is reported anywhere. Affected: Trycycler read subsampling into 12 subsets (C9), the candidate long-read assemblies (C10), and all four cross-validated models - elastic net 8-fold CV (C27), adaptive lasso 8-fold CV (C28), XGBoost 8-fold CV with grid search (C30), and rpart cp tuning by 8-fold CV (C31). Fold assignment therefore cannot be reproduced and the reported AUC/coefficient sets can only be matched distributionally, not exactly.",
+      "how_to_close": "Report set.seed() values (and the RNG kind) alongside the fold assignments, or deposit the fold indices with the analysis scripts."
+    },
+    {
+      "type": 5,
+      "where": "C26 and downstream C27-C31 - derived model input not deposited",
+      "missing": "The predictor matrix that the models were actually trained and validated on is not deposited. Supplementary tables give assembly statistics (S1-S2), accessions and QC (S3), country/year/AST results (S4), the hyperparameter grid (S5), performance metrics (S7) and XGBoost feature gains (S9-S10), but not the binarised feature matrix itself. Reconstructing it requires re-running the whole screening layer against unpinned databases, so the unpinned-database gap propagates into every modelling result.",
+      "how_to_close": "Deposit the final per-isolate predictor matrix (phylogroup, plasmid type, CRISPR array type, ARG presence/absence, ARG and MGE counts, phenotype labels) as a supplementary CSV or in the code repository."
+    },
+    {
+      "type": 3,
+      "where": "Data availability - BioProject PRJNA1279687",
+      "missing": "The accession stated for the newly generated Australian sequencing data does not resolve as of the check date: NCBI E-utilities esearch on db=bioproject for PRJNA1279687 returns Count=0 with PhraseNotFound. This is consistent with a pre-publication hold (routine for a preprint) rather than link rot, but at assessment time the primary dataset is not retrievable, so every step consuming the in-house isolates scores data=1 (accidental gating) rather than 2. This is the single most consequential liveness finding: 30 of 32 computational steps depend on it.",
+      "how_to_close": "Release the BioProject/SRA hold at preprint posting, or state the expected release date and a contact route in the Data Availability section."
+    },
+    {
+      "type": 1,
+      "where": "C25 - global validation cohort selection",
+      "missing": "The procedure used to arrive at the initial 426 SRA read sets is not given: no SRA search query, no date of retrieval, no inclusion/exclusion criteria beyond 'urinary E. coli with corresponding antimicrobial susceptibility results from human urine samples'. The final accession list is in Supplementary Table 3, so the cohort is enumerable after the fact, but the selection step is not reproducible as a procedure - a re-run today would return a different set.",
+      "how_to_close": "Publish the exact SRA/BioSample query string, the retrieval date, and the mapping from accession to reported phenotype, including the 123 isolates excluded by the EnteroBase/rMLST filter."
+    },
+    {
+      "type": 7,
+      "where": "C11 Trycycler consensus, C14 Proksee visualisation",
+      "missing": "Two steps require irreducible human/interactive judgement that is not recorded. Trycycler cluster reconciliation requires the operator to accept or reject clusters and to drop discordant contigs; none of those decisions are logged. Proksee is an interactive web tool with no exported session or configuration. Neither step can be replayed non-interactively even with the same inputs.",
+      "how_to_close": "Record the Trycycler cluster/reconcile decisions (the cluster tree, retained and discarded clusters) and export the Proksee session JSON or replace it with a scripted renderer."
+    },
+    {
+      "type": 11,
+      "where": "C6 - Guppy v6.5.7 base-calling",
+      "missing": "Guppy is Oxford Nanopore proprietary, distribution-restricted software and is now deprecated in favour of Dorado. Reproducing base-calling requires both the archived Guppy v6.5.7 binary and the raw signal data. The paper does not state whether fast5/pod5 signal was deposited under the BioProject; if only basecalled reads were deposited, this step is not re-executable at all.",
+      "how_to_close": "Deposit the raw signal (pod5) alongside the reads and state the basecaller model configuration file, or note explicitly that base-calling is not re-executable and that downstream reproduction starts from the deposited reads."
+    },
+    {
+      "type": 6,
+      "where": "C15, C16 - phylogenetic analysis delegated to a prior publication",
+      "missing": "Roary and FastTree settings are given as 'as previously described' with a citation rather than restated. The reader must chase reference 40 to recover the identity threshold, core-gene definition and tree-building options, and the cited description may itself be partial.",
+      "how_to_close": "Restate the full command lines in this paper's Methods or supplementary material rather than delegating them to a citation."
+    },
+    {
+      "type": 2,
+      "where": "C30, C31 - selected hyperparameters not reported",
+      "missing": "The XGBoost grid is supplied (Supplementary Table 5) and the rpart complexity parameter is described as tuned, but the values actually selected by cross-validation are not reported for either model. Without a seed (gap type 4) the selection cannot be re-derived deterministically, so the final fitted models cannot be reconstructed even from the grid.",
+      "how_to_close": "Report the selected learning rate, tree depth, boosting rounds, regularisation terms and the chosen cp value, or deposit the saved model objects."
+    },
+    {
+      "type": 10,
+      "where": "W1-W4",
+      "missing": "Isolate collection and EUCAST v13.0 disc-diffusion susceptibility testing, Qiagen Gentra Puregene DNA extraction with Illumina MiSeq sequencing, phenol-chloroform extraction for the two long-read isolates, and ONT SQK-LSK114 / FLO-MIN114 / MinION Mk1B library preparation and sequencing. These are wet-lab steps and are out of computational-reproduction scope (OOS), excluded from the denominator S. Note that the phenotype labels the entire modelling layer predicts are generated here, so their reproduction is a replication question, not a computational-reproducibility one.",
+      "how_to_close": "n/a - OOS. Documentation is adequate (kit, instrument, flow-cell chemistry, EUCAST guideline version all stated)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: NONE. The paper has no Code Availability section and links no analysis repository, Zenodo deposit, figshare item, Software Heritage archive or OSF project. Verbatim: the only repository URLs in the entire text are upstream tool homepages cited inside Methods - 'de novo assembly was performed using Shovill (v1.1.0) (https://github.com/tseemann/shovill)', 'quality-filtered with Filtlong (v0.2.1) (github.com/rrwick/Filtlong)', 'polished with Medaka (v1.2.2) (https://github.com/nanoporetech/medaka)', 'using the rpart (v4.1.21) (https://github.com/bethatkinson/rpart) and caret (v6.0-94) packages'.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text HTML back-matter scan (Data availability, Author contributions, Competing Interests, Acknowledgements, References) - no code-availability heading present; no repo URL to resolve"
+    },
+    {
+      "artifact": "data accession (newly generated): 'The sequencing data generated during the current study were deposited in NCBI under Bioproject PRJNA1279687.' (verbatim, Data availability)",
+      "http_status": "NOT RESOLVING - NCBI E-utilities esearch db=bioproject term=PRJNA1279687 returned <Count>0</Count> with <PhraseNotFound>PRJNA1279687</PhraseNotFound>. The https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1279687 page returns HTTP 200 but serves only the JavaScript shell with no record content. Consistent with a pre-publication release hold.",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl + NCBI E-utilities esearch (no API key)"
+    },
+    {
+      "artifact": "data accessions (global validation cohort): 'All other WGS were obtained from the SRA public repository and accession numbers are available in the Supplementary Table 3.' (verbatim, Data availability). 426 Illumina paired-end urinary E. coli read sets retrieved, 303 retained after filtering.",
+      "http_status": "stated-in-paper (accession list is in a supplementary file, not enumerated in the text; individual accessions not resolved at Stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text HTML; SRA is a public archive, so the accessions are expected to resolve, but the list itself was not opened at Stage 1"
+    },
+    {
+      "artifact": "supplementary material (carries Supplementary Tables 1-10: assembly statistics, hybrid assembly metrics, isolate accessions and QC, country/year/AST results, XGBoost hyperparameter grid, performance metrics, XGBoost feature gains): https://www.biorxiv.org/content/biorxiv/early/2025/10/14/2025.10.13.681552/DC1/embed/media-1.docx and https://www.biorxiv.org/content/biorxiv/early/2025/10/14/2025.10.13.681552/DC2/embed/media-2.xlsx",
+      "http_status": "200 OK (supplementary-material page listing both media files)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of https://www.biorxiv.org/content/10.1101/2025.10.13.681552v1.supplementary-material"
+    },
+    {
+      "artifact": "external reference databases and services consumed without pinning: PubMLST (rMLST species check and Achtman/Pasteur MLST schemes), CARD (via RGI v6.0.2), the CRISPRCasTyper v1.8.0 bundled database, MobileElementFinder v1.1.2 MGEdb, Plasmer v23.04.20 model, the ClermonTyping web tool v23.06, the Proksee web tool (no version), and the EnteroBase E. coli QC criteria used for filtering. Also referenced: plasmid sequence CP163781.1 (GenBank).",
+      "http_status": "stated-in-paper (no versions, download dates or URLs given for the databases; ClermonTyping is the only versioned service)",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods prose; individual database endpoints not resolved because no version or retrieval date is available to resolve against"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/10.1101/2025.10.13.681552v1.full",
+      "http_status": "200 OK (345446 bytes). The JATS source XML endpoint https://www.biorxiv.org/content/early/2025/10/13/2025.10.13.681552.source.xml returned HTTP 403 via WebFetch and HTTP 404 via curl; assessment used the full-text HTML instead. Title-phrase verification passed (the string 'CRISPR-Cas I-F as a Genomic Marker of Antibiotic Susceptibility' occurs in the fetched text).",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser user-agent into per-paper scratch dir /tmp/stage1_10.1101_2025.10.13.681552/"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "aa8462e26545f5588d16e8afd0fe46375195695a808cc71f9677958f23160caf",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

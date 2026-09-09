@@ -1,0 +1,331 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "b250ffc42fc46e88cb05cbb64e72ac1bc83a82df9d1c3d5ed020eb84701f3d2d",
+  "canonical_id": {
+    "value": "10.1101/2025.11.10.687711",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.10.687711v3",
+      "biorxiv:2025.11.10.687711v3",
+      "BIORXIV/2025/687711"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "The complete re-analysis of previously published public sequencing datasets that supports the paper's claims about rDNA spacer-promoter microRNAs: download of SRA/GEO fastq files for every study analysed; cutadapt adapter/quality trimming; bowtie2 alignment to the T2T-CHM13 v2 (hs1) assembly and to two purpose-built mini-chromosome references (chm13_mini and chm13_mini3, each defined by explicit hs1 coordinate spans); conversion to BED fragments with bedtools bamtobed; replicate merging and plus/minus strand separation; fraction-normalized coverage-track generation with bedtools genomecov; the Fig. 4C summed-signal fold-change computation across mini-chromosomes under CTCF/MYC knockdown; RNAfold hairpin and minimum-free-energy prediction for the eleven putative 5'ETS microRNA precursors (Fig. 6, Fig. S2); and IGV-based 100-bp-window centering / group-autoscaled track display used to generate Figs. 1-8 and S1-S6. There is NO wet-lab component in this study - the Experimental Design section states verbatim 'Datasets from public archives were downloaded and aligned to current genomic assemblies and derived mini-chromosomes', so W=0 and every step is computational.",
+  "step_source": "prose-methods",
+  "granularity_note": "Steps are derived from the Materials and Methods sections 'Experimental Design', 'Datasets and data processing', and 'Alignment of sequencing datasets to the T2T-CHM13 (hs1) and chm13_mini reference sequences', supplemented by tool mentions that appear ONLY in figure legends and Results prose (RNAfold, IGV) and never in the Methods. The Zenodo code deposit landing page was read as prose only ('UNIX scripts used in manuscript', one file microRNA_scripts.zip, 10.7 kB); the scripts themselves were NOT opened, which is Stage 2. Granularity is COARSE: one step per named tool invocation or per named derived-quantity computation, not one step per figure - the paper's 'Datasets keyed to Figures' list enumerates ~40 figure panels, all of which route through the same 7-step processing chain. Per protocol v0.2.6 this is Stage-1 prose triage: no workflow source was read line-by-line, so env_capture_class is 'n/a' everywhere and no step may be scored R-star.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "release_snapshot",
+  "stage2_candidate": true,
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Retrieval of raw sequencing data: 'We downloaded fastq sequencing files from NCBI's Short Read Archive (SRA) using their toolkit for every study analyzed.' The toolkit is named only generically ('their toolkit') with no version and no sub-command; accessions are enumerated exhaustively in the 'Datasets keyed to Figures' list (GEO GSM series plus SRA SRX11346954-11346955), and two figure panels draw instead on a prior Zenodo deposit (10.5281/zenodo.13138686, DX_HS_P2S5_B*.bed.gz / DX_HS_P2S5_M*.bed.gz).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "unpinned-tool",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Adapter and quality trimming with cutadapt: single-end reads trimmed with 'cutadapt 4.9 with parameters \"-q20 -m20 -a AGATCGGAAGAGC\"'; paired-end reads with 'cutadapt parameters \"-m20 --nextseq-trim 20 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -Z\"'. Both parameter strings are given verbatim and the tool is pinned to a release series.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Read alignment with bowtie2: single-end reads aligned 'using bowtie2 2.5 with parameters \"--end-to-end --very-sensitive --no-unal --phred33\"'; paired-end reads with 'bowtie2 parameters \"--very-sensitive-local --soft-clipped-unmapped-tlen --no-unal --no-mixed --no-discordant --dovtail --phred33 -I 10 -X 1000\"'. Targets are the hs1 (T2T-CHM13 v2) assembly and the chm13_mini / chm13_mini3 mini-chromosome references built in C4. Note the flag is rendered '--dovtail' in the text (the bowtie2 option is spelled --dovetail), a transcription defect in the parameter string.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "param-string-defect"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Construction of the derived mini-chromosome reference sequences from T2T-CHM13 version 2 (hs1). chm13_mini: GART-SON chr21:31,912,598-31,959,322 (46725 bp); Hist_Chr1 chr1:148,935,900-149,012,900 (77001 bp); Hist_Chr6 chr6:25,878,304-26,154,469 (276166 bp); rDNA chr21:3,141,168-3,185,955 (44788 bp). chm13_mini3 adds RNA5Sr chr1:227744287-228026142, a 16-fold tandem rDNA array 'chr21:3141167-3185955x16', and Chr1q-remaining (chr1:124048268-148935898 + chr1:149012901-227744286 + chr1:228026143-248387328). No extraction/concatenation tool is named and no script is identified as producing these FASTAs; the coordinate lists differ by one at each start between chm13_mini and chm13_mini3 (0-based vs 1-based convention, not stated).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "unpinned-tool",
+        "coordinate-convention-unstated"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Extraction of mapped fragments to BED: 'we extracted properly mapped reads from bowtie2 output into bed files of mapped fragments using the bedtools \"bamtobed\" command', and 'when appropriate we separated the bed files of mapped fragments into plus and minus strands, using the strand of READ1 for paired end reads'. No bedtools version is given anywhere in the paper, no bamtobed flags (e.g. -bedpe / -i) are stated, and no samtools filtering step is named although 'properly mapped' implies a flag-based filter.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "unpinned-tool",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Replicate merging: 'When appropriate, we merged bed files for replicates using the UNIX sort command.' No sort options, no coreutils version, and no locale declaration are stated (sort key order is locale-dependent). Which datasets were merged is given only partially, as a '(merged)' annotation on some entries of the 'Datasets keyed to Figures' list (e.g. Fig. 8 WT: GSM9000286-9000288 (merged)); the phrase 'when appropriate' leaves the rule undefined for the remaining entries.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "unpinned-tool",
+        "rule-underspecified"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Fraction-normalized coverage-track generation: 'we computed fraction-normalized tracks from the final bed files of mapped reads using the bedtools \"genomecov\" command. Fraction-normalized tracks are the fraction of mapped counts at each base pair scaled by the size of the reference sequence so that if the counts were uniformly distributed there would be exactly one at each base pair.' The normalization is defined conceptually and unambiguously, but no genomecov flags (-bg/-bga/-d/-scale value/-strand) and no bedtools version are stated. This is the step that produces every track shown in the figures.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "unpinned-tool",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Derived-quantity computation for Fig. 4C (CTCF/MYC knockdown effect): 'Total PRO-seq signal for each strand was summed over entire mini-chromosomes and the fold-change was calculated for each strand and averaged for an overall ratio (last column)', yielding the reported ratios (GART-SON 1.025, Hist_Chr1 1.005, Hist_Chr6 1.039, whole rDNA repeat 0.917, miR-1275/6724 0.567). No tool, script, or version is named for this summation/ratio step, and it is not covered by the 'Datasets and data processing' paragraph to which the Zenodo script deposit is attached; the miR-1275/6724 sub-interval used for the 0.567 ratio is not given as coordinates in the Methods.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unpinned-tool",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Secondary-structure prediction: 'we used RNAfold (36) to identify potential hairpin structures' for the eleven putative 5'ETS microRNA precursors, reporting 'its RNAfold minimum free energy prediction' and hairpins 'in Vienna format' (Fig. 6, Fig. S2). RNAfold appears only in Results prose and figure legends, never in Materials and Methods. No ViennaRNA package version, no energy-model/parameter-file selection, no temperature, no fold window, and no input-sequence extraction procedure are stated; MFE values are model-version dependent. No code for this step is deposited or referenced.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unpinned-tool",
+        "code-absent",
+        "methods-omission"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Track visualisation and figure generation in IGV: 'Each ~50-bp wide peak feature was centered within a 100-bp window using IGV for comparison to PRO-cap and PRO-seq data, autoscaled with the y-axis range shown at upper left' (Fig. 6) and 'displayed in IGV format (61), group-autoscaled for the five tracks' (Fig. 8, Fig. S6). Display conventions are described qualitatively (group-autoscale, per-panel y-ranges printed on the figures, 100-bp sub-regions) but IGV is unversioned, no session/batch file or track-config is deposited, and the window-centering is an interactive GUI operation with no scripted equivalent.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unpinned-tool",
+        "code-absent",
+        "manual-gui-step"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 10,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "3/10 (30%) readiness upper bound - NOT 'reproducible'. This is a pure secondary-analysis paper with unusually complete DATA and PARAMETER disclosure but very uneven SOFTWARE-VERSION disclosure. Strengths: every figure panel is keyed to explicit public accessions in a 'Datasets keyed to Figures' list; the two trimming/alignment steps carry verbatim full parameter strings AND version pins (cutadapt 4.9, bowtie2 2.5); the derived mini-chromosome references are specified by exact hs1 coordinate spans against a pinned assembly (T2T-CHM13 version 2); and the UNIX scripts for the processing chain are deposited on Zenodo (record 17737159, microRNA_scripts.zip, CC-BY / GPL-3.0-or-later). Weaknesses that cap the score: bedtools (used in two distinct steps, one of which - genomecov - produces every track in the paper), the SRA toolkit, UNIX sort, RNAfold/ViennaRNA and IGV are ALL unversioned, and no bedtools/genomecov/bamtobed flag is stated anywhere; RNAfold and IGV appear only in figure legends and Results prose, never in Materials and Methods, and no code is deposited for them. There is no lockfile, no container, no conda environment and no requirements manifest, so even the two exact pins are capped at version=1 under the Stage-1 ceiling and their steps land at RI, not R-star. The formal 'Data and materials availability' statement is pure boilerplate ('All data needed to evaluate and reproduce the conclusions in the paper are present in the paper and/or the Supplementary Materials') and names no accession and no code location - the real disclosures live in the Methods body instead. Under-claim caveat applies symmetrically: a Stage-1 report cannot credit version pins or invocation flags that exist only inside the deposited microRNA_scripts.zip, which is not opened at this stage - and that is precisely why this paper is routed to Stage 2.",
+    "coverage": "10 computational steps assessed (7 in the primary processing chain: retrieval, trimming, alignment, reference construction, BED extraction, replicate merging, coverage-track generation; plus 3 downstream: Fig. 4C summed-signal ratio computation, RNAfold structure prediction, IGV figure generation), 0 wet-lab steps; computational coverage |S|/(|S|+|W|) = 10/10 = 100%. All steps reconstructed from Methods prose plus figure-legend/Results tool mentions; the Zenodo code deposit was read at landing-page prose level only.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment across all 10 steps; acutely C1, C5, C6, C7, C8, C9, C10",
+      "missing": "Version disclosure is partial and there is no environment closure of any kind. Exactly two tools are pinned, and only to a minor series rather than a patch release: 'cutadapt 4.9' and 'bowtie2 2.5'. Unversioned everywhere: the SRA toolkit (named only as 'their toolkit'), bedtools (used for both bamtobed and genomecov), the UNIX sort/coreutils used for replicate merging, RNAfold/ViennaRNA, and IGV. The paper contains no Dockerfile/image digest, no environment.yml, no conda-lock, no requirements.txt and no pixi.lock reference, and the Zenodo deposit landing page describes its single file only as 'UNIX scripts used in manuscript' with no environment metadata. No operating system, shell, or locale is declared, although the pipeline depends on UNIX sort ordering.",
+      "how_to_close": "Publish a single environment specification (conda-lock or a container image cited by digest) covering cutadapt, bowtie2, bedtools, samtools, the SRA toolkit, ViennaRNA and IGV, pin each tool to a patch-level release, and declare the shell/locale under which the sort-based merging was run."
+    },
+    {
+      "type": 5,
+      "where": "C5 and C7 (bedtools invocations), C6 (merge rule), C1 (SRA retrieval), C9 (RNAfold), C10 (IGV), C8 (Fig. 4C ratio)",
+      "missing": "Invocation parameters are given verbatim and completely for cutadapt and bowtie2, and then stop. For bedtools no flag is stated for either bamtobed (no -bedpe, no -i, and no named filter implementing 'properly mapped') or genomecov (no -bg/-bga/-d, no -scale value, no -strand), even though genomecov produces every displayed track; the fraction-normalization is defined in words but the flag combination that realizes it is not given. The merge rule is stated as 'When appropriate, we merged bed files for replicates using the UNIX sort command' with no sort options and no explicit definition of 'when appropriate'. For RNAfold no version, energy model, temperature or command line is given, and MFE values are energy-model dependent. For IGV the window-centering is described as an interactive operation. For C8 the miR-1275/6724 sub-interval over which the 0.567 ratio was summed is not given as coordinates.",
+      "how_to_close": "State the exact bedtools command lines (or point to the specific line of the deposited script for each), define the replicate-merge rule explicitly per dataset, give the RNAfold command line and ViennaRNA version, and record the coordinate intervals used for the Fig. 4C summations."
+    },
+    {
+      "type": 1,
+      "where": "Data and materials availability statement; the 'Datasets keyed to Figures' list; C1 and C6",
+      "missing": "The formal availability statement is boilerplate and content-free: 'All data needed to evaluate and reproduce the conclusions in the paper are present in the paper and/or the Supplementary Materials.' It names no accession, no repository, and not even the Zenodo code deposit. The usable disclosure is the 'Datasets keyed to Figures' list inside Methods, which is exhaustive but has defects: at least one accession is malformed ('Fig. S2 : GSM3677824, GSM3677740-3677741, GSM36762-3677763, GSM3677784-3677785' - GSM36762 is 5 digits short of a GSM ID and its intended value cannot be inferred); accessions are given as GSM sample IDs and as compressed ranges (e.g. 'GSM8141208-GSM8141291', 84 samples; 'GSM8839021-9022' with an abbreviated second term) rather than as run (SRR) accessions, so the exact fastq set is not directly enumerable; and no sample-to-condition metadata table is deposited, so the mapping from accession to genotype/treatment/replicate must be re-derived from each source study. Which replicates were merged is annotated for only some figure panels.",
+      "how_to_close": "Add a real Data availability statement naming the Zenodo code DOI and all archives used, and deposit a machine-readable sample sheet (run accession -> figure panel -> assay -> condition -> replicate -> merge group) covering every dataset in the 'Datasets keyed to Figures' list, with the malformed GSM entry corrected."
+    },
+    {
+      "type": 12,
+      "where": "Code deposit citation form and its coverage of the analysis",
+      "missing": "Code IS archived - Zenodo record 17737159, one file microRNA_scripts.zip (10.7 kB), CC-BY-4.0 and GPL-3.0-or-later - which is a genuine immutable snapshot and the strongest capture claim in the paper. But: the paper cites it as the bare draft-form URL 'https://zenodo.org/uploads/17737159' rather than by its versioned DOI, so the citation is not a resolvable persistent identifier; the deposit description is a single sentence ('UNIX scripts used in manuscript') with no README, no run instructions, no entry point and no mapping from script to Methods step or figure; and by its placement the deposit is claimed only for the 'Datasets and data processing' paragraph (C1-C7), leaving C8 (Fig. 4C ratios), C9 (RNAfold) and C10 (IGV) with no code artifact at all.",
+      "how_to_close": "Cite the Zenodo DOI (10.5281/zenodo....) rather than the /uploads/ URL, add a README to the deposit mapping each script to its Methods step and figure panels, and extend the deposit to cover the downstream quantification, folding and figure-generation steps."
+    },
+    {
+      "type": 13,
+      "where": "C4 (genome assembly - well pinned), C9 (ViennaRNA energy model), C9/Results (miRBase), C10 (IGV genome/annotation)",
+      "missing": "The genome reference is the one well-pinned external resource: 'T2T-CHM13 version 2 (hs1)' is named with a version and all derived intervals are given as explicit coordinates. Everything else is unpinned. miRBase is used repeatedly as the arbiter of which ~50-bp peaks count as annotated microRNAs ('none of the other ~50-bp peaks are annotated in miRBase'), and no miRBase release number or download date is given, although miRBase annotation content changes between releases and the paper's central novelty claim rests on non-annotation. The ViennaRNA energy parameter set behind every reported minimum free energy is unstated. No annotation track version is given for the IGV displays.",
+      "how_to_close": "State the miRBase release (and download date) used for the annotation comparison, the ViennaRNA energy-model/parameter-file version behind the reported MFE values, and the annotation track versions loaded in IGV."
+    },
+    {
+      "type": 7,
+      "where": "C1-C7 (shell-script pipeline) and C10 (interactive IGV step)",
+      "missing": "The pipeline is a set of UNIX shell scripts with no workflow manager, no configuration layer, and no declared input/output roots; the Methods describe it as a linear sequence of commands joined by 'when appropriate' conditionals that are resolved by the operator rather than by the code. The final figure-generation step (C10) is an interactive IGV GUI operation - peak features 'centered within a 100-bp window using IGV', 'group-autoscaled for the five tracks' - which cannot be replayed without a deposited session or batch file. Consequently the path from deposited scripts to published figure is not automatable end to end.",
+      "how_to_close": "Wrap the processing chain in a portable workflow (Snakemake/Nextflow/WDL) driven by the sample sheet, parameterise paths, and replace or supplement the interactive IGV step with a deposited IGV batch/session file or a scripted plotting step."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code deposit (stated in paper, Materials and Methods / 'Datasets and data processing', verbatim): 'The UNIX scripts used are available at https://zenodo.org/uploads/17737159 .' Landing page (resolved at https://zenodo.org/records/17737159) shows title 'Superabundant microRNAs are transcribed from human rDNA spacer promoters insulated by CTCF', description 'UNIX scripts used in manuscript.', one file microRNA_scripts.zip (10.7 kB), licences CC-BY-4.0 and GPL-3.0-or-later. No environment file, container, conda spec or version list is mentioned on the landing page.",
+      "http_status": "200 OK (via WebFetch on https://zenodo.org/records/17737159)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl from this sandbox returns 403 for every zenodo.org URL (bot filtering at the CDN, not link rot); liveness was therefore established through WebFetch, which retrieved and rendered the record metadata. The zip was NOT downloaded or opened - that is Stage 2. Note the paper cites the /uploads/ (draft-form) URL rather than the versioned DOI."
+    },
+    {
+      "artifact": "data deposit (stated in paper, 'Datasets keyed to Figures', for Fig. 1C, Fig. 1D, Fig. S1-7, Fig. S4, Fig. S1-8): 'https://doi.org/10.5281/zenodo.13138686 DX_HS_P2S5_B*.bed.gz', '... DX_HS_P2S5_M*.bed.gz', '... DX_HS_P2S5_BC1_0429.bed.gz', '... DX_HS_P2S5_MA1_0401.bed.gz'. Record resolves to 'Genomic Data for: RNA Polymerase II at histone genes predicts outcome in human cancer' (Henikoff et al.), CC-BY-4.0, ~11.6 GB, containing DX_HS_P2S5_B* breast and DX_Hs_P2S5_M* meningioma .bed.gz files as cited.",
+      "http_status": "200 OK (via WebFetch on https://zenodo.org/records/13138686)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl returns 403 (same CDN bot filtering); verified through WebFetch. Filename patterns cited in the paper were confirmed present in the record's file listing at prose level; individual files were not downloaded."
+    },
+    {
+      "artifact": "data accessions (stated in paper, 'Datasets keyed to Figures'): NCBI GEO sample accessions, spot-checked GSM8141208 (Fig. 1A-B range GSM8141208-GSM8141291), GSM6755736 (Fig. 2F TT-seq), GSM9000286 (Fig. 8 WT, merged). The full list spans ~40 figure panels and includes GSM9050852-53, GSM8180606-7, GSM8839021-9022, GSM4296314-4296339, GSM2265095-2265111, GSM6043500-6043507, GSM8791938-8791987, GSM2552214-2552220, GSM8584120-8584132, GSM1623146/1623148, GSM1505438-1505441, GSM3677740-3677785, GSM5623305-5623317, GSM8267447-8267450, GSM9095398.",
+      "http_status": "200 OK (spot-checked GSM8141208, GSM6755736, GSM9000286 at https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; only HTTP reachability of the sampled accessions was checked. The remaining ~35 accession ranges were NOT individually resolved, and the malformed entry 'GSM36762' (Fig. S2) is not resolvable as written."
+    },
+    {
+      "artifact": "data accessions (stated in paper, 'Datasets keyed to Figures'): NCBI SRA experiment accessions SRX11346954-11346955 (Fig. 2A-E, Fig. S5 PRO-seq)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to https://www.ncbi.nlm.nih.gov/sra/?term=SRX11346954; reachability only, contents not verified against the described PRO-seq experiment"
+    },
+    {
+      "artifact": "reference assembly (stated in paper, Methods): 'T2T-CHM13 version 2 (hs1)', used directly and as the source of the derived chm13_mini / chm13_mini3 references. No download URL or checksum is given in the paper; the version string alone is the pin.",
+      "http_status": "n/a (named by version, no URL given in the paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "no URL was stated by the authors, so no liveness check applies; recorded as version-pinned-without-locator rather than as link rot"
+    },
+    {
+      "artifact": "environment capture artifacts: NONE. No Dockerfile, image digest, environment.yml, conda-lock, renv.lock, requirements.txt or pixi.lock is mentioned in the paper, in the Zenodo deposit description, or on the Zenodo landing page. Version information exists only as two inline prose pins (cutadapt 4.9, bowtie2 2.5).",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "paper full text read end to end; Zenodo landing-page prose read via WebFetch. The contents of microRNA_scripts.zip were not inspected, so an environment spec hidden inside the archive cannot be excluded - this is the main reason the paper is routed to Stage 2."
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/10.1101/2025.11.10.687711v3.full (rendered HTML, v3, 353,968 bytes; the JATS .source.xml endpoint returned an HTML shell rather than XML)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent into /tmp/stage1_10.1101_2025.11.10.687711/ (WebFetch on biorxiv returned 403). Identity verified before scoring by grepping the fetched HTML for the title phrase 'rDNA spacer' (14 hits) and by cross-checking title/authors/abstract against the bioRxiv API record for DOI 10.1101/2025.11.10.687711 (Henikoff S., Henikoff J.G., Fred Hutchinson Cancer Center)."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "supersedes_metric_version": null,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "794b6a75c8f57602db7c325f6cabbc56dca6988ee8cf88712f4d4d0b7a13fe58",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

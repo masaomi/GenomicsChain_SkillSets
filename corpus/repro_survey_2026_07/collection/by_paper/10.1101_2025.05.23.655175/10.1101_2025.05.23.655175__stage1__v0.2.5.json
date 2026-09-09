@@ -1,0 +1,126 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.23.655175",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.23.655175v1",
+      "biorxiv:2025.05.23.655175v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational phylogenetic characterization of a novel triple-reassortant H5N1: maximum-likelihood phylogenies inferred independently for each of the eight IAV genome segments (plus a large ML tree of 11,820 Americas NP sequences) to determine the lineage constellation of the H5N1-Arg_Feb2025 viruses. NGS genome assembly/consensus is upstream but delegated to a previously published protocol (ref 6) with no detail in this prose.",
+  "step_source": "prose-methods",
+  "granularity_note": "This is a short bioRxiv brief report with NO dedicated Methods/Materials section, NO Code availability statement, and NO named bioinformatics software (no tool names, no versions, no substitution model, no alignment tool, no bootstrap settings). Computational analysis is described only narratively ('phylogenies were inferred independently for each of the eight gene segments'; 'Maximum likelihood trees'; 'Phylogenetic tree inferred using ML methods for 11,820 NP sequences'). Sequencing is 'according to previously described protocols (6)'. Two coarse C-layer steps are recorded (assembly/consensus; ML phylogenetics). Wet-lab RRT-PCR subtyping and NGS library prep/sequencing counted in W (layer W / OOS for computational reproduction), not verdicted. No tool named anywhere in the text, so no per-tool step decomposition is possible; steps are at the operation level.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Genome assembly / consensus generation from next-generation sequencing reads ('according to previously described protocols (6)') — no tool, no version, no parameters given in this paper",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Maximum-likelihood phylogenetic inference per gene segment (eight IAV segments) plus large NP ML tree (11,820 Americas sequences); midpoint rooted, bootstrap on key nodes — no phylogenetics tool named, no version, no substitution model, no alignment tool, no bootstrap replicate count",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 2,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/2 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "NI ceiling on both computational steps. Even under stage2 neither step can exceed NI: no software is named at all (code=0 for every step), no version is recorded, no analysis parameters (substitution model, bootstrap replicates, alignment method) are given, and no environment lock or container is claimed. capture_claim=none, so this paper is not a stage2 candidate.",
+    "coverage": "2 computational steps assessed from narrative prose (no dedicated Methods section exists). 2 wet-lab steps (RRT-PCR subtyping, NGS library prep/sequencing) counted in W but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole computational pipeline (assembly/consensus + phylogenetics) — no Code availability statement",
+      "missing": "No code/scripts of any kind are referenced; no author repository, no pipeline, no workflow. Phylogenetic analysis is described only in narrative sentences with no reproducible artifact.",
+      "how_to_close": "Publish the phylogenetic analysis workflow (alignment + tree inference commands/scripts) and the assembly/consensus pipeline (or a concrete pointer beyond 'previously described protocols') in a public repository."
+    },
+    {
+      "type": 3,
+      "where": "All computational steps (assembly, alignment, ML tree inference)",
+      "missing": "No software is named and no version is given anywhere — no assembler, no aligner, no phylogenetics package (e.g. IQ-TREE/RAxML/MAFFT are not mentioned), no substitution model.",
+      "how_to_close": "Name each tool with an exact version (assembler, aligner, ML tree program, substitution-model selection) in a Methods or versions table."
+    },
+    {
+      "type": 5,
+      "where": "C2 ML phylogenetic inference",
+      "missing": "Analysis parameters absent: substitution/evolutionary model, bootstrap replicate count and method, alignment settings, rooting/subsampling criteria for the global background dataset.",
+      "how_to_close": "Record the model, bootstrap configuration, alignment parameters, and dataset-subsampling rules used to build each tree."
+    },
+    {
+      "type": 1,
+      "where": "Inputs to assembly (C1) and phylogenetics (C2)",
+      "missing": "Raw NGS reads are not deposited (only consensus genome sequences are in GISAID, EPI_ISL_19752381 and EPI_ISL_19823059-68). The global AIV background dataset used for the trees (including the 11,820 NP sequences) is not enumerated or provided as a defined, versioned set.",
+      "how_to_close": "Deposit raw reads (e.g. SRA/ENA) and publish the exact list/accessions (or a versioned alignment) of the global background sequences used in each tree."
+    },
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (software environment)",
+      "missing": "No environment lockfile, no container, no conda/env specification, no dependency closure of any kind.",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or a container digest capturing every tool and its dependencies."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: oropharyngeal/cloacal swab collection, real-time RT-PCR (RRT-PCR) influenza A detection and subtyping at SENASA reference laboratory, next-generation sequencing library prep and sequencing (per ref 6)",
+      "missing": "Physical sample-collection, diagnostic, and sequence-generation steps are out of scope for computational reproduction (OOS); counted in W (2), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; deposited raw reads (currently absent) would be the reproducible entry point to the computational pipeline."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — no Code availability statement, no repository, no custom scripts, and no bioinformatics tool is named in the paper.",
+      "http_status": "n/a (no code repository exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv full-text HTML parsed (browser UA), 200 OK"
+    },
+    {
+      "artifact": "data accession: GISAID EPI_ISL_19752381 and EPI_ISL_19823059-68 (full and partial genome consensus sequences)",
+      "http_status": "gisaid.org 200 OK (portal reachable); individual EPI_ISL records require authenticated GISAID login and are not publicly fetchable (liveness of specific accessions not verifiable unauthenticated at stage1)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, gisaid.org"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "ac2f089a726ea9d739aebc44c8cd9cdf9150f3cd8c7e04d07f5b06eb5064fd14",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

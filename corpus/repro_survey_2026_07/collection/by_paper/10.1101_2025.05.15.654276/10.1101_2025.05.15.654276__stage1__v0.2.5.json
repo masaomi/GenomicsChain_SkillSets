@@ -1,0 +1,151 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.15.654276",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.15.654276v2",
+      "biorxiv:2025.05.15.654276v2",
+      "PPR1022515"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational metagenomic analysis of gut-microbiome CAZyme pool and SCFA-production capacity across three Argentine cohorts (reference, average, IBD): low-pass metagenome functional annotation with SqueezeMeta, CAZyme identification with dbCAN3, SCFA-enzyme assignment via 42 KEGG identifiers (FPM normalization), and statistical/visual analysis with scipy + matplotlib. Wet-lab fecal processing, IgG MACS sorting, and NextSeq 550 sequencing are out of computational-reproduction scope (counted in W).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods prose of the bioRxiv v2 PDF (biorxiv HTML/JATS were Cloudflare 403/429-blocked; PDF fetched from the cloudfront full.pdf mirror, abstract cross-checked against Europe PMC PPR1022515). Author code repo github.com/militrot/cazymes contains only two analysis Jupyter notebooks (Cazymes_analysis.ipynb, Cazymes_analysis_version2.ipynb) + a prose README; README describes no environment (no conda/lockfile/Docker/pinned versions). Notebooks not read at line level (stage1). No named tool carries a version pin anywhere in the prose.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "SqueezeMeta metagenomic annotation pipeline (functional/taxonomic profiling of low-pass reads, ~1.3M reads/sample) — no version, no invocation script in repo",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "dbCAN3 CAZyme (carbohydrate-active enzyme) identification/annotation — no version, no invocation script in repo",
+      "layer": "C",
+      "axes": { "data": 0, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "SCFA-enzyme assignment via 42 KEGG identifiers with FPM (fragments-per-million) normalization — KEGG release not pinned, the 42-ID list not enumerated in prose",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "scipy statistical analysis (parametric/non-parametric test selection by homoscedasticity, p-value thresholds)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "matplotlib visualization of CAZyme diversity/abundance and SCFA capacity (boxplots, PCoA plots)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 5,
+    "n_X": 0,
+    "S": 5,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/5 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "No computational step reaches even RI. All 5 tools (SqueezeMeta, dbCAN3, KEGG-based SCFA assignment, scipy, matplotlib) are named without any version pin (floating), so every step caps at NI. No env lockfile, container, or conda spec is claimed (README describes none); capture_claim=none, so no step could exceed RI even at stage2 and none reaches RI here for lack of version pins.",
+    "coverage": "5 computational steps assessed from bioRxiv v2 PDF Methods prose. 2 wet-lab steps (fecal IgG MACS sorting/sample prep; low-pass metagenomic library + NextSeq 550 sequencing) counted in W but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Raw sequencing data (Data and Code availability statement)",
+      "missing": "No public data accession. Statement reads 'Dataset availability upon request after publication.' — the low-pass metagenomic reads (the pipeline's entry point) are not deposited in any repository (no SRA/ENA/DDBJ/MGnify accession).",
+      "how_to_close": "Deposit the raw metagenomic reads (and cohort sample sheet) in a public archive (SRA/ENA/DDBJ) and cite the accession."
+    },
+    {
+      "type": 3,
+      "where": "All 5 named tools across the entire pipeline (Methods prose)",
+      "missing": "No version number is given for SqueezeMeta, dbCAN3, the KEGG database release, scipy, or matplotlib. Every step is therefore version-floating and cannot reach RI.",
+      "how_to_close": "Record exact versions (and builds) for every tool and the KEGG/dbCAN database releases in Methods or a versions table."
+    },
+    {
+      "type": 2,
+      "where": "Whole computational environment (repo github.com/militrot/cazymes)",
+      "missing": "No environment lockfile, no container, no conda/env spec. README describes only 'different versions of the code' (two analysis notebooks); nothing captures the Python/scipy/matplotlib or the SqueezeMeta/dbCAN3 tool environment.",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or container digest pinning the notebook Python stack and the upstream annotation tools + their dependency closure."
+    },
+    {
+      "type": 6,
+      "where": "SqueezeMeta + dbCAN3 upstream annotation (C1, C2)",
+      "missing": "The repository contains only downstream analysis notebooks; there is no script or workflow that invokes SqueezeMeta or dbCAN3, and no parameters/reference-DB versions for these runs are recorded in prose.",
+      "how_to_close": "Publish the pipeline invocation (command lines/config) for SqueezeMeta and dbCAN3 with parameters and reference-database versions."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: fecal sample processing, IgG+/IgG- MACS bead separation (Miltenyi), and low-pass metagenomic library prep + NextSeq 550 sequencing (~1.3M reads/sample)",
+      "missing": "Physical sample-processing and sequence-generation steps are out of scope for computational reproduction (OOS); counted in W (2), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; a public deposit of the resulting reads would provide the reproducible entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/militrot/cazymes (public; 2 analysis notebooks Cazymes_analysis.ipynb + Cazymes_analysis_version2.ipynb, README with no environment spec) — notebooks not read at line level (stage1)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, github.com landing + raw.githubusercontent.com README + api.github.com tree"
+    },
+    {
+      "artifact": "data accession: NONE — Data availability statement says 'Dataset availability upon request after publication'; no SRA/ENA/DDBJ/GEO/MGnify accession cited",
+      "http_status": "n/a (no public data accession exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "Data and Code availability prose parsed from bioRxiv v2 PDF"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "0e91aecdf7d1ea306d8f8ac60307d7f3b8a23f553d31b18942e6dda5b5a790d4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

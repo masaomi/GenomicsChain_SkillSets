@@ -1,0 +1,337 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "24e6ed25ed65199bffa8e1bb2eac9f2a22acf059a32c784a19933b2c1c23b681",
+  "canonical_id": {
+    "value": "10.1101/2025.10.22.683976",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.22.683976v1",
+      "biorxiv:2025.10.22.683976v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational metagenomic genome-phenome association (metaGPA) analysis of REase-enriched dZ phage metagenomes: read trimming (Trim Galore v0.6.4), metaSPAdes assembly, bowtie2 back-mapping, metaGPA main pipeline with contig enrichment score -C 10, Pfam (release 33.0) domain annotation and domain-association analysis, composite-dataset construction across four samples, plus downstream alignment/phylogeny (mafft v7.508, RAxML v8.2.12), residue differential conservation (Two Sample Logo), structural multi-alignment (PROMALS3D) and tree visualization (iTOL). Wet-lab enrichment, cloning, protein purification, in vivo dZ incorporation and UHPLC-MS steps are out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the bioRxiv v1 full-text Methods ('Materials and Methods' -> 'Data process and metaGPA analysis', 'Creation of the composite data set', 'Alignment and phylogenetic analysis') plus tool mentions embedded in Results/figure legends (metaSPAdes, bowtie2, Two Sample Logo, PROMALS3D). JATS source XML returned HTTP 403; the v1 .full HTML was retrieved instead and carries the complete Methods text. The paper has a 'Data accessibility' section (SRA PRJNA1346114) but NO code availability section: the only code statement is 'MetaGPA code and analysis is available as described in (Yang et al. 2021)' - an indirect pointer to a prior publication, with no repository URL, commit, release or version given in this paper. No repository landing page or README was therefore read (none is cited here).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Trim Galore v0.6.4 trimming of paired-end FASTQ reads (--paired)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "metaSPAdes assembly of reads into contigs (control + treated libraries) - no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Assembly merge + redundancy removal and bowtie2 back-mapping of control/treated read pairs to the combined assembly - no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "metaGPA main pipeline run per sample (default parameters except contig enrichment score -C 10); code referenced only as 'available as described in (Yang et al. 2021)' with no URL/commit/version in this paper",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Pfam domain annotation of contigs using Pfam database release 33.0 (annotating software and its version not named in prose)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Composite dataset construction: concatenation of modified contigs (enrichment score >= 10) and unmodified contigs (< 10) across the four samples - no script or code artifact provided",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Re-execution of the Pfam domain association analysis (metaGPA pipeline) on the composite dataset - no version, association thresholds not restated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Residue differential conservation analysis and domain co-occurrence analysis 'as described in the original metaGPA study' - method deferred to prior paper, no version, no parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "mafft v7.508 multiple sequence alignment of full coding sequences of annotated protein domains (parameters not stated)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "RAxML v8.2.12 maximum-likelihood phylogenies (-f a rapid bootstrap, -m PROTGAMMAAUTO, -p 1237, -x 1234)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Two Sample Logo sequence-logo generation for top differentially conserved residues (default parameters, residues shown if p < 0.05) - no version, hosted tool",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "PROMALS3D structural multiple alignment + secondary structure prediction for VpDpoZ vs de novo DpoZ homologs - hosted web service, no version, no parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "iTOL (https://itol.embl.de/) tree visualization - hosted web service, no version, no settings recorded",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 10,
+    "n_X": 0,
+    "S": 13,
+    "W": 10,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/13 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 3/13 computational steps (Trim Galore v0.6.4, mafft v7.508, RAxML v8.2.12 - the only tools with exact prose version pins). 10/13 steps cap at NI: metaSPAdes, bowtie2, the metaGPA pipeline itself, the Pfam annotation step, composite-dataset construction, the composite association re-run, residue conservation / co-occurrence analysis, Two Sample Logo, PROMALS3D and iTOL all lack version pins, and the two web services (PROMALS3D, iTOL) additionally have no obtainable code. R-star is not assignable at stage1; and since no lockfile, container or environment specification is claimed anywhere in the paper, no step could exceed RI even at stage2 without an executed environment capture.",
+    "coverage": "13 computational steps assessed from bioRxiv v1 full-text Methods prose plus tool mentions in Results/figure legends. 10 wet-lab steps counted (W: sample collection + phenol-chloroform gDNA extraction, REase cocktail enrichment, AMPure size selection, Covaris shearing + NEBNext library prep + Illumina NextSeq sequencing, qPCR enrichment-efficiency assay, plasmid cloning/construct assembly, Ni-NTA protein purification, in vivo dZ incorporation in E. coli, NDT enzymatic assay, UHPLC-MS nucleoside quantification) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "Code availability (absent section); Methods 'Data process and metaGPA analysis'",
+      "missing": "The paper contains no code availability statement. The only code pointer is 'MetaGPA code and analysis is available as described in (Yang et al. 2021)' - an indirect citation to a prior publication with no repository URL, no commit, no release tag and no version recorded in this paper. The custom composite-dataset construction (concatenation by enrichment score, re-run of the association analysis) is described in prose only, with no script deposited.",
+      "how_to_close": "Add a Code availability section giving the exact repository URL plus commit hash or release tag of the metaGPA version actually run, and deposit the analysis/driver scripts used for the composite dataset, the association re-run, the residue differential conservation and the co-occurrence analyses."
+    },
+    {
+      "type": 2,
+      "where": "Whole computational pipeline",
+      "missing": "No environment lockfile, no container image or digest, no conda/pixi environment specification is claimed anywhere. Version capture is partial and static: only Trim Galore v0.6.4, mafft v7.508 and RAxML v8.2.12 carry exact pins (plus Pfam DB release 33.0 as a data-resource pin); nothing pins interpreter, system libraries or transitive dependencies.",
+      "how_to_close": "Publish a lockfile (conda-lock / pixi) or a container digest covering every tool and its dependencies for the platform on which the analysis was run."
+    },
+    {
+      "type": 3,
+      "where": "metaSPAdes, bowtie2, metaGPA pipeline, Pfam annotation software, Two Sample Logo, PROMALS3D, iTOL",
+      "missing": "No version numbers are given for these tools; the metaGPA pipeline itself (the central analysis) has neither a version nor a commit. These steps therefore cannot reach RI.",
+      "how_to_close": "Record the exact version (and build) of every tool invoked, including the metaGPA pipeline commit and the software used for Pfam annotation (e.g. HMMER release)."
+    },
+    {
+      "type": 11,
+      "where": "C11 Two Sample Logo, C12 PROMALS3D, C13 iTOL",
+      "missing": "Three analysis/visualization steps rely on hosted web services with no version, no access date and no exported settings. Server-side updates make these outputs non-deterministic and the code is not obtainable.",
+      "how_to_close": "Record the service version and access date, export and deposit the exact input/output files, or substitute scriptable local equivalents with pinned versions."
+    },
+    {
+      "type": 1,
+      "where": "Intermediate analysis inputs (contigs, ORF sets, domain alignments used for C8-C13)",
+      "missing": "The Data accessibility statement covers 'all raw and processed sequencing data' under SRA PRJNA1346114, but the specific intermediate artifacts fed to the alignment, phylogeny, logo and structural-alignment steps (per-domain coding sequence FASTA, alignments, tree files, reference sequences pulled from external databases) are not individually deposited or enumerated.",
+      "how_to_close": "Deposit the intermediate FASTA/alignment/tree files (e.g. as a figshare/Zenodo archive) with a manifest linking each figure to its input files."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: aquatic phage sampling and PEG precipitation, phenol-chloroform gDNA extraction, seven-REase enrichment cocktail, AMPure size selection, Covaris shearing + NEBNext Ultra II library prep + Illumina NextSeq 75 bp PE sequencing, qPCR enrichment assay, plasmid construction (pET21b/pACYCT7/pET28a/pET28b), Ni-NTA protein purification, in vivo dZ incorporation in T7 Express E. coli, NDT enzymatic assay, Agilent 1290 UHPLC-MS nucleoside quantification",
+      "missing": "Physical sample-generation and biochemical validation steps are out of scope for computational reproduction (OOS); counted in W (10), not verdicted. Raw reads are deposited under SRA PRJNA1346114, which is the reproducible entry point into the computational pipeline.",
+      "how_to_close": "N/A for Tier-1 computational readiness."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE stated in this paper. Verbatim code statement: 'MetaGPA code and analysis is available as described in (Yang et al. 2021).' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL, no commit, no release appears anywhere in the paper. No repository landing page or README was fetched (none is cited).",
+      "http_status": "n/a (no code repository URL stated in the paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "code statement parsed from bioRxiv v1 .full HTML (JATS source XML returned HTTP 403)"
+    },
+    {
+      "artifact": "data accession: NCBI SRA BioProject PRJNA1346114 - verbatim: 'All raw and processed sequencing data generated in this study have been submitted to the NCBI Sequence Read Archive (SRA; https://www.ncbi.nlm.nih.gov/sra) under accession number PRJNA1346114.'",
+      "http_status": "200 OK (title matches paper title)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ENA browser API summary + portal search mirror of the INSDC record"
+    },
+    {
+      "artifact": "external resource (not an author artifact): Pfam database release 33.0, cited as the annotation database.",
+      "http_status": "not checked (stage1; third-party database, not deposited by authors)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "external hosted tools (not author artifacts): Trim Galore (https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/), iTOL (https://itol.embl.de/)",
+      "http_status": "not checked (stage1; third-party tool homepages, not author code)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "b496e5cdca9f0024835336aa4a0e7d606fc839845e87824371e669d0d7792bf4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "9bf9a2d9c4a9bed3f7abc0941ea3ba05865adf80086622e54f8511fafc697b52",
+  "canonical_id": {
+    "value": "10.64898/2025.12.05.692650",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.05.692650v1",
+      "biorxiv:2025.12.05.692650v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Secondary GWAS re-analysis of a previously published Apis mellifera Affymetrix 44K SNP array dataset (Spotter et al. 2012/2016; 219 genotyped workers, 2 sampling years) for the Varroa-specific uncapping behaviour trait: SNP quality control (missingness / Hardy-Weinberg / MAF), IBS matrix and outlier removal, PCA for population structure, LD score computation, two GCTA-LOCO mixed-linear-model GWAS runs (continuous 0-4 uncapping count and binary uncapping-positive/negative definitions), LD pattern inspection in PLINK, Manhattan/QQ plotting with qqman in R, a +/-200 kb candidate-gene window search against Amel_HAv3.1, a synteny comparison between Amel_4.0 (GCF_000002195.2) and Amel_HAv3.1 (GCF_003254395.2), a PVE closed-form calculation, and an integrative STRING v12.0 network + GO/KEGG/GSEA enrichment. The controlled cross-breeding programme, seven-day infrared video behavioural phenotyping of 22,000 tagged workers, and the SNP-array genotyping itself are physical/observational steps inherited from the earlier studies (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv JATS source XML Methods prose (fetched via curl with a browser User-Agent; WebFetch returned HTTP 403 for both the JATS URL and the landing page). No code repository of any kind is stated in the paper, so there is no README prose to read and no repo landing page to inspect: the sole Declarations entry is a Data Availability Statement pointing at a Dryad dataset. Several analysis steps (QC, IBS, PCA, synteny) name no software package at all; GCTA and PLINK are named without any version; only 'qqman package in R (v2024.09.0)' and 'Honeybee STRING 12.0' carry version-like strings. Wet-lab / observational phenotyping and array genotyping counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "capture_claim_note": "Boundary call between 'floating' and 'exact_pins_partial'. Two version-like strings exist in prose: 'Manhattan plots were generated using the qqman package in R (v2024.09.0)' and 'Honeybee STRING 12.0'. Neither is an exact software pin in the intended sense: v2024.09.0 is an RStudio IDE build string rather than an R or qqman package version, and STRING 12.0 is a web database release, not a locally installable pinned dependency. The two tools that actually produce the results (GCTA, PLINK) carry no version at all, and no lockfile, container, or conda spec is mentioned anywhere. Classified 'floating' on that basis; under either classification stage2_candidate is false.",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "SNP quality control on 44K array data (missing genotype filtering, Hardy-Weinberg exact test, minor-allele-frequency threshold; 29,841 variants / 219 samples in, 15,097 variants / 190 individuals out) — no software named, no threshold values stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "LD score computation (sum of r^2 between each SNP and all SNPs within a 1000-base window; Yang et al. 2011 / GCTA lineage) — no software version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "IBS (identity-by-state) matrix computation, heatmap/dendrogram, and outlier-sample deletion before vs after QC — no software named, no outlier criterion stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Principal component analysis for population stratification, PCs used as GWAS covariates ('first principal components explaining 8.80 of variation') — no software named, number of retained PCs not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "GWAS on the continuous uncapping definition (0-4 uncapped cells) with GCTA GCTA-LOCO leave-one-chromosome-out mixed linear model; fixed effects queen/year/PC, random polygenic effect from GRM, relaxed significance threshold p < 0.001 — GCTA version not pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "GWAS on the binary uncapping definition (uncapping-positive / uncapping-negative) with the same GCTA-LOCO mixed linear model — GCTA version not pinned, logistic-vs-LMM specification for the binary trait not made explicit",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Manhattan and QQ plot generation using the qqman package in R (v2024.09.0) with significance/suggestive threshold lines",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "LD pattern assessment of the genomic data in PLINK (Purcell et al. 2007) — no PLINK version, no LD command/flags/window/r^2 threshold stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Candidate genomic region / gene annotation: 200 kb window upstream and downstream of each significant SNP searched against the Apis mellifera annotation (Amel_HAv3.1) — no annotation release or tool version pinned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Comparative-genomics synteny plot between Amel_4.0 (GCF_000002195.2) and Amel_HAv3.1 (GCF_003254395.2), LG01-LG16, syntenic blocks and misassembly artifacts (Polevikov & Kolmogorov 2019 cited) — no synteny software named at all",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Proportion of Variance Explained (PVE) per significant SNP via the closed-form Shim et al. (2015) formula using effect size, SE, MAF and N — formula fully specified in prose, no software named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Integrative network and enrichment analysis in Honeybee STRING 12.0: literature gene set assembled via the STRING pathway/process/disease module (2005-2025), merged with this study's candidate genes, PPI network + GO/KEGG/keyword enrichment and GSEA with FDR cutoff 0.01",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "web-service-dependency"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 5,
+    "n_X": 5,
+    "S": 12,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/12 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 2/12 computational steps (C7 qqman in R 'v2024.09.0', C12 Honeybee STRING 12.0 - the only two steps carrying any version-like string). 5/12 steps cap at NI (LD score, both GCTA-LOCO GWAS runs, the 200 kb candidate-window annotation, and the PVE formula: method described but no software version pinned). 5/12 steps are X: SNP QC, IBS/outlier removal, and PCA state no software and no threshold values; the PLINK LD-pattern step states no version and no command/flags; the synteny step names no software at all. No code repository is stated anywhere in the paper, and no lockfile, container, or conda environment is claimed, so no step can exceed RI even under stage 2.",
+    "coverage": "12 computational analysis steps assessed from the bioRxiv v1 JATS Methods prose. 3 physical/observational steps (controlled cross-breeding programme at the Institute for Bee Research Hohen Neuendorf; seven-day infrared video behavioural phenotyping of 22,000 tagged workers in observation hives; Affymetrix 44K SNP array genotyping of 219 workers) counted in W but out of computational-reproduction scope - all three are inherited from Spotter et al. 2012/2016 rather than newly performed here.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Declarations (whole paper)",
+      "missing": "No code availability statement and no code repository of any kind (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage) is stated. The only Declarations entry is a Data Availability Statement pointing at Dryad. No GCTA command lines, PLINK command lines, R scripts, or STRING workflow exports are provided.",
+      "how_to_close": "Deposit the analysis scripts (QC, GRM/LOCO GWAS invocations, IBS/PCA, plotting, PVE computation, candidate-window search) in a public repository with an archived DOI snapshot, and add a Code Availability statement."
+    },
+    {
+      "type": 3,
+      "where": "GCTA and PLINK invocations (C1, C2, C5, C6, C8) and unnamed-tool steps (C3, C4, C10)",
+      "missing": "GCTA and PLINK are cited only by their method papers (Yang et al. 2011; Purcell et al. 2007) with no version numbers. QC, IBS, PCA and the synteny plot name no software package at all. The only version-like strings in the paper are 'R (v2024.09.0)' - an RStudio build string, not an R/qqman package version - and 'Honeybee STRING 12.0', a web database release.",
+      "how_to_close": "Name every tool and pin its exact version (GCTA x.yz, PLINK 1.9/2.0 build date, R x.y.z, qqman x.y.z, and the synteny tool), ideally in a software-versions table."
+    },
+    {
+      "type": 1,
+      "where": "Quality control (C1), IBS/outlier removal (C3), PCA (C4), PLINK LD analysis (C8)",
+      "missing": "QC reports only the counts of removed variants, not the thresholds applied (missingness cutoff, Hardy-Weinberg exact-test p threshold, MAF threshold). The outlier-deletion criterion for the IBS step is not stated. The number of principal components retained as covariates is not stated ('first principal components explaining 8.80 of variation'). The PLINK LD analysis states no window size, r^2 threshold, or subcommand.",
+      "how_to_close": "State every filter threshold and command flag explicitly (e.g. --geno, --hwe, --maf values; the IBS outlier rule; the exact number of PCs; the PLINK --r2/--indep parameters)."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment",
+      "missing": "No environment lockfile, container image/digest, or conda/renv specification is claimed anywhere. There is no dependency closure for the GCTA/PLINK/R stack, and the STRING enrichment depends on a live web service whose database contents change between releases.",
+      "how_to_close": "Provide a container digest or conda-lock/renv lockfile covering GCTA, PLINK, R and qqman, and archive the exact STRING 12.0 query inputs/outputs alongside the analysis."
+    },
+    {
+      "type": 4,
+      "where": "Data Availability Statement",
+      "missing": "The statement gives a Dryad dataset link (https://datadryad.org/dataset/doi:10.5061/dryad.8635cs4h) but does not describe which files it contains, whether the raw 44K genotypes plus the two phenotype definitions (continuous 0-4 counts and the binary case/control assignment) are both included, or how the deposited files map onto the QC input (29,841 variants / 219 samples) and the analysis-ready set (15,097 variants / 190 individuals).",
+      "how_to_close": "Document the Dryad file inventory in the paper, including the phenotype file(s), the pre-QC and post-QC genotype files, and the family/queen and year covariate coding."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab / observational steps (W)",
+      "missing": "The controlled cross-breeding programme, the seven-day infrared video phenotyping of 22,000 tagged workers in observation hives, and the Affymetrix 44K array genotyping are physical data-generation steps carried out in the earlier Spotter et al. 2012/2016 studies. They are out of scope for computational reproduction and are counted in W (3) without a verdict.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the Dryad-deposited genotype/phenotype table is the reproducible entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession: Dryad dataset, verbatim from Data Availability Statement - 'The datasets used in this study are publicly available at Dryad repository with following link https://datadryad.org/dataset/doi:10.5061/dryad.8635cs4h'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -I -L, datadryad.org"
+    },
+    {
+      "artifact": "code repo: none stated in the paper (no code availability statement; no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL anywhere in the full text)",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "not checked - no repository asserted by the authors; no web search performed"
+    },
+    {
+      "artifact": "reference assemblies cited in Methods: Amel_4.0 (GCF_000002195.2) and Amel_HAv3.1 (GCF_003254395.2)",
+      "http_status": "stated-in-paper (accessions given, no URL, not fetched)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    },
+    {
+      "artifact": "external web resource: Honeybee STRING 12.0 (pathway/process/disease module, GSEA, FDR 0.01)",
+      "http_status": "stated-in-paper (named with release version, no URL given)",
+      "checked_at": "2026-07-27",
+      "network_context": "n/a"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "e5d8bb6358ebab3e6acb01766dcc2d76fa922a2aeb06340fb9cb823711a0c486",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

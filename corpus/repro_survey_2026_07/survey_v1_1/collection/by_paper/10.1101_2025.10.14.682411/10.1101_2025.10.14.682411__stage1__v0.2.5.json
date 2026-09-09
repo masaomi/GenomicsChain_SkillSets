@@ -1,0 +1,559 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "3486674acf44f8a92a657c1f5515244ea42383f3b26a9a133daf8c27184b03b9",
+  "canonical_id": {
+    "value": "10.1101/2025.10.14.682411",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.14.682411v2",
+      "biorxiv:2025.10.14.682411v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "A population-scale metabolome-genome integration study in sorghum grain. Wet-lab side: field growth of 266 Sorghum Association Panel (SAP) accessions at the Texas Tech University Research Farm, grain freeze-drying/milling, MTBE:methanol extraction with internal standards, untargeted UHPLC-MS profiling on a Waters 2777c UPLC coupled to a Q Exactive HF (ESI+/ESI-), and targeted parallel-reaction-monitoring (PRM) quantification of flavonoids in 12 lines. Computational side (the reproduction target): MSConvert .raw -> .mzXML conversion; XCMS + CAMERA feature detection/quantification and filtering yielding 4,877 metabolites; putative annotation (MSI Levels 2-3) against HMDB / MassBank / ChemSpider / KEGG; m-trait averaging over 3 biological replicates; bestNormalize (v1.4.3) normalisation with a rules-based +/-1.5 IQR outlier rule; broad-sense heritability from a genotype-random linear mixed model; Shannon and Simpson metabolite diversity indices; metabolite-based GWAS on 2,206 qualifying metabolites against 38,873,876 SAP SNPs (MAF >= 0.05) using MLM in GAPIT and FarmCPU in rMVP v1.0.1 with 100x 90%-subsample resampling and RMIP > 0.05; genome-wide significance via GEC v0.2; CMplot v3.6.2 Manhattan plots; +/-50 kb LD-based locus definition and lead-SNP selection; candidate-gene annotation against BTx623 v3.1 from Phytozome v10; Ensembl VEP variant annotation; plantiSMASH 2.0-beta4 metabolic gene cluster detection; integration with previously published seed-development RNA-Seq (E-MTAB-13406); STRING v12.0 PPI and Cytoscape v3.10.1 networks; ML preprocessing (probabilistic quotient normalisation, log2, >20% missingness filter, KNN k=5 imputation) and Random Forest + XGBoost four-class grain-colour classification with fully stated hyperparameters and fixed seeds (42); pROC ROC/AUC analysis in R v4.3.1 with 2000 bootstrap replicates; geneHapR haplotype analysis with SKAT; ppcor partial-correlation SNP network; and construction of the SorGMDA MySQL/PHP web resource. The three wet-lab steps are scored OOS and excluded from |S|.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the Methods section of the v2 JATS full text plus the Data availability and Code availability statements. 25 steps total: 3 wet-lab (W1 field growth and grain sampling, W2 extraction + untargeted UHPLC-MS acquisition, W3 targeted PRM flavonoid acquisition) scored OOS and excluded from |S|, and 22 computational steps (C1-C22) forming the denominator. Splits made deliberately: MSConvert conversion (C1) is kept separate from XCMS/CAMERA quantification (C2) because they are distinct named tools; the two mGWAS models are separate steps (C7 MLM/GAPIT, C8 FarmCPU/rMVP) because their version disclosure and parameter disclosure differ sharply (rMVP is pinned at v1.0.1 with maxLoop, method.bin, vc.method and the RMIP resampling scheme all stated, while GAPIT carries no version and no PC count for the MLM); the GEC threshold calculation (C9) is separate because it uses a distinct versioned tool (GEC v0.2); LD-based locus merging and lead-SNP selection (C11) is separate because no tool at all is named for it; ML preprocessing (C17), model fitting (C18) and ROC analysis (C19) are separate because only the first two are covered by the Python script in the GitHub repo while the third is the separate R script. The SorGMDA database build (C22) is retained as a C-step because the paper presents it as a released research artifact and it is the sole distribution channel for the metabolite trait matrix.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Field growth and grain sampling: SAP obtained from USDA NPGS via GRIN, grown at the Texas Tech University Research Farm (33 deg 35'52.9\"N, 101 deg 54'21.4\"W), supplemental irrigation ~2.56 cm/week, panicles bagged pre-flowering, ~20 seeds per plant from three independent plants per accession, freeze-dried 12 h (Labconco FreeZone 2.5 L, -84 C), bead-mill ground",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "Metabolite extraction and untargeted UHPLC-MS acquisition: 35 mg freeze-dried sample, MTBE:methanol 3:1 with internal standards (1,2-diheptadecanoyl-sn-glycero-3-phosphocholine; corticosterone; ampicillin), Precellys 24 at 5000 Hz, phase separation, Waters 2777c UPLC + Q Exactive HF in ESI+ and ESI- modes, pooled QC sample",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Targeted PRM flavonoid quantification: polar extracts of 12 lines x 3 biological replicates, Thermo Vanquish UHPLC + Q Exactive HF, Waters Acquity HSS T3 1.7 um 2.1 x 100 mm, stated gradient, resolution 30,000, AGC 3e6, max IT 100 ms, isolation window 1.0 m/z, external calibration curves",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C1",
+      "label": "Raw MS conversion: 'The resulting raw mass spectrometry (MS) data (.raw) files were converted to .mzXML format using MSConvert, with an MS-level filter applied (Chambers et al. 2012).' No MSConvert/ProteoWizard version, no explicit filter argument string",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Feature detection and quantification: 'Metabolite quantification was achieved by analyzing signal intensities using the XCMS and CAMERA data processing pipelines'. Minimum sample threshold of three at the XCMS grouping phase; features filtered on retention time 60-630 s and m/z < 0.5 at the first decimal; isotopes excluded, adducts retained; median imputation/interpolation of missing values; fresh-weight adjustment and total-ion-count normalisation; log transform; IQR filtering and Pareto scaling. No XCMS or CAMERA version, no parameter object (peak-picking method, ppm, peakwidth, bw, minfrac) given",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Metabolite annotation to MSI Levels 2-3 against HMDB, MassBank, ChemSpider and KEGG; evidence thresholds stated as MS/MS spectral similarity > 0.85 and precursor mass accuracy <= 5 ppm. No matching software named, no database release/version or download date for any of the four resources",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "m-trait computation (mean of three biological replicates per metabolite per accession) and phenotype normalisation of 2,206 metabolite traits using 'the bestNormalize R package (v1.4.3)' evaluating Lambert W x F, Box-Cox, Yeo-Johnson and Ordered Quantile by the Pearson P statistic, followed by a rules-based automated outlier rule (values beyond +/-1.5 IQR set to missing)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Broad-sense heritability H2 per metabolite from a linear mixed model with genotype as a random effect over three biological replicates; model equation and H2 formula given verbatim with n = 3. No R package, function or version named for the model fit",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Metabolite diversity analysis: metabolites detected in fewer than 5% of samples excluded, per-sample relative abundances computed, Shannon (H') and Simpson (D) indices computed with formulas given, richness and abundance-weighted diversity reported, density plots of D across accessions; 'All additional statistical assessments and visualizations were performed using the ggplot2 package in R'. No R version, no ggplot2 version, no diversity package named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "mGWAS mixed linear model: 'GWAS was independently performed on each of the 2,206 qualifying metabolites using a mixed linear model (MLM) (Zhang et al. 2010) with principal components (PCs) and the kinship matrix', 'implemented with the R packages GAPIT (Lipka et al. 2012)'. Genotype input = 38,873,876 SNPs from 266 SAP accessions after MAF >= 0.05 filtering, attributed to Boatwright et al. 2022; metabolite inclusion criteria = detected in >= 90% of accessions and passing normality. No GAPIT version, no number of PCs for the MLM, no kinship method for the GAPIT run",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "mGWAS multi-locus model: FarmCPU 'implemented with the R packages ... rMVP (v1.0.1) (Yin et al. 2021)', run with the first three PCs as covariates, kinship computed internally, maxLoop = 10, method.bin = 'FaST-LMM', vc.method = 'GEMMA'; 'the model was rerun 100 times with 90% subsampling, and Resample Model Inclusion Probability (RMIP) was calculated for each variant. Only variants with RMIP > 0.05 were considered robust'. No random seed reported for the 100 subsamples",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Significance threshold: 'Bonferroni corrections were applied based on the effective number of independent markers in each dataset, calculated using the genetic type I error calculator (GEC v0.2) (Li et al. 2012). A stringent genome-wide significance threshold of 1x10-5 was used'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Manhattan and Q-Q plotting: 'Manhattan plots were created using the CMplot R package (v3.6.2) (Yin et al. 2021)'. Q-Q plots referenced for confirming population-structure control; no plotting parameters given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Locus definition and lead-SNP selection: significant markers within 1 MB on the same chromosome merged into single peaks; 'Based on the observed genome-wide linkage disequilibrium (LD) decay of ~50 kb (r2 = 0.2) in this population, we grouped significant SNPs within +/-50 kb into single loci. Lead SNPs were identified by explicitly accounting for LD among significant variants within each locus'. No tool, no LD computation software, no r2 clumping threshold for the lead-SNP rule",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Candidate gene annotation: 'Candidate genes within these defined regions were annotated using the BTx623 reference genome (v3.1) from Phytozome v10 (Goodstein et al. 2012)'. Reference assembly and annotation source are both version-named; no annotation script or overlap rule beyond the locus windows of C11",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Variant consequence annotation: 'Genomic regions containing SNPs were further annotated using the Ensembl Variant Effect Predictor (VEP) (McLaren et al. 2016).' No VEP version, no cache/species/assembly selection, no flags; the downstream fold-enrichment analysis of missense/synonymous/UTR classes (Fig. 4C) depends entirely on this unspecified call",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Metabolic gene cluster detection: 'Metabolic (biosynthetic) gene clusters (MGCs) in sorghum were identified using the plantiSMASH web server (version 2.0-beta4) according to default analysis protocols (Kautsar et al. 2017). Advanced parameters included a CD-HIT cutoff of 0.5 ... and a minimum of 2 unique biosynthetic domains per candidate cluster.' Hosted web service; built-in pHMM library version not separately recorded, and candidate clusters were 'further manually validated'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Integration with seed-development expression data: 'mGWAS results were combined with previously published RNA-Seq expression profiles (E-MTAB-13406) (Khan et al. 2024) covering sorghum seed development stages', five time points (5, 10, 15, 20, 25 dpa) across embryo, endosperm and whole grain, used for co-expression validation of clusters and for lignin biosynthesis. No aligner, quantifier, normalisation, or co-expression correlation method/threshold named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Interaction and correlation networks for the lignin analysis: 'Protein-protein interaction networks were inferred using STRING v12.0 (Von Mering et al. 2005), and correlation networks among genes were visualized using Cytoscape v3.10.1 (Shannon et al. 2003).' Both tools version-named; no STRING confidence-score cutoff, evidence-channel selection, or network layout parameters given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "ML preprocessing of the polyphenol matrix: 1,428 polyphenolic features over 211 colour-labelled accessions; 'probabilistic quotient normalization, log2 transformation, removal of features with >20% missing values across samples, and k-nearest neighbor imputation (k = 5) for the remaining missing values using the impute R package'. Covered by preprocess_train.py in the declared GitHub repository (requirements.txt pins pandas==2.2.0, numpy==1.26.2, scikit-learn==1.2.2, xgboost==1.7.3, joblib==1.3.2, rpy2==3.7.2). Grain colour labels from USDA NPGS/GRIN (1 = white, 2 = red, 3 = yellow, 4 = brown)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Supervised classification of grain colour: Random Forest and XGBoost in a four-class framework, repeated stratified 10-fold CV (10 repeats = 100 folds) via RepeatedStratifiedKFold (scikit-learn). RF: n_estimators = 2000, max_features = 'sqrt', min_samples_split = 2, min_samples_leaf = 1, bootstrap = True, class_weight = 'balanced_subsample', Gini importance averaged over 100 folds. XGBoost: objective = 'multi:softprob', num_class = 4, eta = 0.05, max_depth = 6, min_child_weight = 3, subsample = 0.8, colsample_bytree = 0.8, gamma = 0.1, alpha = 0.01, lambda = 1.0, tree_method = 'hist', early_stopping_rounds = 50, gain importance averaged over 100 folds. 'For full reproducibility, random seeds were fixed (np.random.seed(42), random.seed (42), and XGBoost seed = 42).' Robust markers = top-30 importance in >= 70% of folds in both models",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "ROC/AUC evaluation: 'Receiver Operating Characteristic (ROC) curve analysis ... was subsequently performed in R v4.3.1 using the pROC package' over 27 individual polyphenolic metabolites in one-vs-rest and pairwise comparisons; 'The area under the curve (AUC) and 95% confidence intervals were calculated using 2000 bootstrap replicates.' Script roc_analysis.R is present in the declared repository. R interpreter version pinned (4.3.1); pROC package version not stated and not covered by requirements.txt, and no bootstrap seed given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Haplotype and rare-variant association analysis: lead SNPs for seven polyphenolic compounds encoded numerically (reference = 1, alternative = 2, heterozygous = 1.5); 'Haplotype analysis was performed using the R package geneHapR (Zhang et al. 2023a). Functionally linked SNPs were extracted and analyzed for their correlation with phenotypic traits using the SKAT package'; differential abundance per haplotype visualised with ggplot2; joint haplotypes built by clustering haplotype blocks across regions. No version for geneHapR, SKAT or ggplot2; no SKAT kernel/weighting settings; no haplotype-block clustering parameters. The Code availability statement claims 'downstream genetic association scripts' are in the repository, but the repository root contains only preprocess_train.py and roc_analysis.R",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Genome-wide SNP-metabolite correlation network: 'Partial correlation coefficients (r) and P-values were computed pairwise across all SNPs using the ppcor package (Kim 2015). SNP pairs with significant positive correlations (r = 0.5, P <= 0.05) were filtered and visualized as a correlation network in Cytoscape v3.10.1'. Cytoscape version-pinned; ppcor version and the covariate set of the partial correlation are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Released resource build: 'SorGMDA was developed using MySQL and PHP to enable users to search metabolome profiling data acquired from the SAP accessions studied. The database also integrates mGWAS signals with P-values <= 10-3 mapped across all chromosomes.' No MySQL or PHP version, no schema, no loader code, no repository for the web application, and no bulk export endpoint documented",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 11,
+    "n_NI": 8,
+    "n_X": 3,
+    "S": 22,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/22 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "11/22 (50%) of computational steps reach RI at stage 1 (C4, C8, C9, C10, C12, C14, C16, C17, C18, C19, C21). The verdict distribution is bimodal and the split tracks exactly one thing: whether the step's tool carries a version string in the prose. The eleven RI steps all name a version (bestNormalize v1.4.3, rMVP v1.0.1, GEC v0.2, CMplot v3.6.2, BTx623 v3.1 / Phytozome v10, plantiSMASH 2.0-beta4, STRING v12.0, Cytoscape v3.10.1, R v4.3.1, and the six pinned Python packages in the repository's requirements.txt) and all have at least partial parameter disclosure - the FarmCPU and machine-learning steps in particular are unusually well documented (maxLoop, method.bin, vc.method, RMIP scheme; complete RF and XGBoost hyperparameter sets with fixed seeds of 42). The eight NI steps fail on version = 0 (GAPIT with no version and no PC count for the MLM, C7; no package named for the heritability mixed model, C5; no package named for the diversity indices, C6; no tool at all for LD-based locus merging and lead-SNP selection, C11; unversioned geneHapR/SKAT, C20) or on code = 0 (VEP invoked with no version and no flags although the missense/synonymous/UTR fold-enrichment result depends on it, C13; RNA-Seq reintegration with no aligner or quantifier named, C15; the SorGMDA web application with no code, schema or loader, C22). The three X steps (C1 MSConvert, C2 XCMS/CAMERA, C3 annotation) are unrecoverable rather than merely under-documented, because the raw mass-spectrometry data underneath them was never deposited: no MetaboLights, Metabolomics Workbench, or other repository accession appears anywhere in the paper, so the 4,877-metabolite feature matrix that every downstream step consumes cannot be re-derived by anyone outside the lab. No step can exceed RI at stage 1 by construction (version is capped at 1 under Delta-2), and the paper is not a stage-2 candidate: capture_claim = exact_pins_partial, which protocol v0.2.6 removed from the positive gate.",
+    "coverage": "25 steps built from the Methods section, Data availability statement and Code availability statement of the v2 JATS full text (fetched 200 OK), plus the landing page and README prose of the declared GitHub repository. 22 of the 25 are computational and form the denominator (|S| = 22); 3 are wet-lab (W1 field growth and sampling, W2 extraction + untargeted UHPLC-MS, W3 targeted PRM) and are scored OOS. Computational coverage = 22/25 = 88%. Repository inspection was limited to the landing page, README prose and the six-line requirements.txt; no script body was read (that is stage 2).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "C1, C2, C3 (raw MS conversion, XCMS/CAMERA quantification, annotation) and, transitively, every downstream metabolite-consuming step",
+      "missing": "The raw untargeted UHPLC-MS data (.raw / .mzXML) for 266 accessions x 3 biological replicates in ESI+ and ESI- modes, and the PRM data for the 12 targeted lines, are not deposited anywhere. The Data availability statement reads in full: 'All metabolic traits and corresponding GWAS results can be accessed through SorGMDA (https://www.depts.ttu.edu/igcast/SorbGMDA/index.php).' No MetaboLights (MTBLS), Metabolomics Workbench (ST), GNPS/MassIVE, figshare, Zenodo or Dryad identifier appears anywhere in the article. Neither the intermediate 4,877-metabolite feature matrix nor the 2,206-trait normalised matrix is available as a downloadable file with a stable identifier; the SorGMDA portal is a MySQL/PHP search interface with no documented bulk export.",
+      "how_to_close": "Deposit the raw .raw/.mzXML files and the PRM acquisitions in MetaboLights or Metabolomics Workbench and cite the accession; additionally deposit the XCMS/CAMERA feature table, the 4,877-metabolite matrix and the 2,206-trait normalised matrix as versioned flat files with a DOI (Zenodo/Dryad), and add a bulk-download endpoint to SorGMDA."
+    },
+    {
+      "type": 12,
+      "where": "C1-C16 and C20-C22 (all steps except the ML preprocessing, model fitting and ROC analysis)",
+      "missing": "The Code availability statement scopes the deposited code to the machine-learning branch only: 'The full machine-learning pipeline used in this study, including data preprocessing, model training, hyperparameter settings, cross-validation procedures, feature selection, ROC analysis, and downstream genetic association scripts, is openly accessible on GitHub at: https://github.com/Deepti098c/sorghum_kernel_color_ML', preceded by 'All analyses were performed using publicly available software and standard computational workflows as described in the Methods section.' No script exists for the XCMS/CAMERA processing, the normalisation and heritability pipeline, the diversity indices, the GAPIT/rMVP mGWAS driver, the RMIP resampling loop, the GEC threshold computation, the LD-based locus merging and lead-SNP selection, the VEP invocation, the plantiSMASH post-processing, the RNA-Seq co-expression integration, or the SorGMDA loader. The mGWAS is the paper's central claim (~4.15 million SNP-metabolite associations, 38 metabolite-gene clusters) and none of its code is deposited.",
+      "how_to_close": "Deposit the full analysis code - the mGWAS driver scripts including the 100x subsampling/RMIP loop, the normalisation and heritability scripts, the locus-definition and lead-SNP code, the VEP command line, and the database loader - in the same repository or a second one, and archive a tagged release to Zenodo with a DOI cited in the Code availability statement."
+    },
+    {
+      "type": 9,
+      "where": "C20 (haplotype/SKAT analysis) versus the Code availability statement",
+      "missing": "The Code availability statement declares that 'downstream genetic association scripts' are in the GitHub repository, and the repository description repeats 'SNP/haplotype genetic association analysis'. The repository root (checked 2026-07-28) contains only README.md, kernel_color_labels_TEST.csv, metabolomics_TEST.csv, preprocess_train.py, requirements.txt and roc_analysis.R. There is no geneHapR script, no SKAT script and no ppcor script. In addition the README instructs the user to 'Place metabolomics data in data/', 'Run preprocessing + ML script in scripts/preprocess_train.py', 'Run ROC analysis with scripts/roc_analysis.R' and 'View outputs in results/', but no data/, scripts/ or results/ directory exists in the repository - the two scripts sit at the root.",
+      "how_to_close": "Add the missing genetic-association scripts, or correct the Code availability statement and repository description to state that only the ML preprocessing/training and ROC steps are deposited; and reconcile the README paths with the actual repository layout."
+    },
+    {
+      "type": 2,
+      "where": "C1 (MSConvert), C2 (XCMS, CAMERA), C3 (HMDB, MassBank, ChemSpider, KEGG), C5 (mixed-model package), C6 (ggplot2, diversity indices), C7 (GAPIT), C11 (LD tooling), C13 (Ensembl VEP), C15 (RNA-Seq tooling), C20 (geneHapR, SKAT, ggplot2), C22 (MySQL, PHP)",
+      "missing": "No version string of any kind for these tools. The paper's version discipline is bimodal: eleven tools are pinned exactly (bestNormalize v1.4.3, rMVP v1.0.1, GEC v0.2, CMplot v3.6.2, plantiSMASH 2.0-beta4, STRING v12.0, Cytoscape v3.10.1, BTx623 v3.1, Phytozome v10, R v4.3.1, plus six == pins in requirements.txt) while eleven equally load-bearing tools carry none. GAPIT (C7) and VEP (C13) are the most consequential omissions: the MLM half of the mGWAS and the entire genomic-context enrichment result rest on unversioned invocations. The annotation databases (C3) additionally lack any release date, which makes the MSI Level 2-3 assignments non-reconstructable even in principle.",
+      "how_to_close": "State the version of every named tool and the release/download date of every annotation database, and ship a session-level environment record (sessionInfo()/renv.lock for the R steps, conda or pixi lock for the MS-processing steps)."
+    },
+    {
+      "type": 2,
+      "where": "Paper-level environment closure; requirements.txt in the declared repository",
+      "missing": "The only environment artifact anywhere is a six-line hand-written requirements.txt (pandas==2.2.0, numpy==1.26.2, scikit-learn==1.2.2, xgboost==1.7.3, joblib==1.3.2, rpy2==3.7.2). It has exact == pins but no Python interpreter version, no hashes, no transitive resolution, no platform declaration, and it covers only the Python ML step. There is no renv.lock for the many R steps (bestNormalize, GAPIT, rMVP, CMplot, pROC, geneHapR, SKAT, ppcor, impute, ggplot2), no conda/pixi lock for the MS-processing tools, no Dockerfile and no image digest. The repository has no tags, no releases and no license (checked 2026-07-28), so the code state used for the manuscript is not identified by a commit or tag anywhere in the paper. Classification: exact_pins_partial, not env_lock_claimed.",
+      "how_to_close": "Ship a fully resolved lock (pip-compile with hashes plus a pinned interpreter, or a conda-lock/pixi.lock, or a container image referenced by digest) covering both the Python and the R halves; add renv.lock for the R steps; tag a release, archive it to Zenodo, and cite that DOI in the manuscript."
+    },
+    {
+      "type": 4,
+      "where": "C8 (FarmCPU 100x 90% subsampling / RMIP), C19 (2000-replicate ROC bootstrap)",
+      "missing": "Two stochastic procedures report no random seed. C8: 'Due to instability in individual FarmCPU runs, the model was rerun 100 times with 90% subsampling, and Resample Model Inclusion Probability (RMIP) was calculated for each variant. Only variants with RMIP > 0.05 were considered robust' - the subsampling draw is unseeded, so the exact retained variant set is not reproducible, only its distribution. C19: 'The area under the curve (AUC) and 95% confidence intervals were calculated using 2000 bootstrap replicates' - unseeded, so the confidence intervals are reproducible only distributionally. By contrast the ML step (C18) does fix seeds explicitly (np.random.seed(42), random.seed(42), XGBoost seed = 42), showing the authors applied the discipline unevenly.",
+      "how_to_close": "Record and publish the seeds (or the full resampling index sets) for the FarmCPU RMIP loop and the pROC bootstrap, and state whether the reported RMIP > 0.05 variant list is the single run of record."
+    },
+    {
+      "type": 5,
+      "where": "C7, C8, C11, C12, C20, C21 - the genotype matrix underlying every mGWAS and haplotype result",
+      "missing": "The 38,873,876 SNPs from 266 SAP accessions are attributed only by citation ('Boatwright et al. 2022') with no accession, URL, VCF filename, or file version given in this paper. The MAF >= 0.05 filtered call set actually used, the sample-to-accession mapping for the 266 selected accessions, and the coordinates/reference build of the released VCF are all unstated. Likewise the grain colour labels are attributed to 'the U.S. National Plant Germplasm System (NPGS)' and GRIN with a 1/2/3/4 category coding for 211 accessions but no download date or accession list, and the repository ships only a kernel_color_labels_TEST.csv.",
+      "how_to_close": "Cite the specific SAP resequencing data accession or download URL plus file version and reference build, publish the exact filtered VCF (or the filtering command that regenerates it) and the 266-accession sample list, and deposit the GRIN colour label table actually used with its retrieval date."
+    },
+    {
+      "type": 6,
+      "where": "C14 (plantiSMASH 2.0-beta4 web server), C16 (STRING v12.0 web service)",
+      "missing": "Two steps are externalised to hosted web services with no local, re-executable equivalent. plantiSMASH was run 'according to default analysis protocols' on the web server; the built-in pHMM library version behind the '2.0-beta4' label is not separately recorded, and the resulting candidate clusters were 'further manually validated based on their domain composition and gene co-expression patterns' - a human-judgement step with no recorded decision log, yet 38 metabolite-gene clusters is a headline result. STRING v12.0 was queried with no confidence cutoff or evidence-channel selection recorded.",
+      "how_to_close": "Deposit the plantiSMASH input FASTA/GFF and the raw output archive, record the manual validation decisions per candidate cluster in a supplementary table, and either use the containerised plantiSMASH release or record the exact web-server job identifiers and run dates; record the STRING query parameters and export the network."
+    },
+    {
+      "type": 13,
+      "where": "C22 / Data availability - SorGMDA as the sole distribution channel",
+      "missing": "The metabolite traits and GWAS results are distributed exclusively through an institutional PHP/MySQL web application at https://www.depts.ttu.edu/igcast/SorbGMDA/index.php (200 OK on 2026-07-28). This is a self-hosted departmental URL with no DOI, no versioning, no archival commitment, no license, no API and no documented bulk export - it is out-of-band distribution in the same sense as a Globus endpoint. The ~4.15 million SNP-metabolite associations cannot be retrieved as a file; the portal exposes mGWAS signals only at P <= 10-3 and only 'mapped across all chromosomes' through a search interface, so even the association table a reproducer would need to compare against is not obtainable in bulk.",
+      "how_to_close": "Mirror the full metabolite trait matrix and the complete mGWAS association table to a persistent archive (Zenodo, Dryad, or a domain repository) with a DOI and an explicit license, and cite that DOI in Data availability alongside the portal."
+    },
+    {
+      "type": 8,
+      "where": "Repository README versus repository contents (github.com/Deepti098c/sorghum_kernel_color_ML)",
+      "missing": "The README's usage instructions cannot be followed as written: they reference data/, scripts/ and results/ directories that do not exist, while the two scripts sit at the repository root. The shipped CSVs are named kernel_color_labels_TEST.csv and metabolomics_TEST.csv, i.e. test fixtures rather than the study's 1,428-feature x 211-accession matrix, so the deposited pipeline cannot be run on the study data as distributed. Flagged at prose/landing-page level only; script bodies were not read (stage 2).",
+      "how_to_close": "Fix the README paths or move the scripts into scripts/, state explicitly that the shipped CSVs are toy fixtures, and document how to obtain the real input matrix from SorGMDA or an archived deposit."
+    },
+    {
+      "type": 10,
+      "where": "W1, W2, W3",
+      "missing": "Field growth, grain sampling, metabolite extraction, untargeted UHPLC-MS acquisition and targeted PRM acquisition are wet-lab and are scored OOS, excluded from |S| = 22. Recorded for completeness, not penalised. Documentation quality of these steps is high (site coordinates, irrigation rate, solvent ratios, internal standards, instrument models, gradient programme, AGC target, isolation window are all given).",
+      "how_to_close": "n/a - out of scope for a computational-reproducibility assessment."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: GitHub, stated verbatim in the Code availability statement as 'openly accessible on GitHub at: https://github.com/Deepti098c/sorghum_kernel_color_ML'. Status: URL-present and live. Public, owner Deepti098c, default branch main, 6 commits, last push 2025-12-01T22:10:31Z, created 2025-12-01T18:35:46Z, NO license, NO tags, NO releases. Root contents: README.md, kernel_color_labels_TEST.csv, metabolomics_TEST.csv, preprocess_train.py, requirements.txt, roc_analysis.R. requirements.txt verbatim: 'pandas==2.2.0 / numpy==1.26.2 / scikit-learn==1.2.2 / xgboost==1.7.3 / joblib==1.3.2 / rpy2==3.7.2'. README states 'This repository contains a fully reproducible machine-learning pipeline for identifying polyphenolic metabolites associated with sorghum kernel color using Random Forest and XGBoost' and 'All methods follow the workflow described in the manuscript'. No commit or tag is cited in the paper, so the code state of record is unidentified.",
+      "http_status": "200 (repo landing page, unauthenticated GET, followed redirects); raw.githubusercontent.com main/README.md and main/requirements.txt both returned content; api.github.com/repos/... returned 200 with tags array empty",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with a browser UA from an unauthenticated host; plus WebFetch of the repository landing page"
+    },
+    {
+      "artifact": "data resource: SorGMDA, stated verbatim in Data availability as 'All metabolic traits and corresponding GWAS results can be accessed through SorGMDA ( https://www.depts.ttu.edu/igcast/SorbGMDA/index.php )'. Status: URL-present and live. Institutional PHP/MySQL search portal at Texas Tech University; no DOI, no version, no license, no documented bulk download or API. Note the path segment is 'SorbGMDA' while the resource is named 'SorGMDA' in the text.",
+      "http_status": "200 (unauthenticated GET, followed redirects)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with a browser UA from an unauthenticated host"
+    },
+    {
+      "artifact": "data accession (reused third-party): ArrayExpress/BioStudies E-MTAB-13406, stated verbatim as 'previously published RNA-Seq expression profiles (E-MTAB-13406) (Khan et al. 2024)'. Status: stated-in-paper, accession resolves. This is the only formal repository accession in the entire article, and it belongs to a prior publication, not to data generated here.",
+      "http_status": "200 (https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-13406, unauthenticated GET)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with a browser UA from an unauthenticated host"
+    },
+    {
+      "artifact": "data accession: raw untargeted UHPLC-MS and targeted PRM metabolomics data. Status: NONE. Full-text scan of the v2 JATS XML for MetaboLights|MTBLS|Metabolomics Workbench|ST[0-9]|MassIVE|GNPS|GEO|SRA|ENA|PRJ[A-Z]+[0-9]+|dbGaP|EGA|figshare|zenodo|dryad returns no identifier for the data generated in this study. The only accession-shaped strings in the article are E-MTAB-13406 (third-party, above) and the funding award numbers.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "Full-text scan of https://www.biorxiv.org/content/early/2025/12/31/2025.10.14.682411.source.xml (JATS XML, v2, fetched 200 OK via unauthenticated curl, 309,588 bytes; title-phrase check for 'sorghum grain' returned 5 hits, confirming correct paper)"
+    },
+    {
+      "artifact": "genotype data: 38,873,876 SAP SNPs used for mGWAS. Status: none-in-this-paper (citation only). The paper states 'Only the 38,873,876 SNPs from the 266 SAP accessions after filtering minor allele frequencies (>= 0.05) were used for mGWAS (Boatwright et al. 2022)' and elsewhere 'whole-genome resequencing of the SAP panel (Boatwright et al. 2022)'. No accession, no URL, no VCF version, no reference build for the call set is given in this article.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-28",
+      "network_context": "Full-text scan of the v2 JATS XML; the Boatwright et al. 2022 reference entry carries no data identifier either"
+    },
+    {
+      "artifact": "third-party software and resources cited WITH a version (recorded verbatim, not resolved): rMVP (v1.0.1), GEC v0.2, CMplot R package (v3.6.2), bestNormalize R package (v1.4.3), plantiSMASH web server (version 2.0-beta4), STRING v12.0, Cytoscape v3.10.1, R v4.3.1, BTx623 reference genome (v3.1), Phytozome v10. Cited WITHOUT any version: MSConvert, XCMS, CAMERA, HMDB, MassBank, ChemSpider, KEGG, GAPIT, Ensembl VEP, pROC, geneHapR, SKAT, ppcor, impute, ggplot2, MySQL, PHP.",
+      "http_status": "n/a (version strings recorded from prose; no resolution attempted at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "Verbatim extraction from the Methods section of the v2 JATS XML"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "supersedes_metric_version": null,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "03bf93d42485fbc98b316ce823e37db826f9988ea631dcae7d605e74f13c26a1",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

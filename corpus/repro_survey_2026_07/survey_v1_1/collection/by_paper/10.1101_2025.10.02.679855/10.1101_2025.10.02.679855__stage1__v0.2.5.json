@@ -1,0 +1,818 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "157d2533b2ae9ab4bca3058a3b8471715e3ce51da302f01de6f9e7cb8134c28a",
+  "canonical_id": {
+    "value": "10.1101/2025.10.02.679855",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.02.679855v1",
+      "biorxiv:2025.10.02.679855v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational multi-omics analysis of skeletal muscle from HCR/LCR rats and an HCR x LCR F2 cohort: RNA-Seq (Trimmomatic/STAR/QoRTs), ATAC-Seq and CUT&Tag (cta/bwa/samtools/picard/bedtools/MACS2/ataqv/chromVAR), RUVSeq+DESeq2 differential analysis, ChromHMM 12-state chromatin-state discovery and differential testing, RNA-Enrich/ChIP-Enrich/fgsea/clusterProfiler pathway enrichment with kappa-clustering reduction, peak-to-gene (Pk2G) correlation linking, GATK/bcftools SNP calling, picard/GATK/bcftools liftover plus IMPUTE5/SHAPEIT5 imputation, FST computation, MotifDb/FIMO/AME haplotype-aware motif analysis, and GEMMA + modified-eigenMT F2 eQTL/caQTL mapping.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation from the bioRxiv JATS Methods prose (fetched 2026-07-28 from biorxiv .source.xml; title phrase verified in the fetched text). Steps array contains the 38 computational (layer C) steps only; the 6 wet-lab steps (HCR/LCR breeding + exercise/dissection protocol, CUT&Tag nuclei isolation and library prep, ATAC-Seq nuclei isolation and library prep, RNA extraction and poly(A) library prep, NovaSeq/HiSeq sequencing, custom Affymetrix Axiom ~700k SNP genotyping of 613 F2 animals) are carried in counts.W and are out of scope for computational reproduction (gap #10). Only repo LANDING pages and README prose were read (stage 1); no workflow source was read line-by-line.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Pipeline orchestration and language environment: Snakemake (no version) used 'to create pipelines used throughout the analysis'; R v4.3.2 (2023-10-31) and Python v3.10.4; pipeline code NOT deposited ('All original code will be deposited at a Zenodo repository ... by the date of publication')",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "RNA-Seq adapter/quality trimming - Trimmomatic v0.36 TrimmomaticPE (ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads SLIDINGWINDOW:5:20)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "RNA-Seq alignment - STAR v2.7.6a-aekjdpr ('-c --outSAMtype BAM SortedByCoordinate') to Ensembl release v109 rn7 (mRatBN7.2)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "RNA-Seq gene count matrix - QoRTs QC --stranded (no version) with alignment GTF; 30,454 genes -> autosomal/expression filters -> 14,781 genes",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "ATAC-Seq / CUT&Tag adapter trimming - cta v0.1.2 (https://github.com/ParkerLab/cta); no arguments stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "ATAC-Seq / CUT&Tag alignment - bwa mem v0.7.15 ('-I 200,200,5000', '-M' for ATAC only) to Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz; samtools v1.13 sort and read-group merge",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Duplicate marking - picard MarkDuplicates v2.25.5 ('-ASSUME_SORTED true -VALIDATION_STRINGENCY LENIENT')",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Alignment filtering - samtools v1.13 view '-h -f 3 -F 4 -F 8 -F 256 -F 1024 -F 2048 -q 30' (properly paired autosomal MAPQ>30)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Custom rn7 blacklist creation (bespoke, 336 libraries from 56 rats): bedtools v2.30.0 makewindows 1kb/100bp bins + per-modality quantile normalization (broman::normalize, no version) + outlier rule -> 278 regions / 848 kb. Blacklist BED itself not stated as deposited",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Blacklist-region removal and BAM->BED conversion - bedtools v2.30.0",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Peak calling - MACS2 v2.2.4 callpeak; narrow (H3K27ac, H3K4me1, H3K4me3), broad (H3K27me3, H3K36me3), both for ATAC; '-g hs -B --keep-dup all -q 0.05' plus modality-specific '--SPMR -f BED --nomodel --shift -100/-37 --seed 762873 --extsize 200/73 --broad/--call-summits'",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "ATAC/CUT&Tag QC metrics - ataqv (no version), used downstream for latent-variable justification",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Consensus peak matrix construction and counting - majority-presence merge per line+sex+acute-exercise group; R plyranges reduce_ranges (no version) and chromVAR getCounts ('paired = FALSE, by_rg = FALSE, format = bam') (no version)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Latent variable discovery - RUVSeq (no version), 1-10 factors trialled, control features = DESeq p>0.1 across known contrasts (2,000-14,000+ controls); final factor count chosen by judgement across Figures S3-S4",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Differential analysis of RNA-Seq / ATAC-Seq / CUT&Tag counts - DESeq2 (no version), model specified only as 'Figure S4B'; FDR<0.01 & |log2FC|>0.5 (RNA/ATAC), FDR<0.1 & |log2FC|>0.5 (histone marks)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Chromatin state discovery - ChromHMM (no version), 200bp bins, 56 samples x 6 modalities (336 libraries), BAM downsampling to lowest depth, 2-20 state models assessed, 12-state model chosen and states manually renamed; custom rn7 chrom-size/coordinate/anchor files via GenomicFeatures + TxDb.Rnorvegicus.UCSC.rn7.refGene (no versions, files not deposited)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Chromatin state differential analysis - bespoke posterior-probability preparation (1,160,951 200bp regions), inverse rank normal transform with ties='random' (no seed), linear regression ~ Line + Sex + Acute Exercise Group, FDR<0.1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Gene set assembly - msigdbr (no version) for GOBP/GOMF/GOCC/KEGG + biomaRt (no version) against rnorvegicus_gene_ensembl v109; categories 10-500 genes; BH adjustment per database",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "Custom ChIP-Enrich rn7 locus definitions - published code at https://github.com/weitzela/custom-chipenrich-locus-defs commit e6ebc23 (README documents Rscript R/create-locus-defs.R and ships ready-made rn7 locus-defs); no renv.lock / DESCRIPTION version constraints / container",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Pathway enrichment on differential features - RNA-Enrich (transcriptomic) and ChIP-Enrich broadenrich (epigenomic), both without versions; inputs = DESeq p<0.05 peaks / linear-regression p<0.01 chromatin-state regions, nearest-TSS annotation; per-modality input counts stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "GSEA and over-representation on Pk2G target genes - fgsea::fgsea and clusterProfiler::enricher (no versions); genes ranked by correlation significance, background = all skeletal-muscle-expressed genes; input gene counts stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Gene-set redundancy reduction by kappa clustering - published R package at https://github.com/weitzela/reducekappa commit 04eb74d; pairwise kappa, min/max normalization, distance = 1 - kappa, hierarchical clustering method='average', cut height 0.7, representative = lowest p-value term. Installed via pak::pak (no lockfile, no version constraints, no releases/tags)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Peak-to-gene (Pk2G) correlation analysis and 4-tier direction consensus - limma::removeBatchEffect on DESeq VST counts (blind=FALSE), residualization by linear regression, 12,481,099 pairwise Spearman tests across 4 link types, FDR<0.05, then a bespoke 4-tier direction-assignment algorithm described in prose only",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C24",
+      "label": "SNP calling from HCR/LCR RNA-Seq BAMs - GATK v4.3.0.0 SplitNCigarReads / BaseRecalibrator / ApplyBQSR against founder-strain known variants; bcftools v1.12 mpileup '-Q 20 -I -a DP,AD -d 10000 -E' and call '-mv -a GQ'; GQ<35 -> missing, QUAL<20 or >50% missing removed, filtered to founder-population sites",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "F2 genotype liftover rn4->rn6->rn7 - picard v2.8.1 LiftoverVcf, rn6 mask from https://github.com/shwetaramdas/maskfiles (no commit pin), GATK v4.3.0.0 LiftoverVcf (--RECOVER_SWAPPED_REF_ALT false) bidirectional, bcftools v1.7 annotate (-x ID --set-id +'%CHROM_%POS') and view; 380,990 -> 375,220 autosomal SNPs",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Genetic map preprocessing - bespoke 4-step cleanup (contig!=chr removal, linear cM transformation, outlier removal, SD-weighted running-mean smoothing bin=500) of the published Jong et al. rn7 genetic map; 1,626 entries removed -> 149,209 positions; no code deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C27",
+      "label": "Genotype imputation - IMPUTE5 v1.2.0 (xcftools_static view -m 0.03125, imp5Chunker_v1.2.0_static, impute5_v1.2.0_static with Ne=52) and SHAPEIT5 v5.1.1 phase_common_static, against the Hermsen et al. reference panel; post-filter MAC>10 and posterior>0.97 in all samples",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "Fixation index (FST) computation between HCR and LCR reference allele frequencies with FST>0.3 threshold (163,767 variants); formula given as an equation image, no code",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C29",
+      "label": "Comparison of FST to epigenomic peak significance - linear regression (model given as equation image) with GC content, FPKM and variant location covariates; max-FST variant retained per feature",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C30",
+      "label": "Motif catalogue assembly - MotifDb (no version) query of cisbp/JASPAR/HOCOMOCO etc., filtered to TFs present in RNA-Seq, duplicate JASPAR versions dropped, redundancy removed via TFBSTools::PWMSimilarity (no version); 6,131 -> 1,962 motifs / 516 TFs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C31",
+      "label": "Canonical HCR/LCR sequence construction - reference allele replacement at variants with FST>0.3 and within-line ALT frequency >0.5, with a most-represented-combination rule for co-located SNPs; bespoke, no code",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C32",
+      "label": "Haplotype-aware PWM scans - FIMO v5.5.5 on HCR and LCR sequences extended +/-35bp around FST>0.3 variants; disrupted motif defined as delta FIMO -log10(p) > 1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "Differential motif enrichment - AME v5.5.5 '--control --shuffle scoring max' (shuffled background, no seed stated); per-modality FDR/log2FC input thresholds and territory-trimming to within ~1kb; global and allele-specific comparisons, top 10% of delta -log10(p) called differential",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C34",
+      "label": "F2 sample-swap detection - QTLtools v1.2 mbv against bidirectionally lifted F2 genotypes; '--filter-mapping-quality 255' for RNA-Seq BAMs only, n_het_covered>5 for ATAC; 1 RNA-Seq and 2 ATAC-Seq samples dropped at <63% heterozygous consistency",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "F2 ATAC-Seq consensus peak matrix construction - bespoke: narrow summits +/-150bp present in >=20% of male or female samples, high-scoring candidate region per overlap group; no code",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C36",
+      "label": "F2 sample outlier drop and normalization - DESeq2-style size factors as implemented in pyqtl (https://github.com/broadinstitute/pyqtl, no version or commit), zero-fill at half-minimum, log10, PCA, outliers chosen by 'visual inspection of the top 10 PCs' (non-deterministic human step); final n=147 RNA-Seq, n=132 ATAC-Seq",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C37",
+      "label": "F2 cis-eQTL and cis-caQTL scans - GEMMA v0.98.5 linear mixed model (full command given: -bfile -n -snps -lmm -k -o -c; kinship via -gk 1); TMM + inverse-normal-transform normalization, cis windows 1Mb TSS / 100kb peak centre, expression-PC covariate count chosen by maximizing eGenes/caPeaks (N=20 RNA, N=5 ATAC)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C38",
+      "label": "Multiple-testing adjustment - modified eigenMT at git commit c89bf4e of https://github.com/porchard/eigenMT (collapses perfect-LD variants before eigenvalue computation), full argument list given, then Benjamini-Hochberg across features at FDR 5%; lead variant chosen at random among LD-tied variants (no seed)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 36,
+    "n_X": 0,
+    "S": 38,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/38 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification); unexecuted; declared environment statically valid but not verified as the env that produced the results. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "RI ceiling on 2/38 computational steps (C19 custom-chipenrich-locus-defs @ commit e6ebc23; C22 reducekappa @ commit 04eb74d) - the only two steps where the authors' own code is actually public AND the inputs are the Zenodo-deposited processed result tables. The other 36/38 steps cap at NI, driven overwhelmingly by the Data axis: raw FASTQ/BAM 'will be deposited on NCBI GEO upon final submission' and count matrices / posterior-probability matrices / imputed genotypes / the Axiom panel 'will be publicly available ... by the date of publication', so at preprint time neither raw nor intermediate data exist for any upstream step. The main analysis code is likewise promised ('All original code will be deposited at a Zenodo repository ... by the date of publication') and is therefore absent, capping Code at 1 (reconstructable from prose) for third-party tool invocations and 0 for the ~14 bespoke steps (custom blacklist, consensus peak matrices, Pk2G tiering, genetic-map preprocessing, FST, canonical-sequence construction). About 20 tools carry exact prose version pins (Trimmomatic 0.36, STAR 2.7.6a-aekjdpr, cta 0.1.2, bwa 0.7.15, samtools 1.13, picard 2.25.5/2.8.1, bedtools 2.30.0, MACS2 2.2.4, GATK 4.3.0.0, bcftools 1.12/1.7, IMPUTE5 1.2.0, SHAPEIT5 5.1.1, FIMO/AME 5.5.5, QTLtools 1.2, GEMMA 0.98.5, R 4.3.2, Python 3.10.4) but ~15 R/Bioconductor packages and ChromHMM, ataqv, QoRTs, RUVSeq, DESeq2, msigdbr, biomaRt, MotifDb, TFBSTools, chipenrich, fgsea, clusterProfiler, pyqtl carry none, and no lockfile / container / conda environment is claimed anywhere - so version stays at 1 at best (exact_pins_partial, no closure). R-star is not assignable at stage 1 and, absent any declared environment capture, would not be reachable at stage 2 either.",
+    "coverage": "38 computational steps assessed from bioRxiv preprint Methods prose. 6 wet-lab steps counted in W and excluded from the computational-reproduction denominator. Repo evidence limited to landing pages / README prose for github.com/weitzela/custom-chipenrich-locus-defs, github.com/weitzela/reducekappa, and the Zenodo processed-data record; workflow source not read (stage 1).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Resource Availability -> 'Data and code availability'; all Snakemake pipelines and analysis scripts",
+      "missing": "Verbatim: 'All original code will be deposited at a Zenodo repository to be publicly available by the date of publication.' At preprint time no analysis-code repository exists. Snakemake is stated to have been used 'to create pipelines used throughout the analysis' but no Snakefile, config, or environment file is reachable. Only three small helper repositories are linked (weitzela/custom-chipenrich-locus-defs @ e6ebc23, weitzela/reducekappa @ 04eb74d, porchard/eigenMT @ c89bf4e).",
+      "how_to_close": "Deposit the Snakemake workflows and R/Python analysis scripts at the promised Zenodo DOI with a resolvable version, and cite that DOI (not a bare promise) in the availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Resource Availability -> 'Data and code availability'; every upstream computational step (C2-C17, C23-C38)",
+      "missing": "Verbatim: 'Raw (FASTQ files) and aligned (BAM files) sequencing data will be deposited on NCBI GEO upon final submission.' and 'The HCR/LCR posterior probability matrices, HCR/LCR and F2 count matrices, HCR/LCR and F2 imputed genotypes, and the F2 Affymetrix Axiom panel will be publicly available by uploading to appropriate database by the date of publication.' No GEO/SRA accession number appears anywhere in the preprint, so there is no sample-to-file correspondence and no input data for any step upstream of the deposited result tables.",
+      "how_to_close": "Register the GEO/SRA accession before or at preprint posting and publish a sample-to-run mapping table covering the 128 HCR/LCR + 147-150 F2 animals across RNA-Seq, ATAC-Seq and 5 CUT&Tag marks."
+    },
+    {
+      "type": 2,
+      "where": "'Data Analysis' and all downstream R-based sections",
+      "missing": "2a - no version recorded for ChromHMM, ataqv, QoRTs, Snakemake, RUVSeq, DESeq2, chromVAR, plyranges, GenomicRanges, GenomicFeatures, TxDb.Rnorvegicus.UCSC.rn7.refGene, limma, msigdbr, biomaRt, MotifDb, TFBSTools, chipenrich, RNA-Enrich, ChIP-Enrich, fgsea, clusterProfiler, broman, tidyverse, ComplexHeatmap, pyqtl. R 4.3.2 and Python 3.10.4 are pinned but no renv.lock, conda env, pixi.lock, container image or digest is claimed anywhere in the paper or in either author GitHub README.",
+      "how_to_close": "Ship renv.lock (R) + a conda/pixi lock or container digest (command-line tools, Python) alongside the promised Zenodo code deposit, and record the Bioconductor release used."
+    },
+    {
+      "type": 5,
+      "where": "'Custom Blacklist Creation for rn7 Genome'; 'ATAC-Seq and CUT&Tag Count Matrix Construction'; 'ATAC-Seq Count Matrix Construction for F2 Analysis'; 'Genetic Map Preprocessing'",
+      "missing": "Several derived artifacts that every downstream step depends on are described but not deposited: the 278-region / 848 kb custom rn7 blacklist BED, the consensus master peak sets per modality, the F2 consensus peak set, the preprocessed 149,209-position rn7 genetic map, and the custom rn7 ChromHMM chromosome-size/coordinate/anchor files. Only the custom ChIP-Enrich rn7 locus definitions are actually published (in the GitHub repo).",
+      "how_to_close": "Deposit the blacklist BED, consensus peak BEDs, preprocessed genetic map and ChromHMM support files as versioned files in the Zenodo record."
+    },
+    {
+      "type": 4,
+      "where": "C16 ChromHMM; C17 inverse-rank-normal transform (ties='random'); C33 AME --shuffle background; C38 random selection among LD-tied lead variants",
+      "missing": "Four stochastic steps with no random seed recorded. MACS2 is correctly seeded (--seed 762873), which makes the omission elsewhere clearly a reporting gap rather than a house style. ChromHMM random initialization, ties='random' rank normalization, AME shuffled-background scoring and the random representative-variant choice can only be matched distributionally.",
+      "how_to_close": "Record the seed (or the exact RNG state / software defaults) for ChromHMM, the rank-normalization call, AME, and the lead-variant tie-break."
+    },
+    {
+      "type": 6,
+      "where": "C15 DESeq2 differential model; C14 latent-variable selection; C16 chromatin-state model choice",
+      "missing": "The DESeq2 design formula is not written out in the Methods text - it is referenced only as 'the model specified in Figure S4B'. Latent-variable count selection is likewise delegated to Figures S3A-G and S4A/C-D plus a stated preference for 'the simpler model' when results are similar, and the 12-state ChromHMM choice rests on a visual log-likelihood judgement. These are analyst-judgement decision points externalized to supplementary figures.",
+      "how_to_close": "State the final design formulas and the chosen number of RUV factors per modality in machine-readable form (a config table) rather than in a figure."
+    },
+    {
+      "type": 7,
+      "where": "C36 F2 sample outlier drop",
+      "missing": "'Outliers were determined based on visual inspection of the top 10 PCs' - a non-scripted human decision embedded mid-pipeline. The final retained sample sets (147 RNA-Seq, 132 ATAC-Seq) are stated, but the exclusion list itself is not.",
+      "how_to_close": "Publish the explicit list of excluded sample IDs (and the PCA input matrix) so the drop is replayable without re-doing the visual judgement."
+    },
+    {
+      "type": 3,
+      "where": "C25 rn6 blacklist mask; C36 pyqtl; C5 cta",
+      "missing": "Three external code/resource dependencies are cited by bare repository URL with no commit or release pin: https://github.com/shwetaramdas/maskfiles (rn6 accessible-regions mask used to filter 380,990 -> lifted SNPs), https://github.com/broadinstitute/pyqtl (normalization implementation), and https://github.com/ParkerLab/cta (cta does carry a version string v0.1.2 but no commit). All three currently resolve HTTP 200 but are mutable HEAD references.",
+      "how_to_close": "Pin each external dependency to a commit SHA or tagged release, as the authors already did correctly for eigenMT (c89bf4e), reducekappa (04eb74d) and custom-chipenrich-locus-defs (e6ebc23)."
+    },
+    {
+      "type": 10,
+      "where": "6 wet-lab steps carried in counts.W",
+      "missing": "HCR/LCR selective-breeding generation-39 cohort with 6-week treadmill training and graded acute-exercise dissection timepoints; CUT&Tag nuclei isolation and 360 library reactions across 5 histone marks; ATAC-Seq nuclei isolation and transposition (custom protocol in Supplemental Protocol S1); Zymo Direct-zol RNA extraction and stranded poly(A) library prep; NovaSeq/HiSeq sequencing; custom Affymetrix Axiom ~700k SNP genotyping of 613 F2 animals. These are out of scope for computational reproduction and are not verdicted.",
+      "how_to_close": "n/a - wet-lab steps are OOS for Tier-1 computational readiness. The ATAC nuclei-isolation protocol is at least externalized to Supplemental Protocol S1 rather than left implicit."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (main analysis pipeline): NONE at preprint time. Verbatim: 'All original code will be deposited at a Zenodo repository to be publicly available by the date of publication.'",
+      "http_status": "n/a (no author analysis-code repository exists yet)",
+      "checked_at": "2026-07-28",
+      "network_context": "code availability prose parsed from biorxiv JATS .source.xml"
+    },
+    {
+      "artifact": "code repo (helper, author-owned): https://github.com/weitzela/custom-chipenrich-locus-defs, cited with commit e6ebc23; R scripts + ready-made rn7 locus-def files; no releases/tags, no license visible, deps listed in README prose only (pacman, tidyverse, GenomicRanges, gUtils, plyranges, biomaRt, chipenrich)",
+      "http_status": "200 OK (repo landing); commit e6ebc23 resolves 200 via GitHub API",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl + WebFetch, github.com / api.github.com"
+    },
+    {
+      "artifact": "code repo (helper, author-owned): https://github.com/weitzela/reducekappa, cited with commit 04eb74d; R package (R/, man/, vignettes/, DESCRIPTION, NAMESPACE), installed via pak::pak('weitzela/reducekappa'); LICENSE present, no releases/tags, no renv.lock or Dockerfile",
+      "http_status": "200 OK (repo landing); commit 04eb74d resolves 200 via GitHub API",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl + WebFetch, github.com / api.github.com"
+    },
+    {
+      "artifact": "code repo (third-party, modified by co-author): https://github.com/porchard/eigenMT, cited with git commit c89bf4e (LD-collapsing modification)",
+      "http_status": "200 OK (repo landing); commit c89bf4e resolves 200 via GitHub API",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, github.com / api.github.com"
+    },
+    {
+      "artifact": "code repo (third-party tool sources, unpinned): https://github.com/ParkerLab/cta (cta v0.1.2), https://github.com/broadinstitute/pyqtl, https://github.com/shwetaramdas/maskfiles (rn6 mask BED path)",
+      "http_status": "200 OK each (HEAD references, no commit pin)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "data accession: Zenodo 10.5281/zenodo.17245661 - 'Integrative multi-omics uncovers skeletal muscle enhancer programming of cardiorespiratory fitness', Dataset, v2 (2025-10-01), CC-BY-4.0, 24 files / 1.1 GB. PROCESSED RESULT TABLES ONLY (DESeq outputs for RNA-Seq/ATAC-Seq/5 histone marks, pathway enrichment, Pk2G correlation results, motif enrichment, F2 caQTL/eQTL results, gene and motif reference files) - contains no code and no raw or count-level data.",
+      "http_status": "200 OK via browser-agent fetch (bare curl returns 403 from the Zenodo bot shield)",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch via doi.org -> zenodo.org redirect"
+    },
+    {
+      "artifact": "data accession: NCBI GEO raw FASTQ + aligned BAM - NOT DEPOSITED, no accession stated. Verbatim: 'will be deposited on NCBI GEO upon final submission.'",
+      "http_status": "n/a (no accession number given in the paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "availability prose parsed from biorxiv JATS .source.xml"
+    },
+    {
+      "artifact": "data accession: count matrices, ChromHMM posterior-probability matrices, imputed genotypes, F2 Affymetrix Axiom panel - NOT DEPOSITED. Verbatim: 'will be publicly available by uploading to appropriate database by the date of publication.'",
+      "http_status": "n/a (no accession or repository named)",
+      "checked_at": "2026-07-28",
+      "network_context": "availability prose parsed from biorxiv JATS .source.xml"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "edf6284fb3cfd3dd6d163e859450fac2a37623637ef8988d20840874f1fdbc9d",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

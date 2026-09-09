@@ -1,0 +1,304 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.04.30.651387",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.04.30.651387v1",
+      "biorxiv:2025.04.30.651387v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Development and application of a Moraxella catarrhalis core-genome MLST (cgMLST) scheme (1,319 core genes) and a LIN code barcode classification, then whole-genome population-structure analysis of ~1,913 genomes: assembly + QC of DCHS and public reads, chewBBACA scheme construction, PubMLST/BIGSdb allele calling and cgST/LIN assignment, core-gene alignment and recombination-corrected ML phylogeny, minimum-spanning-tree / clustering-resolution (silhouette, ARI) analyses, ANI, pangenome openness (Heaps' law) and accumulation curves, functional (EggNOG/COG/KEGG) classification, and virulence-gene characterisation (uspA1/uspA2/uspA2H motif typing, bro/mcb detection, LOS/16S typing).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the Materials and Methods prose. bioRxiv JATS 'source.xml' endpoint served the wrong article (a caching collision returning 10.1101/2025.05.24.655935); Methods/Data/Code text was therefore extracted from the v1.full HTML instead, cross-checked against the biorxiv API abstract. Named GitHub repo (brueggemann-lab/pgl_cgmlst_2024) read at landing/README + file-tree prose level only (stage-1); no workflow source read line-by-line. Wet-lab isolate collection / DNA extraction / WGS captured as a single W-layer step (not counted in S).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: DCHS isolate collection (137 children), DNA extraction (Maxwell 16 Buccal Swab LEV kit; Qubit dsDNA HS quantification), and whole-genome sequencing (Illumina HiSeq X Ten, Wellcome Sanger Institute). Not computationally reproducible.",
+      "layer": "W",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 0 },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "DCHS genome assembly via Sanger-internal pipeline: VelvetOptimiser v2.2.5 + Velvet v1.2, scaffolding with SSPACE (unversioned), gap-filling with GapFiller (unversioned); best-N50 draft selected. Described as an 'internal pipeline' with no public code.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Assembly of public short reads: VelvetOptimiser v2.2.6 or SPAdes v3.15.3, k-mer sizes 21-133 bp.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Assembly QC (genome size, N50, contig count, GC): QUAST v5.3.0. Numeric acceptance thresholds not stated in prose.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Species confirmation via rMLST species tool implemented in PubMLST (53 ribosomal loci; 100% support required). Hosted web service, no local version.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Sequence-type (ST) assignment using the 8-locus M. catarrhalis MLST scheme (Enterobase / PubMLST). Hosted web service, no version pin.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "cgMLST scheme development with chewBBACA v3.3.1 (CreateSchema, AlleleCall, RemoveGenes, UniprotFinder, ExtractCgMLST, JoinProfiles; later PrepExternalSchema, SchemaEvaluator, AlleleCallEvaluator), default parameters; core = genes in >=95% of genomes.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Paralog filtering / uspA locus localisation via blastn v2.13.0 (BLAST+); >=80% identity and >=100 bp overlap removed as putative paralogs.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Allele assignment / cgST + LIN code implementation in PubMLST via BIGSdb 'sequence tagging' (90% min identity, 90% min alignment, blastn word size 20, 5% stop-codon length tolerance); LIN thresholds 1290/832/281/85/20/8/4/2/1/0. Hosted BIGSdb, unversioned.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Core-gene concatenated-sequence alignment with MAFFT v7.525 (missing alleles as gaps).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Polymorphic-site extraction with SNP-sites v2.5.1 (total alignment 175,014 bp).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "Maximum-likelihood phylogeny with IQ-TREE2 v2.2.6 (ModelFinder Plus, -m MFP+ASC ascertainment-bias correction, 1000 bootstrap replicates).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Recombination-corrected tree with ClonalFrameML v1.13; midpoint-rooted.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Tree visualisation with interactive Tree Of Life (iTOL) v7. Interactive/manual web visualisation, not scriptably reproducible from prose.",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Minimum-spanning tree from cgST allelic profiles with GrapeTree (unversioned).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Functional classification of core genes with EggNOG-mapper v2.1.12 -> COG categories -> KEGG BRITE grouping.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Average nucleotide identity across all genomes with ANIclustermap v1.2 (FastANI calculation mode, default parameters; github.com/moshi4/ANIclustermap).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Pairwise allelic-mismatch and silhouette-index clustering-resolution analysis with MSTclust v0.21b, default parameters (gitlab.pasteur.fr/GIPhy/MSTclust).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Clonal-complex assignment via global eBURST (SLV level) implemented in PHYLOVIZ v2.00; ARI concordance vs rST/ST/CC.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Pangenome-openness (Heaps' law alpha) from chewBBACA presence/absence matrix using R package micropan v2.1.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Pangenome / core-genome accumulation curves with PanGP v1.0 ('totally random' sampling, 10 repeats).",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "ORF identification in extracted uspA intergenic regions with ORF Finder v1.8.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C22",
+      "label": "uspA1/uspA2/uspA2H motif detection & classification (GGG/FAAG/CTER1/CTER2) with MAST from MEME Suite v5.5.6, default parameters.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Core-gene concatenation for downstream alignment/phylogeny via repository script concat_aln.py (github.com/brueggemann-lab/pgl_cgmlst_2024, Analysis/). Script present in repo but no interpreter/dependency pinning.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 21,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 23,
+    "W": 1,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/23 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 21 of 23 computational steps; 2 steps (C1 Sanger-internal assembly pipeline, C13 interactive iTOL visualisation) fall to NI in prose because they lack public code / scriptable specification. R★ not assignable at stage1. The paper pins exact versions for a majority of named tools (chewBBACA 3.3.1, BLAST+ 2.13.0, MAFFT 7.525, SNP-sites 2.5.1, IQ-TREE2 2.2.6, ClonalFrameML 1.13, QUAST 5.3.0, SPAdes 3.15.3, EggNOG-mapper 2.1.12, ANIclustermap 1.2, MSTclust 0.21b, PHYLOVIZ 2.00, micropan 2.1, PanGP 1.0, MEME 5.5.6, ORF Finder 1.8) but with NO environment closure: the linked repo (brueggemann-lab/pgl_cgmlst_2024) carries no environment.yml, conda-lock, renv.lock, DESCRIPTION, requirements.txt or container, and several web-hosted steps (PubMLST rMLST/MLST, BIGSdb tagging, iTOL) are unversioned. capture_claim='exact_pins_partial' -> stage2_candidate=true: a stage-2 pass could examine whether the partial exact pins are executable, but the ceiling stays RI absent a lockfile/container.",
+    "coverage": "23 computational steps + 1 wet-lab step assessed from the v1.full Methods prose, biorxiv-API abstract, and the GitHub repo landing/README/file-tree (prose only). Analysis data (assemblies + accessions) are hosted in PubMLST; the repo contains R figure scripts and one Python concatenation script, i.e. it covers figure/analysis-glue rather than the full assembly->scheme->phylogeny pipeline.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment (whole pipeline + repo brueggemann-lab/pgl_cgmlst_2024)",
+      "missing": "No environment.yml / conda-lock / renv.lock / DESCRIPTION / requirements.txt / Dockerfile / container digest anywhere in the repo (file tree: Analysis/concat_aln.py, Figures/*.md R code, README.md, LICENSE, pgl.png). ~16 tools carry exact version pins but there is no closure over their dependencies, R/Python interpreter versions, or OS.",
+      "how_to_close": "Ship a conda-lock/pixi.lock or a container image (with digest) capturing the full tool stack + R/Python environment for a declared platform; add a top-level manifest mapping each Methods tool to its locked version."
+    },
+    {
+      "type": 6,
+      "where": "Pipeline code coverage (assembly, chewBBACA runs, allele calling, phylogeny)",
+      "missing": "The Code-availability repo is 'adapted from' a pneumococcal codebase and shared across three manuscripts; it contains R figure scripts + one concatenation script but not the assembly (Velvet/SPAdes), QC (QUAST), chewBBACA module invocations, BIGSdb tagging config, MAFFT/SNP-sites/IQ-TREE2/ClonalFrameML command sets used for this study. Much of the pipeline is described in prose only.",
+      "how_to_close": "Deposit the actual driver scripts / command logs / config for each Methods stage (or a workflow: Snakemake/Nextflow) tied to this M. catarrhalis analysis, ideally in a M. catarrhalis-specific tagged release."
+    },
+    {
+      "type": 1,
+      "where": "Input / raw data provenance",
+      "missing": "Data availability points to PubMLST (assemblies + per-isolate accession numbers, Supplementary Data 1) but does not give a single consolidated SRA/ENA BioProject for the 1,447 DCHS raw-read sets; public reads are described 'as of March 2023' without a frozen accession list beyond supplementary tables.",
+      "how_to_close": "Provide a consolidated accession manifest (BioProject/SRA run list + PubMLST isolate IDs) as a versioned file so the exact input set is retrievable deterministically."
+    },
+    {
+      "type": 12,
+      "where": "Repository snapshot / citability",
+      "missing": "The paper cites a floating repo (github.com/brueggemann-lab/pgl_cgmlst_2024, default branch main, last push 2025-06-05) with no tagged release or Zenodo DOI for this manuscript; the repo is explicitly reused across three papers, so HEAD does not pin the state used here.",
+      "how_to_close": "Mint a tagged release + Zenodo archive DOI for the exact commit used in the M. catarrhalis analysis and cite that commit/DOI in the paper."
+    },
+    {
+      "type": 5,
+      "where": "Hosted-service determinism (PubMLST rMLST/MLST, BIGSdb sequence tagging, iTOL v7, Enterobase MLST)",
+      "missing": "Several steps depend on live web services (unversioned) whose allele/definition databases evolve over time; results can drift as PubMLST/Enterobase definitions are updated. No snapshot date/version of the definition databases is fixed beyond query dates.",
+      "how_to_close": "Record the PubMLST/BIGSdb scheme + database versions/dates used, and where possible provide an offline/exportable copy of the definitions to allow deterministic re-tagging."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/brueggemann-lab/pgl_cgmlst_2024 (R + Shell + Python; files Analysis/concat_aln.py, Figures/FIGURE_1..4.md + SF*.md, README.md, LICENSE, pgl.png; description 'Repository for the pneumococcal cgMLST typing scheme'; shared across MGen 2024 + two 2025 bioRxiv manuscripts incl. this one; default branch main; last push 2025-06-05; not archived; has LICENSE)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "GitHub REST API (gh), public repo"
+    },
+    {
+      "artifact": "data: PubMLST Moraxella database — https://pubmlst.org/organisms/moraxella-spp and https://pubmlst.org/bigsdb?db=pubmlst_moraxella_isolates (genome assemblies + per-isolate accession numbers; Supplementary Data 1)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "hosted BIGSdb resource cited as primary data availability; not verified via HTTP in stage1"
+    },
+    {
+      "artifact": "reference genome: M. catarrhalis CCRI-195ME complete genome, GenBank CP018059.1 (cgMLST reference)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "NCBI GenBank accession cited in Methods"
+    },
+    {
+      "artifact": "tool repos cited inline: github.com/moshi4/ANIclustermap (ANIclustermap v1.2), gitlab.pasteur.fr/GIPhy/MSTclust (MSTclust v0.21b), enterobase.warwick.ac.uk/species/index/mcatarrhalis (MLST)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "third-party tool sources, not this paper's deposited artifacts"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "c131859b09af219861580d2c4e6b1cb66ef71e444ae55a04dfdc6f488112c892",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

@@ -137,7 +137,7 @@ module KairosMcp
             begin
               record = spec.build_manifest(
                 operator: operator,
-                submission_key: 'dry-run-' + ('0' * 56),
+                submission_key: '0' * 64, # schema requires 64 hex; a prose placeholder made every dry_run report INVALID
                 server_fields: { 'trust_tier' => 'self_reported' }
               )
               checks['record_schema'] = 'ok'

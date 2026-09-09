@@ -1,0 +1,666 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "ebca3110cc65a85cf0ee09ee24489e7743a005d1f7edd66cecdc98817acdf9e0",
+  "canonical_id": {
+    "value": "10.64898/2025.12.11.693713",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The computational 3D-genome and chromatin analysis: Hi-C processing (BWA-MEM alignment to GRCh38, HiCExplorer matrix build/ICE correction, SpectralTAD TAD calling, Mustache loop calling, dcHiC A/B compartment analysis) and CUT&Tag processing (nf-core/cutandrun 3.2.2, SEACR peak calling, ChIPseeker annotation, deeptools signal analysis) starting from the deposited GEO series GSE312031 (Hi-C), GSE312029 (CUT&Tag) and GSE231761 (previously published RNA-seq), through to the TAD chromatin-state classification, loop-to-enhancer/promoter linking, compartment-transition and H3K27me3-redistribution results. iPSC culture, VSMC differentiation, in situ Hi-C library preparation, CUT&Tag bench protocol, DNA-FISH hybridization and immunofluorescence staining/imaging acquisition are wet-lab and out of scope. The Imaris DNA-FISH quantification and the CellProfiler EZH2 quantification are computational but their source microscopy images are not deposited anywhere, so they are scored as C-steps with data=0.",
+  "step_source": "prose-methods",
+  "funnel_stage": "stage1-prose-only",
+  "granularity_note": "Coarse step list built from Methods prose only (Stage-1 triage). No workflow file exists to anchor granularity because the paper deposits no code at all, so the rule is one step per named tool/analysis invocation. Repeated deeptools invocations serving distinct analytical purposes (multiBigwigSummary for TAD state, bamCoverage for tracks, computeMatrix/plotHeatmap for profiles, bigwigCompare for compartment log2 ratios) are kept as separate steps because their parameter completeness differs. Visualization is split into pyGenomeTracks (versioned) vs Juicebox/IGV (unversioned) so the version pin is not averaged away. The two image-quantification steps (Imaris, CellProfiler) are classified C rather than W: the quantification itself is computational, and classifying them OOS would hide the fact that the source images are undeposited. No repository landing page or README was read because the paper names no code repository; the only code URL in the whole article is https://github.com/lh3/bwa, cited as the tool's home page.",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "iPSC lines and culture — HGPS lines 0901C/0031C (Progeria Research Foundation, MTA-gated) and control lines BJ1C/AG1B (from corresponding author), Matrigel-coated plates in E8 medium",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "VSMC differentiation from iPSCs via embryoid bodies (Collagenase IV, low-attachment culture), passaged to P7 and P14",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "In situ Hi-C library preparation (biotin fill-in, streptavidin pull-down, Illumina TruSeq adapters) and NovaSeq 6000 150 bp paired-end sequencing to >500M read pairs (Donnelly Sequencing Centre, Toronto)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "CUT&Tag bench protocol with Drosophila spike-in (concanavalin A beads, pA-Tn5, listed antibodies for H3K27me3/H3K36me3/H3K27ac/CTCF/SMC1A/IgG) and NovaSeq 6000 100 bp paired-end sequencing (IRCM, Montreal)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "DNA-FISH probe design (OligoMiner principles, three color-coded pools per locus for PPARG and GJA1, sequences in Table S5), 3D-preserving co-denaturation hybridization, and 3D stack acquisition on a Zeiss AxioImager (100x/1.4 NA, ~50 z-slices, 0.20 um step)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W6",
+      "label": "EZH2 immunofluorescence staining in 96-well plates and high-content image acquisition (ImageXpress XLS, MetaXpress, 20x/0.75 NA, 1,000-4,000 cells per condition)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C1",
+      "label": "Hi-C read alignment to Homo sapiens GRCh38 primary assembly (from GENCODE, no release number stated) — BWA-MEM version 0.7.17-r1188 (https://github.com/lh3/bwa) with parameters '-A1 -B4 -E50 -L0 -t 20'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Hi-C contact matrix construction and merging — HiCExplorer hicBuildMatrix at 5 kb resolution, hicSumMatrix across replicates, hicConvertFormat for downstream format conversion; HiCExplorer is cited by reference [73] with NO version stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Hi-C matrix normalization and QC — HiCExplorer hicCorrectMatrix (Imakaev iterative correction / ICE) on 50 kb-binned matrices plus hicPlotDistVsCounts; no HiCExplorer version, no filterThreshold or other correction parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "TAD calling — SpectralTAD version 1.18.0 at 100 kb resolution with Vanilla-Coverage (VC) normalization; window size, z_clt, qual_filter and other SpectralTAD arguments not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "TAD chromatin-state classification — deeptools version 3.5.0 multiBigwigSummary BED-file over H3K27ac/H3K36me3/H3K27me3 signal across TADs, then a custom rule assigning each TAD to the histone mark with highest peak signal contingent on that signal being in the top 25% of its distribution ('other TAD' otherwise); the classification script is not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited",
+        "custom-rule-prose-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "TAD property analysis by chromatin state — TAD sizes, gene density via bedtools version 2.31.0 intersect, and gene expression via TPM counts from RNA-seq GSE231761; Mann-Whitney-Wilcoxon with adjusted p < 0.05. bedtools intersect flags not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "TAD chromatin-state transition analysis for TADs with identical coordinates (Control vs HGPS; P7 vs P14), visualized as alluvial plots with the R package ggalluvial — no ggalluvial version, no R version, no matching/plotting parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Chromatin loop calling and differential loop detection — Mustache version 1.2.0 at 5 kb resolution; -pt sparsity/threshold and distance arguments not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Loop anchoring to promoters (defined as 1 kb upstream of genes) and GeneHancer enhancers — R package LoopRig version 0.1.1 (10.32614/CRAN.package.LoopRig) LinkedElements function; GeneHancer release/version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited",
+        "reference-db-unpinned"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Differential-expression filtering of genes under differential E-P loops (log2 fold change > 0, adjusted p < 0.05, HGPS vs control) from the RNA-seq data, with Mann-Whitney-Wilcoxon significance testing; the DE-calling tool and its version are not named in this paper (the RNA-seq is from prior work GSE231761)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated",
+        "externalized-to-prior-study"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Gene Ontology and KEGG pathway enrichment of genes under differential E-P loops — g:Profiler web server; no g:Profiler version, no query date, no KEGG release, no significance threshold or background gene set stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated",
+        "web-service-mutable"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "A/B compartment and differential compartment identification — dcHiC version 2.1 at 50 kb resolution with default parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Compartment-transition classification (A-to-B / B-to-A by compartment-score sign change; A-to-A / B-to-B further split by score strength) and overlap with RNA-seq TPM at 50 kb bins, Wilcoxon signed-rank p < 0.05, alluvial visualization; no tool or version named for the gene-to-bin overlap or the plotting",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated",
+        "custom-rule-prose-only"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "H3K27me3 log2 ratio (HGPS vs control) at compartment-switch regions and global B-compartment enrichment — deeptools version 3.5.0 bigwigCompare and multiBigwigSummary, Mann-Whitney-Wilcoxon p < 0.05; bin size and pseudocount not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "CUT&Tag primary processing (trimming, alignment, spike-in normalization, QC) — nf-core cutandrun pipeline version 3.2.2, cited with doi 10.5281/zenodo.5653535; the Nextflow version, the execution profile (docker/singularity/conda), the genome/spike-in params and any custom config are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited",
+        "externalized-subpipeline",
+        "concept-doi-not-version-doi"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "CUT&Tag peak calling — SEACR (Sparse Enrichment Analysis for CUT&RUN) version 1.3 with the full parameter string 'target.bedgraph IgG.bedgraph norm stringent output'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Merging of replicate peaks into a per-sample consensus peak set — bedtools version 2.31.0; the exact subcommand and flags (merge? multiinter? minimum replicate support?) are not stated, only 'merged into a consensus set of peaks per sample'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Genomic distribution and annotation of H3K27me3, H3K36me3 and H3K27ac peaks — ChIPseeker version 1.38.0; TxDb/annotation package, TSS region window and R version not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited",
+        "reference-db-unpinned"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "CUT&Tag bigWig signal track generation — deeptools version 3.5.0 bamCoverage with RPGC normalization; bin size and effective genome size not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Signal enrichment profiles of CTCF at TAD and loop boundaries, and of H3K27me3 across gene bodies — deeptools version 3.5.0 computeMatrix and plotHeatmap; no mode (reference-point vs scale-regions), no flank/body window sizes, no bin size, no sorting or scaling options stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Integrated genome-browser figures of A/B compartments, TADs, loops and histone-mark/protein bigWig tracks — pyGenomeTracks version 3.9; the tracks .ini configuration file and the plotted coordinates ('regions of interest') are not provided",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Hi-C contact-map visualization of differential loops at genes of interest — Juicebox 'Observed vs Control' at 5 kb with maps split across the diagonal; plus manual inspection of A/B compartment vs H3K27ac/H3K27me3 signal tracks in IGV. Neither Juicebox nor IGV carries a version, and the IGV step is explicitly manual inspection used to validate the compartment calls",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "no-code-deposited",
+        "tool-version-unstated",
+        "manual-inspection-step"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "3D DNA-FISH image quantification — Imaris (no version, commercial): nucleus and FISH-focus surface segmentation by intensity threshold with size filtering, centroid-to-centroid distances among Regions 1/2/3, focus-to-nuclear-centroid/boundary distances, inter-allelic distances; ~300 cells per condition. The microscopy z-stacks are not deposited in any repository (GEO holds only the sequencing data) and the thresholds are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "source-images-not-deposited",
+        "proprietary-tool",
+        "tool-version-unstated"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "EZH2 immunofluorescence quantification — CellProfiler 4.2.8: per-image background subtraction, Hoechst-based nuclear segmentation, integrated intensity per nucleus, fields pooled per condition. The .cppipe pipeline is not deposited and the source high-content images are not deposited in any repository",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "source-images-not-deposited",
+        "no-code-deposited"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 13,
+    "n_NI": 9,
+    "n_X": 2,
+    "S": 24,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/24 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Unexecuted; declared environment statically valid but not verified as the env that produced the results. Under-claims by construction: Stage-1 cannot credit an undeclared-but-present dependency, and has_validated_env_capture=false so this ratio is a ceiling artefact, not a per-paper score. In this paper the zero is additionally structural rather than merely procedural: no analysis code is deposited anywhere, so the Code axis cannot exceed 1 on any step and R-star is unreachable even at Stage 2. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "13/24 (54%) readiness upper bound at the Stage-1 RI ceiling ((n_R-star + n_RI)/|S| with n_R-star forced to 0). Never read as 'reproducible'. Nine steps fall to NI, six of them purely because a named tool carries no version (HiCExplorer for all Hi-C matrix construction and ICE correction, ggalluvial, g:Profiler, Juicebox, IGV) and three because operative parameters are absent (deeptools computeMatrix/plotHeatmap windows, the pyGenomeTracks .ini and plotted coordinates, the compartment-transition overlap rule). Two image-quantification steps are X because the source microscopy images are not deposited in any repository.",
+    "coverage": "24 computational steps scored from Methods prose; 6 wet-lab steps recorded as OOS and excluded from |S|. Computational coverage |S|/(|S|+|W|) = 24/30 (80%). No code repository exists to read at Stage 2; supplementary tables (including Table S5, the FISH oligo order sheet) were not retrieved.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "whole paper - every computational step C1-C24",
+      "missing": "12 - no analysis code is deposited or linked. The article carries a Data availability statement ('All genomics data are available via GEO: CUT&Tag datasets (GSE312029), Hi-C datasets (GSE312031), and as well as previously published RNA-seq datasets (GSE231761)') but NO Code availability statement, no GitHub/GitLab/Zenodo/Software Heritage repository, and no supplementary code file. The only code URL in the entire article is https://github.com/lh3/bwa, cited as the BWA tool home page, not as author code. Consequently the Code axis is capped at 1 (reconstructable from prose) for every step, and the bespoke logic - the top-25% TAD chromatin-state classification rule, the TAD-transition matching, the compartment-transition sign/strength classification, the gene-to-50kb-bin overlap, and every statistical script - exists only as prose description.",
+      "how_to_close": "Deposit the Hi-C, CUT&Tag and downstream R/Python analysis scripts in a public repository with a tagged release or Zenodo DOI, and add a Code availability statement pointing at it."
+    },
+    {
+      "type": 2,
+      "where": "C2, C3 (HiCExplorer), C7 (ggalluvial), C10 (DE-calling tool), C11 (g:Profiler), C13 (overlap/plotting), C22 (Juicebox, IGV); also no R version and no Python version anywhere in the article",
+      "missing": "2a - no version recorded for a set of load-bearing tools. HiCExplorer is the workhorse for all Hi-C matrix construction, merging, format conversion and ICE correction and is cited only by reference [73] with no version, which alone drags two steps to NI. ggalluvial, the DE-calling step, Juicebox and IGV are likewise named without versions. g:Profiler is a web server with no version and no query date, so its underlying GO/KEGG snapshot is unrecoverable. No R interpreter version and no Python interpreter version is stated anywhere.",
+      "how_to_close": "State the HiCExplorer version and subcommand arguments, the R and Python interpreter versions, the ggalluvial/Juicebox/IGV versions, and the g:Profiler version plus query date."
+    },
+    {
+      "type": 2,
+      "where": "whole paper - software environment",
+      "missing": "2a/env-closure - the versioned tools do carry exact prose pins (BWA-MEM 0.7.17-r1188, nf-core/cutandrun 3.2.2, SEACR 1.3, bedtools 2.31.0, ChIPseeker 1.38.0, deeptools 3.5.0, SpectralTAD 1.18.0, Mustache 1.2.0, LoopRig 0.1.1, dcHiC 2.1, pyGenomeTracks 3.9, CellProfiler 4.2.8), but they are scattered prose with no interpreter+channel+platform closure. There is no lockfile, no conda environment.yml, no renv.lock, no Dockerfile, no container digest, no sessionInfo output, and no repository in which such a file could live. The single occurrence of the substring 'conda' in the article is inside 'concanavalin A', not a conda environment.",
+      "how_to_close": "Ship a conda-lock / renv.lock / digest-pinned container declaring the interpreters, the CRAN/Bioconductor/conda channels and the platform, alongside the deposited scripts."
+    },
+    {
+      "type": 6,
+      "where": "C15 - CUT&Tag primary processing",
+      "missing": "6 - the entire CUT&Tag primary pipeline is externalized to 'the nf-core cutandrun pipeline version 3.2.2 (doi: 10.5281/zenodo.5653535)'. The version is pinned in prose, but the cited DOI is the nf-core/cutandrun CONCEPT DOI (it currently redirects to zenodo record 10606804), not a version-specific DOI, so the DOI alone does not pin the release. The Nextflow version, the execution profile (docker / singularity / conda), the -c custom config, the reference genome parameters and the spike-in genome used are all unstated, so the pipeline's own container/conda declarations cannot be tied to a specific realized environment.",
+      "how_to_close": "Cite the version-specific Zenodo DOI for cutandrun 3.2.2, state the Nextflow version and the execution profile, and deposit the params.yaml / nextflow.config actually used."
+    },
+    {
+      "type": 13,
+      "where": "C1 (GRCh38 from GENCODE), C9 (GeneHancer), C11 (KEGG via g:Profiler), C18 (ChIPseeker annotation database)",
+      "missing": "13 - external reference resources are named but not pinned. 'Homo sapiens GRCh38 primary assembly (from GENCODE)' has no GENCODE release number and no URL. GeneHancer is cited by reference [80] with no release version. The KEGG snapshot behind the g:Profiler query has no version or date. The TxDb/OrgDb annotation package behind ChIPseeker is not named. Because no workflow exists to read, env_capture_class cannot be assigned A/B/C and is left n/a per the Stage-1 rule; on prose alone all four look like prose-pin-only or worse.",
+      "how_to_close": "State the GENCODE release (e.g. GRCh38 primary assembly, GENCODE vNN) with its download URL, the GeneHancer version, the g:Profiler/KEGG query date, and the annotation package version; better, fetch them inside a deposited download rule."
+    },
+    {
+      "type": 11,
+      "where": "C23 (Imaris), and the acquisition-side MetaXpress in W6",
+      "missing": "11 - Imaris (Bitplane, commercial) is used for all 3D DNA-FISH quantification with no version stated and with segmentation thresholds described only qualitatively ('intensity thresholds with size filtering', 'local background subtraction and a minimum-size filter'). A commercial tool without a version pin scores version=0, and the GUI-driven session leaves no reusable artifact. MetaXpress controls the high-content acquisition on the immunofluorescence side.",
+      "how_to_close": "State the Imaris version and export the Imaris analysis settings/batch parameters; or reimplement the segmentation in an open tool and deposit the script."
+    },
+    {
+      "type": 12,
+      "where": "C23, C24 - source microscopy images",
+      "missing": "12/data-side - the DNA-FISH 3D z-stacks (~300 cells per condition) and the high-content EZH2 immunofluorescence images (1,000-4,000 cells per condition) are not deposited in any repository. The Data availability statement covers only the three GEO sequencing series. With neither the images nor the quantification pipeline available, both image-quantification steps are unrecoverable and score X rather than NI.",
+      "how_to_close": "Deposit the raw image stacks in an image repository (BioImage Archive / IDR / Zenodo) and deposit the CellProfiler .cppipe pipeline and the Imaris settings."
+    },
+    {
+      "type": 10,
+      "where": "W1-W6",
+      "missing": "10 - iPSC culture, VSMC differentiation, in situ Hi-C library preparation, the CUT&Tag bench protocol, DNA-FISH hybridization and immunofluorescence staining/imaging are wet-lab; they are recorded as OOS and excluded from the computational denominator. Note separately that the biological material is access-gated: HGPS lines 0901C and 0031C require an MTA with the Progeria Research Foundation, and control lines BJ1C and AG1B are available only from the corresponding author.",
+      "how_to_close": "Not applicable - wet-lab is outside NASEM 2019 reproducibility scope for this survey. The MTA/author-request gating is recorded as context for any replication attempt, not as a computational-reproducibility penalty."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Code repository: NONE. There is no Code availability statement in the article. The Data availability statement reads verbatim: 'All genomics data are available via GEO: CUT&Tag datasets (GSE312029), Hi-C datasets (GSE312031), and as well as previously published RNA-seq datasets (GSE231761).' A full-text scan of the JATS XML for github/gitlab/bitbucket/zenodo/software-heritage found exactly one code-hosting URL, https://github.com/lh3/bwa, cited in Methods as the BWA tool home page, and one Zenodo DOI, 10.5281/zenodo.5653535, cited as the nf-core/cutandrun pipeline DOI. Neither is author code.",
+      "http_status": "n/a (no author repository stated)",
+      "checked_at": "2026-07-28",
+      "network_context": "determined from the fetched JATS XML only; per protocol, no web search was performed to find a repository the paper does not state"
+    },
+    {
+      "artifact": "CUT&Tag data accession, stated verbatim in the Data availability statement: 'CUT&Tag datasets (GSE312029)'. Resolves on GEO with Status 'Public on Dec 04, 2025', Title 'Spatiotemporal remodeling of chromatin topology architecture and H3K27me3 redistribution underlies vascular pathology in Hutchinson-Gilford progeria syndrome', Organism Homo sapiens, Experiment type 'Genome binding/occupancy profiling by high throughput sequencing'.",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE312029, unauthenticated"
+    },
+    {
+      "artifact": "Hi-C data accession, stated verbatim in the Data availability statement: 'Hi-C datasets (GSE312031)'. Resolves on GEO with Status 'Public on Dec 04, 2025', same title, Organism Homo sapiens, Experiment type 'Other'.",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE312031, unauthenticated"
+    },
+    {
+      "artifact": "Previously published RNA-seq accession, stated verbatim in Methods ('RNA-seq data are deposited in GEO (GSE231761)') and in the Data availability statement. Resolves on GEO with Status 'Public on Mar 07, 2024', Title 'Progeria-based vascular model identifies networks associated with cardiovascular aging and disease', Organism Homo sapiens, Experiment type 'Expression profiling by high throughput sequencing'. Used in this paper as TPM counts and as a differential-expression source.",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE231761, unauthenticated"
+    },
+    {
+      "artifact": "Third-party pipeline cited in Methods with a version and a DOI: 'the nf-core cutandrun pipeline version 3.2.2 (doi: 10.5281/zenodo.5653535)'. The DOI resolves, but to https://zenodo.org/records/10606804, i.e. the concept (all-versions) DOI redirecting to the current latest record; the landing page offers nf-core/cutandrun-3.2.2.zip. The version pin therefore comes from the prose string '3.2.2', not from the DOI itself.",
+      "http_status": "200 (redirect chain to zenodo.org/records/10606804)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L to https://doi.org/10.5281/zenodo.5653535, unauthenticated"
+    },
+    {
+      "artifact": "Third-party tool URL cited in Methods: 'BWA-MEM version 0.7.17-r1188 (https://github.com/lh3/bwa)'.",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L, unauthenticated"
+    },
+    {
+      "artifact": "Cell lines, stated verbatim in Methods: 'Cell lines 0901C and 0031C are available from the Progeria Research Foundation under an MTA; BJ1C and AG1B are available from the corresponding author (WLS).' Access-gated wet-lab material, recorded for context only.",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-28",
+      "network_context": "not fetched; recorded verbatim from the article"
+    },
+    {
+      "artifact": "Paper source, JATS XML: https://www.biorxiv.org/content/early/2025/12/15/2025.12.11.693713.source.xml (232,651 bytes). Title/phrase check performed before scoring: 'chromatin topology architecture' and 'Hutchinson-Gilford' both present in the fetched XML.",
+      "http_status": "200 (via curl with browser UA; WebFetch returned 403 Forbidden)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L with a browser User-Agent into the per-paper scratch dir /tmp/stage1_10.64898_2025.12.11.693713/paper.xml"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "5199d82b9a087d2e94886927c75b88e694192806e819eb9e19a6e043532bb3a8",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

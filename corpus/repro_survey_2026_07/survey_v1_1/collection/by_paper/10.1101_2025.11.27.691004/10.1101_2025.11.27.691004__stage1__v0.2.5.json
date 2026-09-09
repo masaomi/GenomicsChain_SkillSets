@@ -1,0 +1,462 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "de96b679725e6e7407291ca60c44f80c5f89c246062505d5e5d0c6b97ca1d09c",
+  "canonical_id": {
+    "value": "10.1101/2025.11.27.691004",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.27.691004v1",
+      "biorxiv:2025.11.27.691004v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Secondary computational analysis of newly generated mouse RNA-seq (liver, adipose) and STAT5B/H3K27ac ChIP-seq from STAT5B SH2-domain knock-in mutant mice (Y665F, Y665H), plus re-analysis of two published liver RNA-seq datasets (STAT5B-CA GSE196015, STAT5A/B-KO GSE103885). Computational target: read trimming (Trimmomatic), RNA-seq alignment (STAR, mm10) and counting (HTSeq), differential expression (DESeq2 in R 4.2.3 / Bioconductor) with RUVSeq confounder removal, GSEA and Metascape enrichment, dplyr/ggplot2 figures, custom shiny heatmap helper package; secondary mm9 re-analysis with STAR + featureCounts + edgeR; ChIP-seq alignment (Bowtie 1.3.1 -m 1), Picard dedup, Homer/deepTools coverage, MACS2 peak calling, IGV visualization; and GraphPad Prism ANOVA on wet-lab phenotype measurements. Mouse line generation, husbandry/diet, phenotyping, histology, RNA/chromatin preparation and NovaSeq sequencing are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the bioRxiv JATS XML full text (WebFetch returned HTTP 403; XML retrieved via curl with a browser user-agent, 219 KB, 200 OK). The paper has a 'Data Availability' section (GEO accessions) but NO code availability statement. The only code URL anywhere in the paper is https://github.com/Ye1203/Heatmap_shinyapp, cited as 'a custom heatmap helper package' for figure heatmaps only; its README prose was read at Stage 1 (it names pheatmap 1.0.12 and says to contact the author 'including how to build the environment with renv', but the repository contains no renv.lock, no tag and no release). No analysis code for alignment, counting, differential expression, enrichment or peak calling is provided anywhere. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "RNA-seq read quality control / trimming with Trimmomatic (version 0.36) — no trimming parameters or adapter file stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "RNA-seq alignment with STAR (version 2.7.11b) in paired-end mode to mouse genome release mm10",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Raw read counting with HTSeq (0.9.1) — no annotation GTF release, counting mode or strandedness setting stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Differential expression with DESeq2 under R (version 4.2.3) and Bioconductor — R is pinned but DESeq2 and Bioconductor carry no version; thresholds stated (pre-filter >=10 reads total, |log2FC|>1, Benjamini-Hochberg pAdj<0.05)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Confounding-factor removal with the RUVSeq package — no version, no RUV variant (RUVg/RUVs/RUVr), no k, no control-gene set stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Gene set enrichment analysis (GSEA, https://www.gsea-msigdb.org/gsea/index.jsp) — no software version, no MSigDB collection/version, no ranking metric or permutation settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "Metascape enrichment analysis (https://metascape.org) — hosted web service, no version/date-of-access, no input gene-list definition or thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "Figure visualization with dplyr and ggplot2 — no package versions, no plotting scripts provided",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Heatmaps prepared with a custom heatmap helper package (https://github.com/Ye1203/Heatmap_shinyapp; README names pheatmap 1.0.12) — repository is public but has no tag, release or commit pin cited, and no heatmap parameters (scaling, clustering, distance) are stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Secondary liver RNA-seq re-analysis ('analyzed as described elsewhere'): STAR alignment to mm9 (NCBI 37) + featureCounts collapsed-exon counting against a published 75,798-gene mm9 GTF — no versions for STAR, featureCounts or the GTF file itself",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Sex-biased differential expression with edgeR (|log2FC|>1, pAdj<0.05) for WT male vs WT female liver comparison — no edgeR version, no dispersion/test method (exactTest vs glmQLFit) stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "ChIP-seq read quality filtering with Trimmomatic (version 0.36) — no trimming parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "ChIP-seq alignment with Bowtie (version 1.3.1) using parameter '-m 1' to keep only uniquely mapped reads, reference genome mm10",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Duplicate removal with Picard tools (version 2.9.2) — subcommand and options not named, but the operation is unambiguous",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "bedGraph generation and coverage normalization with Homer (version 4.10.4) and deepTools (version 3.5.4); reads normalized to 10 million per sample, background signal <2 eliminated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "ChIP-seq peak calling with MACS2 over input control — no version, no q/p-value cutoff, no effective genome size or broad/narrow mode stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Track visualization with Integrative Genomics Viewer (version 2.3.98)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Statistical analysis of phenotype/biochemical measurements with PRISM GraphPad (version 10.1.1), 1-way or 2-way ANOVA multiple comparisons — underlying per-animal measurement tables are not deposited and the tool is closed-source GUI software",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 12,
+    "n_X": 1,
+    "S": 18,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 5/18 computational steps (C2 STAR 2.7.11b, C13 Bowtie 1.3.1 '-m 1', C14 Picard 2.9.2, C15 Homer 4.10.4 + deepTools 3.5.4, C17 IGV 2.3.98) - all reach RI only because the tool version is exactly pinned in prose AND at least one operational parameter is stated. 12/18 steps cap at NI: either the tool has no version pin (DESeq2, RUVSeq, GSEA, Metascape, dplyr/ggplot2, secondary STAR/featureCounts, edgeR, MACS2) or the version is pinned but no parameters at all are given (Trimmomatic x2, HTSeq, heatmap package). 1/18 step is X (C18, GraphPad Prism ANOVA: underlying per-animal phenotype measurements are not deposited and the software is closed-source GUI). There is NO code availability statement and no analysis-pipeline repository; the only code URL in the paper is a peripheral shiny heatmap helper app. No lockfile, container digest or conda spec is claimed, so no step could exceed RI even under stage 2.",
+    "coverage": "18 computational steps assessed from the bioRxiv v1 JATS XML Methods prose (RNA-seq processing/DE/enrichment/visualization, secondary published-dataset re-analysis, ChIP-seq processing/peak calling/visualization, and GraphPad statistics). 6 wet-lab step groups counted in W but out of computational-reproduction scope: knock-in mouse line generation, husbandry/diet and in vivo phenotyping, serum/liver biochemical assays, histology and microscopy, RNA extraction + TruSeq library prep + NovaSeq 6000 sequencing, chromatin immunoprecipitation + NEBNext library prep + NovaSeq 6000 sequencing.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Whole analysis pipeline (no Code Availability section exists in the paper)",
+      "missing": "No analysis code is provided for read processing, alignment, counting, differential expression, RUVSeq correction, enrichment analysis, ChIP-seq processing or peak calling. The only code URL in the entire manuscript is https://github.com/Ye1203/Heatmap_shinyapp, a peripheral shiny app used to draw figure heatmaps.",
+      "how_to_close": "Publish the actual analysis scripts/workflow (shell pipelines, R scripts for DESeq2/RUVSeq/edgeR, MACS2 invocations, figure code) in a public repository with a tagged release or Zenodo DOI, and add a Code Availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Whole software environment (R/Bioconductor stack and command-line NGS stack)",
+      "missing": "No environment lockfile, container image/digest, conda environment file or renv.lock is claimed anywhere. The cited heatmap repository's README mentions renv only as something to request from the author by email; the repository itself contains no renv.lock.",
+      "how_to_close": "Ship a conda-lock/pixi lockfile or a container digest pinning the full stack (Trimmomatic, STAR, HTSeq, Bowtie, Picard, Homer, deepTools, MACS2, R + DESeq2/RUVSeq/edgeR/ggplot2/dplyr/pheatmap), and commit renv.lock to the heatmap repository."
+    },
+    {
+      "type": 3,
+      "where": "C4, C5, C6, C7, C8, C10, C11, C16 (DESeq2, Bioconductor, RUVSeq, GSEA, Metascape, dplyr, ggplot2, secondary STAR/featureCounts, edgeR, MACS2)",
+      "missing": "No version pins. R itself is pinned at 4.2.3 but every R package used for the actual statistics is unversioned, and MACS2/GSEA/Metascape/featureCounts carry no version or access date. These steps cannot exceed NI.",
+      "how_to_close": "Add a versions table naming every package and web service with exact version (and, for hosted services such as Metascape, the access date and the underlying annotation release)."
+    },
+    {
+      "type": 1,
+      "where": "C1, C3, C5, C6, C7, C9, C12, C16 (Trimmomatic, HTSeq, RUVSeq, GSEA, Metascape, heatmap app, MACS2)",
+      "missing": "Key invocation parameters are absent: Trimmomatic has no adapter file or clipping/quality settings (stated twice, for RNA-seq and ChIP-seq); HTSeq has no GTF release, counting mode or strandedness; RUVSeq has no RUV variant, k, or control-gene set; GSEA has no MSigDB collection/version, ranking metric or permutation count; MACS2 has no significance cutoff, effective genome size or broad/narrow mode; the heatmap app has no scaling/clustering/distance settings.",
+      "how_to_close": "Record the full command lines (or the scripts) for each tool, including annotation files and their releases."
+    },
+    {
+      "type": 4,
+      "where": "C1-C3 and C10 (reference genome and annotation)",
+      "missing": "Genome builds are named (mm10 for the primary analyses, mm9/NCBI37 for the secondary re-analysis) but no specific assembly source/patch release, no STAR index build parameters, and no versioned GTF file are given; the 75,798-gene mm9 GTF is only cited to another publication.",
+      "how_to_close": "Give the exact FASTA/GTF download URLs with release numbers and checksums, and deposit the custom mm9 GTF file itself."
+    },
+    {
+      "type": 6,
+      "where": "C18 (GraphPad Prism statistics on wet-lab phenotype measurements)",
+      "missing": "The per-animal source measurements underlying the ANOVA comparisons (body/liver weights, serum and hepatic lipid and cholesterol measurements, histology quantification) are not deposited in any repository; only summary figures are shown. The analysis also runs in closed-source GUI software with no script.",
+      "how_to_close": "Deposit the per-animal source-data tables (e.g., as supplementary spreadsheets or on Zenodo) and provide the statistical analysis as a script."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab steps (W = 6)",
+      "missing": "Knock-in mouse line generation, husbandry/diet and phenotyping, biochemical assays, histology/microscopy, RNA extraction + TruSeq library prep + NovaSeq sequencing, and chromatin immunoprecipitation + NEBNext library prep + NovaSeq sequencing are physical steps, out of scope for computational reproduction; counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; the GEO-deposited raw sequencing data (GSE310018 umbrella; GSE309954, GSE310017, GSE309955) is the reproducible computational entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession: GEO GSE310018 (SuperSeries, RNA-seq + ChIP-seq generated in this study) - stated in paper, URL resolvable",
+      "http_status": "200 OK - 'Status Public on Feb 12, 2026'",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "data accession: GEO GSE309954 (ChIP-seq) - stated in paper",
+      "http_status": "200 OK - 'Status Public on Feb 12, 2026'",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "data accession: GEO GSE310017 (RNA-seq, liver) - stated in paper",
+      "http_status": "200 OK - 'Status Public on Feb 12, 2026'",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "data accession: GEO GSE309955 (RNA-seq, adipose tissue) - stated in paper",
+      "http_status": "200 OK - 'Status Public on Feb 12, 2026'",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "data accession: GEO GSE196015 (published STAT5B-CA liver RNA-seq, re-analyzed) - stated in paper",
+      "http_status": "200 OK - 'Status Public on Apr 04, 2022'",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "data accession: GEO GSE103885 (published STAT5A/B-KO liver RNA-seq, re-analyzed) - stated in paper",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo/query/acc.cgi"
+    },
+    {
+      "artifact": "code repo: github.com/Ye1203/Heatmap_shinyapp (custom heatmap helper package, figure heatmaps only) - URL present in Methods",
+      "http_status": "200 OK (public; last push 2025-11-17; no releases, no tags, no license, no renv.lock; files: app.R, Other/*.R, README.md, example_data/, methods PDF)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl + GitHub REST API (repos, releases, git/trees) and raw README"
+    },
+    {
+      "artifact": "analysis code repository for the RNA-seq / ChIP-seq pipelines",
+      "http_status": "none - no code availability statement and no repository stated in the paper",
+      "checked_at": "2026-07-27",
+      "network_context": "full-text JATS XML search for 'code availability', 'github', 'gitlab', 'zenodo' returned only the heatmap shiny app URL"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "9fa622783dd085cec56d0f9b13ce2c74cbbe05c405b99f22d36a91019cc5033a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

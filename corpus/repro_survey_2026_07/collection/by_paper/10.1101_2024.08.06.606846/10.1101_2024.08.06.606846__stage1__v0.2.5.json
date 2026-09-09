@@ -1,0 +1,355 @@
+{
+    "rubric_version": "0.2.5",
+    "metric_semantics_version": "0.2.5",
+    "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+    "assessor_id": "claude (stage1 subagent) + masaomi",
+    "assessed_at": "2026-07-23",
+    "canonical_id": {
+        "value": "10.1101/2024.08.06.606846",
+        "kind": "doi",
+        "aliases": [
+            "https://www.biorxiv.org/content/10.1101/2024.08.06.606846v2",
+            "biorxiv:2024.08.06.606846v2"
+        ]
+    },
+    "paper_type": "pure-computational",
+    "reproduction_target": "Multi-ancestry / multi-biobank polygenic risk score (PRS) training and evaluation pipeline: from All of Us (AoU v7 WGS, ~245k) and Pan-UK Biobank GWAS summary statistics, through ancestry assignment, GWAS (Regenie), cross-biobank meta-analysis (METAL), genetic-architecture estimation (SBayesS/LDSC/GCTA/Popcorn), PRS construction (P+T, PRS-CS, PRS-CSx), Fst/individual-PRS-accuracy, evaluated across AFR/AMR/EUR/EAS/CSA target groups. Secondary analysis of existing biobank data; no wet-lab in scope.",
+    "step_source": "prose-methods",
+    "granularity_note": "Coarse one-step-per-named-tool from Methods prose only. NO code/data availability statement in the preprint; no repository (GitHub/GitLab/Zenodo) named for this paper's analysis code. The only GitHub URL in the XML (narechan/khill_complexity) belongs to a cited reference, not this study. All named tools are standard public software but authors' driver scripts are not shared and versions are almost entirely absent (only 'PLINK 2.0' as a loose major version). Data are AoU (controlled-access via Researcher Workbench) + Pan-UKB (public GWAS release).",
+    "funnel_stage": "stage1-prose-only",
+    "stage2_candidate": false,
+    "capture_claim": "floating",
+    "steps": [
+        {
+            "step_id": "C1",
+            "label": "Genetic-ancestry assignment — PCA projection onto HGDP+1000G reference (168,899 pre-estimated variant weights) + random-forest classification (prob>50%) + centroid-distance outlier pruning; no named software or version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 0,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "no-named-tool",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C2",
+            "label": "Regenie — GWAS on AoU AFR/AMR/EUR training datasets (HapMap3 variants; covariates age, sex, first 10 PCs); no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code",
+                "controlled-access-data"
+            ]
+        },
+        {
+            "step_id": "C3",
+            "label": "METAL — inverse-variance-weighted cross-biobank/cross-ancestry meta-analysis of AoU + UKB GWAS; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C4",
+            "label": "PLINK — clumping to define top genome-wide-significant loci for variance-explained calculation (ancestry-matched UKB reference panels); no version",
+            "layer": "C",
+            "axes": {
+                "data": 2,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C5",
+            "label": "SBayesS — polygenicity estimation (Bayesian mixed linear model, default settings) on UKB EUR GWAS; no version",
+            "layer": "C",
+            "axes": {
+                "data": 2,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "default-params",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C6",
+            "label": "LDSC — LD-score-regression SNP-heritability and genetic-correlation (r_g) estimates on AoU EUR GWAS; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C7",
+            "label": "GCTA-GREML — restricted-maximum-likelihood heritability from individual-level downsampled AoU/UKB data (covariates age, sex, 10 PCs); no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "controlled-access-data",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C8",
+            "label": "Popcorn — cross-ancestry genetic-correlation (EUR/AFR, EUR/AMR from AoU) using 1000 Genomes reference panels; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C9",
+            "label": "PRS-CS — Bayesian genome-wide PRS (auto model, default MCMC: 1000 iterations, 500 burn-in, thinning 5) with software-provided UKB LD matrices; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 2
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "default-params",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C10",
+            "label": "PRS-CSx — multi-ancestry Bayesian PRS (auto model) with software-provided UKB LD matrices; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C11",
+            "label": "Pruning-and-thresholding (P+T) PRS — LD r2 threshold 0.1, p-value grid (5e-8 ... 1), pre-computed UKB LD matrices; validation/test split for threshold tuning; PLINK-based, no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 2
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C12",
+            "label": "PLINK 2.0 — Wright's Fst (\"wc\" method, 168,899 pruned variants) and PRS scoring (--score, 100 sets of posterior effects); loose major version 'PLINK 2.0' only, no exact pin",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 2
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "floating",
+            "subflags": [
+                "major-version-only",
+                "no-author-code"
+            ]
+        },
+        {
+            "step_id": "C13",
+            "label": "SCOPE — per-individual continental-ancestry-proportion inference for European-ancestry-quintile stratification; no version",
+            "layer": "C",
+            "axes": {
+                "data": 1,
+                "code": 1,
+                "version": 0,
+                "params": 1
+            },
+            "verdict": "NI",
+            "env_capture_class": "n/a",
+            "version_subtier": "none",
+            "subflags": [
+                "version-absent",
+                "no-author-code"
+            ]
+        }
+    ],
+    "counts": {
+        "n_R": 0,
+        "n_RI": 0,
+        "n_NI": 13,
+        "n_X": 0,
+        "S": 13,
+        "W": 0,
+        "n_fetch_required": 0,
+        "n_exact_capture_unexecuted": 0
+    },
+    "headline": {
+        "static_readiness": "0/13 (0%) — stage1 ceiling only, no R★",
+        "inference_inclusive_upper_bound": "NI ceiling on all 13/13 computational steps. R★ not assignable at stage1, and RI is also unreachable at prose level because the paper publishes NO analysis code (no repository, no code-availability statement) and almost NO software versions (only a loose 'PLINK 2.0' major version). Every step relies on standard public tools with documented parameters, but without the authors' driver scripts and without version pins the version axis is 0 for all steps, driving axis-min to 0 (NI). Even a stage-2 code read is not possible (nothing to read). This is not a stage2_candidate. To lift steps toward RI, the authors would need to publish their analysis pipeline plus a versioned software manifest / environment lock.",
+        "coverage": "13 computational steps assessed from Methods prose (AoU/Pan-UKB secondary analysis). No wet-lab in scope (WGS generated by the AoU and UKB programs, not this study; W=0).",
+        "repro_index": null
+    },
+    "levers": {
+        "software_env_lock": false,
+        "in_code_db_pin_classA": false,
+        "has_validated_env_capture": false,
+        "software_env_platform_coverage": "unverified (stage1)"
+    },
+    "gaps": [
+        {
+            "type": 3,
+            "where": "Whole analysis (no Code Availability statement)",
+            "missing": "The preprint contains no code-availability statement and names no repository (GitHub/GitLab/Zenodo/Software Heritage) for the PRS training/evaluation pipeline. Authors' driver scripts, config, and glue code are unavailable; only the underlying third-party tools are public.",
+            "how_to_close": "Publish the analysis pipeline (scripts + configs orchestrating Regenie/METAL/PRS-CS/PRS-CSx/PLINK/etc.) in a versioned public repository with a code-availability statement."
+        },
+        {
+            "type": 2,
+            "where": "Software environment",
+            "missing": "No conda env / lockfile / Docker / Singularity / environment-modules manifest anywhere. No reproducible environment specification is provided.",
+            "how_to_close": "Ship a conda-lock/pixi.lock or container digest for a declared OS/arch covering all named tools."
+        },
+        {
+            "type": 5,
+            "where": "Software versions",
+            "missing": "Versions are essentially absent: Regenie, METAL, PLINK (clumping), SBayesS, LDSC, GCTA, Popcorn, PRS-CS, PRS-CSx, SCOPE have NO version; only 'PLINK 2.0' is given as a loose major version. Reference-panel and HGDP/1000G weight versions are also unpinned.",
+            "how_to_close": "Provide a tool-version manifest (exact versions/commits) for every named piece of software and for the reference panels/LD matrices used."
+        },
+        {
+            "type": 1,
+            "where": "AoU controlled-access data",
+            "missing": "AoU v7 WGS and individual-level phenotypes are controlled-access (obtainable only via the AoU Researcher Workbench under an approved workspace); no public accession. Exact participant subsets, kinship exclusions and QC thresholds are described in prose but not shipped as a reproducible sample manifest.",
+            "how_to_close": "Provide, within the Researcher Workbench, a sample/ID manifest and QC/split scripts so an approved researcher can regenerate the exact training/test partitions."
+        },
+        {
+            "type": 11,
+            "where": "C1 ancestry assignment",
+            "missing": "Ancestry assignment (PCA projection + random forest + centroid-distance outlier removal via histogram inspection) is described narratively with no named software, no version, and a manual outlier-cutoff step (\"excluding individuals at the extreme high end\"), making it non-deterministically specified.",
+            "how_to_close": "Release the ancestry-assignment code with fixed thresholds/seeds and the exact HGDP+1000G weight file version."
+        }
+    ],
+    "liveness": [
+        {
+            "artifact": "code repo: NONE — no repository or code-availability statement in the preprint for this study's analysis pipeline (the only GitHub URL in the JATS XML, github.com/narechan/khill_complexity, is a cited reference, not this paper)",
+            "http_status": "n/a (no artifact named)",
+            "checked_at": "2026-07-23",
+            "network_context": "JATS XML full-text scanned for github/gitlab/zenodo/figshare/software-heritage; none found for this study"
+        },
+        {
+            "artifact": "data resource (public): Pan-UK Biobank GWAS release — https://pan.ukbb.broadinstitute.org/ (source of UKB per-ancestry and meta-analyzed GWAS + LD matrices, Karczewski et al.)",
+            "http_status": "200 OK",
+            "checked_at": "2026-07-23",
+            "network_context": "unauthenticated curl -L, public site"
+        },
+        {
+            "artifact": "data resource (controlled-access): All of Us Research Program v7 WGS + phenotypes — https://www.researchallofus.org/ (Researcher Workbench, application/approval required; no public accession)",
+            "http_status": "200 OK",
+            "checked_at": "2026-07-23",
+            "network_context": "unauthenticated curl -L, landing page reachable; data itself gated"
+        },
+        {
+            "artifact": "supporting resource: UKB data-field showcase https://biobank.ndph.ox.ac.uk/showcase/ (phenotype matching); PheCode map v1.2 https://phewascatalog.org/phecodes",
+            "http_status": "200 OK (showcase)",
+            "checked_at": "2026-07-23",
+            "network_context": "unauthenticated curl -L; used for phenotype curation, not primary genetic data"
+        }
+    ],
+    "assessable": {
+        "is_assessable": true
+    },
+    "contested_corrected": [],
+    "human_signoff": {
+        "signed": false,
+        "reviewer_id": "PENDING (stage1 draft)"
+    },
+    "manifest": {
+        "b1_manifest_hash": "cbb558d447c4bdd89bc37174d5bc8bcc5e3dd4845df4a25488aa67b34c743d7f",
+        "chain_record": "not-yet-recorded",
+        "supersedes": null
+    }
+}

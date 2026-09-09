@@ -1,0 +1,819 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "4d409c34f4c5e60c9882fabb1d588a2ead9c30c8348dbca7b94e9c76f14a3e01",
+  "canonical_id": {
+    "value": "10.64898/2025.12.23.696241",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.23.696241v1",
+      "biorxiv:2025.12.23.696241v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Scope-split of a heavily mixed wet-lab + computational study. The wet-lab arm (ONT HMW/UHMW extraction and library prep, PacBio HiFi library prep, native CENP-A ChIP-seq, CENP-A CUT&RUN, DiMeLo-seq, Fiber-seq, PRO-seq and total RNA-seq bench work) is OOS and enters only the W denominator. The reproduction target is the computational arm described in the Supplemental Figures and Methods (media-1.pdf), namely: (i) generation of gapless haplotype-phased NativeCen/NeoCen assemblies for PDNC4 (chr4), MS4221 (chr8) and IMS13q (chr13) from HiFi + ONT reads (CCS v4.2.0/v6.2.0/v6.3.0 + lima v2.5.1 -> Verkko v1.0/v1.1 and hifiasm v0.16.1 -> minimap2 alignment to T2T-CHM13 -> Winnowmap v2.03 + NucFreq + TandemQUAST validation); (ii) ONT CpG methylation derivation (Bonito-Remora dna_r9.4.1_e8_sup@v3.3 -> samtools v1.15.1 / Winnowmap v2.03 two-step remap -> modbam2bed -> BEDTools v2.29.0 1 kb windows) and CDR annotation (CDR-Finder v1.0.4 for public assemblies, manual annotation for MS4221); (iii) CENP-A domain definition from Passage A ChIP-seq reanalysis of GSE44724 and newly generated Passage B ChIP-seq/CUT&RUN (cutadapt -> BWA -> deepTools bamCompare -> MACS3 broad peaks; SEACR top-1% stringent for CUT&RUN); (iv) DiMeLo-seq processing (Dorado v0.8.2 sup,6mA -> samtools v1.19.2 -> modbam2bed --mod_threshold=0.8 -> bedtools v2.31.1 -> bedGraphToBigWig) per https://github.com/gabriellehartley/cenpa-dimelo-processing; (v) Fiber-seq processing (jasmine --keep-kinetics -> pbmm2 -> fibertools-rs -> fiberseq-qc -> FIRE) and single-molecule footprint calling with FiberHMM v1.4 plus 10,000x bootstrap resampling; (vi) alphaSat annotation (HumAS-HMMER AS-SFs-hmmer3.0.290621, CenMAP v0.4.3.1, Snakemake-HumAS-SD, StringDecomposer, stv/stv_chm13, CenStats v0.0.10, CenPlot v0.1.4, ModDotPlot v0.8.4) and StainedGlass v0.5 identity heat maps; (vii) repeat/TE composition (RepeatMasker + buildSummary.pl + BEDTools v2.29.0), gene annotation liftover (LiftOff from chm13v2.0_RefSeq_Liftoff_v4.gff3), SNP detection (minimap2 + SYRI), Meryl 21-mer uniqueness and overlapSelect filtering, QUAST GC content and FIMO CENP-B box scanning; (viii) transcription quantification (PRO-seq and RNA-seq -> BEDTools coverage -counts -F 0.6 -> DESeq2 v1.42.1 in RStudio v2025.05.0 -> pheatmap v1.0.13); and (ix) population-genetic context from 1KGP (SHAPEIT-duohmm v2.r904 phasing, bcftools filtering, vcftools --het, per-population Hardy-Weinberg chi-squared) plus an lme4/emmeans v1.11.1 mixed-effects model of k-mer diversity. Reproduction target = Figures 1-7 and SuppFigs. 1-22 / SuppTables 1-13.",
+  "step_source": "prose-methods",
+  "granularity_note": "Stage-1 prose triage. The main bioRxiv article carries NO Methods section, NO Data Availability statement and NO Code Availability statement; all methods live in the supplementary PDF 'Supplemental Figures and Methods' (DC1/media-1.pdf, fetched 2026-07-28, 14.1 MB, extracted with pdftotext). No workflow file (Snakefile/CWL/Nextflow/WDL) is deposited by the authors, so steps are derived one-per-named-tool-invocation per rubric Step 1 fallback. |S| = 37 C-steps and |W| = 8 W-steps. Coarsening decisions recorded so an independent rater can reproduce the denominator: (1) the three assembly-generation calls (CCS+lima, Verkko, hifiasm) are kept as three steps because each carries its own version pin and its own verbatim command line; (2) alignment of assemblies to T2T-CHM13 and the fastaexplode/seqtk orientation fix are merged into one step (C07) because the orientation fix has no independent parameterisation; (3) the alphaSat annotation stack is split into exactly two steps - HumAS-HMMER SF subclassification (C24) and the CenMAP/Snakemake-HumAS-SD/stv/CenStats/CenPlot pipeline (C25) - rather than one step per constituent tool, because the supplement presents the CenMAP stack as a single pipeline invocation with one shared configuration; (4) Passage A ChIP-seq reprocessing (C15), Passage B ChIP-seq (C16), CUT&RUN (C17) and RNA-seq (C22) are four steps even though three of them are specified only by reference ('processed ... the same way as the paired-end ChIP-seq reads'), because their input data provenance differs (public GSE44724 vs non-deposited new reads) and that difference drives the Data axis; (5) BORDERLINE, flagged for the orchestrator - C13 (identification of which IMS13q haplotypes were merged) and C27 (CENP-A domain/flank boundary demarcation with manual repeat-anchored adjustment) are manual/visual adjudications; they are scored C because they operate on sequencing-derived data and produce tabulated coordinates, but a rater who treats manual curation as non-computational would drop |S| to 35, leaving n_NI = 25 and an upper bound of 9/35 (25.7%) with coverage 35/43 (81.4%). Nothing else changes.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C01",
+      "label": "ONT basecalling of all whole-genome/adaptive-sampling runs for PDNC4, MS4221 and IMS13q with the GUPPY super-accuracy basecaller (live or post-sequencing), R9.4.1 flow cells. Verbatim: 'all samples were run with ~25 fentamoles on R9.4 flow cells and were basecalled using the GUPPY super accuracy basecaller (either live or post-sequencing)'. No Guppy version, no model string, no config file, no command line. Raw FAST5/POD5 signal is not deposited under any stated accession.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C02",
+      "label": "ONT read-set statistics (fold coverage, >100 kbp coverage, read N50) with the custom script ont_stats.py from https://github.com/EichlerLab/compteam_tools/blob/main/ont_stats, command 'ont_stats --fofn {fastq.fofn} -g 3.1'. Repo URL present, no commit/tag/version; input FASTQs not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C03",
+      "label": "PacBio HiFi consensus generation with the CCS algorithm (v4.2.0 or v6.2.0 for MS4221; v6.3.0 for IMS13q and PDNC4) with verbatim parameters '--minLength 10 --maxLength 100000 --minPasses 3 --minPredictedAccuracy 0.99' (v4.2.0) or '--all --all-kinetics --subread-fallback' (v6.2.0/v6.3.0), followed by demultiplexing with lima v2.5.1 ('--hifi-preset SYMMETRIC-ADAPTERS --min-score 80 --min-qv 20'), retaining >=Q20 reads. Subread/HiFi inputs not deposited; the 'v4.2.0 or v6.2.0' disjunction leaves the per-sample assignment ambiguous.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C04",
+      "label": "Whole-genome diploid assembly with Verkko (v1.0 for MS4221, v1.1 for IMS13q and PDNC4) from HiFi + ONT reads, verbatim command 'verkko -d {dir} --hifi $( cat {hifi_fastq.fofn} ) --nano $( cat {ont_fastqs.fofn} ) --sge --mbg {dir_to_mbg} --snakeopts \"-j {number_of_threads}\"'. Thread count and MBG path are placeholders; input reads not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C05",
+      "label": "HiFi-only assembly with hifiasm v0.16.1, verbatim command 'hifiasm -o {dir_name) -t {number_of_threads} $(cat {hifi_fastq.fofn})'. Used to produce the PDNC4 phased chr4 NativeCen/NeoCen contigs. Input reads not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C06",
+      "label": "Assembly statistics (SuppTable 2) with the custom script seq_stats.py (https://github.com/mrvollger/utilities/blob/master/seq_stats.py), command 'seq_stats.py -r {assembly.fa}'. Assemblies are stated as available on NCBI per cell line/BioSample (PDNC4 SAMN46577041, MS4221 SAMN54265883, IMS13q SAMN54262959); the script repo carries no version or commit.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C07",
+      "label": "Alignment of each assembly to T2T-CHM13 with minimap2 ('-t 4 -I 8G -a --eqx -x asm20 -s 5000') to confirm that NativeCen and NeoCen regions were assembled, plus correction of contig orientation: flipped contigs extracted with fastaexplode (exonerate), reverse-complemented with 'seqtk seq -r', renamed and substituted back into the assemblies. minimap2 version not stated; no seqtk/exonerate versions; the rename/substitute step has no script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C08",
+      "label": "Misassembly detection: ONT (>30 kb) and HiFi reads remapped to their own assembly with Winnowmap v2.03 ('-W meryl_k15mers.txt --eqx -ax map-ont -s 4000 -t 4 -I 8g'), plotted with NucFreq, and extra-long tandem repeat arrays evaluated with TandemQUAST using both read sets (SuppFigs. 1-4). NucFreq and TandemQUAST versions and parameters not stated; the meryl k15 database build is not described; raw reads not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C09",
+      "label": "HSat/alphaSat repeat annotation for assembly validation with RepeatMasker, HOR boundary identification confirmed with StringDecomposer against chromosome-specific alphaSat monomer consensus sequences, retaining monomers with >=90% identity. No RepeatMasker version, no Dfam/RepBase library version, no engine, no StringDecomposer version, no command lines; the monomer consensus set used is not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "IMS13q breakpoint refinement: ONT reads (>1 kb) mapped to T2T-CHM13 with Winnowmap v2.03 (same parameters as validation), breakpoint-spanning reads (>100 kb) extracted with 'seqtk subseq' and inspected in Geneious v2019.1.3 (commercial, licence-gated), inverted-duplication confirmed with YASS dot plots. Single-base breakpoint reported (chr13:51,976,458; NAHR interval to chr13:51,986,512). YASS version/parameters absent; the Geneious inspection is manual.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "ONT CpG (5mC) methylation calling: FAST5 super-accurate basecalling with Bonito-Remora using model 'dna_r9.4.1_e8_sup@v3.3' (>=Q10), then a two-step remap pipeline given verbatim: 'samtools fastq -@ {threads} -T MM,ML {input_unaligned_bam} > {output_fastq}' then 'winnowmap -t {threads} -W {kmer_file} -ax map-ont -y {reference_file} {output_fastq} | samtools view -@ {threads} -Sb -F 256 -F 2048 - | samtools sort -@ {threads} -o {remapped_bam} -', requiring samtools >= v1.15.1 and Winnowmap v2.03. Bonito and Remora tool versions are not given (only the basecalling model); FAST5s not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C12",
+      "label": "Methylation summarisation and visualisation: per-read MM/ML tags viewed in IGV v2.15.4; modbam2bed (https://github.com/epi2me-labs/modbam2bed, no version) used to summarise; the modbam2bed output averaged with 'BEDTools (v2.29.0) map -mean' into 1 kb windows generated with 'BEDTools (v2.29.0) makewindows'. modbam2bed thresholds/flags for this step are not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Identification of which two of the three IMS13q 13q14.3-qter haplotypes were merged during Verkko assembly, by inspecting individual methylated ONT reads mapped to each haplotype against three enumerated merge scenarios (SuppFig. 17D-E). The decision rule is stated in prose ('We did not observe any haplotype wherein 50% of reads were hypomethylated and 50% were hypermethylated ... we determined that the two inactive copies were merged'), but the step is a manual visual adjudication with no script, no quantitative threshold, and no deposited input BAM.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Unique/single-copy 21-mer generation with Meryl in three modes (between haplotypes of one assembly; within each chr4 HOR; per cell-line phased assembly for PRO-seq read filtering), followed by filtering with overlapSelect (GenomeBrowser/20180626) using '-overlapBases=21bp'. Meryl version not stated; the UCSC utility build date acts as the version pin; assemblies public on NCBI.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C15",
+      "label": "Reprocessing of the previously published 'Passage A' CENP-A ChIP-seq and input DNA (GEO GSE44724, Hasson et al. 2013, 100 bp paired-end) against the new phased assemblies: cutadapt trimming (Phred >= 20, Illumina TruSeq adapters, reads < 50 bp discarded); BWA alignment with '-k 50 -c 1000000'; 'samtools view -F 2308' filtering; deepTools bamCompare '--operation ratio --binSize 1 --minMappingQuality 1'; MACS3 broad peaks at q <= 0.01 with at most two duplicate reads retained, input DNA as control. No version for cutadapt, BWA, samtools, deepTools or MACS3; no driver script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Processing of the newly generated 'Passage B' MS4221 CENP-A ChIP-seq and input (150 bp paired-end, NextSeq 500/550): 'pre-processed, mapped, and post-processed as for Passage A data' (cutadapt / BWA -k 50 -c 1000000 / samtools -F 2308 / deepTools bamCompare / MACS3 broad q <= 0.01). No tool versions; raw FASTQs not deposited under any stated accession.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Processing of the newly generated Passage B CUT&RUN data (PDNC4, IMS13q; CENP-A, H3K4me3 positive control, IgG negative control): controls processed as for the ChIP-seq pipeline; CENP-A-enriched reads mapped to a combined dual genome (cell-line phased assembly + S. cerevisiae spike-in genome) with spike-in reads filtered out before post-processing; peaks called with SEACR reporting the top 1% of peaks by total signal using the 'stringent' threshold. No SEACR version, no version for the S. cerevisiae reference build, no dual-genome construction script; raw FASTQs not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "DiMeLo-seq (PDNC4 Passage B) processing: independent basecalling of CENP-A and no-Hia5 control with Dorado v0.8.2 ('sup,6mA' model, min q-score 10); alignment to the reference assembly with Dorado v0.8.2; samtools v1.19.2 processing; conversion to methylated BED with modbam2bed '--mod_threshold=0.8'; bedgraph conversion with bedtools v2.31.1; control signal subtracted from CENP-A signal with awk; bigwigs via the UCSC bedGraphToBigWig module. Verbatim: 'Full details of data processing are available in: https://github.com/gabriellehartley/cenpa-dimelo-processing'. The repository exists and its README carries the full command sequence with HPC 'module load' version strings, but there is no environment file, no release tag and no commit pin; raw ONT data not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Fiber-seq primary processing: HiFi reads processed with jasmine using '--keep-kinetics', aligned to the respective assemblies with pbmm2, 6mA calls predicted with fibertools-rs, QC with fiberseq-qc, then passed into the FIRE pipeline to call inferred regulatory elements. Verbatim: 'All scripts and/or tools are included in the Fiber-seq repository and were run without modification (https://github.com/fiberseq)'. That URL is a GitHub organisation root, not a repository, and no version, tag or commit is given for jasmine, pbmm2, fibertools-rs, fiberseq-qc or FIRE; raw HiFi Fiber-seq data not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Fiber-seq single-molecule footprint calling with FiberHMM v1.4 'using transition probabilities trained on a subset of the datasets', edge footprints filtered, footprint sizes 80-450 bp normalised, and 10,000x bootstrap resampling used to derive 95th-percentile ranges and 1x/2x CENP-A footprint enrichment ratios. Version pinned; the training subset, the trained transition-probability matrix, the resampling code and any RNG seed are not provided.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "PRO-seq processing: cutadapt trimming (Phred >= 20, adapters removed, reads < 20 nt discarded), reverse-complementing with the fastx-toolkit, Drosophila S2 spike-in removal by bowtie2 '--very-sensitive' alignment to dm6, alignment of remaining reads to the cell-line phased assembly with bowtie2 defaults (end-to-end, best match), BAM->BED with BEDTools v2.29.0, then single-copy 21-mer filtering ('overlapSelect -overlapBases=21') or BigWig conversion (GenomeBrowser/20180626). No cutadapt/fastx/bowtie2 versions; dm6 build source not pinned; raw FASTQs not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C22",
+      "label": "Total RNA-seq processing (PDNC4, MS4221, IMS13q; 100 bp paired-end HiSeq 2500): 'Raw, 100bp paired-end fastqs were pre-processed, mapped, and post-processed the same way as the paired-end ChIP-seq reads' (cutadapt / BWA / samtools / deepTools). No versions; note that a DNA aligner (BWA) is used for RNA-seq without further comment; raw FASTQs not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Gene annotation transfer: T2T-CHM13v2.0 NCBI RefSeq curated gene set (chm13v2.0_RefSeq_Liftoff_v4.gff3, obtained from https://github.com/marbl/CHM13) lifted to each assembly with LiftOff, haplotypes run separately to preserve haploid-to-haploid annotation; main functional isoform per protein-coding gene taken from Ensembl APPRIS predictions. No LiftOff version, no LiftOff parameters, no Ensembl release, no commit pin on the marbl/CHM13 annotation file.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "AlphaSat suprachromosomal-family (SF) subclassification across NativeCen contigs following Altemose et al., using the scripts at https://github.com/fedorrik/HumASHMMER_for_AnVIL with the pinned HMM version 'AS-SFs-hmmer3.0.290621'; SFs grouped into three broad age classes (HOR / dHOR / mon); output BEDs converted to bigBed and viewed in IGV v2.15.4 (colour key in SuppTable 5). Repo public and the HMM profile release string is pinned; the exact invocation and any post-processing script are not given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C25",
+      "label": "AlphaSat HOR monomer/array annotation pipeline: native centromere regions identified with the Centromere Mapping and Annotation Pipeline CenMAP v0.4.3.1 (https://github.com/logsdon-lab/CenMAP), annotated with the Snakemake-HumAS-SD workflow (https://github.com/logsdonlab/Snakemake-HumAS-SD) using HumAS-HMMER chromosome-specific monomer HMM profiles and StringDecomposer, HOR/dHOR structures resolved with an enhanced StV approach (https://github.com/fedorrik/stv), 'live' HOR arrays defined with CenStats v0.0.10 (adjacent blocks < 8 kbp merged, arrays retained with >= 5 HOR monomers and >= 90% active sequence), and tracks rendered with CenPlot v0.1.4 including CDR-Finder v1.0.4 methylation tracks and ModDotPlot v0.8.4 local self-identity. Versions pinned for CenMAP/CenStats/CenPlot/CDR-Finder/ModDotPlot; the CenMAP YAML configuration and the CenPlot track configuration file are not deposited, and no version is given for Snakemake-HumAS-SD, stv or StringDecomposer.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C26",
+      "label": "HOR structural-variant (monomeric indel) detection with the script at https://github.com/fedorrik/stv_chm13, followed by HOR-SV composition computed as SV coverage (bp) divided by overall HOR size (SuppTable 7). No version/commit for stv_chm13, no command line, and the coverage computation has no script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "Regional boundary demarcation of CENP-A domains and flanks: boundaries from SEACR top-1% CUT&RUN peaks (PDNC4, IMS13q) or MACS3 ChIP-seq peaks with input control (MS4221); flanks defined by extending 100 kb either side, then 'subsequently adjusted to end on the same repeat between haplotypes for the most accurate comparisons'. The adjustment is a manual, non-algorithmic operation with no recorded rule or script; the resulting coordinates are, however, tabulated in SuppTable 8, so the downstream regions are recoverable even though the derivation is not.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C28",
+      "label": "CDR annotation. For the three new assemblies, CDRs in each active NativeCen and NeoCen were 'annotated as described in' a cited reference (the sentence is truncated in the supplement: 'annotated as described in .'); CDRs of active NeoCens were transferred to the inactive counterpart with minimap2 and confirmed against TE annotations; in MS4221 and NativeCen approximations 'we performed a manual annotation'. For the HPRC and HGSVC assemblies CDRs were called with CDR-Finder v1.0.4 inside CenMAP v0.4.3.1. Mixed data provenance (public HPRC/HGSVC assemblies vs non-deposited internal methylation), no parameters for the manual arm.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C29",
+      "label": "Regional GC/AT content of CENP-A domains computed with QUAST (SuppTable 8), and CENP-B box detection with FIMO using the 17-bp CENP-B box motif supplied as a MEME-format file; output TSV converted to BED for IGV v2.15.4 and motif counts reported per CENP-A domain (SuppFig. 20B). No QUAST version, no FIMO version, no p-value/q-value threshold, and the MEME motif file is not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C30",
+      "label": "Sequence-identity heat maps: pairwise dot plots within and between centromeric haplotypes with StainedGlass v0.5 (input fragmented into 2 kb windows, default, aligned with minimap2), plus an earlier-version StainedGlass v0.5 run with 5 kb windows and 2.5 kb sliding window for haplotype-variation plots (SuppFig. 19A-B); 1D pairwise self-identity tracks generated with ModDotPlot v0.8.4 run inside the CenMAP workflow using the 'localselfident' option in the CenMAP YAML configuration. Both tools versioned and window parameters stated; the YAML configuration itself is not deposited, and the text calls v0.5 both the current and 'an earlier version'.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C31",
+      "label": "SNP detection between NeoCen Hap1 and its homologous Hap2 region in PDNC4 and IMS13q: minimap2 alignment between the two haplotypes fed into SYRI (Synteny and Rearrangement Identifier) for counting, then SNPs counted per 1 kb window with 'BEDTools (v2.29.0) map -o count' (SuppTable 11). BEDTools pinned; minimap2 and SYRI versions and parameters absent; assemblies public.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C32",
+      "label": "Dot plots between HORs of opposing haplotypes, and self-alignments for intra-array structure, generated with TandemAligner and MUMmer (SuppFigs. 7, 8, 11-14, 16), with MEM/MUM/alignment-match/indel colour coding. No versions and no parameters for either tool; no plotting script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C33",
+      "label": "Repeat composition of the demarcated regions summarised from RepeatMasker output with 'buildSummary.pl' against a per-region genome length file, reported as base-pair composition by repeat class/family/subfamily (SuppTable 13); non-repetitive regions obtained with 'BEDTools (v2.29.0) subtract'. BEDTools pinned; RepeatMasker/buildSummary.pl version and library version absent.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C34",
+      "label": "Quantification of CpG methylation and transcriptional activity: 'BEDTools (v2.29.0) map -mean' to average CpG methylation per region/repeat/non-repeat (Fig. 4G, SuppFig. 18, SuppTables 4, 8); 'BEDTools (v2.29.0) coverage -counts' with '-F 0.6' to count PRO-seq/RNA-seq reads overlapping gene exons; counts loaded into RStudio v2025.05.0, cell line and sequencing type coded as factors, DESeq2 v1.42.1 used for normalisation and dispersion estimation with fitType 'mean', and a hierarchical-clustering heatmap of rlog-transformed counts drawn with pheatmap v1.0.13 (Fig. 6A,B). Versions pinned for BEDTools/RStudio/DESeq2/pheatmap but no R base version, no Bioconductor release, no session info, no script; input PRO-seq/RNA-seq reads not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C35",
+      "label": "1000 Genomes Project analysis: variants for 2,504 unrelated individuals against CHM13v1.0 phased with SHAPEIT-duohmm v2.r904 following the New York Genome Center filtering/phasing pipeline, filtered to biallelic variants with no missing genotypes and MAF >= 0.01 using bcftools, then lifted to T2T-CHM13v2.0 for UCSC browser visualisation alongside the sex-averaged recombination map lifted from GRCh38. SHAPEIT pinned; bcftools and the liftover tool/chain file are unversioned; no driver script; 1KGP data are public.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C36",
+      "label": "Per-sample heterozygosity and Hardy-Weinberg analysis: 10 kb windows generated with 'BEDTools makewindows', heterozygous variants counted with 'vcftools --het' on the filtered phased calls, mean per-window heterozygous counts computed across samples (SuppFig. 19C-D); for two haplotype-differentiating variants (chr13:96262531:A:G and chr13:96309388:G:C) expected heterozygotes computed as 2p(1-p)N per 1KGP population and a chi-squared test run as 'chisq = sum((obs het - exp. het)^2 / exp. het)' with 1 degree of freedom (SuppTable 12). Formula and variant identifiers given verbatim; BEDTools/vcftools versions not restated for this step and no analysis script is deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C37",
+      "label": "k-mer diversity comparison across NativeCen sites (CDR, D4Z1, D4Z1B) in two analyses (D4Z1-active alleles n=7; D4Z1B-active alleles n=2): linear mixed-effects model fitted with the lme4 package (k-mer diversity ~ site, cell line as random effect, maximum-likelihood estimation), Type I ANOVA for the fixed effect of site (RStudio), post-hoc pairwise comparisons with emmeans v1.11.1 (Tukey adjustment for analysis 1; no adjustment for analysis 2, explicitly flagged by the authors as low-powered), plot in GraphPad Prism v10.4.1. emmeans and Prism pinned; lme4 version and R base version absent; no script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: HMW/UHMW DNA extraction (modified Qiagen Gentra Puregene, QIAGEN Genomic-tips, Circulomics Nanobind HMW/UHMW), Covaris gTUBE shearing to 20 kb, Circulomics short-read eliminator XS size selection, ONT library preparation (SQK-LSK109 / SQK-LSK110 / SQK-ULK001), ~25 fmol loading on R9.4 flow cells, MinION/PromethION runs including one adaptive-sampling run (SuppTable 1). OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: PacBio HiFi DNA preparation - HMW extraction (modified Gentra Puregene for MS4221; Monarch HMW Kit for Blood and Cells for IMS13q/PDNC4), Megaruptor 3 shearing, SMRTbell Express Template Prep Kit v2 / SMRTbell Prep Kit 3.0 with Barcoded Adapter plate v3.0, SageELF or PippinHT size selection (13 kbp or 17 kbp cutoff), Sequel II/IIe sequencing with Chemistry 2.0/2.2/3.2, 2-h pre-extension, 30-h movies. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: native CENP-A ChIP-seq on MS4221 (Passage B) - nuclei isolation through sucrose buffers I/II/III, MNase digestion (0.2-0.3 U/ug, 10 min 37C), EGTA quench, 500 mM NaCl extraction, protein G Sepharose preclear, 20 ug Enzo anti-CENP-A ADI-KAM-CC006-E overnight, phenol-chloroform + MinElute recovery, TruSeq ChIP Library Prep Kit Set A, 150 bp paired-end NextSeq 500/550 High Output v2.5. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: CENP-A CUT&RUN on PDNC4 and IMS13q (Passage B) with the Cell Signaling CUT&RUN Assay Kit #86652 (250K-1M cells, wash steps skipped, Enzo CENP-A 1:50, H3K4me3 #9751 positive and IgG #66362 negative controls), Covaris S2 sonication of inputs, S. cerevisiae spike-in DNA, NEBNext Ultra II DNA Library Prep (#E7645S) with 15 PCR cycles and shortened anneal/extension, Illumina NovaSeq 150 bp paired-end. Note: CUT&RUN failed for MS4221. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: DiMeLo-seq on PDNC4 (Passage B) following DiMeLo-seq V.2 - 10M cells permeabilised with 0.02% digitonin, split into anti-CENP-A (Enzo ADI-KAM-CC006 1:50) and no-antibody controls, pA-Hia5 binding at 200 nM, activation with 800 uM SAM for 2 h at 37C, Monarch HMW extraction, Megaruptor 3 shearing to 20-40 kb, SRE XS size selection, ONT LSK114 library on an R10.4.1 PromethION flow cell. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Wet-lab: Fiber-seq on IMS13q, MS4221 and PDNC4 - ~3M cells treated per Stergachis et al., Monarch HMW DNA extraction, Megaruptor 3 shearing at speed 32 targeting 18 kb, SRE XS size selection, SMRTbell prep kit 3.0 (102-141-700), sequencing on Sequel IIe (2023 libraries) or Revio (2025 libraries). OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Wet-lab: PRO-seq - cell permeabilisation in buffers P/W/F with RNase inhibitor and snap-freezing, ~2x10^6 permeabilised cells mixed with 5x10^4 permeabilised Drosophila S2 nuclei, 4-biotin-NTP run-on, Norgen column extraction, base hydrolysis (1N NaOH 10 min on ice), streptavidin enrichment, on-bead 3'-ligation/end-repair/5'-ligation, RT and PCR, PAGE purification to 140-650 bp, Illumina NextSeq 550 paired-end 75 bp. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W8",
+      "label": "Wet-lab: total RNA-seq - mirVana Total RNA Isolation, Bioanalyzer Total RNA Pico QC, ribo-depletion, Illumina TruSeq stranded total RNA library preparation, HiSeq 2500 100 bp paired-end sequencing. OOS.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 9,
+    "n_NI": 27,
+    "n_X": 1,
+    "S": 37,
+    "W": 8,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/37 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "9/37 (24%) RI, 27/37 (73%) NI, 1/37 (3%) X. This is an unusually version-disciplined paper whose readiness is bound by a single structural omission: there is no Data Availability statement and no Code Availability statement anywhere in the article or in the 100-plus-page supplement. (1) Data: the only deposition sentence in the entire paper is 'The assemblies, per haplotype, are available on NCBI per cell line/BioSample as the following: PDNC4 (SAMN46577041), MS4221 (SAMN54265883), IMS13q (SAMN54262959)'. That covers the assemblies only. Not one accession is given for any raw dataset generated here - ONT whole-genome and adaptive-sampling runs, PacBio HiFi, Passage B CENP-A ChIP-seq, CUT&RUN, DiMeLo-seq, Fiber-seq, PRO-seq or total RNA-seq - so all 17 steps that enter from this study's own reads score data = 0. What offsets this is that the assemblies themselves are accessioned, which lifts the 18 assembly-consuming annotation, repeat, identity and population-genetics steps to data = 2, and one reused dataset (GEO GSE44724) plus 1KGP, HPRC (hprc_intermediate_assembly index) and HGSVC (GCA_964198485, GCA_964199175, PRJEB83624) inputs are fully public. (2) Code: exactly one repository is offered for work done in this study, https://github.com/gabriellehartley/cenpa-dimelo-processing, which is a README-only command list for the DiMeLo-seq arm (no environment file, no release tag, no commit pin, HPC 'module load' version strings). Every other bespoke operation - the CENP-A/flank boundary demarcation and its manual repeat-anchored adjustment, the manual MS4221 CDR annotation, the IMS13q merge-scenario adjudication, the FiberHMM transition-probability training, the 10,000x bootstrap resampling, the HOR-SV coverage computation, the Hardy-Weinberg chi-squared, the lme4/emmeans model and all figure code - has no deposited script. The Fiber-seq arm is externalised to a bare GitHub organisation root (https://github.com/fiberseq), not a repository, with no commit. (3) Version is capped at 1 by construction and the prose pins are genuinely dense: CCS v4.2.0/v6.2.0/v6.3.0, lima v2.5.1, Verkko v1.0/v1.1, hifiasm v0.16.1, Winnowmap v2.03, samtools v1.15.1 and v1.19.2, BEDTools v2.29.0 and v2.31.1, Dorado v0.8.2, IGV v2.15.4, Geneious v2019.1.3, CenMAP v0.4.3.1, CenStats v0.0.10, CenPlot v0.1.4, CDR-Finder v1.0.4, ModDotPlot v0.8.4, StainedGlass v0.5, FiberHMM v1.4, HumAS-HMMER AS-SFs-hmmer3.0.290621, overlapSelect GenomeBrowser/20180626, SHAPEIT-duohmm v2.r904, RStudio v2025.05.0, DESeq2 v1.42.1, pheatmap v1.0.13, emmeans v1.11.1, GraphPad Prism v9.1.0/v10.4.1, and the basecalling model dna_r9.4.1_e8_sup@v3.3. But an equally long list carries no version at all: GUPPY, minimap2, BWA, cutadapt, bowtie2, fastx-toolkit, deepTools, MACS3, SEACR, RepeatMasker (and its repeat library), StringDecomposer, TandemQUAST, NucFreq, YASS, Meryl, LiftOff, QUAST, FIMO, SYRI, TandemAligner, MUMmer, jasmine, pbmm2, fibertools-rs, FIRE, bcftools, vcftools, lme4, and R itself. There is no lockfile, no container, no conda specification, no renv.lock, no release tag and no session info, so the capture claim is exact_pins_partial and no step could exceed RI even under a successful stage-2 code check. The nine RI steps (C14 Meryl/overlapSelect, C24 HumAS-HMMER, C25 CenMAP stack, C30 StainedGlass/ModDotPlot, C31 SYRI, C33 repeat composition, C35 1KGP phasing, C36 heterozygosity/HWE, C37 k-mer diversity LMM) are exactly the steps that combine a public input (the NCBI-deposited assemblies or public 1KGP/HPRC/HGSVC data), a public tool, at least one exact version pin and stated parameters. The single X step is C01, ONT basecalling: the raw FAST5 signal is not deposited, no Guppy version, model or config is stated, and Guppy has been withdrawn from general public distribution, so the step is not recoverable from what is written.",
+    "coverage": "37 computational steps versus 8 wet-lab steps = 37/45 (82%) computational coverage. Steps were enumerated from the Supplemental Figures and Methods (media-1.pdf), sections 'ONT methods applied across all three lines' through 'Visualization of assembly-specific tracks and plots'. Verified paper identity by grepping the fetched JATS XML for the title phrase 'Haplotype-Resolved Genomics Reveals Conserved Chromatin' (2 hits) before scoring.",
+    "repro_index": {
+      "value": 0.7,
+      "coverage": "37/45 (82%)",
+      "S": 37,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper - no Data Availability and no Code Availability statement (main text and supplement)",
+      "missing": "The bioRxiv article (JATS XML fetched 2026-07-28) contains no section, sentence or heading matching 'availability', 'accession', 'deposited', 'GEO', 'SRA', 'ENA' or 'BioProject'. The supplement contains exactly one deposition sentence: 'The assemblies, per haplotype, are available on NCBI per cell line/BioSample as the following: PDNC4 (SAMN46577041), MS4221 (SAMN54265883), IMS13q (SAMN54262959).' There is therefore no statement of where the study's own code lives, no statement of licence, and no statement of where the raw sequencing data live. The single project-specific repository (https://github.com/gabriellehartley/cenpa-dimelo-processing) is discoverable only from one sentence buried in the DiMeLo-seq data-processing subsection.",
+      "how_to_close": "Add explicit 'Data availability' and 'Code availability' sections to the article. List every accession (see gap type 1), name the analysis repository or repositories with a tagged release archived to Zenodo, and state the licence. The UCSC track hubs referred to in 'Visualization of assembly-specific tracks and plots' should be given as resolvable hub URLs."
+    },
+    {
+      "type": 1,
+      "where": "All 17 steps entering from this study's own raw reads: C01, C02, C03, C04, C05, C08, C10, C11, C12, C13, C16, C17, C18, C19, C20, C21, C22, C27, C34",
+      "missing": "No accession, BioProject, reviewer token or embargo date is given for any raw dataset generated by this study: ONT whole-genome runs (four HMW + one UHMW + one adaptive-sampling run for IMS13q, plus PDNC4 and MS4221 runs), PacBio HiFi (Sequel II/IIe), Passage B CENP-A ChIP-seq and input (MS4221), Passage B CUT&RUN (PDNC4, IMS13q, including H3K4me3 and IgG controls), DiMeLo-seq (PDNC4, CENP-A and no-Hia5 control), Fiber-seq (all three lines, 2023 Sequel IIe and 2025 Revio libraries), PRO-seq (all three lines with Drosophila S2 spike-in), and total RNA-seq (all three lines). The three NCBI BioSample identifiers are stated as carrying the assemblies, not the reads, and no SRA run or BioProject identifier is quoted. SuppTables 1 and 2 describe the runs but the assessor cannot verify that they carry accessions from prose alone.",
+      "how_to_close": "Deposit all raw reads (including FAST5/POD5 or at minimum the modified-base BAMs for the ONT and DiMeLo arms, and the kinetics-bearing HiFi BAMs for the Fiber-seq arm) under a single BioProject and quote the BioProject plus per-run SRA accessions in a Data Availability section, cross-referenced to the run table in SuppTable 1."
+    },
+    {
+      "type": 9,
+      "where": "C07, C09, C13, C19, C20, C26, C27, C28, C29, C32, C33, C34, C36, C37 and all figure generation",
+      "missing": "No script is deposited for any bespoke operation in the paper other than the DiMeLo-seq arm. Specifically unavailable: the contig rename/substitute step after reverse-complementing; the meryl k15 database build used by every Winnowmap invocation; the manual IMS13q merge-scenario adjudication; the CENP-A domain and 100 kb flank demarcation together with the repeat-anchored manual boundary adjustment; the manual MS4221 CDR annotation; the HOR-SV coverage/size computation; the FIMO output TSV-to-BED conversion and motif counting; the RepeatMasker buildSummary.pl driver and its per-region genome file; the BEDTools/DESeq2 quantification driver; the FiberHMM transition-probability training and the 10,000x bootstrap resampling; the Hardy-Weinberg expected-heterozygote and chi-squared computation; the lme4 mixed-effects model and Type I ANOVA; and all figure-generating code (IGV sessions, GraphPad Prism files, CenPlot configuration).",
+      "how_to_close": "Publish a single analysis repository containing the driver scripts, the CenMAP and CenPlot configuration files, the statistics scripts with RNG seeds, and the plotting code, with a tagged release archived to Zenodo. None of this carries patient-data risk since the cell lines are long-established public research lines."
+    },
+    {
+      "type": 2,
+      "where": "C01, C02, C06, C07, C09, C15, C16, C17, C19, C22, C23, C26, C29, C32 (version = 0), and partially C03, C08, C10, C11, C12, C21, C34, C35, C37",
+      "missing": "Subtype 2a (no version recorded) applies to: GUPPY, ont_stats.py, seq_stats.py, minimap2, seqtk, exonerate/fastaexplode, NucFreq, TandemQUAST, RepeatMasker (and its Dfam/RepBase library), StringDecomposer, YASS, Meryl, modbam2bed, cutadapt, BWA, deepTools, MACS3, SEACR, bowtie2, fastx-toolkit, jasmine, pbmm2, fibertools-rs, fiberseq-qc, FIRE, LiftOff, Snakemake-HumAS-SD, stv, stv_chm13, QUAST, FIMO, SYRI, TandemAligner, MUMmer, bcftools, vcftools, lme4, and the R base / Bioconductor release underlying DESeq2 v1.42.1, pheatmap v1.0.13 and emmeans v1.11.1. Also recorded here: the Bonito and Remora tool versions are absent even though the basecalling model 'dna_r9.4.1_e8_sup@v3.3' is pinned, and the CCS pin 'v4.2.0 or v6.2.0' for MS4221 does not resolve to a single version, so two mutually exclusive parameter sets are quoted for the same dataset.",
+      "how_to_close": "Emit a single software table listing every tool with its exact version, the R sessionInfo() for the statistical steps, and the RepeatMasker engine plus repeat-library version. Resolve the 'v4.2.0 or v6.2.0' ambiguity per SMRT cell."
+    },
+    {
+      "type": 13,
+      "where": "C07, C09, C10, C14, C17, C21, C23, C24, C25, C28, C29, C35",
+      "missing": "External reference resources are referred to without a pinned identifier: T2T-CHM13 is used as 'the complete T2T-CHM13' in C07/C10 without stating v1.1 vs v2.0 (v2.0 is named only later, for liftover and annotation); the RefSeq annotation chm13v2.0_RefSeq_Liftoff_v4.gff3 is cited via the bare repository https://github.com/marbl/CHM13 with no commit or release; the RepeatMasker repeat library has no version; the Drosophila dm6 genome used for PRO-seq spike-in removal has no source or build stamp; the S. cerevisiae genome used to build the CUT&RUN dual genome is not identified at all; the chromosome-specific alphaSat monomer consensus sequences used with StringDecomposer are not deposited; the CENP-B box MEME motif file is not deposited; the GRCh38-to-CHM13v2.0 liftover chain used for the recombination map is not named; and the HPRC input is cited as a raw GitHub path (hprc_intermediate_assembly/blob/main/data_tables/assemblies_release2_v1.0.index.csv) on a mutable 'main' branch.",
+      "how_to_close": "Pin every reference resource by versioned accession or DOI (T2T-CHM13v2.0 GCA_009914755.4, a specific marbl/CHM13 release tag or commit for the GFF3, the Dfam release for RepeatMasker, a UCSC/Ensembl build identifier for dm6 and for the S. cerevisiae genome), and replace the branch-tip HPRC CSV link with a commit-pinned permalink. At stage 2 these become env_capture_class B or C determinations."
+    },
+    {
+      "type": 5,
+      "where": "C08, C09, C20, C25, C29, C30",
+      "missing": "Custom/derived resources that the analysis depends on are not shared: the meryl k15-mer database file ('meryl_k15mers.txt') referenced in every Winnowmap command; the chromosome-specific alphaSat monomer consensus set used by StringDecomposer with the >=90% identity cutoff; the FiberHMM transition-probability matrix, described only as 'trained on a subset of the datasets' with the subset unspecified; the CenMAP YAML configuration (including the 'localselfident' settings) and the CenPlot track configuration file that determine the annotation and plot outputs; and the CENP-B box motif in MEME format supplied to FIMO.",
+      "how_to_close": "Deposit these five artefacts alongside the analysis code, or state the exact provenance and generation command for each (for the meryl database, the meryl version and the k-mer counting command on which reference)."
+    },
+    {
+      "type": 6,
+      "where": "C19 (Fiber-seq primary processing), C25 (alphaSat HOR annotation pipeline)",
+      "missing": "The Fiber-seq arm is externalised in full to another project with the verbatim statement 'All scripts and/or tools are included in the Fiber-seq repository and were run without modification (https://github.com/fiberseq)'. That URL is a GitHub organisation root, not a repository; no repository name, release, tag or commit is given for jasmine, pbmm2, fibertools-rs, fiberseq-qc or the FIRE pipeline, and 'run without modification' is unverifiable without a commit. Similarly, C25 delegates to five separate external repositories (CenMAP, Snakemake-HumAS-SD, stv, CenStats, CenPlot) of which only three carry a version, and the repository organisation name is written inconsistently in the supplement ('logsdonlab' in some URLs, 'logsdon-lab' in others), so two of the five printed URLs do not resolve as written.",
+      "how_to_close": "Replace the organisation root with the specific repository plus release tag or commit SHA for each externalised sub-pipeline, and correct the logsdonlab/logsdon-lab URL inconsistency."
+    },
+    {
+      "type": 4,
+      "where": "C20 (FiberHMM footprint bootstrap), C34 (DESeq2), C35 (SHAPEIT phasing), C36 (heterozygosity resampling context)",
+      "missing": "No RNG seed is recorded for any stochastic operation: the two 10,000x bootstrap resamplings of footprint size distributions and of 1x/2x CENP-A footprint enrichment ratios; the FiberHMM transition-probability training on an unspecified subset; DESeq2 dispersion estimation with fitType 'mean'; and SHAPEIT-duohmm phasing, which is seeded by default in most builds. Reproduction of these steps is therefore distributional only.",
+      "how_to_close": "Record the seed for each stochastic step, or state explicitly that only distributional agreement is claimed."
+    },
+    {
+      "type": 7,
+      "where": "C18 (DiMeLo-seq processing repository)",
+      "missing": "The single project-specific repository, https://github.com/gabriellehartley/cenpa-dimelo-processing, contains only README.md and one PNG. The README is a 10-step command list written against an HPC module system (module version strings Dorado/0.8.2, samtools/1.19.2, bedtools/2.31.1, an unversioned GenomeBrowser module), with no environment.yml, no Dockerfile, no requirements.txt, no lockfile and no release tag. The workflow is therefore bound to one site's module layout and cannot be instantiated elsewhere without reconstruction.",
+      "how_to_close": "Add a conda environment file or container recipe with a digest, tag a release, and archive it to Zenodo; replace module names with the resolved tool versions."
+    },
+    {
+      "type": 11,
+      "where": "C10 (Geneious v2019.1.3), C37 and figure generation (GraphPad Prism v9.1.0 and v10.4.1)",
+      "missing": "Two commercial, licence-gated tools sit on the analysis path. Geneious v2019.1.3 is used for the manual inspection of breakpoint-spanning ONT reads that establishes the refined 13q14.3 breakpoint - a headline claim of the paper. GraphPad Prism v9.1.0 and v10.4.1 generate Fig. 3E, Fig. 4G and SuppFigs. 7A, 11A, 12A, 18, 20 and run the unpaired t tests for methylation differences. Both are version-pinned (so Version = 1 rather than 0), but neither is freely re-executable and no exported project files or underlying value tables are deposited for the Geneious step.",
+      "how_to_close": "Provide the input tables behind each Prism panel and the statistical test outputs, and export the Geneious read alignment as a BAM plus a coordinate list so the breakpoint call can be checked without a Geneious licence."
+    },
+    {
+      "type": 3,
+      "where": "Supplementary Methods URL list",
+      "missing": "Several repository URLs printed in the supplement do not resolve as written. The CenMAP stack is cited under two different organisation spellings in adjacent sentences ('https://github.com/logsdonlab/CenMAP', 'https://github.com/logsdonlab/Snakemake-HumAS-SD', 'https://github.com/logsdonlab/CenPlot' versus 'https://github.com/logsdon-lab/CenMAP' and 'https://github.com/logsdon-lab/CenStats'); the HumAS-HMMER URL is split across a line break as 'https://github.com/fedorrik/HumAS-HMMER_for_AnVIL' with a hyphen inserted by PDF wrapping; and 'https://github.com/fiberseq' is an organisation, not a repository. These are recorded verbatim as prose defects rather than resolved by web search, per the collection protocol.",
+      "how_to_close": "Normalise all repository URLs to their canonical form and verify each one resolves from the published PDF."
+    },
+    {
+      "type": 10,
+      "where": "W1-W8",
+      "missing": "Eight wet-lab steps (ONT extraction/library/sequencing, PacBio HiFi library/sequencing, native CENP-A ChIP-seq, CENP-A CUT&RUN, DiMeLo-seq, Fiber-seq, PRO-seq, total RNA-seq) are out of scope for computational reproducibility and enter only the W denominator. They are documented to an unusually high standard - buffer compositions, kit catalogue numbers, antibody clones and concentrations, incubation times and temperatures, flow-cell chemistries - which is why their Params axis is 2 even though Data, Code and Version are 0 by construction.",
+      "how_to_close": "No action - OOS by rubric Step 5."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Project-specific code repository for this study (DiMeLo-seq arm only): https://github.com/gabriellehartley/cenpa-dimelo-processing. Cited verbatim as 'Full details of data processing are available in: https://github.com/gabriellehartley/cenpa-dimelo-processing.' Description: 'Processing workflow for CENP-A Dimelo-seq data.'",
+      "http_status": "URL-present, landing page retrieved 200 (README + CENPA_Dimelo_Example.png only)",
+      "checked_at": "2026-07-28",
+      "network_context": "Landing page and README prose read at stage 1 (permitted). Root contains exactly two files: README.md and CENPA_Dimelo_Example.png. No environment.yml, no Dockerfile, no requirements.txt, no lockfile, no release tag, no commit pin cited in the paper. README pins tool versions as HPC module strings (Dorado/0.8.2, samtools/1.19.2, bedtools/2.31.1, GenomeBrowser unversioned) and quotes modbam2bed --mod_threshold=0.8. No source line-by-line reading performed - that is stage 2."
+    },
+    {
+      "artifact": "Fiber-seq analysis code, cited as 'All scripts and/or tools are included in the Fiber-seq repository and were run without modification (https://github.com/fiberseq)'",
+      "http_status": "URL-present (GitHub organisation root, not a repository; stated-in-paper, not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "No repository name, release, tag or commit is given for jasmine, pbmm2, fibertools-rs, fiberseq-qc or the FIRE pipeline. Recorded as an unpinned workflow reference; no web search performed to guess the intended repository."
+    },
+    {
+      "artifact": "Third-party tool repositories cited in the Supplementary Methods: https://github.com/EichlerLab/compteam_tools/blob/main/ont_stats; https://github.com/mrvollger/utilities/blob/master/seq_stats.py; https://github.com/nathanweeks/exonerate/blob/master/src/util/fastaexplode.c; https://github.com/lh3/seqtk; https://github.com/epi2me-labs/modbam2bed; https://github.com/fedorrik/HumASHMMER_for_AnVIL (version AS-SFs-hmmer3.0.290621); https://github.com/fedorrik/stv; https://github.com/fedorrik/stv_chm13; https://github.com/logsdon-lab/CenMAP (v0.4.3.1); https://github.com/logsdonlab/Snakemake-HumAS-SD; https://github.com/logsdon-lab/CenStats (v0.0.10); https://github.com/logsdonlab/CenPlot (v0.1.4)",
+      "http_status": "URL-present (stated-in-paper; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "These are dependencies, not the study's own analysis code. Four carry a version string in prose (HumAS-HMMER, CenMAP, CenStats, CenPlot); none carries a commit SHA. Three of the paths point at branch tips ('main', 'master'), which are mutable. The logsdonlab/logsdon-lab organisation-name inconsistency is recorded verbatim, not corrected."
+    },
+    {
+      "artifact": "Assemblies generated by this study: NCBI BioSample PDNC4 SAMN46577041, MS4221 SAMN54265883, IMS13q SAMN54262959. Verbatim: 'The assemblies, per haplotype, are available on NCBI per cell line/BioSample as the following: PDNC4 (SAMN46577041), MS4221 (SAMN54265883), IMS13q (SAMN54262959).'",
+      "http_status": "stated-in-paper (three BioSample accessions quoted; no assembly GCA accession, no BioProject, not resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "BioSample records describe biological samples rather than sequence submissions; no GCA/GCF assembly accession and no BioProject identifier is quoted, and no release date is stated. Treated as data = 2 for assembly-consuming steps because an accession is given, with the caveat recorded here."
+    },
+    {
+      "artifact": "Raw sequencing data generated by this study (ONT whole-genome and adaptive sampling, PacBio HiFi, Passage B CENP-A ChIP-seq, CUT&RUN, DiMeLo-seq, Fiber-seq, PRO-seq, total RNA-seq): NO ACCESSION STATED ANYWHERE",
+      "http_status": "none",
+      "checked_at": "2026-07-28",
+      "network_context": "The fetched JATS XML contains no Data Availability section and no occurrence of 'accession', 'GEO', 'SRA', 'ENA' or 'BioProject'. The supplementary Methods PDF contains one occurrence of 'accession', which refers to third-party HGSVC assemblies. Absence of a stated accession is recorded as a finding; no web or SRA search was performed to resolve it."
+    },
+    {
+      "artifact": "Reused public data: GEO GSE44724 (Hasson et al. 2013 Passage A CENP-A ChIP-seq and input DNA for all three lines); HGSVC chr4 NativeCen assemblies HG01114 GCA_964198485 and HG02492 GCA_964199175, both under PRJEB83624; HPRC chr4 NativeCen HG00733 via https://github.com/humanpangenomics/hprc_intermediate_assembly/blob/main/data_tables/assemblies_release2_v1.0.index.csv; T2T-CHM13 and HG002v1.1 annotation/methylation tracks via https://github.com/marbl/CHM13 and https://github.com/marbl/T2T-Browser; 1000 Genomes Project variant calls for 2,504 unrelated individuals",
+      "http_status": "stated-in-paper (accessions and URLs quoted; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "GSE44724 is a resolvable GEO series identifier. The HPRC entry is a branch-tip GitHub path rather than a release-pinned permalink. The marbl/CHM13 and marbl/T2T-Browser references are bare repository roots with no release tag, used to obtain chm13v2.0_RefSeq_Liftoff_v4.gff3 and the Guppy-3.6.0/nanopolish CpG methylation track."
+    },
+    {
+      "artifact": "UCSC Genome Browser track hubs for each cell-line-specific assembly, referred to in 'Visualization of assembly-specific tracks and plots' and credited in Author Contributions ('SN: hosted UCSC browser tracks, generated hubs')",
+      "http_status": "none (named but no hub URL given)",
+      "checked_at": "2026-07-28",
+      "network_context": "Track hubs are the natural distribution point for the processed bigWig/bigBed/BAM products of this study, but no hub text URL, no session link and no hosting location is printed anywhere in the article or the supplement."
+    },
+    {
+      "artifact": "Source documents used for this assessment: JATS XML https://www.biorxiv.org/content/early/2025/12/25/2025.12.23.696241.source.xml; supplementary Methods PDF https://www.biorxiv.org/content/biorxiv/early/2025/12/25/2025.12.23.696241/DC1/embed/media-1.pdf; supplementary tables https://www.biorxiv.org/content/biorxiv/early/2025/12/25/2025.12.23.696241/DC2/embed/media-2.xlsx",
+      "http_status": "200 (XML 152,641 bytes; DC1 PDF 14,090,296 bytes; DC2 XLSX listed, not downloaded)",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch returned HTTP 403 on the JATS XML; retrieved with curl and a browser user-agent instead. Paper identity verified by grepping the fetched XML for 'Haplotype-Resolved Genomics Reveals Conserved Chromatin' (2 hits) and 'neocentromere' before scoring. Methods text extracted from the DC1 PDF with pdftotext because the main article carries no Methods section."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "4e976014366555ae636aa8fd9b6b2973a23355ce1ecd1908727e3ccd26082a43",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

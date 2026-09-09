@@ -1,7 +1,7 @@
 # GenomicsChain core deployment profile.
 #
 # anchor_profile decides whether this node registers the submit tools at all.
-# It ships false: off-anchor, gc_tier1_submit and gc_tier2_submit are absent from
+# It ships false: off-anchor, gc_tier1_submit and gc_tier3_submit are absent from
 # the tool list rather than present-and-refusing, so a node that was never meant
 # to sign cannot be talked into signing.
 #

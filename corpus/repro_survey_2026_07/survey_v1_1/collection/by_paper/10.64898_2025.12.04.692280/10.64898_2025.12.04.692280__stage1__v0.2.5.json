@@ -1,0 +1,486 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "4e46ca64f4f597731dcdcb934f8d46fe2637d7150d4369c03bf2e15c95c6330c",
+  "canonical_id": {
+    "value": "10.64898/2025.12.04.692280",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.04.692280v1",
+      "biorxiv:2025.12.04.692280v1",
+      "europepmc:PPR1232214",
+      "pmid:41573893"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Population-genomic characterisation of 213 Bacillus anthracis genomes (122 from cultured isolates, 91 from culture-free targeted capture) from the Ngorongoro Conservation Area, northern Tanzania. Computational reproduction target: the read-to-SNP pipeline (Trimmomatic trimming, Bowtie2 mapping to the Ames Ancestor reference NC_007530.2, VarScan SNP calling, custom variant-site filtering to a 213 x 1196 concatenated SNP alignment, coverage/contamination QC), the phylogenomic analyses (IQ-TREE ML with model selection and ascertainment-bias correction, MrBayes posterior tree sampling, BAli-Phy ancestral state inference), and the downstream diversity/statistics in R (duplicate collapsing, ape dist.dna SNP distances, iNEXT rarefaction, permutation tests of isolate-vs-targeted-capture diversity, multi-scale SNP distance comparison, epidemiologically-linked-group and risk-zone permutation tests, and UniFrac trait-clustering via the toolkitSeqTree R package). Wet-lab work (field sample collection 2016-2021, culture on sheep blood agar, QIAamp/DNeasy DNA extraction, qPCR confirmation, MicrobesNG Illumina WGS library prep, RNA-bait targeted-capture library prep with NEBNext Ultra II FS and myBaits hybridisation, NextSeq 500/550 sequencing) is out of computational-reproduction scope.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis-invocation extracted from the Methods prose ('Read mapping and SNP calling' through 'Assessing population structure through phylogenetic clustering by trait'). 15 computational steps. Wet-lab procedures are counted in W (6) but are not enumerated in the steps array, consistent with prior stage-1 reports in this collection: (1) field sample collection from carcasses/human eschars, (2) culture on sheep blood agar + QIAamp UCP Pathogen Mini / DNeasy DNA extraction + 0.2 um filtration, (3) qPCR confirmation of B. anthracis, (4) MicrobesNG Illumina library prep and WGS of isolates, (5) RNA-bait targeted-capture library prep (NEBNext Ultra II FS, myBaits Hybridization Capture manual v4.01/v5.02), (6) Illumina NextSeq 500 (2x75/2x100) and NextSeq 550 (2x150) sequencing. The RNA-bait core-genome design is described only as 'as described' with reference to prior work (80 bp baits, ~50% overlap, plasmids PXO1/PXO2 excluded, 52 public BA genomes, 89% of NC_007530.2 covered); because no tool is named it is not enumerated as its own C-step and is instead recorded under gap types 6 and 8. Repository reading was limited to landing pages and README prose plus the top-level file listing; no workflow source was opened.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Read trimming of raw Illumina reads (n = 288 samples) with Trimmomatic (paper writes 'Trimmomatic (v. 039)', read as 0.39; OHRBID README also pins Trimmomatic 0.39). No trimming parameters (adapter file, LEADING/TRAILING/SLIDINGWINDOW/MINLEN) are stated anywhere in prose.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "params-absent",
+        "version-typo-in-prose"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Read mapping with 'Bowtie v.2' against the B. anthracis Ames Ancestor reference NC_007530.2 with an insert size of 800 bp. Only the major version is given (no 2.x.y pin); no alignment preset or other flags stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-major-only",
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "SNP calling with VarScan using a coverage threshold of 8 and a minimum variant frequency of 80% (pileup generated with samtools per the anthraxdiversityscripts README). Version not given in the paper; the repository README pins VarScan v2.4.4.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "version-from-readme-not-paper"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Variant-site filtering and multiple-sequence-alignment generation by the custom pipeline (scripts in matejmedvecky/anthraxdiversityscripts; bam-readcount used for read-mapping metrics per README): base alleles require >= 6X read coverage and 80% homozygosity, a SNP site must be met by >= 20 samples, sites below the coverage threshold are written as gaps ('-') and sites below the frequency threshold as ambiguous ('N'); output is the concatenated SNP alignment of 213 sequences x 1196 bases.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script",
+        "version-absent",
+        "no-commit-or-tag-pinned"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Sequence QC and exclusion (75 of 288 sequences dropped): coverage criterion is numeric and stated (mapped reads must cover > 79% of the Ames Ancestor reference at >= 8X average depth), but contamination was identified by 'manual inspection of BAM files with suspicious frequencies of alternate alleles via Tablet v1.21' with no numeric rule and no list of excluded samples.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "manual-curation",
+        "thresholds-partial",
+        "exclusion-list-absent"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Model selection and maximum-likelihood tree estimation in IQ-TREE using slow bootstrapping with 1,000 replicates; selected model was Kimura 3-parameter with equal base frequencies; ascertainment-bias correction applied for the SNP-only alignment. No IQ-TREE version and no command line given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Bayesian posterior tree sampling with MrBayes Version 3.2.7a under the Kimura 3-parameter substitution model, unconstrained branch-length prior, chain length 10,000,000 iterations, sampling every 10,000 states, 10% burn-in removed; run on the case-de-duplicated alignment (n = 150 genomes).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "seed-absent",
+        "code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Collapsing of unambiguous duplicate sequences with a 'custom R-script', and de-duplication by case retaining the sample with the highest coverage (yielding n = 150). Script not deposited; no R version; the definition of 'unambiguous duplicate' is not formalised.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script",
+        "version-absent",
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Secondary identity check and pairwise genetic distances with the dist.dna function of the R package ape, using the Hamming distance (absolute number of differing sites, referred to as SNP distance). No ape version, no R version, and no statement of how gap ('-') and ambiguous ('N') characters are handled (e.g. pairwise.deletion).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "params-partial",
+        "missing-data-handling-unstated"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Rarefaction analysis with the iNEXT R package comparing 122 isolate-derived sequences (55 cases) with 91 targeted-capture sequences (84 cases). Sample sizes are given, but no iNEXT version, no diversity order q, no endpoint/knots, and no bootstrap replicate count.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "params-partial",
+        "seed-absent"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Permutation test of mean SNP distance between isolate-derived and targeted-capture sequences: 55 cases subsampled from the 78 NCA targeted-capture cases, repeated to produce 100 subsets, each tested against the full isolate set; alpha 0.05 Bonferroni-corrected to 0.0005. No tool, no version, no seed, no script deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script",
+        "version-absent",
+        "seed-absent"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Ancestral character state inference on a fixed alignment with BAli-Phy (v.4.0-beta.16) under a general time reversible substitution model; two independent runs of 50,000 states combined, consensus tree and alignment determined with the bp-analyze script.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "seed-absent",
+        "code-not-deposited"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Genomic distance and diversity comparison across physical scales: SNP distances examined among cases, within individual cases, and within sample material, to test whether diversity decreases towards smaller scales. No tool, no version, no script, and no explicit summary statistic or test named for the scale comparison itself.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script",
+        "version-absent",
+        "params-partial"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Assignment of epidemiologically linked groups (ELGs: cases within 10 days and within 10 km of each other) and of previously determined high/low anthrax infection-risk zones, followed by permutation tests comparing group means (random reshuffling of value assignments preserving category proportions, difference between means computed 10,000 times). No tool, version, seed, or script; the participatory-mapping risk model is cited to prior work.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "custom-script",
+        "version-absent",
+        "seed-absent",
+        "params-by-reference"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Phylogenetic clustering of five categorical traits by a UniFrac-based method implemented in the SeqTree toolkit (https://github.com/will-harvey/toolkit_seqTree): 100 annotated topologies from the MrBayes posterior, trait labels shuffled 1,000 times per tree to build null distributions, empirical right-tailed p-values, Benjamini-Hochberg FDR correction. The R package is public but carries no version and the analysis driver script is not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "version-absent",
+        "seed-absent",
+        "driver-script-not-deposited"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 12,
+    "n_X": 0,
+    "S": 15,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/15 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "3/15 (20%) computational steps reach RI at the stage-1 prose ceiling. The three RI steps are C3 (VarScan, coverage threshold 8 / minimum variant frequency 80%, version 2.4.4 pinned in the anthraxdiversityscripts README), C7 (MrBayes 3.2.7a with a fully stated MCMC configuration) and C12 (BAli-Phy 4.0-beta.16 with GTR, 2 x 50,000 states and bp-analyze). The remaining 12 steps cap at NI. The dominant single cause is the version axis: exact pins exist in prose only for Trimmomatic 0.39, Tablet v1.21, MrBayes 3.2.7a and BAli-Phy 4.0-beta.16, while Bowtie is given as 'v.2' (major only), IQ-TREE, ape, iNEXT and toolkitSeqTree carry no version at all, no R version or sessionInfo is reported anywhere, and the custom pipeline and custom R scripts have no commit, tag or release. Secondary causes are absent parameters (C1: no Trimmomatic settings whatsoever) and absent code (C5: contamination exclusion is manual Tablet inspection with no rule and no excluded-sample list). Data is the strongest axis and scores 2 everywhere: both BioProjects (PRJNA918617, PRJNA1298849) are public and unembargoed, and the Microreact project supplying per-sample metadata and the tree file resolves publicly. No step can exceed version=1 at stage 1 by construction; the env-lock claim carried by the OHRBID README is a claim only and is verified at stage 2.",
+    "coverage": "15 computational steps assessed from Methods prose plus three GitHub landing pages and their README prose; 6 wet-lab steps counted in W and excluded from computational-reproduction scope (n_X is 0 because wet-lab steps are not enumerated in the steps array). Full text obtained through the r.jina.ai text proxy of the bioRxiv .full page after the JATS XML endpoint returned HTTP 429 repeatedly and then HTTP 403, and after PMC (PMC12822646) declined to host the full text under the author-selected licence. Identity of the fetched text was confirmed against the title and abstract (Ngorongoro Conservation Area, Bacillus anthracis, 213 genomes, 122 isolate / 91 targeted capture, Ames Ancestor NC_007530.2). Repository reading was limited to README prose and top-level directory listings; no workflow source was opened.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Study-generated sequence data (C1-C5) and the derived SNP alignment",
+      "missing": "The Data Availability statement is concrete and public ('All sequence data generated as part of this study are available under BioProject accession numbers PRJNA918617 (isolates) and PRJNA1298849 (targeted capture). Individual BioSample accessions are also included in the Microreact project spreadsheet.'), which is good practice. Two residual gaps remain. First, the per-sample mapping from the 213 analysed sequences to BioSample accessions exists only inside the Microreact spreadsheet, not in the paper or its supplementary tables, so the paper alone does not identify which runs were used. Second, the BioProject landing page for PRJNA1298849 listed 39 SRA experiments on 2026-07-28 while the Methods state that 111 targeted-capture sequences were generated for this study; this was not reconciled at stage 1. The final concatenated SNP alignment (213 sequences x 1196 bases), which is the input to every phylogenetic and statistical step, is not stated as deposited anywhere as a file.",
+      "how_to_close": "Deposit the 213 x 1196 concatenated SNP alignment (and the case/ELG assignment table) as a supplementary file or in a repository, restate the BioSample-to-sequence mapping in a supplementary table rather than only in Microreact, and confirm that all 111 targeted-capture runs are released under PRJNA1298849."
+    },
+    {
+      "type": 2,
+      "where": "Software environment for all 15 computational steps",
+      "missing": "The pipeline that produced the results (matejmedvecky/anthraxdiversityscripts) has no environment file at all: its top level is bin/, data/, LICENSE and README.md, and the README gives no installation instructions, no conda environment.yml, no requirements.txt, no Dockerfile and no lockfile. The alternative Nextflow implementation (tlforde/OHRBID) does carry an environment claim - a conda/ directory where 'the software versions are pinned in the recipes', nextflow.config with docker / singularity / conda / climbnotebook profiles, CLIMB-BIG-DATA quay.io container images whose 'tag ... refers to the version of the software', and a custom pybactocap:1.0.0 container - but no image digest, no lockfile, and no release tag, and the README itself records that the conda and container versions diverge (bam-readcount 0.8 in conda versus 1.0.1 in the container). None of the R-based analysis (C8-C11, C13-C15) has any environment capture: no R version, no Bioconductor release, no renv.lock and no sessionInfo, even though ape, iNEXT and toolkitSeqTree are all load-bearing.",
+      "how_to_close": "State which of the two pipelines produced the published results and pin it by commit or tagged release; publish a container digest (not just a tag) for the Nextflow profile; and add an renv.lock or conda environment plus sessionInfo covering the R analysis stack."
+    },
+    {
+      "type": 3,
+      "where": "Downstream analysis code (C6-C15)",
+      "missing": "Code availability covers only the read-mapping and SNP-calling stage. The two pipeline repositories implement trimming, mapping, SNP calling and variant-site filtering; nothing downstream is deposited. The Methods refer to 'a custom R-script' for duplicate collapsing (C8) and describe the permutation tests (C11, C14), the multi-scale distance comparison (C13), the rarefaction (C10) and the UniFrac clustering driver (C15) without any accompanying script. The toolkitSeqTree R package is public, but the code that fed 100 MrBayes topologies through it with 1,000 label shuffles and BH correction is not. Command lines for IQ-TREE, MrBayes and BAli-Phy are not provided either.",
+      "how_to_close": "Deposit the R analysis scripts and the phylogenetics command lines / configuration files in a single repository organised per Methods subsection, and cite it in a Code Availability statement (the paper currently has no distinct Code Availability section - the repository URLs appear inline in the Methods)."
+    },
+    {
+      "type": 4,
+      "where": "Previously published sequences reused as input (C1-C4)",
+      "missing": "The Methods state that 72 isolate-derived sequences and 52 targeted-capture sequences from earlier work were included alongside the sequences generated here, giving the 288 raw samples processed. Their accessions are not restated in the Methods prose; the reader is directed to the Microreact spreadsheet column recording 'the study in which any sequences were originally published'. No freeze date or download date is recorded for these reused datasets.",
+      "how_to_close": "List the reused run/BioSample accessions and their source studies in a supplementary table with the download date, rather than deferring entirely to the Microreact project."
+    },
+    {
+      "type": 5,
+      "where": "Reference genome (C2, C4, C5)",
+      "missing": "The reference is version-pinned as the Ames Ancestor NC_007530.2, which is good practice. However, the source and exact FASTA used for mapping are not given (RefSeq record download date, and whether the pXO1/pXO2 plasmid replicons were present in the mapping reference or excluded as they were for bait design). The coverage-breadth QC criterion ('> 79% of the Ames Ancestor reference genome') depends on which sequences the reference FASTA contained.",
+      "how_to_close": "State the download URL and date for the reference FASTA and whether plasmid replicons were included in the mapping index."
+    },
+    {
+      "type": 6,
+      "where": "External reference sets used for capture design and interpretation",
+      "missing": "The RNA baits were designed against a core genome 'determined using 52 BA genomes publicly available at the time', covering 89% of NC_007530.2. Neither the accession list of those 52 genomes nor the date of the snapshot is given, and the bait FASTA / target BED is not deposited. Because the targeted-capture data are only defined over the captured core, the analysable site space cannot be reconstructed without this. The SNP profile comparison against 'the genotypes defined in the predecessor study' likewise depends on an external genotype definition that is not tabulated in this paper.",
+      "how_to_close": "Deposit the bait design (FASTA and target intervals against NC_007530.2), list the 52 accessions and the snapshot date, and include the predecessor-study genotype definition table as supplementary material."
+    },
+    {
+      "type": 7,
+      "where": "Stochastic steps without recorded seeds (C7, C10, C11, C12, C14, C15)",
+      "missing": "Six steps are stochastic and none reports a random seed: the MrBayes MCMC (10,000,000 iterations), the BAli-Phy MCMC (two runs of 50,000 states), the iNEXT rarefaction bootstrap, the 100-subset case subsampling for the isolate-versus-targeted-capture permutation test, the 10,000-replicate reshuffling for the ELG and risk-zone comparisons, and the 1,000 tip-label shuffles per tree in the UniFrac analysis. The reported p-values (including the Bonferroni threshold of 0.0005 and the BH-corrected UniFrac p-values) therefore cannot be reproduced exactly.",
+      "how_to_close": "Set and report random seeds in the deposited scripts for every MCMC, bootstrap, subsampling and label-shuffling step."
+    },
+    {
+      "type": 8,
+      "where": "Parameters given by external reference or omitted (C1, C2, C6, C13)",
+      "missing": "Trimmomatic is named with a version but no parameters at all - no adapter file, no quality or length settings. Bowtie2 is given only an insert size of 800 bp with no preset or mismatch/reporting flags. The targeted-capture protocol is described as 'following protocols previously described' and the bait design 'as described', deferring the specification to prior publications. The multi-scale diversity comparison (C13) states the three scales but not the statistic or test used to compare them.",
+      "how_to_close": "List the actual command lines for trimming, mapping and tree inference (or ship the pipeline configuration), and name the statistic and test used for the across-scale diversity comparison."
+    },
+    {
+      "type": 9,
+      "where": "Quality-control thresholds and exclusions (C5)",
+      "missing": "The coverage criterion is numeric and reproducible (> 79% breadth at >= 8X average depth), and the SNP-calling thresholds are stated (>= 6X per base allele, 80% homozygosity, site present in >= 20 samples). But 75 of 288 sequences were excluded on a mixed criterion in which contamination was judged by 'manual inspection of BAM files with suspicious frequencies of alternate alleles via Tablet v1.21'. No numeric definition of 'suspicious', no per-sample QC metric table, and no list of which sequences were excluded on which criterion are provided, so the 288 -> 213 reduction cannot be reproduced.",
+      "how_to_close": "Publish a per-sample QC table with breadth, depth, alternate-allele frequency summary, the applied thresholds, and an explicit pass / fail / excluded column naming the failing criterion."
+    },
+    {
+      "type": 10,
+      "where": "Manual curation steps (C5, C8)",
+      "missing": "Two steps depend on human judgement that is not recorded: the manual Tablet inspection of BAM files for contamination (C5), and the identification of 'unambiguous duplicates' prior to the ape-based secondary identity check (C8), where the criterion distinguishing an unambiguous duplicate from a near-identical sequence is not defined.",
+      "how_to_close": "Replace the manual contamination call with a scripted rule (or publish the decision table), and formalise the duplicate-collapsing criterion as an explicit SNP-distance or identity threshold."
+    },
+    {
+      "type": 11,
+      "where": "Workflow orchestration and pipeline identity",
+      "missing": "The Methods state 'Raw reads from a total of 288 samples were processed in a custom pipeline' and then 'The original pipeline and a Nextflow version are available on GitHub', without saying which of the two produced the published results. The two implementations are not equivalent artefacts - one is a Python/shell script collection with no environment declaration, the other a Nextflow DSL2 workflow with conda and container profiles whose own README notes version divergence between the two execution modes. Downstream of the alignment there is no workflow manager, no driver script and no stated execution order for the ten R and phylogenetics steps.",
+      "how_to_close": "Name the pipeline and version actually used for the published results, and provide a driver script or workflow definition covering the phylogenetics and R analyses."
+    },
+    {
+      "type": 12,
+      "where": "Software identity and provenance of the three cited repositories",
+      "missing": "All three repositories (matejmedvecky/anthraxdiversityscripts, tlforde/OHRBID, will-harvey/toolkit_seqTree) are cited as bare GitHub URLs with no commit SHA, no tagged release, and no Zenodo or Software Heritage DOI. None of the three showed a release or archival DOI on its landing page. There is therefore no immutable pointer to the code state corresponding to this manuscript, and toolkitSeqTree in particular is installed from the default branch via remotes::install_github, which is a moving target.",
+      "how_to_close": "Archive each repository at a tagged release with a Zenodo DOI and cite the DOI plus commit SHA in the Methods or in a Code Availability statement."
+    },
+    {
+      "type": 13,
+      "where": "Intermediate result artifacts",
+      "missing": "The central derived artifacts are not deposited as files: the concatenated SNP alignment (213 x 1196), the per-sample BAM or pileup files inspected for contamination, the SNP profile table, the de-duplicated 150-genome alignment used for clustering, the IQ-TREE ML tree, and the 100-topology MrBayes posterior sample consumed by the UniFrac analysis. The Microreact project carries one tree file and an 18-column metadata spreadsheet, which is a genuine partial release, but the alignment and the posterior tree sample are the inputs that the statistical conclusions actually rest on.",
+      "how_to_close": "Deposit the SNP alignment, the de-duplicated alignment, the ML tree and the MrBayes posterior tree sample as supplementary files or in a versioned repository archive."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (pipeline that produced the results): https://github.com/matejmedvecky/anthraxdiversityscripts - stated verbatim in the Methods: 'The original pipeline and a Nextflow version are available on GitHub (https://github.com/matejmedvecky/anthraxdiversityscripts; https://github.com/tlforde/OHRBID).' README description: 'A series of scripts for the assessment of SNP read mapping metrics data, variant site filtering and generation of variant call and MSA alignment files'. Tools named in README: VarScan v2.4.4, samtools (unversioned), bam-readcount (unversioned), Java. Top level observed: bin/, data/, LICENSE (GPL-3.0), README.md. No installation instructions, no requirements.txt, no conda environment.yml, no Dockerfile, no lockfile, no release tag, no Zenodo DOI. Status: URL-present and resolving; no commit or tag pinned in the paper.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of the github.com landing page (curl was unavailable in this sandbox session)"
+    },
+    {
+      "artifact": "code repo (Nextflow re-implementation): https://github.com/tlforde/OHRBID - 'bactocap' Nextflow workflow of the One Health Research into Bacterial Infectious Diseases Lab, University of Glasgow, described as a translation of Matej Medvecky's bactocap python pipeline for 'analysis and SNP calling of Illumina short-read sequences'. README claims: DSL2-capable Nextflow, 'It is recommended to run the pipeline with NXF_VER=22.10.4'; Trimmomatic 0.39; bam-readcount 1.0.1 in the container and 0.8 in conda; CLIMB-BIG-DATA docker images from quay.io where 'The tag of the container images refers to the version of the software'; a custom pybactocap:1.0.0 container; conda recipes in conda/ where 'The software versions are pinned in the recipes'; 'cleanup = true has been set in nextflow.config, note this prevents the use of the resume feature'. Top level observed: bin/, conda/, modules/, workflows/, README.md, main.nf, nextflow.config. No image digest, no lockfile, no release tag, no Zenodo DOI. Status: URL-present and resolving. This repository is the sole basis for the env_lock_claimed capture_claim, and it covers at most steps C1-C4.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of the github.com landing page and of raw.githubusercontent.com/tlforde/OHRBID/main/README.md"
+    },
+    {
+      "artifact": "code repo (analysis library): https://github.com/will-harvey/toolkit_seqTree - cited verbatim in the Methods as the implementation of the UniFrac-based clustering method ('as implemented within the SeqTree toolkit'). README: R package toolkitSeqTree for analysing sequence alignments and phylogenetic trees; installation via remotes::install_github('will-harvey/toolkit_seqTree/toolkitSeqTree') or devtools; 'Compatible with most versions of R and Rstudio', tested with R v4.3.2 and RStudio v2025.09.1+401 on Mac, Windows and Ubuntu. Top level observed: toolkitSeqTree/, .gitignore, LICENSE (GPL-3.0), README.md. No renv.lock, no conda environment, no Dockerfile, no release tag, no Zenodo DOI. Status: URL-present and resolving; installed from the default branch, so no immutable version.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of the github.com landing page"
+    },
+    {
+      "artifact": "data accession (study-generated, isolates): NCBI BioProject PRJNA918617 - stated verbatim in Data Availability: 'All sequence data generated as part of this study are available under BioProject accession numbers PRJNA918617 (isolates) and PRJNA1298849 (targeted capture).' Landing page title 'Insights into genomic variation of closely related B. anthracis isolates in a hyperendemic area', University of Glasgow, registered 10-Apr-2023, 50 linked SRA experiments, no embargo or access restriction indicated. Status: public and resolving.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of ncbi.nlm.nih.gov/bioproject and NCBI eutils esearch (db=bioproject) which returned count=2 for the two accessions"
+    },
+    {
+      "artifact": "data accession (study-generated, targeted capture): NCBI BioProject PRJNA1298849 - landing page title 'Target-Enrichment Sequencing of Bacillus anthracis from Human and Animal Samples in Tanzania', University of Glasgow, registered 30-Jul-2025, 39 linked SRA experiments, no embargo or access restriction indicated. Status: public and resolving. Unreconciled at stage 1: the Methods state that 111 targeted-capture sequences were generated for this study, which exceeds the 39 SRA experiments shown on the landing page; this was not investigated further (no run-level enumeration was performed).",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of ncbi.nlm.nih.gov/bioproject"
+    },
+    {
+      "artifact": "metadata / derived artifact: Microreact project https://microreact.org/project/ivGWEG2R5UUM3vdQ5kpTck-ba-ncahilbig-medvecky-forde - stated verbatim in Data Availability as the source of cases, species, host type, sampling location and year, high/low risk classification, season, sequence retrieval method, epidemiologically linked groups, SNP profiles, sample material, original publication, and individual BioSample accessions. The public JSON API returned a valid project (meta name 'BA-NCA_Hilbig-Medvecky-Forde') containing two files - an Excel metadata spreadsheet and a tree file - plus an 18-column metadata table, tree, map, filter and style configuration. Status: URL-present and publicly resolving. A read-me for the Microreact contents is cited as Supplementary Material 2.",
+      "http_status": "200 OK (https://microreact.org/api/projects/json?project=ivGWEG2R5UUM3vdQ5kpTck-ba-ncahilbig-medvecky-forde)",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch of the Microreact public project JSON endpoint"
+    },
+    {
+      "artifact": "reference resource: B. anthracis Ames Ancestor chromosome NC_007530.2, used as the mapping reference and as the coordinate system for bait design (baits excluded plasmids PXO1 and PXO2 and covered 89% of this sequence). Version-pinned in prose; no download URL or date given.",
+      "http_status": "n/a (no URL provided in the paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "prose-cited RefSeq accession, not independently retrieved at stage 1"
+    },
+    {
+      "artifact": "software resource: BAli-Phy v.4.0-beta.16 with the bp-analyze script, project site https://www.bali-phy.org/ cited in prose. No repository commit or archive DOI given.",
+      "http_status": "not checked",
+      "checked_at": "2026-07-28",
+      "network_context": "prose-cited software URL"
+    },
+    {
+      "artifact": "full text source: bioRxiv JATS XML https://www.biorxiv.org/content/early/2025/12/10/2025.12.04.692280.source.xml returned HTTP 429 on five successive attempts and then HTTP 403; the .full HTML page also returned HTTP 403 to WebFetch. Europe PMC record PPR1232214 carries only the abstract, and PMC12822646 states 'The license terms selected by the author(s) for this preprint version do not permit archiving in PMC.' Methods text was obtained through the r.jina.ai text proxy of https://www.biorxiv.org/content/10.64898/2025.12.04.692280v1.full and its identity confirmed against the title and abstract retrieved independently from the bioRxiv details API and Europe PMC.",
+      "http_status": "429 then 403 (bioRxiv direct); 200 via r.jina.ai proxy",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch only; curl and all shell hashing/network commands were blocked by the sandbox in this session"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c0accf51a06e49d2393edb454d25bb5de3de003fbb9bff9664bf416888cce053",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

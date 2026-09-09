@@ -1,0 +1,329 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "316e0b67b8b0cfe007204c7ca211b690d80f2ab051ab7a904675f024ac54b0fa",
+  "canonical_id": {
+    "value": "10.1101/2025.04.15.649007",
+    "kind": "doi",
+    "aliases": [
+      "PPR1007217",
+      "https://www.biorxiv.org/content/10.1101/2025.04.15.649007v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The bioinformatic analysis chain that converts raw WGS FASTQ from three sequencers (Illumina NovaSeq 6000, MGI DNBSeq-T7, Salus EVO) into per-site basecall mismatch/error rates, observed-Q-vs-cycle curves, false-positive variant counts at MF>0.5%, and error-bias-pattern tables (Tables 1-3, Figures 1-5). Wet-lab culture / library prep / sequencing / in-house Sanger assembly of the E. coli reference are OOS (W).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool invocation in the MATERIALS AND METHODS 'Bioinformatic analysis' subsection, plus two unnamed-but-distinct custom analyses that produce the headline numbers (error-rate computation; FP-variant + bias-pattern analysis). No workflow file (no Snakefile/CWL/Nextflow/WDL/Makefile) exists - the only deposited code is a single Python script. IMPORTANT PROVENANCE NOTE: this preprint is WITHDRAWN (v2, 2025-11-14; withdrawal statement replaces the abstract, authors ask that it not be cited). Both the v2 landing page and the v2 JATS XML carry only the withdrawal notice and were additionally Cloudflare-blocked (HTTP 403 / error 1015) at assessment time; the assessment was therefore made from the archived v1 full PDF (posted 2025-04-20, https://www.biorxiv.org/content/biorxiv/early/2025/04/20/2025.04.15.649007.full.pdf, 16 pp, title-phrase-verified), which retains the complete Methods and Data-availability text. Every page of that PDF is watermarked WITHDRAWN.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "E. coli ATCC8739 culture (~13 h, ~40 generations) and genomic DNA extraction (TIANGEN DP302-02); Coriell NA12878 gDNA purchased and used directly",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "DNA library preparation (VAHTS Universal Plus DNA Library Prep Kit for Illumina V2; fragmentation, end-repair, A-tailing, adapter ligation, 2 PCR cycles), QC on LabChip GX Touch",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Sequencing of the ten library splits: 2 on DNBSeq-T7 and 2 on NovaSeq 6000 (Sequanta Technologies), 6 on Salus EVO (EVO Sequencing Kit PRM-PE150), PE150 dual-barcode WGS; vendor on-instrument basecalling produces the raw FASTQ",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "In-house assembly of the E. coli ATCC8739 reference genome by Sanger sequencing at Sangon Biotech (the reference against which all E. coli mismatch rates are computed)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "fastp - adapter removal and low-quality read filtering ('low-quality' defined as reads containing >=15 basecalls with Q<25)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "bwa-mem2 - alignment of clean reads to the in-house E. coli ATCC8739 Sanger assembly and to human hg19",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Sambamba - duplicate removal and 'other reads manipulation'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "GATK - merge of the six EVO aligned BAMs and down-sampling to approximately the NovaSeq/T7 coverage (~1600x for E. coli); also 'picked the one of two with less overall mismatch rate' for T7 and NovaSeq",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "get_position_info.py - extraction of per-site depth, base composition, base quality and mapping quality from the BAMs (https://github.com/yaotianran/get_position_info, public, GPL-3.0, no releases/tags, deps stated as python + pysam without versions)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Mismatch-rate / error-rate computation (undeposited custom analysis): mismatch basecalls over total aligned bases; all sites for haploid E. coli, restricted to homozygous loci of the GIAB NA12878 VCF (GRCh37 v4.2.1) for human; observed-Q-vs-cycle curves (Tables 1-2, Figures 1-2)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "False-positive variant enumeration and error-bias-pattern analysis (undeposited custom analysis): sites with at least one allele at MF>0.005 over 100,000 random E. coli sites, plus depth>=1000x / >=1500x strata, plus sequence-context-dependent and -independent bias profiling (Table 3, Figures 3-5)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 7,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/7 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Reported for completeness only: has_validated_env_capture=false, so this per-paper ratio is NOT a publishable descriptor (P2), and it under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency. n_exact_capture_unexecuted=0, n_fetch_required=0.",
+    "inference_inclusive_upper_bound": "(n_R + n_RI)/|S| = (0+5)/7 = 71% readiness upper bound (RI-inclusive; 'documented enough to attempt', never 'reproducible'). The 5 RI steps are the four off-the-shelf tool invocations plus the one deposited script; the 2 NI steps are the undeposited custom analyses that produce every headline number in the abstract.",
+    "coverage": "computational coverage |S|/(|S|+|W|) = 7/11 = 64% (4 wet-lab steps OOS: culture/extraction, library prep, sequencing incl. vendor basecalling, in-house Sanger assembly of the E. coli reference)",
+    "repro_index": {
+      "value": 0.5,
+      "coverage": "7/11 = 64%",
+      "S": 7,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "MATERIALS AND METHODS, 'Bioinformatic analysis'; and the get_position_info GitHub README",
+      "missing": "2a - no version is stated anywhere for fastp, bwa-mem2, Sambamba or GATK (only literature citations), and the deposited script's README names its dependencies as 'python' and 'pysam' with no version constraint. No requirements.txt, environment.yml, conda/pixi/renv lock, or Dockerfile exists in the repository, and no release or tag pins the script itself.",
+      "how_to_close": "State exact tool versions and full command lines in Methods; add a lockfile or container digest to the repository and tag the commit used for the manuscript."
+    },
+    {
+      "type": 12,
+      "where": "Data availability: 'The script was submitted to Github' (singular) - https://github.com/yaotianran/get_position_info",
+      "missing": "Only the per-site extraction script is deposited. The code that turns its TSV output into the manuscript's actual results - mismatch/error-rate aggregation, observed-Q-vs-cycle curves, the MF>0.005 false-positive variant enumeration, and the sequence-context bias-pattern analysis - is not deposited or linked anywhere.",
+      "how_to_close": "Deposit the downstream analysis scripts/notebooks (and the figure-generating code) in the same repository with a tagged release."
+    },
+    {
+      "type": 5,
+      "where": "MATERIALS AND METHODS, 'Samples' and 'Bioinformatic analysis'",
+      "missing": "The E. coli ATCC8739 reference genome used for every mismatch-rate calculation was assembled in-house by Sanger sequencing at Sangon Biotech and carries no accession, DOI or download link. Substituting the public ATCC8739 assembly would not reproduce the reported numbers exactly. Likewise the list of the '100,000 random sites' used for Table 3 is not deposited.",
+      "how_to_close": "Deposit the in-house assembly (GenBank/Zenodo) with an accession, and deposit the 100,000-site list (or the seed and the selection code)."
+    },
+    {
+      "type": 1,
+      "where": "MATERIALS AND METHODS, 'Sequencing' and 'Bioinformatic analysis' vs. BioProject PRJNA1207107 (10 SRA runs)",
+      "missing": "No mapping from the 10 deposited runs to the analysis units. The paper says two libraries each went to T7 and NovaSeq and that 'we picked the one of two with less overall mismatch rate for further analysis' without naming which run was picked; the six EVO runs merged for the averaged result are likewise not enumerated by accession.",
+      "how_to_close": "Add a sample-to-accession table naming, per figure/table, which SRR runs were used, merged, or discarded."
+    },
+    {
+      "type": 4,
+      "where": "C4 (GATK down-sampling) and C7 (100,000 random E. coli sites)",
+      "missing": "Two stochastic operations with no random seed reported and no deposited seed-consuming code: the down-sampling of the merged EVO BAM to '~ the same coverage', and the random draw of 100,000 genome sites underlying Table 3. Re-running yields a different draw, so only distributional agreement is achievable.",
+      "how_to_close": "Report the seed and the exact GATK tool/arguments, or deposit the down-sampled BAM and the site list."
+    },
+    {
+      "type": 11,
+      "where": "W3 sequencing / the object of study itself",
+      "missing": "The three vendor basecallers (NovaSeq 6000 RTA, DNBSeq-T7, Salus EVO) are proprietary, unversioned in the text, and one of them (EVO) is the sequencing platform of the author's own company (Shenzhen Salus BioMed). The raw FASTQ are deposited, so the computational chain remains assessable, but the basecalling stage that the paper measures cannot itself be re-executed.",
+      "how_to_close": "Report instrument control-software / basecaller versions and run dates for each platform."
+    },
+    {
+      "type": 13,
+      "where": "C2 (hg19), C6 (GIAB NA12878 VCF)",
+      "missing": "External reference resources are obtained out of band. The GIAB truth set is pinned in prose only (GRCh37 v4.2.1, FTP URL given in reference 16) and hg19 is named without a source, build patch or checksum. No workflow rule fetches either; Stage-1 therefore leaves env_capture_class='n/a' and does not assign A/B/C.",
+      "how_to_close": "Add a download rule pinning the versioned artifact (or its checksum) inside the executable workflow."
+    },
+    {
+      "type": 10,
+      "where": "W1-W4",
+      "missing": "Four wet-lab / service steps (culture and DNA extraction, library preparation, sequencing, in-house Sanger assembly) are out of scope for computational reproducibility and are excluded from |S|. Note that W4 is OOS as a procedure but produces a data artifact whose absence is scored under gap type 5.",
+      "how_to_close": "n/a - OOS by NASEM 2019 scope."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (stated in Data availability): https://github.com/yaotianran/get_position_info",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:20:42Z",
+      "network_context": "public internet, unauthenticated curl -L and WebFetch; repo exists, public, GPL-3.0, files: get_position_info.py, lib/, README.md, LICENSE; 11 commits on master; no releases/tags; no requirements.txt / environment.yml / Dockerfile / lockfile; README states dependencies as 'python' and 'pysam' with no versions"
+    },
+    {
+      "artifact": "data accession (stated in Data availability): NCBI BioProject PRJNA1207107 - https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1207107",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:20:42Z",
+      "network_context": "public internet; NCBI eutils esearch db=sra term=PRJNA1207107 returns Count=10 runs, consistent with the ten library splits described in Methods; open (not controlled) access"
+    },
+    {
+      "artifact": "external reference resource (cited, reference 16): GIAB NA12878/HG001 NISTv4.2.1 GRCh37 truth VCF - https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/NA12878_HG001/NISTv4.2.1/GRCh37/",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:20:42Z",
+      "network_context": "public internet; version pinned in paper prose only (GRCh37 4.2.1)"
+    },
+    {
+      "artifact": "paper v2 landing page (WITHDRAWN): https://www.biorxiv.org/content/10.1101/2025.04.15.649007v2",
+      "http_status": "403 (WebFetch); Cloudflare 'error code: 1015' rate-limit body on curl",
+      "checked_at": "2026-07-28T07:15:00Z",
+      "network_context": "public internet; blocked at assessment time. bioRxiv API (api.biorxiv.org/details) returned v2 metadata: type='withdrawn', date 2025-11-14, abstract replaced by the withdrawal statement"
+    },
+    {
+      "artifact": "paper v2 JATS XML: https://www.biorxiv.org/content/early/2025/11/14/2025.04.15.649007.source.xml",
+      "http_status": "Cloudflare 'error code: 1015' (17-byte body, not XML)",
+      "checked_at": "2026-07-28T07:16:00Z",
+      "network_context": "public internet; two attempts with backoff both rate-limited. Fallback used instead (next row)"
+    },
+    {
+      "artifact": "paper v1 full PDF (fallback source of Methods): https://www.biorxiv.org/content/biorxiv/early/2025/04/20/2025.04.15.649007.full.pdf",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:18:00Z",
+      "network_context": "public internet, unauthenticated curl after 90 s backoff; 2,691,733 bytes, PDF 1.4, 16 pages, every page watermarked WITHDRAWN; pdftotext -layout yielded 1,172 lines containing the full MATERIALS AND METHODS and Data availability sections; title phrase 'Basecall Error Rates and Bias Patterns' verified present"
+    },
+    {
+      "artifact": "in-house E. coli ATCC8739 Sanger reference assembly (Sangon Biotech)",
+      "http_status": "none - no accession, DOI or URL stated anywhere in the paper",
+      "checked_at": "2026-07-28T07:20:42Z",
+      "network_context": "n/a - artifact not deposited; recorded as a finding, not searched for on the open web"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "floating",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "256e4c81fa95011b29fa3aadb89a780e2c085b183847b851ff1d0a7189554c62",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

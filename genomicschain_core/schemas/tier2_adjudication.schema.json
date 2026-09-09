@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier2_adjudication.schema.json",
+  "title": "GenomicsChain Tier-2 Code-Reading Adjudication Record",
+  "description": "Synoptis evidence manifest for a signed Tier-2 (code-reading) adjudication. Same recording path as tier1_report and tier3_verdict: a proof on the anchor, no separate chain. The record carries identities and counts only — the adjudication body and the scan stay with the operator, bound here by adjudication_digest and codescan_evidence_digest. It is a self_reported PROPOSAL: stage_transition.applied is always false, because the Tier-1 rubric makes human sign-off mandatory before a stage transition. The interpreter that produced the adjudication is part of the record because the code-reading tier is deterministic per interpreter, not across interpreters (measured 2026-09-09).",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "tier1_report_content_hash",
+    "codescan_evidence_digest",
+    "adjudication_rubric_version",
+    "adjudication_digest",
+    "levers",
+    "counts",
+    "toolchain",
+    "stage_transition",
+    "trust_tier",
+    "operator"
+  ],
+  "properties": {
+    "record_type": { "type": "string", "enum": ["tier2_adjudication"] },
+    "record_version": { "type": "string", "pattern": "^0\\.[0-9]+$" },
+    "mcp_tool_name": { "type": "string", "enum": ["gc_tier2_submit"] },
+    "mcp_tool_version": { "type": "string" },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^doi:.+$",
+      "description": "The paper, e.g. doi:10.1101/2024.06.17.598857. The code is identified by the evidence digest and, when stated, by repository."
+    },
+    "canonical_id_value": { "type": "string" },
+    "tier1_report_content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "report_content_hash of the Tier-1 report that was read against the code. Copied from the adjudication (which copied it from the report); binds this record to a specific Tier-1 report."
+    },
+    "tier1_rubric_version": { "type": "string" },
+    "tier1_funnel_stage": { "type": ["string", "null"] },
+    "codescan_evidence_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over (path, content-sha256) of every file the scanner read. A re-scan of the same bytes reproduces it."
+    },
+    "codescan_rubric_version": { "type": ["string", "null"] },
+    "adjudication_rubric_version": { "type": "string" },
+    "adjudication_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Canonical-JSON sha256 of the gc_tier2_adjudicate output as submitted. Recomputed server-side."
+    },
+    "levers": {
+      "type": "object",
+      "required": ["declared_lock", "byte_fixed_lock", "in_code_db_pin_classA"],
+      "properties": {
+        "declared_lock": { "type": "boolean", "description": "Lever 1 at threshold `versioned`: an exact conda version or a container tag is present." },
+        "byte_fixed_lock": { "type": "boolean", "description": "Lever 1 at threshold `immutable`: a lock whose bytes are named by their own hash." },
+        "in_code_db_pin_classA": { "type": "boolean", "description": "Lever 2: every external resource the code names is class A." },
+        "headline": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["tier1_steps", "steps_linked", "proposed_demotions", "demotion_proposal_is_a_lower_bound"],
+      "properties": {
+        "rules_in_code": { "type": ["integer", "null"], "minimum": 0 },
+        "rules_unique": { "type": ["integer", "null"], "minimum": 0 },
+        "tier1_steps": { "type": "integer", "minimum": 0 },
+        "steps_linked": { "type": "integer", "minimum": 0 },
+        "steps_unlinked": { "type": ["integer", "null"], "minimum": 0 },
+        "proposed_demotions": { "type": "integer", "minimum": 0 },
+        "demotion_proposal_is_a_lower_bound": { "type": "boolean", "enum": [true] }
+      },
+      "additionalProperties": false
+    },
+    "ambiguous_links": { "type": "integer", "minimum": 0 },
+    "discrepancy_codes": { "type": "array", "items": { "type": "string" } },
+    "toolchain": {
+      "type": "object",
+      "required": ["ruby"],
+      "properties": {
+        "ruby": { "type": "string" },
+        "ruby_platform": { "type": "string" },
+        "psych": { "type": "string" },
+        "codescan_rubric_version": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "description": "Interpreter that produced the scan. Part of the signed identity (toolchain_ruby)."
+    },
+    "adjudication_toolchain": {
+      "type": "object",
+      "properties": {
+        "ruby": { "type": "string" },
+        "ruby_platform": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "repository": {
+      "type": "object",
+      "description": "OPTIONAL. The checkout that was scanned, as stated by the operator (the scanner reads no .git). Signed when present.",
+      "properties": {
+        "url": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[a-f0-9]{7,64}$" },
+        "provenance": { "type": "string", "enum": ["operator_stated"] }
+      },
+      "additionalProperties": false
+    },
+    "stage_transition": {
+      "type": "object",
+      "required": ["applied"],
+      "properties": {
+        "from": { "type": ["string", "null"] },
+        "to": { "type": ["string", "null"] },
+        "applied": { "type": "boolean", "enum": [false] }
+      },
+      "additionalProperties": false
+    },
+    "trust_tier": { "type": "string", "enum": ["self_reported"] },
+    "submission_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "operator": { "type": "object" }
+  },
+  "additionalProperties": false
+}

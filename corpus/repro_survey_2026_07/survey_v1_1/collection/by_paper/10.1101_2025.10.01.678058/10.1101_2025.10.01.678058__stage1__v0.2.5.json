@@ -1,0 +1,590 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "0b318546e40f0e125045a62cf1a41b8078ec050d36d0f4530ca9d01af831a450",
+  "canonical_id": {
+    "value": "10.1101/2025.10.01.678058",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.01.678058v1",
+      "biorxiv:2025.10.01.678058v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "A comparative/population-genomics study of 34 small-spored Alternaria isolates collected from eight wild tomato species in Peru and Chile (isolate collection previously described in Schmey et al. 2023). Wet-lab scope (OOS): phenol/chloroform and KingFisher-robot DNA extraction, ONT MinION/PromethION long-read sequencing on four PromethION flowcells, and Illumina/BGI DNBseq short-read sequencing. Computational scope (the reproduction target): read QC and Q10 filtering, flye+medaka+pilon de novo assembly of 34 genomes, QUAST/BUSCO/D-genies assembly evaluation, manual correction of two fused-chromosome artifacts at explicitly stated split coordinates, tidk telomere identification, funannotate+EarlGrey+AntiSMASH structural/functional annotation, coverage-based identification of putative accessory contigs (minimap2/samtools/mosdepth/IGV), EDTA+bedtools+gffread+BioKIT TE/gene density and gene-wise relative synonymous codon usage, seqkit in-silico PCR for the AAL-toxin and 6-MSA PKS marker genes, BUSCO_phylogenomics supermatrix and gene trees feeding SplitsTree NeighborNet and ASTRAL, OrthoFinder species tree, mashtree k-mer clustering (also against 98 NCBI reference genomes), clair3+bcftools SNP calling against Y784-BC03, plink LD-pruning/PCA and ADMIXTURE, Manhattan-distance clone calling and PopGenome statistics, a Mantel isolation-by-distance test, a PanTools pangenome with phenotype-specific gene classification, EffectorP effector prediction, RAiSD selective-sweep scan with BiNGO GO enrichment, repeat-content correlation statistics and EarlGrey TE divergence landscapes, starfish starship identification, blastn mating-type typing with binomial and chi-squared tests, and RIPper repeat-induced-point-mutation analysis with a Welch's t-test. Main-text Methods are deliberately short ('Please find extended methods with details about the employed software in the supplementary material'); the extended methods in supplementary PDF 678058_file02.pdf carry the tool versions and were read for this assessment.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse step list built from the main-text 'Short Methods' section of the v1 JATS XML plus the 'Extended Methods' section of the supplementary PDF (678058_file02.pdf, pages with the extended methods and their 50-item reference list). Because the paper names roughly 40 distinct tool invocations, steps are grouped one-per-analysis-unit rather than one-per-binary: a step aggregates the tools that jointly produce one reported result (e.g. C3 groups flye + medaka + pilon as 'assemble and polish'), and a group is split off whenever its axis scores would differ from its neighbours (e.g. C11 BUSCO_phylogenomics is split from C12 SplitsTree and C13 ASTRAL because the pipeline itself carries no version or commit while the two downstream tools are exactly pinned). Where a group mixes exactly-pinned tools with an unversioned online/GUI helper used only for visualisation (D-genies in C4, iTOL and phylo.io in C14, UpSetR in C21), the step keeps version = 1 and the unversioned helper is recorded as a type-2a gap rather than dragging the whole step to version = 0; where the unversioned tool IS the analysis (C11 BUSCO_phylogenomics, C20 online Megablast, C25 starfish, C27 online RIPper), the step is scored version = 0. Basecalling (C1) is kept as a separate computational step because the paper states verbatim 'Basecalling was performed by the respective ONT sequence providers' with no basecaller, model, or version, and the pre-basecalling signal data is not deposited. One described analysis is omitted from S: the BiG-SCAPE 1.1.5/2.0.0 biosynthetic-gene-cluster clustering, because the authors state verbatim 'we refrain from mentioning this analysis in the main paper' - it produces no reported result and therefore has no reproduction target. S = 27 computational steps, W = 3 wet-lab steps.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Basecalling of ONT raw signal. Extended methods verbatim: 'Basecalling was performed by the respective ONT sequence providers.' No basecaller (guppy/dorado), no model, no version, no configuration. The pre-basecalling signal data (fast5/pod5) is not deposited; ENA PRJEB93827 carries the sequencing data downstream of basecalling",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "Read QC and quality filtering. 'Sequencing yields were assessed with NanoComp (version 1.23.1)'; 'Quality filtering of the sequencing reads was performed using NanoFilt (version 2.8.1) keeping only reads with a quality better than Q10'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C3",
+      "label": "De novo long-read assembly and polishing. 'We used flye (version 2.8.1) and medaka (version 1.7.1, https://github.com/nanoporetech/medaka) to assemble the long read data of all samples'; 'The samples for which additional short read data was available were polished using three iterations of pilon (version 1.24) each.' No flye command line (read mode, genome size, iterations), no medaka model, and no short-read aligner named for the pilon input BAMs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C4",
+      "label": "Assembly evaluation. 'Assembly quality was evaluated with quast (version 5.3.0) and BUSCO (version 5.8.2)'; contiguity visualised 'in D-genies dotplots (online)' against NCBI references Y784-BC03 (ASM2008506v1) and Z7 (ASM1475150v1). The BUSCO lineage dataset (e.g. ascomycota_odb10) and its ODB release are not named; D-genies is an unversioned online service. Rejected alternatives are also pinned: wtdbg2 2.5, canu 2.2, LINKS 2.0.1, Inspector 1.0.2, SLR (no version)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C5",
+      "label": "Manual correction of two fused-chromosome assembly artifacts. canu assemblies mapped to the flye/medaka assemblies with 'minimap2 (version 2.28-r1209)', split coordinates read from the PAF and sequences extracted with 'samtools faidx (version 1.19.2)'. Split coordinates are given verbatim (RS007 scaf_1:1-2837880, scaf_1:2835830-6266848, scaf_1:6264302-8082830; RS102 scaf_3:1-414269, scaf_3:414270-2769139, scaf_3:2769140-4849448), but the splitting itself is a manual dotplot-guided judgement",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C6",
+      "label": "Telomere identification. 'The telomeric identification toolkit tidk (versions 0.2.41 and 0.2.65) was run with the subcommand search and the expected telomeric repeat sequence TTAGGG and its canonical notation AACCCT'; 'The number of telomeres was then estimated by visual inspection of the output from tidk plot (plots not shown).' Two tidk versions are named without stating which assembly was processed by which, and the telomere counts reported in Results come from unrecorded visual inspection",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C7",
+      "label": "Genome annotation. 'All final assemblies were cleaned and sorted with funannotate clean and funannotate sort on default settings (funannotate version 1.8.17)'; 'We then used Earl Grey (version 4.0.6) to produce assembly files in which repeats are softmasked. Subsequently, we followed the remaining steps of the funannotate pipeline for annotation, including the integration of AntiSMASH (version 7.1.0) results.' The funannotate predict/annotate parameters (species/BUSCO seed species, protein and transcript evidence, Augustus/GeneMark training) are not given, EarlGrey's RepBase/Dfam library release is not stated, and AntiSMASH's database release is not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C8",
+      "label": "Identification of putative accessory contigs. Concatenated FASTA of all 34 assemblies plus 'nine downloaded reference genomes with less than 100 scaffolds (downloaded from NCBI 6th August 2024)' mapped to each assembly with 'minimap2 (version 2.24)', BAM handling with 'samtools (version 1.12)', coverage with 'Mosdepth (version 0.3.3)'; classification rule stated verbatim (core = coverage above the mean; accessory = >100 kb and below mean); classification validated visually in 'IGV v2.12.3'. The accession numbers of the nine downloaded A. alternata genomes are NOT listed anywhere",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C9",
+      "label": "TE/gene density and codon-usage comparison of core vs accessory contigs. 'Extensive De Novo TE Annotator (EDTA v2.2.0)' with soft-masked files from 'bedtools (version 2.26.0)', CDS extraction with 'gffread (version 0.12.7)', 'the number of TEs and genes with standard GNU command-line utilities for density calculation', gRSCU with 'the BioKIT package (version0.2.0)'; 'Statistical analyses were conducted in R v4.3.1 using RStudio v2023.06.0. Wilcoxon rank-sum tests were performed to compare gene-wise RSCU values between core and accessory contigs. Cliff's delta (d) was calculated using the effsize package' with the stated interpretation thresholds. EDTA settings, the density window definition, the unnamed 'standard GNU command-line utilities', and the effsize package version are not given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "In silico PCR for the AAL-toxin ALT gene and the 6-methylsalicylic-acid PKS accessory-chromosome marker. 'we performed as in silico PCR using their primer pairs and the command seqkit amplicon (version 2.8.2)'; positive control 'A. arborescens EGS 39-128 (NCBI accession AIIC01000192.1)'; mismatch tolerance increased stepwise until a hit appeared at five mismatches. The primer sequences themselves are not printed - they are cited to references [29,30] and [31]",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C11",
+      "label": "BUSCO-based supermatrix and gene-tree generation. 'we used the pipeline BUSCO_phylogenomics (https://github.com/jamiemcg/BUSCO_phylogenomics)' - a third-party GitHub repository cited with NO version, NO release tag and NO commit hash. The pipeline performs alignment, trimming and concatenation; neither the aligner nor the trimmer nor their settings are named. Inputs are BUSCO runs on the 34 assemblies plus 13 downloaded reference genomes (accessions listed). Outputs: a 5243-gene supermatrix (and a repeat run excluding the incomplete assembly CS042) and 6588 gene trees",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "NeighborNet network. 'We used this supermatrix as input for splitstree (version 6.3.30). Splitstree computes P-distances to generate a Neighbor Net.' SplitsTree is a GUI application; the run settings beyond the P-distance choice are not recorded and no saved session/nexus file is mentioned",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Coalescent species tree and plotting. 'We used these gene trees as input for ASTRAL (version 5.7.8)'; tree rooted to A. solani; 'the local posterior probabilities from ASTRAL are shown as support values'; plotted 'using R 4.4.0 in RStudio (version 2024.04.2+764) with ggtree and further packages ggplot2, ape, dplyr, glue and ggrepel'. R and RStudio are exactly pinned; none of the six R packages carries a version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C14",
+      "label": "Orthology-based species tree. 'We used Orthofinder (version 2.5.5) to infer a species tree from the protein sequences listed in the funannotate annotation results. Subsequently, we rooted the tree from Orthofinder using itol. We calculated and visualized a tree comparison in phylo.io.' OrthoFinder is exactly pinned; iTOL and phylo.io are unversioned online services used for rooting and visual comparison; OrthoFinder's non-default options (if any) are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C15",
+      "label": "k-mer based clustering. 'Mashtree (version 1.4.6)' run twice: once on the ASTRAL sample set, and once on 'our 33 A. alternata genomes ... and all available A. alternata reference genomes from the NCBI genomes database available at the time (9th January 2025). To this end we downloaded 89 A. alternata genomes and 9 A. tenuissima genomes.' The individual accessions of the 98 downloaded genomes are not listed, and 'two downloaded assemblies had unrealistic branch lengths, likely because they had been mislabelled on the NCBI database, excluded these and ran mashtree again' without naming which two. Sketch size / k-mer size not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C16",
+      "label": "SNP calling and filtering. 'we mapped the long-read sequencing data to the reference genome Yref (accession see above) and used the SNP-caller clair3 (version 1.0.10) as described in [40]' - the read aligner used for the mapping is not named and the clair3 model (e.g. r941_prom_*) is not stated, both delegated to a cited paper. Filters are stated verbatim: 'we applied the maxDP filter on each of the generated g.vcf files with bcftools (version 1.21) before merging the them. Then we applied further filters with bcftools, namely SnpGap 3 ... QUAL 25 ... and DP 10'. A parallel filtered set excluding RS040 was produced the same way. The maxDP threshold value itself is not given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C17",
+      "label": "Population structure. 'We used plink (version 1.9) to perform linkage pruning and perform a principal component analysis (PCA) of the unlinked SNPs, which we then plotted in Rstudio using the R packages tidyverse, grepel, readr and dplyr. Furthermore, we used the linkage pruned results from plink to perform an ADMIXTURE analysis (version 1.3.0), the results of which we plotted in Rstudio with the packages pophelper, ggplot2 and gridExtra.' K was tested from 1 to 20 by cross-validation error (K=2 lowest). The plink LD-pruning parameters (window size, step, r2 threshold) are not given, no ADMIXTURE seed or replicate count is given, and no R package versions are given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Genetic distances, clone identification, population-genetic statistics and isolation-by-distance. Manhattan distance matrix and histogram 'in Rstudio with the packages vcfR, poppr, adegenet and ggplot2'; 'We used the histogram and the distance matrix to identify clones' (threshold set by eye - Results say six pairwise comparisons 'form a histogram bar close to zero, which we define as clones'); PopGenome statistics after 'splitting the vcf file by chromosomes using bcftools'; Mantel test with 999 permutations correlating Manhattan genetic distances against Haversine geographic distances after removing RS040 and known clones. No clone-calling threshold value, no Mantel seed, no R package versions",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Pangenome construction and phenotype-specific gene classification. 'We constructed a pangenome from the 33 A. alternata genomes with PanTools (version 4.3.1) and supplied information about host plants, sampling regions, elevation and affiliation with phylogenetic clades as phenotypes. Then we used the subcommand pantools gene_classification -phenotype'. PanTools build parameters (k-mer size, clustering relaxation setting) are not given; the phenotype table itself is described but not identified as a deposited file",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C20",
+      "label": "Identification of clade-specific genes by online Megablast. 'attempted to identify these specific genes with an online Megablast against the NCBI nucleotide database (https://blast.ncbi.nlm.nih.gov/Blast.cgi)'. This is a browser-driven query against a rolling, unversioned database: no BLAST+ version, no nt release date, no query date, no e-value or other search parameters, and no saved result set. The same online-Megablast pattern is reused in C10 to disconfirm a spurious in-silico-PCR hit",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Effector prediction. 'we identified effectors from our de novo assemblies by first extracting proteins predicted to be secreted by funannotate. These were then scored as predicted effectors or not using EffectorP (version v3.0-Fungi). The predicted proteomes were then organized into predicted orthogroups using OrthoFinder' (version pinned at 2.5.5 in C14). 'Distribution of orthologous effector groups was visualized with UpSetR' - no UpSetR version. The secretion-prediction settings inside funannotate (SignalP/Phobius configuration) are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C22",
+      "label": "Selective-sweep detection. Extended methods: 'We used RAiSD (Raised Accuracy in Sweep Detection) (version 4.0) to detect genomic regions under positive selection ... We did RAiSD separately for each chromosome using a SNP-driven sliding window of 50 SNPs. The windows with the top 0.01% of the mu-statistic distribution were considered putative selective sweeps. The windows were extended by adding 1050 base pairs in both directions'; genes recovered with 'bedtools intersect and the gene annotation produced by funannotate'. NOTE a tool-identity discrepancy: the main text says 'We used RAiSD-AI to detect genomic regions under positive selection in both clades' while the extended methods say RAiSD version 4.0 - RAiSD and RAiSD-AI are different programs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C23",
+      "label": "GO enrichment of sweep genes. 'To identify overrepresented functional categories we performed Gene Ontology (GO) enrichment using the BiNGO plugin (version 3.0.5, within the Cytoscape graphical interface version 3.10.3)'. Both the plugin and the host application are exactly pinned, but the GO annotation source and its release, the ontology file version, the background/reference gene set, the statistical test and the multiple-testing correction are not stated, and the analysis is executed through a GUI with no saved session",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C24",
+      "label": "Repeat-content correlation statistics and TE divergence landscapes. 'we assessed the correlation between assembly size (bp) and repeat content (%) using Pearson's product-moment and Spearman's rank correlation tests in R. We evaluated the normality of each variable with the Shapiro-Wilk test'; outlier removal is fully specified and justified (RS040, CS007, CS042). 'Repeat annotation by EarlGrey, as summarized in the HighLevelCount.summary.txt result' plotted as stacked bars 'with ggplot and dplyr in Rstudio', bars sorted by total repeat length; TE divergence landscapes re-plotted with a fixed y-axis height. No R version is restated for this block and no package versions are given; the re-plotting code is the kind of thing the Zenodo script archive would carry",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C25",
+      "label": "Starship (giant mobile element) identification. 'To identify segregating starship transposable elements, we scanned the 32 de novo A. alternata genomes, as well as the reference isolate Y784-BC03. We used the starfish pipeline [48], retaining elements where the six flanking genes up- and downstream were conserved.' starfish carries NO version and NO commit anywhere in the paper or supplement; the pipeline's numerous configuration inputs (gene finder, HMM profiles, clustering settings) are not stated. Follow-up flanking-gene checks used 'blast-plus'. Also note the sample-count discrepancy: 32 de novo genomes here vs 33 A. alternata genomes elsewhere",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C26",
+      "label": "Mating-type determination and ratio tests. 'we conducted a blastn search (blast-plus with Nucleotide-Nucleotide BLAST 2.13.0+) of the known mating type loci (accession numbers AB00945.1, AB009452.1, AB465670.1, AB444167.1) against our assemblies'; 'we used binomial tests in Rstudio. Furthermore, we used Pearson's Chi-squared test with Yates' correction to check whether the ratios differ significantly between clades.' BLAST version and query accessions are exact; the blastn search parameters (e-value, identity/coverage cutoff, hit-calling rule) are not given. Accession 'AB00945.1' appears to be malformed (one digit short of the AB009452.1 pattern)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C27",
+      "label": "Repeat-induced point mutation analysis. 'The online version of the RIPper computes the occurrence of repeat induced point mutation (RIP) affected regions in sliding windows over the full genome assemblies. Large RIP affected regions (LRARs) and percentage of RIP-affected regions among the genome are reported in the profile.csv results.' No RIPper version, no access date, no window/step size, no RIP-index thresholds - all left at whatever the web service defaulted to at the time. The downstream Welch's t-test comparing clade RIP percentages is stated and reproducible given the profile.csv outputs, which are not deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W1",
+      "label": "DNA extraction. Phenol/chloroform method 'described in Einspanier et al. 2022' for CS330 and 20 further isolates; QIAGEN DNeasy kit for the CS046 short-read library; 'Additional DNA extractions were performed with a KingFisher Flex robot from ThermoFisher Scientific with Mag-Bind Plant DNA DS Kit from QUIAGEN' for 13 isolates",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "ONT long-read sequencing. Isolate CS330 on a MinION; 20 isolates on PromethION at the LMU gene center Munich across four flowcells after several repetitions; 13 further isolates on a PromethION flow cell at Senckenberg BiK-F Frankfurt. Yields varied from 8X to 139X (supplementary table S1). Flowcell chemistry, kit and run configuration are not stated",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Short-read sequencing. Illumina short reads for CS330; BGI DNBseq short reads for CS046 and for eight of the 13 additionally extracted isolates (BGI, Hong Kong). Read length, insert size and library kit are not stated",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 21,
+    "n_NI": 5,
+    "n_X": 1,
+    "S": 27,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/27 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "21/27 (78%) of computational steps reach RI at stage 1, which is the stage-1 ceiling. This is an unusually high upper bound for a mixed wet-lab/computational genomics paper and it rests on three things the authors did well: (1) sequencing reads and annotated genomes are deposited at ENA under project accession PRJEB93827, which resolves and is public; (2) an explicit code-availability sentence points to a Zenodo deposit ('All code used in this study has been deposited in Zenodo (DOI 10.5281/zenodo.15768389)', concept DOI resolving to the versioned record 10.5281/zenodo.16413727, 'Code Archive for ...', v2, published 2025-07-24); and (3) the supplementary extended methods pin an exact version for very nearly every tool (NanoComp 1.23.1, NanoFilt 2.8.1, flye 2.8.1, medaka 1.7.1, quast 5.3.0, BUSCO 5.8.2, pilon 1.24, minimap2 2.28-r1209 and 2.24, samtools 1.19.2 and 1.12, tidk 0.2.41/0.2.65, funannotate 1.8.17, EarlGrey 4.0.6, AntiSMASH 7.1.0, mosdepth 0.3.3, IGV 2.12.3, EDTA 2.2.0, bedtools 2.26.0, gffread 0.12.7, BioKIT 0.2.0, seqkit 2.8.2, SplitsTree 6.3.30, ASTRAL 5.7.8, OrthoFinder 2.5.5, mashtree 1.4.6, clair3 1.0.10, bcftools 1.21, plink 1.9, ADMIXTURE 1.3.0, PanTools 4.3.1, EffectorP 3.0-Fungi, RAiSD 4.0, BiNGO 3.0.5, Cytoscape 3.10.3, blast+ 2.13.0+, R 4.3.1/4.4.0, RStudio 2023.06.0 and 2024.04.2+764). Six steps fall below RI (five NI plus one X) and they are all of one shape - the analysis is delegated to something with no version at all: C1 basecalling ('performed by the respective ONT sequence providers', scored X because the pre-basecalling signal data is also not deposited), C11 the BUSCO_phylogenomics GitHub pipeline with no tag or commit, C20 online Megablast against the rolling NCBI nt database, C23 GUI GO enrichment with no GO release or background set, C25 the starfish pipeline with no version, and C27 the online RIPper with no version or access date. No step can exceed RI at stage 1 by construction, and no step would reach R-star even at stage 2 on env grounds, because there is no environment closure anywhere: no conda/mamba environment file, no conda-lock or renv.lock, no Dockerfile or image digest, no channel or platform declaration, and no R package versions - only scattered exact pins in a PDF, which is exactly the exact_pins_partial pattern that rubric Delta-2 caps at version = 1. The paper is therefore NOT a stage-2 candidate under protocol v0.2.6 (a code check could confirm or refute the code axis but could yield no R-star gain); it would only reach stage 2 through the stratified audit draw.",
+    "coverage": "30 steps built from the main-text 'Short Methods' section of the v1 JATS XML (fetched 2026-07-28) plus the 'Extended Methods' section of supplementary PDF 678058_file02.pdf (23 pages, fetched 2026-07-28), which the main text explicitly designates as the location of the software details. 27 steps are computational (S = 27) and 3 are wet-lab (W = 3, scored OOS): 計算被覆率 = 27/30 = 90%. The BiG-SCAPE biosynthetic-gene-cluster clustering described in the extended methods is excluded from S because the authors state 'we refrain from mentioning this analysis in the main paper' and it produces no reported result. Not fetched or inspected at stage 1: the contents of the Zenodo script archive (Alternaria_Evolutionary_Divergence_Scripts_July2025.zip, 75.8 kB), supplementary tables S1-S2, and the individual ENA run/sample records - only the ENA project XML was resolved.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Paper-wide - every computational step (C2-C27)",
+      "missing": "There is no environment capture of any kind. The extended methods pin individual tool versions in PDF prose (roughly 40 tools, listed in the headline) but nothing declares an interpreter/runtime version for the tool stack, a package source (conda channel, CRAN/Bioconductor snapshot, PyPI index), or a target platform. No environment.yml, conda-lock.yml, renv.lock, pixi.lock, requirements.txt, Dockerfile or image digest is mentioned in the paper, the supplement, or the Zenodo record description. Under rubric v0.2.5 Step 8 this is exactly the 'scattered == pins in prose' case: version = 1 with subtier exact_pins_partial for every step, never version = 2. Additionally, none of the R packages carries a version (ggtree, ggplot2, ape, dplyr, glue, ggrepel, tidyverse, readr, pophelper, gridExtra, vcfR, poppr, adegenet, PopGenome, effsize, UpSetR), even though R itself is pinned at 4.3.1 and 4.4.0 and RStudio at 2023.06.0 and 2024.04.2+764.",
+      "how_to_close": "Ship a resolved environment lock alongside the Zenodo script archive - e.g. a conda-lock.yml or pixi.lock covering the declared platform (linux-64), plus renv.lock for the R side - or a container image referenced by digest. That single artifact would convert the whole paper from exact_pins_partial to an env-lock claim and make it a stage-2 candidate."
+    },
+    {
+      "type": 2,
+      "where": "C11 (BUSCO_phylogenomics), C25 (starfish), C27 (RIPper), C20 (online Megablast), C4 (D-genies), C14 (iTOL, phylo.io), C21 (UpSetR)",
+      "missing": "Seven tools are named with no version whatsoever, in a supplement that otherwise pins nearly everything. Three of them carry a reported result and therefore drop their step below RI: the BUSCO_phylogenomics pipeline is cited only as a bare GitHub URL (https://github.com/jamiemcg/BUSCO_phylogenomics) with no release tag or commit hash, yet it produces both the 5243-gene supermatrix behind Figure 1 left and the 6588 gene trees behind Figure 1 right, and its internal aligner and trimmer are not named either; starfish produces the 24 starship elements in supplementary Figure S9; the online RIPper produces the LRAR and RIP-percentage values compared between clades.",
+      "how_to_close": "Record the commit hash (or a Zenodo/Software Heritage archive) for BUSCO_phylogenomics and starfish, name the aligner/trimmer and their settings inside BUSCO_phylogenomics, and state the RIPper version plus access date (or move to the standalone/offline implementation)."
+    },
+    {
+      "type": 13,
+      "where": "C20 (online Megablast vs NCBI nt), C27 (online RIPper), C4 (D-genies online), C14 (iTOL, phylo.io), C8 and C15 (NCBI genome downloads), C7 (EarlGrey repeat library, AntiSMASH database), C23 (GO annotation source)",
+      "missing": "Several external reference resources are consumed without a pinned release. The clade-specific genes are identified by 'an online Megablast against the NCBI nucleotide database' - nt is rolling and unversioned, and no query date is recorded, so the reported 'mostly hits for uncharacterized and hypothetical proteins' cannot be reconstructed. The EarlGrey repeat library release, the AntiSMASH database release, and the GO annotation/ontology release used by BiNGO are all unstated. Download dates ARE given for two NCBI pulls (nine A. alternata genomes on 2024-08-06 for C8; 89 A. alternata + 9 A. tenuissima genomes on 2025-01-09 for C15), which is better than nothing but is a date, not an accession list. At stage 1 no env_capture_class A/B/C is assigned - that classification requires reading the Zenodo scripts at stage 2 - but the prose alone shows several class-C-shaped (rolling/latest) dependencies.",
+      "how_to_close": "State the release/version of every external database (nt, GO/ontology, Dfam or RepBase behind EarlGrey, the AntiSMASH database) and deposit the exact accession lists of the downloaded NCBI assemblies rather than only download dates."
+    },
+    {
+      "type": 1,
+      "where": "C8 (nine reference genomes), C15 (98 NCBI genomes and two exclusions)",
+      "missing": "Two analyses depend on downloaded NCBI assemblies whose identities are not recorded. C8 uses 'nine downloaded reference genomes with less than 100 scaffolds (downloaded from NCBI 6th August 2024)' with no accession list, and these nine contribute to the coverage baseline that defines which contigs are called accessory. C15 downloads '89 A. alternata genomes and 9 A. tenuissima genomes' with no accession list, and then states 'two downloaded assemblies had unrealistic branch lengths, likely because they had been mislabelled on the NCBI database, excluded these and ran mashtree again' without naming which two were dropped from supplementary Figure S5. By contrast the 13 outgroup/reference genomes used for the BUSCO phylogeny ARE listed with assembly accessions, so the omission is inconsistent within the same supplement.",
+      "how_to_close": "Publish the full accession lists (with assembly versions) for both downloads as a supplementary table, and name the two excluded assemblies."
+    },
+    {
+      "type": 2,
+      "where": "C3, C4, C7, C10, C12, C14, C16, C17, C18, C19, C21, C23, C25, C26",
+      "missing": "Parameters are the weakest axis of the paper: 14 of 27 computational steps score params = 1 or 0 despite exact version pins. Specific omissions: no flye command line or read mode and no medaka model (C3); no BUSCO lineage dataset (C4); no funannotate predict/annotate configuration, seed species or evidence sets (C7); primer sequences given only by citation (C10); no plink LD-pruning window/step/r2 (C17); no maxDP threshold value and no read aligner named for the clair3 input BAMs, both deferred to a cited paper (C16); no clone-calling distance threshold - clones are defined visually from a histogram bar 'close to zero' (C18); no PanTools k-mer/clustering settings (C19); no blastn e-value or identity cutoff (C26); no GO background set, statistical test or multiple-testing correction (C23); no starfish configuration (C25); no mashtree sketch or k-mer size (C15).",
+      "how_to_close": "Include the actual command lines (or the driver scripts that contain them) in the Zenodo archive and reference them per methods subsection, rather than describing invocations in prose."
+    },
+    {
+      "type": 4,
+      "where": "C17 (ADMIXTURE), C18 (Mantel test, 999 permutations)",
+      "missing": "Two stochastic analyses report no random seed. ADMIXTURE K=1-20 cross-validation is run with no stated seed and no replicate count, yet the K=2 choice from the cross-validation-error curve (Figure 2C) and the K=2 ancestry proportions (Figure 2D) are load-bearing for the paper's central two-clade claim. The Mantel test with 999 permutations reports no seed. Both steps are therefore reproducible only in distribution, not exactly.",
+      "how_to_close": "Record seeds (and replicate counts for ADMIXTURE) in the deposited scripts, or state explicitly that only distributional agreement is expected."
+    },
+    {
+      "type": 12,
+      "where": "Zenodo deposit 10.5281/zenodo.15768389 -> 10.5281/zenodo.16413727",
+      "missing": "The code deposit is present and resolvable, which is a genuine strength, but at stage 1 it is a single 75.8 kB zip ('Alternaria_Evolutionary_Divergence_Scripts_July2025.zip') with no README in the record, no file listing in the description, no license file mentioned beyond the record-level CC-BY-4.0, and no stated mapping from scripts to methods subsections or figures. The record description is one sentence ('The archive contains all code used for analyses in the publication'). Whether 75.8 kB of scripts in fact covers all 40-odd tool invocations - including the assembly, annotation, pangenome and sweep-detection runs - cannot be judged without opening the archive, which is a stage-2 action. The code axis is scored 2 at stage 1 on the strength of the blanket claim.",
+      "how_to_close": "Add a README to the Zenodo record mapping each script to the methods subsection and figure it produces, state which steps were run interactively/by GUI and are therefore NOT in the archive, and cite the versioned DOI (16413727) rather than only the concept DOI in the paper."
+    },
+    {
+      "type": 6,
+      "where": "C1 (basecalling)",
+      "missing": "Basecalling is fully externalised: 'Basecalling was performed by the respective ONT sequence providers.' Three different providers were involved (LMU gene center Munich, Senckenberg BiK-F Frankfurt, plus the original MinION run), so basecaller, model and version very likely differ across the 34 isolates - an uncontrolled source of assembly-quality heterogeneity that the paper itself notes indirectly ('Sequencing yields from ONT PromethION runs varied considerably from 8X to 139X'). The raw signal data (fast5/pod5) is not deposited, so the step cannot be re-run even if the basecaller were named; this is why C1 scores X rather than NI.",
+      "how_to_close": "Record the basecaller name, model and version per sequencing batch in supplementary table S1, and deposit the raw signal data (or state explicitly that it was not retained)."
+    },
+    {
+      "type": 8,
+      "where": "C22 (selective sweeps) vs main text; C25 (starfish) vs Results",
+      "missing": "Two internal inconsistencies would send a reproducer down the wrong path. (a) The main text says 'We used RAiSD-AI to detect genomic regions under positive selection in both clades' while the extended methods say 'We used RAiSD (Raised Accuracy in Sweep Detection) (version 4.0)'. RAiSD and RAiSD-AI are different programs with different outputs, and the paper's sweep counts (68 regions in clade 1, 293 in clade 2) depend on which was actually run. (b) C25 states the starfish scan covered 'the 32 de novo A. alternata genomes' while the rest of the paper works with 33 A. alternata assemblies (34 minus RS040); which genome was dropped and why is not stated. Also minor: mating-type query accession 'AB00945.1' is one digit short of the AB0094xx pattern of its neighbours and does not look well-formed.",
+      "how_to_close": "Reconcile the main-text and extended-methods tool names, state the exact sample set for the starship scan, and check the mating-type locus accessions."
+    },
+    {
+      "type": 7,
+      "where": "C5 (manual split of fused chromosomes), C6 (telomere counting), C8 (IGV validation), C12 (SplitsTree GUI), C14 (iTOL/phylo.io), C20 (online BLAST), C23 (Cytoscape/BiNGO GUI), C27 (online RIPper)",
+      "missing": "A substantial fraction of the analysis is interactive rather than scripted: the two assembly artifacts were split by reading coordinates off a PAF after visual dotplot inspection, telomere counts were obtained 'by visual inspection of the output from tidk plot (plots not shown)', accessory-contig classification was 'validated ... in the Integrative Genomics Viewer', and SplitsTree, iTOL, phylo.io, web BLAST, Cytoscape/BiNGO and RIPper are all GUI or web tools with no saved session or parameter file mentioned. These steps cap at code = 1 (reconstructable from the description) and cannot be replayed from the Zenodo archive. The split coordinates for C5 are, to the authors' credit, printed verbatim, which is what keeps that step at RI.",
+      "how_to_close": "Export and deposit the session/state files (SplitsTree nexus, Cytoscape session, iTOL tree files, BLAST result tables, RIPper profile.csv outputs) so that the interactive steps have a machine-readable record even if they cannot be scripted."
+    },
+    {
+      "type": 5,
+      "where": "C24 (TE divergence landscape re-plots), C27 (RIP statistics), C23 (GO enrichment inputs)",
+      "missing": "Several intermediate result files that the statistics are computed over are named but not deposited: the EarlGrey 'HighLevelCount.summary.txt' summaries used for Figure 3, the RIPper 'profile.csv' outputs used for the Welch's t-test between clades, and the per-clade sweep gene lists fed to BiNGO. Supplementary table S2 carries population-genetic statistics but the underlying VCFs (raw, filtered, biallelic, LD-pruned) are not listed as deposited artifacts anywhere - the ENA deposit covers 'sequencing data and annotated genomes', not derived variant call sets.",
+      "how_to_close": "Deposit the filtered VCF set and the named intermediate tables (HighLevelCount summaries, RIPper profile.csv, sweep gene lists, orthogroup tables) with the Zenodo archive so that downstream statistics can be checked without re-running assembly and variant calling."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession: ENA/EMBL-EBI BioProject PRJEB93827. Data Availability Statement verbatim: 'Supplementary figures, tables and extended methods can be found in the supplementary materials. The sequencing data and annotated genomes have been uploaded to the European Molecular Biology Laboratory's European Bioinformatics Institute (EMBL-EBI) under the project accession PRJEB93827.' The article's external-link footnote gives https://www.ebi.ac.uk/ena/browser/view/PRJEB93827. Status: URL-present and resolving. The ENA XML API returns a populated PROJECT record: accession PRJEB93827, alias PRJEB90665, secondary ID ERP176702, center_name 'Institute of Phytopathology Christian-Albrechts Universitaet Kiel', TITLE 'WGS of Alternaria alternata from wild tomato', DESCRIPTION 'This genomic study aimed to investigate the population structure of Alternaria alternata infecting wild tomato.', with per-isolate LOCUS_TAG_PREFIX entries (ALCS007T, ALCS013T, ALCS017T, ALCS026T, ALCS038T, ALCS042T, ALCS046T, ALCS057T, ALCS085T, ALCS091T, ALCS092T, ALCS106T, ALCS126T, ALCS133T, ALCS134T, ALCS139T, ALCS152T, ALCS185T, ALCS311T, ...). Public, no access restriction stated.",
+      "http_status": "200 (https://www.ebi.ac.uk/ena/browser/api/xml/PRJEB93827, populated PROJECT_SET returned); 200 for the browser view https://www.ebi.ac.uk/ena/browser/view/PRJEB93827 (JS shell). NOTE: the ENA portal filereport/search API returned HTTP 500 for this accession on this date, so the per-run file listing was NOT enumerated at stage 1 - the project record itself is confirmed live, the individual run/fastq availability is not.",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl with a browser User-Agent from a Swiss residential connection; ENA browser XML API and portal API both attempted."
+    },
+    {
+      "artifact": "code repo: Zenodo deposit. Data/Code Availability sentence verbatim: 'All code used in this study has been deposited in Zenodo (DOI 10.5281/zenodo.15768389).' The article's external-link footnote gives https://zenodo.org/records/16413727. The two identifiers are the concept DOI and its current versioned record. Record title verbatim: 'Code Archive for \"Evolutionary divergence in sympatric populations of the fungal pathogen Alternaria alternata across wild tomato hosts\"'. Description verbatim (as rendered): the archive 'contains all code used for analyses in the publication' by Schmey et al. 2025. Single file: Alternaria_Evolutionary_Divergence_Scripts_July2025.zip (75.8 kB). Version v2, published 2025-07-24. License CC-BY-4.0. Author Tamara Schmey (Kiel University). No README is present in the record and the description mentions no software versions, conda environment, Docker container or lockfile. Status: URL-present and resolving.",
+      "http_status": "200 via browser-equivalent fetch of https://zenodo.org/records/16413727 and of https://zenodo.org/doi/10.5281/zenodo.15768389 (both rendered the record). NOTE: plain curl to the same URLs returned 403 (Zenodo bot filtering), not a dead link - the record is live.",
+      "checked_at": "2026-07-28",
+      "network_context": "WebFetch (browser-equivalent client) for the record pages; plain curl with browser User-Agent additionally attempted and blocked with 403 by Zenodo's bot filter."
+    },
+    {
+      "artifact": "third-party tool repository cited without version: 'BUSCO_phylogenomics (https://github.com/jamiemcg/BUSCO_phylogenomics)' and 'medaka (version 1.7.1, https://github.com/nanoporetech/medaka)'. medaka carries an exact version; BUSCO_phylogenomics carries none. Status: URL-present (not resolved at stage 1).",
+      "http_status": "not checked (third-party tool repositories are not the authors' deposit; no liveness claim made at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "Recorded from the extended-methods text of supplementary PDF 678058_file02.pdf."
+    },
+    {
+      "artifact": "supplementary material: DC1 'Supplementary_materials', media href supplements/678058_file02.pdf. Contains supplementary figures S1-S9, supplementary tables S1-S2, the Extended Methods section and its 50-item reference list. This is where every tool version in this assessment comes from - the main text states 'Please find extended methods with details about the employed software in the supplementary material.' Status: URL-present and fetched.",
+      "http_status": "200 (https://www.biorxiv.org/content/biorxiv/early/2025/10/01/2025.10.01.678058/DC1/embed/media-1.pdf, 1,753,637 bytes, PDF 1.7, 23 pages)",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl with a browser User-Agent; text extracted with pdftotext for the extended-methods read."
+    },
+    {
+      "artifact": "paper full text: JATS XML for 10.1101/2025.10.01.678058 v1. Status: fetched; title-phrase check passed ('sympatric populations of the fungal pathogen' present in the fetched body), so no assessor cross-fetch occurred.",
+      "http_status": "200 (https://www.biorxiv.org/content/early/2025/10/01/2025.10.01.678058.source.xml, 128,077 bytes)",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl with a browser User-Agent into the per-paper scratch directory /tmp/stage1_10.1101_2025.10.01.678058/paper.xml."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "d0df8da039e6b34e8b3096e81260a4b9f5395512cd3a34a2c2242764cbeaa1a9",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

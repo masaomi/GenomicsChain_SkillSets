@@ -1,0 +1,319 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "0346ec4dd0be30487a9164c86c80b0785acfe846fd43a14fb39eca74ad59689b",
+  "canonical_id": {
+    "value": "10.1101/2025.10.25.684551",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.25.684551v1",
+      "biorxiv:2025.10.25.684551v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational cfDNA methylome + fragmentome analysis of targeted EM-seq capture data from two healthy cohorts: nf-core/methylseq (2.6.0) / bismark (0.24.0) processing to hg38, lambda spike-in based cfDNA concentration estimation, reference-marker selection from public GEO methylation atlases, EpiDISH cell-type deconvolution, elastic-net methylation age model, 2-mer end-motif analysis, marker-based per-fragment cell-type assignment, in silico size selection + re-deconvolution, regularized canonical correlation analysis, and mixed-model/ANOVA statistics.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis extracted from the bioRxiv v1 full-text Methods (fetched via unauthenticated curl after Cloudflare 403/429 on the JATS .source.xml endpoint; landing-page .full HTML used as the equivalent methods source). The paper contains NO code availability statement and names no repository (no GitHub/GitLab/Zenodo/Software Heritage anywhere in the text) — all downstream analyses beyond the nf-core pipeline are in-house and unpublished. Wet-lab recruitment/plasma/extraction/library/capture/sequencing steps counted in W, not verdicted (layer W / OOS for computational reproduction).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "nf-core/methylseq 2.6.0 uniform processing of EM-seq capture reads (explicit params: clip_r1/r2 0, three_prime_clip_r1/r2 0, aligner 'bismark', ignore_r1 10, ignore_r2 7, ignore_3prime_r1 15, ignore_3prime_r2 13, meth_cutoff 10)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "bismark 0.24.0 alignment to hg38, 'without hardclipping' (invoked within the methylseq pipeline; version and reference build pinned in prose)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Library QC / sample exclusion filter (conversion efficiency >98% via non-CpG methylation, sex-chromosome coverage consistency for swap detection, sequencing yield) — no tool named, no script",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "cfDNA concentration estimation from spiked-in lambda vector read counts, duplication-rate adjusted, genomic-equivalence formula (formula rendered as an image in the preprint; no script)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Cell-type marker selection from public reference methylomes GSE186458 + GSE206818 (103 samples / 24 cell types; one-vs-others two-sample t-test, Benjamini-Hochberg adjustment, top 300 markers per cell type with adj.P<0.05 or |delta|>0.2, non-unique markers dropped -> 5,699 markers) — custom, no code",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "EpiDISH cell-type deconvolution on the 5,699-marker set — no version, no deconvolution mode/parameters stated, no wrapper script",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "cfDNA methylation age prediction model: Spearman CpG-age screening (|rho|>=0.1 -> 9,275 CpGs), elastic-net regression with sex as non-penalized factor, leave-one-out tuning on 144 year-1 samples -> 146-CpG final model, applied to year 2 — package (e.g. glmnet) not named, no version, alpha/lambda not reported, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "2-mer end motif analysis: terminal 2-nt sequences extracted from alignments, frequencies over all 16 2-mers, stratified by highly/lowly methylated regions — custom, no tool, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Marker-based per-fragment cell-type assignment (subset of the 5,699 markers with >=0.6 absolute methylation difference vs all other cell types; hypo/hyper marker classes; fragments matching 0%/100% methylation assigned; discordant multi-marker fragments excluded) — custom, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "In silico ('in vitro') size selection from BAM insert size into <167 / 167-250 / >250 bp bins, <10x-coverage bins dropped, methylation re-extraction and re-deconvolution, paired comparison — custom, no code, no samtools/bedtools version named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Regularized canonical correlation analysis of cell-type proportions vs 2-mer end-motif frequencies (both matrices standardized, regularization tuned by cross-validation, 1,000-permutation test) — package not named (e.g. mixOmics/CCA), no version, no tuned parameter values reported",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Statistical analysis: coefficient of variation, repeated-measures ANOVA (within-subject), linear mixed-effects models with individual/time/year random effects, Shapiro-Wilk normality with conditional log10 transform, ICC from variance components, paired t-tests, Spearman/Kendall/Pearson correlations — no R version, no package names/versions, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 10,
+    "n_X": 0,
+    "S": 12,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/12 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 2/12 computational steps (C1 nf-core/methylseq 2.6.0 and C2 bismark 0.24.0 — the only version-pinned software in the paper, and the only steps with explicitly enumerated parameters). 10/12 steps cap at NI: every downstream analysis (QC filter, lambda-based concentration estimation, marker selection, EpiDISH deconvolution, elastic-net age model, end-motif analysis, fragment assignment, in silico size selection, regularized CCA, statistics) is in-house with no repository, no software versions, and in several cases no named package at all. No lockfile, container, or conda environment is claimed anywhere, so the two pinned tools are exact_pins_partial (no closure) and cannot exceed RI even after stage-2 verification. Stage-2 code verification is impossible for this paper: there is no code artifact to verify.",
+    "coverage": "12 computational steps assessed from bioRxiv v1 Methods prose. 7 wet-lab steps (recruitment/blood draw, plasma double-spin separation, Maxwell RSC cfDNA extraction, Advia 2120 complete blood counts, EM-seq library prep with lambda/pUC spike-ins, Roche KAPA HyperExplore capture enrichment, NovaSeq 150-bp PE sequencing) counted in W but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "Whole paper — there is no Code availability section",
+      "missing": "No code repository of any kind is stated. The full text contains zero occurrences of github / gitlab / zenodo / 'code availability'. Author contributions state 'H.C. performed all bioinformatics and statistical analyses', but none of that code is released. Ten of twelve computational steps are custom in-house analyses with no released implementation.",
+      "how_to_close": "Publish the analysis code (marker selection, deconvolution wrapper, age model training, end-motif and fragment-assignment code, size-selection pipeline, CCA and statistics scripts) in a versioned public repository with a release tag or Zenodo DOI."
+    },
+    {
+      "type": 1,
+      "where": "DATA AVAILABILITY statement",
+      "missing": "Verbatim: 'The datasets generated and/or analysed during the current study will be available in the European Genome-Phenome Archive (EGA) repository under controlled access.' Future tense, no EGA study/dataset accession (no EGAS/EGAD identifier), no DAC named, no access-request procedure. The primary EM-seq data is therefore not retrievable at assessment time.",
+      "how_to_close": "Deposit and cite the concrete EGA accession(s) (EGAS…/EGAD…), name the Data Access Committee, and state the request procedure and expected turnaround."
+    },
+    {
+      "type": 2,
+      "where": "Software environment across all 12 computational steps",
+      "missing": "No lockfile, container image/digest, conda environment file, renv.lock, or session info. Only two exact version pins exist in prose (nf-core/methylseq 2.6.0, bismark 0.24.0) with no dependency closure; the nf-core profile actually used (docker/singularity/conda) and the Nextflow version are not stated.",
+      "how_to_close": "Publish the nf-core run configuration (profile, Nextflow version, container digests from the pipeline's software_versions report) plus a conda-lock/renv.lock or container digest for the downstream R/Python analyses."
+    },
+    {
+      "type": 3,
+      "where": "C6 EpiDISH; C7 elastic-net age model; C11 regularized CCA; C12 statistics",
+      "missing": "No version numbers for EpiDISH; the elastic-net, CCA and mixed-model implementations are not even named (no package identified), and no R/Python version is reported anywhere. EpiDISH's deconvolution mode (RPC/CBS/CP) and its parameters are unstated; the elastic-net alpha and the selected lambda are unstated; the tuned CCA regularization parameters are unstated.",
+      "how_to_close": "Report language version, every package name and version, and the concrete algorithm settings (EpiDISH method, elastic-net alpha/lambda, CCA regularization values) or ship a sessionInfo()/environment capture."
+    },
+    {
+      "type": 7,
+      "where": "Capture design and reference resources",
+      "missing": "The custom Roche KAPA HyperExplore probe set (4,991 regions) is described but the region BED/coordinates are not provided as a downloadable artifact; the hg38 reference build is named without a specific assembly/patch or source URL; the derived 5,699-marker and 146-CpG model coordinate lists are described but not provided as machine-readable files in the availability statements.",
+      "how_to_close": "Release the capture region BED, the 5,699 marker CpG list, and the final 146-CpG age-model coefficient table as supplementary machine-readable files, and pin the exact hg38 reference (source + patch/analysis set)."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: recruitment/venipuncture (Streck and Nonacus Cell3 tubes), double-spin plasma separation, Maxwell RSC ccfDNA extraction on Hamilton liquid handler, Advia 2120 complete blood counts, EM-seq library prep with lambda/pUC spike-ins, Roche KAPA HyperExplore capture enrichment, NovaSeq 150-bp PE sequencing",
+      "missing": "Physical sample-generation steps are out of scope for computational reproduction (OOS); counted in W (7), not verdicted. Note that the entry point to the computational pipeline (raw EM-seq FASTQ) is itself not yet available (see gap type 1).",
+      "how_to_close": "N/A for Tier-1 computational readiness; closing the EGA deposition gap makes the pipeline entry point reachable under controlled access."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE. The preprint has no Code availability section and names no repository (0 hits for github/gitlab/zenodo/software heritage in the full text). The only named public software artifacts are nf-core/methylseq (2.6.0), bismark (0.24.0) and EpiDISH, cited as tools via literature references, not as author code.",
+      "http_status": "n/a (no code repository stated in paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "full text parsed from biorxiv v1 .full HTML (unauthenticated curl); JATS .source.xml endpoint returned Cloudflare 403 then 429"
+    },
+    {
+      "artifact": "data accession: primary study data — EGA (European Genome-Phenome Archive), controlled access, stated as future deposition ('will be available'), NO accession identifier given",
+      "http_status": "n/a (no accession to resolve)",
+      "checked_at": "2026-07-27",
+      "network_context": "stated-in-paper only; nothing to check"
+    },
+    {
+      "artifact": "data accession: reference methylation atlas GEO GSE186458 (Loyfer et al.), cited as input for marker selection — stated-in-paper, public",
+      "http_status": "not checked (stage1 prose triage; accession stated in paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "stated-in-paper"
+    },
+    {
+      "artifact": "data accession: reference methylation dataset GEO GSE206818 (Moss et al.), cited as input for marker selection — stated-in-paper, public",
+      "http_status": "not checked (stage1 prose triage; accession stated in paper)",
+      "checked_at": "2026-07-27",
+      "network_context": "stated-in-paper"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "18ad5ef9de2f1e761c032f5bfb4195f3dbfe8217230b8292374555b09e024296",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

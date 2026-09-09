@@ -1,0 +1,528 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "4b1fe0b32c262c61430f5fb6d93b7fbd92da364fbefae99e4a60130631f957d8",
+  "canonical_id": {
+    "value": "10.1101/2025.10.13.681986",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.13.681986v1",
+      "biorxiv:2025.10.13.681986v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Re-derive, from public TCGA PanCancer Atlas processed data, (i) the CSI-HRD homologous-recombination-deficiency labels for >10,000 TCGA tumors, (ii) the four-signature ssGSEA Inflammation Score and its hot/intermediate/cold tertile calls, (iii) the CIBERSORTx TME cell-state deconvolution, and (iv) the copy-number/LOH-vs-immune association analyses reported in Figures 1-5. Secondary target: reproduce the IS validation against the independent mIF-classified ovarian cohort (EGA/GEO).",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file (Snakefile/CWL/Nextflow/WDL/Makefile) and no author code repository exists, so steps are derived from the STAR Methods 'Method Details' prose: one step per named tool invocation or per distinct named analysis producing a reported quantity. The Key Resources Table is published as a bitmap graphic (JATS <graphic xlink:href='681986v1_utbl1'>) with no machine-readable rows, so no version or RRID information could be extracted from it - all version evidence below comes from running prose only. 22 computational steps; 0 wet-lab steps in scope (the multiplex-immunofluorescence and bulk RNA-seq generation for the validation cohort is prior published work, reference 10, not performed in this study).",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "S01",
+      "label": "Cohort assembly and sample exclusion (WES/expression co-availability; removal of 8-oxo-guanine artefact tumors flagged by SBS45, 94/10308)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S02",
+      "label": "Bulk RNA-seq expression matrix acquisition and assembly (EBPlusPlusAdjustPANCAN_IlluminaHiSeq_RNASeqV2.geneExp.tsv from PanCancer Atlas; separate counts matrix 'assembled manually by concatenating individual cancer type counts data' from GDAC Firehose for CIBERSORTx)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S03",
+      "label": "Somatic mutation processing and damaging-variant filtering (mc3.v0.2.8.PUBLIC.maf.gz; truncating categories, SIFT 'deleterious' + PolyPhen 'probably_damaging', ClinVar pathogenic/likely_pathogenic, ClinVar 'Benign' veto) and tumor mutational burden",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S04",
+      "label": "Germline pathogenic variant handling (PCA_pathVar_integrated_filtered_adjusted.tsv from GDC; variants of unknown significance excluded)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S05",
+      "label": "Allele-specific copy-number retrieval and sample/chromosome-level aggregation (ASCAT ReleasedData/TCGA_SNP6_hg19; segment-length-weighted minor/major CN over segments >100 kb)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "S06",
+      "label": "Gene-level copy-number calling (relative amplification = 2-3 copies above sample baseline; focal amplification = log10(length) < 6.5 with >=2 extra copies; LOH = minor CN < 1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S07",
+      "label": "Genome-wide 100 kb-bin copy-number, LOH and baseline-corrected amplification profiles",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S08",
+      "label": "LOH-fraction and amplification enrichment statistics (per-region t-tests against the null; two-group t-tests on LOH fraction and baseline-corrected amplification distributions)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S09",
+      "label": "DNA-methylation functional-silencing calls with RESET v1.1.1 (FANTOM5 promoter-probe selection from 450k, variance/intermediate-methylation filtering in normals, per-tumor-type consensus probe set, expression-drop confirmation, 1-SD sample-level filter)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S10",
+      "label": "Clinical, demographic and subtype annotation assembly (TCGA-CDR-SupplementalTableS1.xlsx; cBioPortal PanCancer Atlas HPV/EBV/HBV/HCV status; SKCM primary vs metastatic; UCEC endometrioid vs serous; BRCA HER2+/ER+/TNBC)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S11",
+      "label": "ssGSEA scoring of the four immune signatures (Bruand double-strand-break interferon, Dangaj chemokine/T-cell-recruitment, Azizi single-cell activated-CD8, MSigDB Hallmark interferon-gamma)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S12",
+      "label": "Inflammation Score aggregation (per-sample mean of the four ssGSEA scores), per-tumor-type tertile assignment to hot/intermediate/cold with viral and MMRD/PPD tumors excluded from threshold estimation, and Z-transformation for cross-tumor-type comparison",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S13",
+      "label": "Inflammation Score validation against the independent treatment-naive ovarian cohort with matched bulk RNA-seq (GEO GSE264660) and whole-slide CD8+ TIL immunofluorescence classification (EGA EGAD50000001556)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S14",
+      "label": "Genomic Instability Score retrieval (TAI + LST + LOH per Knijnenburg et al., deposited on GDC by Thorsson et al.)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S15",
+      "label": "MMRP / MMRD / POLE-exo multi-class classification with the classifier built into SigMA v2.0 (SBS signatures combined with MSIsensor scores from Thorsson et al.)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "S16",
+      "label": "SBS signature 3 (Sig3) scoring with SigMA using TCGA-MC3-specific classifiers regenerated for this manuscript from 3476 WGS samples (run setting data = 'tcga_mc3'; tumor_type = 'other' for LAML, TGCT, THCA, THYM, UVM, PCPG)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S17",
+      "label": "HRD-linked indel quantification (count of deletions >= 5 bp, stratified by overlap with microhomology >= 2 bp, as proxies for ID6/ID8)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "S18",
+      "label": "CSI-HRD gradient-boosting classifier training and pan-cancer HRD prediction (gbm R package; features = SigMA Sig3 score/likelihood/exposure, GIS, microhomology indel counts; BRCA1/2-/- seed positives plus top-3 feature-space matches; two-step label refinement; 5-fold cross-validation; pan-cancer and 16 tumor-type-specific models)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S19",
+      "label": "TME single-cell reference construction for deconvolution (pan-cancer single-cell counts downloaded from blueprint.lambrechtslab.org, merged into a Seurat object, fine cell-type labels obtained from the authors on request, subsampled to <= 400 cells per cell type)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S20",
+      "label": "CIBERSORTx signature-matrix construction and absolute-mode deconvolution of TCGA bulk RNA-seq (quantile normalization disabled for both matrix build and deconvolution, 500 permutations, all other parameters default)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "S21",
+      "label": "Reactome pathway ssGSEA and differential pathway analysis (Z-normalized within tumor type, HRD vs HRP and dHpC vs dCpH t-value comparisons; pathway enrichment of amplifications and LOH)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "S22",
+      "label": "Immune-program association analyses (Pearson correlations between Z-normalized ssGSEA scores and Z-normalized deconvolved cell proportions at p < 0.05; multivariate modelling of IS with regional LOH and oncogene amplification status as covariates)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 16,
+    "n_X": 0,
+    "S": 22,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/22 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "6/22 (27%) RI ceiling at Stage 1. The paper's strength is the DATA axis: it is a secondary analysis of TCGA PanCancer Atlas resources, and nearly every input is named down to the exact file (EBPlusPlusAdjustPANCAN_IlluminaHiSeq_RNASeqV2.geneExp.tsv, mc3.v0.2.8.PUBLIC.maf.gz, PCA_pathVar_integrated_filtered_adjusted.tsv, TCGA-CDR-SupplementalTableS1.xlsx, ASCAT ReleasedData/TCGA_SNP6_hg19), so data = 2 on 19/22 steps. The binding constraints are the CODE and VERSION axes. The Data and Code Availability statement contains NO code statement at all - there is no author repository (no GitHub, GitLab, Bitbucket, Zenodo or Software Heritage deposit for this paper's analysis code), and the statement closes with 'available from lead contacts upon request'. Only two software versions are pinned anywhere in the prose - RESET v1.1.1 and SigMA v2.0 - which is what lifts S09, S15 and S16 to RI; S05, S19 and S20 reach RI on named-but-unversioned dependencies (ASCAT released data referenced by a master-branch tree URL, Seurat, CIBERSORTx). The remaining 16 steps fall to NI because the computation is bespoke arithmetic performed by undeposited in-house scripts with no software identity at all (version = 0), and in five cases (S01, S11, S13, S18, S21) the prose also underdetermines the computation itself (code = 0): the SBS45 'high artefact' threshold, the ssGSEA implementation and its exact gene lists, the mIF classification pipeline, and the gbm hyperparameter grid / feature-space similarity metric / score thresholds are all unstated. No seeds are given for any stochastic step (gbm 5-fold CV, CIBERSORTx 500 permutations, Seurat 400-cell subsampling). NOTE: the Key Resources Table is a bitmap image in the JATS record, so any version or RRID information it may carry was not machine-readable and could not be scored.",
+    "coverage": "22/22 computational steps assessed (100%); |W| = 0 wet-lab steps in scope - the multiplex-immunofluorescence imaging and bulk RNA-seq of the validation ovarian cohort are prior published work (reference 10), not performed here, so computational coverage |S|/(|S|+|W|) = 100%.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Data and Code Availability (STAR Methods) - whole paper",
+      "missing": "There is no code availability statement and no analysis-code deposit of any kind. Verbatim: 'The TCGA data (dbGaP accession phs000178) is obtained through NCI Genomic Data Commons, cbioportal and previous publications as detailed in the Key Resources Table. Bulk RNA-seq data and mIF based immune categorizations for ovarian cancers used to validate inflammation score was obtained from our recent publication and deposited under at EGA (EGAD50000001556) and GEO (GSE264660). Any additional information required to reanalyze the data reported in this paper is available from lead contacts upon request.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL for this study's own code appears anywhere in the manuscript.",
+      "how_to_close": "Deposit the CSI-HRD training/prediction scripts, the ssGSEA/Inflammation-Score code, the copy-number binning and statistics code, and the CIBERSORTx reference-building code in a public repository with a citable release tag or DOI."
+    },
+    {
+      "type": 5,
+      "where": "S16, S18, S19 - SigMA TCGA-MC3 classifier regeneration, CSI-HRD gradient-boosting models, TME signature matrix",
+      "missing": "The three custom-built derived artifacts on which the paper's central claims rest are not deposited: (i) the WES simulation / classifier-retraining pipeline used to regenerate SigMA classifiers for TCGA-MC3 from 3476 WGS samples (the WGS cohort itself is not identified by accession), (ii) the trained pan-cancer and 16 tumor-type-specific gbm CSI-HRD models and their thresholds, (iii) the CIBERSORTx signature matrix built from the Lambrechts single-cell data. Table S1 does provide the final per-sample HRD labels, which is a partial mitigation.",
+      "how_to_close": "Deposit the trained model objects, the signature matrix, and the retraining scripts; give the accession(s) of the 3476 WGS samples."
+    },
+    {
+      "type": 2,
+      "where": "S01-S04, S06-S08, S10-S14, S17, S21, S22 (2a: no version stated) and S05, S18, S19, S20 (2b: named but floating)",
+      "missing": "2a - no version is stated for the ssGSEA implementation (the package is not even named), the R installation, the ClinVar release, the FANTOM5 annotation release, the MSigDB release, the Reactome release, or the TCGA methylation data freeze ('the latest data freeze'). 2b - ASCAT released data is cited by a master-branch tree URL rather than a tag or commit; Seurat, the gbm R package and CIBERSORTx are named without versions; CIBERSORTx is a hosted web service whose behaviour can change under a fixed name. Only RESET v1.1.1 and SigMA v2.0 are pinned. There is no lockfile, no conda/renv environment file and no container anywhere.",
+      "how_to_close": "State versions for every named package plus the R version and OS, cite the ASCAT release by tag/commit, and ship a renv.lock or a container digest."
+    },
+    {
+      "type": 9,
+      "where": "S09 - RESET v1.1.1 source",
+      "missing": "The stated download location embeds a personal account name in the clone URL: 'https://marcomina85@bitbucket.org/cso_repo/reset.git'. Both https://bitbucket.org/cso_repo/reset.git and the repository landing page https://bitbucket.org/cso_repo/reset return HTTP 404 unauthenticated, i.e. the repository is private or removed. The tool is presented as downloadable but is not publicly retrievable as cited.",
+      "how_to_close": "Make the RESET repository public, or deposit the exact v1.1.1 source used in Zenodo/Software Heritage with a DOI."
+    },
+    {
+      "type": 3,
+      "where": "S19 - single-cell reference download",
+      "missing": "http://blueprint.lambrechtslab.org (and https://) does not resolve/connect (curl exit code 000, no HTTP status) when checked 2026-07-28. The pan-cancer single-cell expression counts that the entire deconvolution reference is built from therefore have no working retrieval path as cited.",
+      "how_to_close": "Cite the underlying single-cell dataset by a persistent accession (GEO/ArrayExpress/EGA/Zenodo) rather than a lab website."
+    },
+    {
+      "type": 13,
+      "where": "S19 cell-type labels; whole-paper availability statement",
+      "missing": "Two out-of-band, request-gated dependencies. (i) The fine cell-type calls used to label the Seurat reference were 'kindly given by the authors upon request' and are not deposited anywhere. (ii) The availability statement routes everything else through 'available from lead contacts upon request'. Neither is a resolvable artifact.",
+      "how_to_close": "Deposit the cell-type label table alongside the signature matrix; replace request-gating with a deposit."
+    },
+    {
+      "type": 4,
+      "where": "S18 (gbm 5-fold CV and two-step label refinement), S19 (subsampling to 400 cells per cell type), S20 (CIBERSORTx 500 permutations)",
+      "missing": "No random seed is stated for any stochastic step, and no seed-setting code is available (there is no code). Cross-validation folds, the 400-cell subsample, and the permutation null are therefore not exactly reproducible; only distributional agreement is achievable.",
+      "how_to_close": "Publish seeds and the RNG state, or publish the exact intermediate outputs (fold assignments, subsampled cell barcodes)."
+    },
+    {
+      "type": 11,
+      "where": "S20 - CIBERSORTx",
+      "missing": "CIBERSORTx is a registration-gated hosted service (https://cibersortx.stanford.edu/, HTTP 200 on 2026-07-28) with restrictive licensing and no open-source, version-pinnable distribution. Its exact numerical behaviour at the time of the analysis cannot be recovered by a third party.",
+      "how_to_close": "Record the CIBERSORTx build/date used and deposit the resulting absolute-mode fraction matrix so downstream steps do not depend on re-running the service."
+    },
+    {
+      "type": 1,
+      "where": "S13 - validation cohort",
+      "missing": "The paper does not provide the per-sample mapping between the GEO GSE264660 RNA-seq identifiers, the EGA EGAD50000001556 imaging identifiers, and the inflamed/excluded/desert mIF categories used to validate the Inflammation Score; it cites reference 10 instead. Table S1 does supply per-sample HRD labels for the TCGA cohort, so this gap is confined to the validation arm.",
+      "how_to_close": "Provide a supplementary table mapping validation-cohort sample IDs to mIF category and to the computed IS value."
+    },
+    {
+      "type": 2,
+      "where": "Key Resources Table (STAR Methods)",
+      "missing": "The Key Resources Table is published only as a bitmap graphic in the JATS record (<graphic xlink:href='681986v1_utbl1'>), with no machine-readable rows. Any software versions, RRIDs or repository identifiers it may contain are not extractable from the text record and were not available for scoring at Stage 1. This is recorded as an assessment-boundary note, not as a claim that the table is empty.",
+      "how_to_close": "Publish the Key Resources Table as text/XML so that tool identities, versions and RRIDs are machine-readable."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "author analysis code repository (any host)",
+      "http_status": "none - no code repository is stated anywhere in the paper",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "n/a - nothing to resolve; no web search was performed to find a repository the paper does not cite"
+    },
+    {
+      "artifact": "https://github.com/VanLoo-lab/ascat/tree/master/ReleasedData/TCGA_SNP6_hg19 (third-party ASCAT TCGA copy-number release, S05)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated, macOS host, direct internet"
+    },
+    {
+      "artifact": "https://marcomina85@bitbucket.org/cso_repo/reset.git (RESET v1.1.1 source as cited, S09) - tested as https://bitbucket.org/cso_repo/reset.git and https://bitbucket.org/cso_repo/reset",
+      "http_status": "404 (both the .git clone URL and the repository landing page)",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated (the cited URL embeds the username 'marcomina85', implying credentialed access)"
+    },
+    {
+      "artifact": "http://blueprint.lambrechtslab.org (pan-cancer single-cell reference download, S19)",
+      "http_status": "000 - connection/DNS failure, no HTTP response (retested over https, also 000)",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, 25-30 s timeout, unauthenticated, direct internet"
+    },
+    {
+      "artifact": "GEO GSE264660 (validation cohort bulk RNA-seq, S13) - https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE264660",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated"
+    },
+    {
+      "artifact": "EGA EGAD50000001556 (validation cohort, controlled access, S13) - https://ega-archive.org/datasets/EGAD50000001556",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated; dataset page resolves, DAC application path not documented in the paper"
+    },
+    {
+      "artifact": "dbGaP phs000178 (TCGA, stated in Data Availability) - accession stated in paper, resolution not separately tested",
+      "http_status": "stated-in-paper (not fetched)",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "n/a - the analyses actually consume PanCancer Atlas / GDC / cBioPortal processed public derivatives, not raw dbGaP data"
+    },
+    {
+      "artifact": "https://cibersortx.stanford.edu/ (S20, registration-gated hosted service)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated landing page only"
+    },
+    {
+      "artifact": "JATS XML source record - https://www.biorxiv.org/content/early/2025/10/14/2025.10.13.681986.source.xml",
+      "http_status": "200 via curl (314230 bytes); WebFetch returned 403 Forbidden",
+      "checked_at": "2026-07-28T07:50:36Z",
+      "network_context": "curl with a browser User-Agent succeeded where the WebFetch tool was blocked; title string verified present in the fetched XML"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "4098dcbe514db0f4dae163a80ac794653e605de78636e3dbf43a7ddcdcc9be78",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

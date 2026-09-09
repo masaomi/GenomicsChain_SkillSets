@@ -1,0 +1,509 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "5623b8009098c89d72e14d5272df31b7de44dda0c4643b34f4d5bcbdefad63c8",
+  "canonical_id": {
+    "value": "10.1101/2025.10.22.683841",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.22.683841v1",
+      "biorxiv:2025.10.22.683841v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Re-derive, from the public NCBI BioProject PRJNA1225280 shotgun metagenomes (30 vineyard soil samples), (i) the 200 dereplicated metagenome-assembled genomes and their GTDB taxonomy, (ii) the 200-genome x 30-sample normalized coverage table (Table S1), (iii) the 600 rpS3 species-group abundance profiles and the Shannon/Simpson/Pielou diversity indices, (iv) the microTrait genome x trait matrix (Table S2) and its coverage-weighted sample-level aggregation (Table S3), and (v) the reported statistics: soil multifunctionality Z-scores (Figure 1), the linear mixed-effects treatment contrasts on soil properties / species groups / MAGs / traits (Table 1, Tables S4-S6, Figures 2-4), the RDA ordinations (Figure 3, Supplementary Figure 3) and the trait-vs-soil-property Spearman correlation heatmaps (Figures 5, Supplementary Figure 4). The field trial, soil physicochemical and enzymatic assays, DNA extraction and Illumina sequencing are wet-lab / field steps and are out of scope (OOS).",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file (Snakefile/CWL/Nextflow/WDL/Makefile) and no author code repository is cited. Steps are derived from the 'Materials and methods' prose subsections 'Metagenome assembly, genome binning, and bin dereplication', 'Quantification of MAG coverages across samples', 'Microbial community composition and diversity analysis', 'Microbial fitness trait inference from MAGs' and 'Statistical treatment': one step per named tool invocation or per distinct named analysis producing a reported quantity. IMPORTANT GRANULARITY DECISION: the assembly stage is scored as ONE step (C01), because the paper describes it as a single versioned KBase app invocation - 'JGI Metagenome Assembly Pipeline v0.6.0' - and then enumerates its six internal components (BBTools RQCFilter, Bloom-filter read correction, Seqtk pairing, metaSPAdes, BBTools stats.sh, BBMap) as documentation of that one app. Splitting them into six steps would inflate |S| with six sub-steps that all carry identical axis scores. 18 computational steps, 5 wet-lab/field steps (OOS).",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W01",
+      "label": "Long-term field trial, Bargota (Navarre, Spain): randomized block design, 3 replicate blocks, 5 fertilization treatments (Abonlir pellet compost 3,700 kg FW/ha, urban solid-waste compost 4,075 kg FW/ha, sheep-manure compost 4,630 kg FW/ha, mineral 14-10-40-2.5-1.5, unfertilized), applied annually 1998-2018 (mineral biennially)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W02",
+      "label": "Soil sampling (May 2022, 0-10 cm, 15-core composites) and physicochemical characterization: texture, pH, CEC, EC, dry matter, nitrate/ammonium, Olsen P, active limestone, carbonates, exchangeable cations (MAPA 1994); water-holding capacity and wilting point (Eijkelkamp ceramic plates); total C/N (Elementar Soli TOC Cube, ISO 10694 / ISO 13878); MAOM/POM/soluble OM (Cotrufo et al. 2019, Shimadzu TOC-L); HNO3/HClO4 digestion + ICP-AES for 18 elements",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W03",
+      "label": "Soil biological assays: six fluorogenic enzyme activities (ISO 22939:2010, 96-well, MUB/AMC substrates, per Anza et al. 2019), soil respiration (ISO 16072:2002), potentially mineralizable nitrogen (Powers 1980), microbial biomass carbon (Vance et al. 1987), Biolog EcoPlate community-level physiological profiles (Epelde et al. 2008)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W04",
+      "label": "Soil DNA extraction (0.25 g DW, >=3 replicate extractions, MoBio PowerSoil DNA Isolation Kit) and QC (Agilent TapeStation)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W05",
+      "label": "Shotgun metagenomic library preparation and sequencing at CNAG-CRG (Illumina NovaSeq6000, 2 x 150 bp paired-end, ~18 +/- 3.54 Gb per sample, range 11.21-25.83 Gb)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C01",
+      "label": "Metagenome assembly in KBase - single app invocation 'JGI Metagenome Assembly Pipeline v0.6.0' (KBase 2025), comprising (1) BBTools RQCFilter quality trimming/artefact removal, (2) Bloom-filter read correction (Li 2015), (3) Seqtk read re-pairing, (4) metaSPAdes with default k = 33,55,77,99,127 (Nurk et al. 2017), (5) BBTools stats.sh assembly statistics, (6) BBMap read-to-scaffold mapping. Executed and published as the KBase static narrative https://kbase.us/n/126617/119/ ('Bargota-vineyard-metagenomes')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C02",
+      "label": "Per-sample genome binning with MetaBAT2 (Kang et al. 2019) using coverage from the sample plus the other samples of the same row-block (6 binning groups x 5 samples), yielding 1,918 bins of which 861 had completeness > 50% and contamination < 25%; performed inside the same KBase narrative",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C03",
+      "label": "Bin dereplication with dRep at 99% ANI (Olm et al. 2017), parameters verbatim 'completeness: 50, contamination: 25, secondary ANI threshold: 0.99, primary ANI threshold: 0.9', yielding the 200 dereplicated MAGs",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C04",
+      "label": "GTDB taxonomy assignment to the 200 MAGs with GTDB-Tk (Chaumeil et al. 2022) against GTDB (Parks et al. 2022); neither the GTDB-Tk version nor the GTDB release (e.g. R202/R207/R214) is stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C05",
+      "label": "MAG abundance quantification with coverM in 'genome' mode (Aroney et al. 2025) against the 200 dereplicated bins using each sample's raw reads, thresholds verbatim 'min-read-aligned-percent = 0.75, min-read-percent-identity = 0.95, min-covered-fraction-0', followed by sequencing-depth normalization to produce the 200 genomes x 30 samples coverage table (Table S1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C06",
+      "label": "Open reading frame prediction on contigs > 1 kb with Prodigal V2.6.3 (Hyatt et al. 2010) in metagenome mode, parameters '-m -p meta'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C07",
+      "label": "rpS3 (rpsC) marker-gene identification across all metagenome assemblies using a hidden Markov model built from the tree-of-life rpS3 alignment of Hug et al. (2016). The HMM profile itself is not deposited, the HMM search program is not named (HMMER is implied but not stated), and no bit-score / E-value / coverage threshold is given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C08",
+      "label": "Species-group (SG) definition by clustering rpS3 sequences at 99% identity with USEARCH (Edgar 2010), options verbatim '-cluster_fast -sort length -id 0.99 -maxrejects 0 -maxaccepts 0'; 600 SGs obtained; longest contig per cluster taken as representative",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C09",
+      "label": "Mapping each sample's reads to the SG representative contigs with Bowtie2 in sensitive mode ('--sensitive'); index-build settings, read pre-processing and BAM sorting/filtering are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "SG read-count table generation from the BAM files with coverM contig (version 0.5.0, https://github.com/wwood/CoverM), options verbatim '--proper-pairs-only --min-read-percent-identity 0.99 --min-read-aligned-percent 0.9 --methods count'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Per-base-pair coverage normalization of the SG contig counts, formula verbatim 'reads mapped from sample / (contig length x reads sequenced in sample)'. No script, no software identity; the per-sample sequenced-read denominators (pre- vs post-QC) are not tabulated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Microbial fitness-trait inference from the 200 MAGs with microTrait (Karaoz et al. 2022), an HMM-based workflow mapping genome sequences to a hierarchy of fitness traits, producing the genomes x traits presence/absence-or-count matrix (Table S2). No microTrait version, no HMM database release and no threshold settings are stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Sample-level trait aggregation: for each trait x sample pair, trait presence/absence or count weighted by the normalized coverages of the genomes in that sample (Table S3). Described in prose only; no script, no software identity",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Prokaryotic structural diversity indices (Shannon, Simpson, Pielou) computed from the 600 species groups. No software, package or function is named; no rarefaction / normalization / base-of-logarithm convention is stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Soil multifunctionality index: Z-transformation of individual soil properties followed by averaging into four functions (water storage: dry matter, WHC, wilting point; fertility: total N, nitrate, ammonium, Olsen P, extractable Ca/Mg/K, S; carbon storage: C content, MAOM, POM, MBC; OM decomposition: enzyme activities, respiration, PMN, AWCD-Biolog) and then into a multifunctionality index (Wagg et al. 2014). Property-to-function membership is fully listed; no script or software is named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Linear mixed-effects models for treatment effects on all soil parameters, diversity indices, species groups, MAGs and functional traits - GAMLj module (Gallucci 2019, https://gamlj.github.io/) of jamovi (The jamovi project 2022), fertilization treatment as fixed effect, subplot and row as random effects. No jamovi/GAMLj version numbers (only citation years), no estimation or degrees-of-freedom method, no post-hoc test named despite the significance letters in Table 1, and no multiple-testing correction stated for the ~600 SG / 200 MAG / trait-wise test families. No .omv analysis file is deposited",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Redundancy analyses (RDA) on species-group and MAG data with treatments as explanatory variables, performed in Canoco 5 (ter Braak and Smilauer 2012). Verbatim, the entire method statement is 'Redundancy analyses (RDA) were performed using Canoco 5': no data transformation, no centring/standardization choice, no permutation-test design or permutation count, and no random seed are given. Canoco is closed commercial software",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Clustered heatmaps and Spearman correlations between fitness traits and soil parameters, drawn with pheatmap and Rcmdr in R. No R version, no package versions, no clustering distance or linkage method, no scaling, and no multiple-testing correction for the trait x soil-property correlation matrix are stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 11,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 18,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "11/18 (61%) RI ceiling at Stage 1. This paper is unusually strong on the DATA axis and unusually weak on the VERSION axis. Data = 2 on all 18 computational steps: the raw reads AND the metagenome-assembled genomes are deposited under NCBI BioProject PRJNA1225280 (resolves HTTP 200), and the four key intermediate matrices - the 200 genomes x 30 samples coverage table (Table S1), the microTrait genome x trait matrix (Table S2), the coverage-weighted sample-level trait table (Table S3) and the full soil-property table (Table S4) - are published as a 944 kB supplementary workbook with six sheets ST1-ST6 (resolves HTTP 200), so every downstream statistical step can start from published inputs. The CODE axis is carried by one artifact: the assembly and binning were executed in KBase and published as a static narrative, https://kbase.us/n/126617/119/, which is a citable, versioned, publicly readable record of the executed workflow (KBase workspace 126617, global read permission 'r', static_narrative version 119, name 'Bargota-vineyard-metagenomes', confirmed via the KBase Workspace API on 2026-07-28). That is why C01 and C02 reach code = 2 - stronger than any other step here. Everything downstream of binning (coverM, Prodigal, USEARCH, Bowtie2, microTrait, the normalization arithmetic, the diversity indices, the Z-score multifunctionality construction, the jamovi/GAMLj mixed models, the Canoco RDA, the pheatmap/Rcmdr heatmaps) has NO deposited code at all and scores code = 1 (reconstructable from prose) or, for the custom rpS3 HMM (C07), code = 0. The binding constraint on the whole paper is VERSION: only three exact pins exist in the entire Methods - 'JGI Metagenome Assembly Pipeline v0.6.0', 'Prodigal V2.6.3' and 'coverM contig version 0.5.0'. MetaBAT2, dRep, GTDB-Tk (and the GTDB release itself), coverM in genome mode, USEARCH, Bowtie2, microTrait, jamovi, GAMLj, Canoco (major version 5 only), R, pheatmap and Rcmdr are all named without versions, so 12 of 18 steps sit at version = 1 / floating and three (C11, C13, C14, C15) have no software identity at all (version = 0). There is no lockfile, no conda environment file, no renv.lock and no container digest anywhere. The seven NI steps fall for two distinct reasons: (i) no software identity for bespoke arithmetic performed by undeposited scripts (C11 normalization, C13 trait aggregation, C14 diversity indices, C15 multifunctionality Z-scores), and (ii) params = 0 on the two ordination/correlation steps whose method statements are a single sentence (C17 Canoco RDA, C18 pheatmap/Rcmdr Spearman) plus the undeposited custom rpS3 HMM with no stated search thresholds (C07).",
+    "coverage": "18/18 computational steps assessed (100%); |W| = 5 wet-lab/field steps in scope (field trial and fertilization regime, soil sampling + physicochemical characterization, soil biological assays, DNA extraction, Illumina library prep and sequencing), all scored OOS and excluded from |S|. Computational coverage |S|/(|S|+|W|) = 18/23 = 78%.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "whole paper - there is no Data Availability or Code Availability section; the only availability statement is one sentence inside Methods",
+      "missing": "No analysis code is deposited or linked for anything downstream of binning. The paper's entire availability statement is, verbatim: 'Genomic data, including metagenome-assembled genomes and raw sequencing reads, are available under NCBI BioProject accession no. PRJNA1225280.' plus, in the next subsection, 'Assembly of raw reads into scaffolds and binning scaffolds in genomes was done in KBase, available as a KBase narrative at https://kbase.us/n/126617/119/.' There is no GitHub / GitLab / Bitbucket / Zenodo / Software Heritage deposit for the coverM/Prodigal/USEARCH/Bowtie2 command drivers, the rpS3 HMM search and clustering pipeline, the per-base-pair normalization, the microTrait run and coverage-weighted aggregation, the diversity-index computation, the multifunctionality Z-score construction, the jamovi/GAMLj analysis file, the Canoco project file, or the pheatmap/Rcmdr plotting code. The single GitHub URL in the Methods (https://github.com/wwood/CoverM) is the third-party tool's own repository, not this study's code. NOTE: this gap is materially mitigated for the upstream half of the pipeline by the published KBase narrative, and mitigated for the downstream half by the deposited intermediate tables (ST1-ST3), which let a reproducer start from published matrices even without the scripts.",
+      "how_to_close": "Deposit the post-binning command drivers and the statistics/plotting code (or the jamovi .omv and Canoco project files) in a public repository with a citable release tag or DOI, and add an explicit Code Availability statement."
+    },
+    {
+      "type": 2,
+      "where": "2a (no version stated): C11, C13, C14, C15 - normalization, trait aggregation, diversity indices, multifunctionality Z-scores (no software named at all); the GTDB release consumed by C04; the R release used by C18. 2b (named but floating): C02 MetaBAT2, C03 dRep, C04 GTDB-Tk, C05 coverM genome mode, C08 USEARCH, C09 Bowtie2, C12 microTrait, C16 jamovi + GAMLj, C17 Canoco 5, C18 pheatmap + Rcmdr",
+      "missing": "Only three exact version pins exist in the whole Methods: 'JGI Metagenome Assembly Pipeline v0.6.0', 'Prodigal V2.6.3' and 'coverM contig (version 0.5.0)'. Note the internal inconsistency: coverM is pinned to 0.5.0 for the contig-mode step (C10) but cited without a version for the genome-mode step (C05), and coverM 0.5.0 predates the Aroney et al. 2025 citation attached to C05, so it is not determinable from the text whether one coverM build or two were used. jamovi and GAMLj are cited by publication year (2022, 2019) rather than by software version. Canoco gives only the major version ('Canoco 5'). There is no lockfile, no conda/renv environment file, no container image and no digest anywhere in the paper.",
+      "how_to_close": "State the exact version of every named tool and package (including MetaBAT2, dRep, GTDB-Tk plus its GTDB release identifier, coverM in both modes, USEARCH, Bowtie2, microTrait, R, pheatmap, Rcmdr, jamovi, GAMLj, Canoco) and ship a conda-lock / renv.lock or a container digest covering the downstream analysis."
+    },
+    {
+      "type": 5,
+      "where": "C07 - rpS3 marker identification",
+      "missing": "The hidden Markov model used to find rpS3 (rpsC) genes across all assemblies is a custom artifact built by the authors from 'the alignment of rpS3 (rpsC) sequences from the tree of life data set from Hug et al. (2016)'. Neither the alignment used, nor the built HMM profile, nor the HMM-building command is deposited, and the HMM search program is never named (HMMER is implied by 'HMM based' but not stated) and carries no reported bit-score, E-value or coverage cutoff. The 600 species groups that underpin all structural-diversity results therefore cannot be regenerated from the paper. The same concern applies more weakly to C12 (microTrait), whose HMM database release is not identified.",
+      "how_to_close": "Deposit the rpS3 alignment, the built .hmm profile and the exact hmmsearch/hmmscan invocation with its thresholds; state the microTrait HMM database release."
+    },
+    {
+      "type": 13,
+      "where": "C04 GTDB-Tk / GTDB reference taxonomy; C12 microTrait HMM database",
+      "missing": "Both steps consume an external, versioned reference resource whose release is never identified. GTDB is cited only as 'GTDB taxonomy (Parks et al., 2022)' with no release string (R202 / R207 / R214 ...), and GTDB-Tk classification results change between GTDB releases, so the reported taxonomic assignments (including the named taxa Nitrosocosmicus oleophilus and Nitrospira japonica that carry an abstract-level claim) are not pinned. microTrait's underlying HMM/rule database release is likewise unstated. Per collection protocol Delta-B, env_capture_class (A/B/C) is a Stage-2 code-verified classification and is left 'n/a' here; the prose-level finding is that no version pin exists to verify.",
+      "how_to_close": "State the GTDB release and the GTDB-Tk version together, and the microTrait database release; ideally have the workflow fetch a versioned DOI/accession for each (class A)."
+    },
+    {
+      "type": 11,
+      "where": "C08 USEARCH; C17 Canoco 5",
+      "missing": "Two closed/commercial dependencies sit on the critical path. USEARCH is distributed by its author under a restricted licence (the free 32-bit build is memory-limited and historical versions are not archived in a public registry), and no version is given, so the exact clustering result at -id 0.99 is not recoverable by a third party. Canoco 5 is closed commercial Windows software; the RDA ordinations in Figure 3 and Supplementary Figure 3 cannot be rerun without a licence, and no equivalent open re-implementation (e.g. vegan::rda) is provided.",
+      "how_to_close": "Record the exact USEARCH build (or switch to an open equivalent such as VSEARCH/MMseqs2 and report both), and deposit the RDA input matrices plus an open-source script reproducing the ordination."
+    },
+    {
+      "type": 3,
+      "where": "C01, C02 - the KBase static narrative https://kbase.us/n/126617/119/",
+      "missing": "The narrative URL cited in the paper returned HTTP 403 to an unauthenticated command-line fetch on 2026-07-28, but the 403 body is a Cloudflare bot-challenge interstitial ('Just a moment...'), not an authorization denial. An independent check against the KBase Workspace API (Workspace.get_workspace_info on id 126617) returned global read permission 'r', owner 'ukaraoz', 321 objects, static_narrative version '119', narrative name 'Bargota-vineyard-metagenomes' - i.e. the artifact is genuinely public. This is recorded as an access-friction finding, not a dead link: automated Stage-1 retrieval of the narrative contents was blocked, so the app versions and per-cell parameters actually recorded inside the narrative could NOT be read at Stage 1 and were not credited on the version axis. Reading them is precisely the Stage-2 check this paper needs.",
+      "how_to_close": "Additionally archive the narrative export (or the equivalent app-version/parameter listing) in Zenodo with a DOI, so retrieval does not depend on an interactive browser session."
+    },
+    {
+      "type": 4,
+      "where": "C17 Canoco RDA permutation tests; C03 dRep clustering; C08 USEARCH clustering",
+      "missing": "No random seed is reported anywhere in the paper, and no code exists in which a seed could be inspected. The RDA significance tests are permutation-based (Canoco default) but neither the permutation count nor the permutation design (which respects the split-plot / block structure) nor a seed is stated, so the reported explained-variance significance can be matched only distributionally. dRep's greedy secondary clustering and USEARCH's length-sorted greedy clustering are order-dependent; without the exact input order and build, the 200-MAG and 600-SG partitions are reproducible only approximately.",
+      "how_to_close": "Report permutation counts, permutation design and seeds for the RDA; deposit the exact dRep and USEARCH input FASTA (in order) or the resulting cluster membership tables."
+    },
+    {
+      "type": 1,
+      "where": "C05, C16 - sample identifiers linking sequencing runs to field plots",
+      "missing": "The paper does not publish, in the text, the mapping from the 30 sequencing samples in PRJNA1225280 to treatment / block / subplot / row. Since the mixed models use subplot and row as random effects (C16), that mapping is load-bearing for every reported statistic, and the six binning groups in C02 are defined by row-block membership. The supplementary workbook column headers (Table S1, 200 genomes x 30 samples) plausibly carry sample labels, but whether those labels resolve to BioProject run accessions and to the block/row design was not verified at Stage 1 - flagged for Stage 2 / human confirmation rather than asserted.",
+      "how_to_close": "Publish an explicit sample sheet mapping SRA run/biosample accessions to treatment, block, subplot and row."
+    },
+    {
+      "type": 10,
+      "where": "W01-W05",
+      "missing": "Five field/wet-lab steps are out of scope for computational reproducibility: the 20-year fertilization trial (1998-2018), soil sampling and physicochemical characterization, the enzyme/respiration/PMN/MBC/Biolog assays, DNA extraction, and NovaSeq6000 library preparation and sequencing. They are documented to normal standards (ISO methods, MAPA 1994 standard methods and prior-publication cross-references are cited) but are not reproducible in the NASEM computational sense; they are recorded as OOS and excluded from |S|. Their measurement outputs are, however, deposited (Table S4), so the downstream computational steps do not inherit an unavailable-input failure from them.",
+      "how_to_close": "n/a - out of scope by construction. Recorded so the 78% computational coverage figure is auditable."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "JATS XML source record - https://www.biorxiv.org/content/early/2025/10/23/2025.10.22.683841.source.xml",
+      "http_status": "200 via curl (201811 bytes); the WebFetch tool returned 403 Forbidden for the same URL",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL with a browser User-Agent succeeded where WebFetch was blocked; the title substring 'vineyard soil health and multifunctionality' and 'composted organic wastes caused a lasting increase' were verified present in the fetched XML before scoring"
+    },
+    {
+      "artifact": "NCBI BioProject PRJNA1225280 (raw metagenomic reads + metagenome-assembled genomes) - https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1225280",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated, macOS host, direct internet"
+    },
+    {
+      "artifact": "KBase static narrative (assembly + binning workflow) - https://kbase.us/n/126617/119/",
+      "http_status": "403 - but the response body is a Cloudflare bot-challenge page ('Just a moment...'), not an authorization denial. Independent authoritative check: POST https://kbase.us/services/ws Workspace.get_workspace_info id=126617 returned 200 with [126617, 'ukaraoz:narrative_1663701260289', 'ukaraoz', '2025-10-10T18:30:58+0000', 321, 'n', 'r', 'unlocked', {static_narrative_ver: '119', narrative_nice_name: 'Bargota-vineyard-metagenomes', static_narrative: '/126617/119/'}] - global read permission 'r' confirms the narrative is public. https://narrative.kbase.us/narrative/126617 likewise returned 403 (same challenge).",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL -A 'Mozilla/5.0 ... Chrome/126.0 Safari/537.36' with browser Accept headers, unauthenticated; the Workspace JSON-RPC endpoint was reached unauthenticated and is not behind the challenge. Narrative CELL CONTENTS (app versions, per-cell parameters) were NOT retrievable at Stage 1 and were therefore not credited on any axis."
+    },
+    {
+      "artifact": "Supplementary Tables workbook (Tables S1-S4 / sheets ST1-ST6) - https://www.biorxiv.org/content/biorxiv/early/2025/10/23/2025.10.22.683841/DC1/embed/media-1.xlsx (JATS: supplements/683841_file02.xlsx)",
+      "http_status": "200 (944173 bytes, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; six worksheets named ST1, ST2, ST3, ST4, ST5, ST6; sampled shared strings confirm microTrait trait-hierarchy column labels, consistent with the stated genome x trait and sample x trait matrices)",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated; workbook downloaded and its sheet names read locally. Per-sheet row-level content was NOT exhaustively enumerated at Stage 1."
+    },
+    {
+      "artifact": "https://github.com/wwood/CoverM (third-party tool repository cited for coverM 0.5.0, C10)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated. This is the tool author's repository, NOT this study's analysis code."
+    },
+    {
+      "artifact": "https://gamlj.github.io/ (GAMLj jamovi module cited for the mixed models, C16)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "curl -sL -A Mozilla/5.0, unauthenticated. Third-party module landing page; no version pin is obtainable from the paper's citation."
+    },
+    {
+      "artifact": "author analysis code repository for the post-binning pipeline and statistics (any host)",
+      "http_status": "none - no such repository is stated anywhere in the paper",
+      "checked_at": "2026-07-28T08:23:18Z",
+      "network_context": "n/a - nothing to resolve; no web search was performed to find a repository the paper does not cite"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "release_snapshot",
+  "stage2_candidate": true,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "34e5b2af2e0f95d75d52524a66cf0eaecafd032c648282e6c8f122624340efcc",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

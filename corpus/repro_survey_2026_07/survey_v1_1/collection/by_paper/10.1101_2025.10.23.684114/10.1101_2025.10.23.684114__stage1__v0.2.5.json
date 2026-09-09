@@ -1,0 +1,698 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "5e82627de9b9bff584661b0d64157612ebdd38b5a942d03c7664b2314771fa8e",
+  "canonical_id": {
+    "value": "10.1101/2025.10.23.684114",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.23.684114v1",
+      "biorxiv:2025.10.23.684114v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational half of scOUT-seq (single-cell Outcomes Using Transcript sequencing): amplicon/scOUT read processing (umi_tools barcode whitelisting, CRISPResso v2.3.1 alignment, samtools v1.13 realignment of translocated read portions to hg38/mm10), custom repair-outcome classification and per-cell allele assignment, matched single-cell transcriptome processing (Cell Ranger 6.0, Seurat v5.1.0, ParseBiosciences Pipeline v1.3.1, scanpy v1.10.4, harmony v0.0.10), CellMarker 2.0 cell-type assignment, inferCNV v1.12.0 chromosome-arm CNV inference, Seurat differential expression + clusterProfiler v4.14.6 GSEA, and the custom outcome-enrichment / co-occurrence-bias / indel-size-differential / insertion-sequence-enrichment statistics.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-or-analysis-invocation, derived from the bioRxiv JATS Methods prose (source.xml fetched HTTP 200, title phrase 'Cell-stereotyped DNA repair outcomes' verified present in the fetched document). The paper has NO Data availability section, NO Code availability section, and NO accession number of any kind (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/DDBJ/figshare/Zenodo). The only availability-adjacent text is an UNFILLED PLACEHOLDER appearing twice: 'These data are available in browsable form at [XYZ]' (Abstract and Discussion). The only repository URL in the whole paper is the third-party Trinity CTAT inferCNV project (https://github.com/broadinstitute/inferCNV), which is a cited dependency, not author code. Named third-party tools get code=1 (reconstructable); custom scOUT-seq pipeline / classification / statistics steps get code=0. Many tools carry exact prose versions (CRISPResso v2.3.1, samtools v1.13, Seurat v5.1.0, Cell Ranger 6.0, ParseBiosciences v1.3.1, scanpy v1.10.4, harmony v0.0.10, inferCNV 1.12.0, dplyr 1.1.4, ggplot2 3.5.1, ComplexHeatmap 2.20.0, clusterProfiler v4.14.6, Python v3.11, R v4.5, GraphPad Prism 10) but there is no lockfile, container, or conda specification anywhere, so version caps at 1 (exact_pins_partial); a subset of tools (umi_tools, TIDE, CRISPResso2 in the sentinel screen, MSigDB/KEGG collections) carry no version at all and score version=0/floating. Because data=0 on every step (nothing deposited), every computational step is NI regardless of code/version/params. Wet-lab sample-preparation, editing, AAV production, animal work, and library-generation/sequencing steps are counted in W and not verdicted (OOS).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Sentinel sgRNA screening: pooled amplicon-NGS of candidate 3'UTR sgRNAs in mouse fibroblasts/neuroblasts/myoblasts analysed with CRISPResso2 (ref 28, no version stated in this section); selection thresholds >=10% HDR and >=40% end-joining",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Human sentinel sgRNA screening in CD34+ HSPCs: Sanger-sequencing editing-efficiency/outcome-diversity quantification with TIDE (ref 46) - no version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Cell-line-mixing bulk amplicon analysis: 'Illumina reads were demultiplexed and analyzed using the described scOUT-seq pipeline modified for bulk samples' - custom in-house pipeline, no repository, no version, modification undescribed",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Cell-line-mixing scRNA-seq primary processing: Cell Ranger 6.0 with default parameters, aligned to mouse reference mm10 (mm10 build/release not further specified)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Cell-line-mixing QC/clustering: Seurat v5.1.0 filtering (200 < reads/cell < 6500, mito < 10%), cell-cycle score regression, 2000 variable genes, 12 PCs, Louvain resolution 0.5, UMAP, marker-gene-based cell-line assignment",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Cell-line-mixing allele/outcome assignment: assumed per-line Gpi1/Pgk1 copy numbers (NIH-3T3 4/3, C2C12 4/4, Neuro-2a 5/5) and WT/EJ/HDR genotype-call thresholds (>60% single call; 40-60%/40-60% heterozygous call) - custom, no code shared",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "scOUT cell-barcode whitelist generation: umi_tools (ref 27, NO version) barcode extraction by specified pattern, density-based knee method on the barcode rank-frequency distribution with expected-cell-number prior (prior value not stated), reads capped at 999,999,999",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "scOUT read alignment to the target amplicon reference using the CRISPResso algorithm (v2.3.1), plus GAPDH off-target blacklist filtering and imperfect-priming-sequence discard (blacklist sequences and CRISPResso invocation parameters not given)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "Translocation detection: split-read portion realigned to hg38 (human) / mm10 (mouse) and quantified by location and cell-barcode/UMI combination using samtools (v1.13) (ref 68); genome build release and alignment settings not further specified",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "Repair-outcome classification and per-cell allele assignment: NHEJ vs MMEJ deletion call by 2-25 nt microhomology, Deletions+Insertion / Insertion / duplication-insertion / HDR / imperfect-HDR / target-anchored inter- and intra-chromosomal SV categories, alignment-score-based misprime filtering ('first mismatch in first 30% of read'), UMI-to-barcode outcome integration, proportional allele assignment - custom, no code shared, alignment-score cutoffs unspecified",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "Human CD34+ HSPC and upper-airway-organoid scRNA-seq primary processing: Cell Ranger 6.0 default parameters, aligned to human reference hg38",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Human HSPC/organoid QC and clustering: Seurat version 5.1.0 filtering (1000 < reads/cell < 7500, mito < 20%), 2000 variable genes, 30 PCs, Louvain resolution 1.2, UMAP",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Cell-type assignment: per-cell scoring against the CellMarker 2.0 database (ref 69) by positive-marker enrichment and negative-marker absence, cluster-level score summation, top-3 candidate types evaluated MANUALLY before cluster label assignment (Tables S2-S9) - scoring code not shared, manual curation step not machine-reproducible",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Mouse LSK 10x scRNA-seq processing: Cell Ranger 6.0 default parameters against mm10, Seurat v5.1.0 filtering (1000 < reads/cell < 7500, mito < 20%), 2000 variable genes, 30 PCs, Louvain resolution 1, UMAP",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Evercode single-nucleus whole-transcriptome processing: ParseBiosciences Pipeline (v1.3.1) with v2 chemistry, aligned against the mm10 genome, sub-libraries combined",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "In vivo nuclei integration and clustering: scanpy (v1.10.4) KNN graph on first 30 PCs, Leiden resolution 1, harmony (v0.0.10) batch-effect removal, per-organ nuclei aggregation with Seurat (v5.1.0) and separate per-organ re-clustering with scanpy (per-organ clustering parameters not stated)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Chromosome-arm deletion/duplication inference: inferCNV (version 1.12.0, Trinity CTAT, https://github.com/broadinstitute/inferCNV), residual expression by subtracting unedited-cell expression using base R and dplyr (version 1.1.4), target coordinates chr12:6,538,000 (human GAPDH 3'UTR) / chr2:122,153,000 (mouse B2m 3'UTR), 7 Mb comparison window chr12:6,538,000-13,638,000, heatmaps with ggplot2 (3.5.1) and ComplexHeatmap (2.20.0) - inferCNV cutoff/reference-group settings not stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "scOUT-parse read analysis: barcode-combination and UMI extraction, whitelist construction, barcode salvaging, barcode-ID mapping via the barcode manifest, then analysis as in C7-C10 - custom, no code shared, no version",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "Differential expression by repair-outcome group (HDR vs non-HDR, Insertion vs non-Insertion, NHEJ-Deletion vs non-NHEJ-Deletion; cell labelled positive if it carries >=1 allele of the category): Wilcoxon rank-sum test implemented in Seurat (v5.1.0), FDR-adjusted p < 0.1",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "Gene-set enrichment analysis: GSEA function of clusterProfiler (v4.14.6) on genes ranked by average log fold-change, against MSigDB C8, C5:GO:BP, C5:GO:MF and KEGG (no MSigDB / GO / KEGG release version stated), FDR-adjusted p < 0.05",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "Editing-outcome enrichment: unedited alleles excluded, unassignable categories and categories below 0.3% of all outcomes removed, per-cell-type fold change vs bulk average, G-test per editing class against the null of cell-type-independent proportions, Benjamini-Hochberg FDR - custom, no code shared, no tool/version named",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Allele co-occurrence bias: marginal outcome frequencies, Hardy-Weinberg-analogous multinomial expected co-occurrence (2 x product of marginals for non-homozygous pairs), symmetric observed counting, normalization to 100%, observed/expected fold change, chi-square test with Benjamini-Hochberg FDR - custom, no code shared, no tool/version named",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C23",
+      "label": "Indel-size differential: indel-size binning, cell-type-minus-bulk frequency differential, multinomial rarefaction of the bulk distribution to the cell-type indel count, Kolmogorov-Smirnov (maximal ECDF difference) statistic, label-permutation null with 2,000 permutations per comparison, Benjamini-Hochberg FDR - custom, no code shared, NO random seed stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Insertion-sequence enrichment: stratification by insertion length, position-specific A/C/G/T frequency tallies globally and per cell type, fold-change enrichment, G-test with Monte-Carlo multinomial permutation null (permutation count NOT stated), Benjamini-Hochberg FDR - custom, no code shared, no seed",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Data analysis and figure generation: Python (v3.11) for data and statistical analyses and several graphs, R (v4.5) for data analyses and several graphs, GraphPad Prism 10 for several graphs, schematics via biorender.com - no scripts shared, no library inventory, no per-figure attribution",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "W1",
+      "label": "Cell culture of NIH3T3 / C2C12 / Neuro-2a lines, human CD34+ HSPCs, and human upper-airway organoids",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "Murine LSK HSPC isolation and culture",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Cas9 RNP generation (sgRNA/protein complexing, ssODN HDR templates)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "Sentinel sgRNA screening wet-lab: candidate sgRNA design/electroporation in fibroblasts, neuroblasts, myoblasts and CD34+ HSPCs, amplicon-NGS and Sanger library generation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "Cell-line mixing experiment: per-line nucleofection with Gpi1/Pgk1 RNP+HDR template, QuickExtract gDNA, AmpliTaq Gold amplicon PCR (25 cycles) + Q5 indexing PCR (5 cycles), SPRIselect purification, 2x150 PE Illumina sequencing, equal-ratio mixing and 16,000-cell 10x Chromium (Firmware 4.0, 3' v3.1) encapsulation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W6",
+      "label": "scOUT-seq 10X-based library generation: gene-specific cDNA amplification (14 cycles Gpi1, 11 cycles Pgk1, 17 cycles GAPDH), SI-PCR indexing, SPRI cleanup, Quant-iT/TapeStation QC, Illumina sequencing at stated cycle settings",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W7",
+      "label": "Editing of human CD34+ HSPCs: Lonza P3 nucleofection with GAPDH RNP/HDR template, +/- 1 uM AZD7648, 48 h CD34+CD38+ / CD34+CD38- FACS sorting",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W8",
+      "label": "Editing of human upper-airway organoids: Dispase II/TrypLE dissociation, Lonza SE nucleofection with GAPDH RNP/HDR template, BME replating with Y-27632 +/- AZD7648, 67 h harvest",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W9",
+      "label": "AAV cloning, production and titration: Gibson cloning of pAAV-scOUT-Son/-B2m/-NTC from AAV-Perturb-seq backbone (Addgene #211502), HEK293T triple transfection, PEG precipitation, iodixanol gradient ultracentrifugation, Amicon concentration, KASH-primer ddPCR titration; AAV-8/-9/PHP.eB produced by the UZH viral vector facility",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W10",
+      "label": "Ex vivo editing of mouse HSPCs: AAV-6 targeting B2m 3'UTR at 50K viral genomes/cell, day-3 GFP+/dTomato+ FACS sorting, library generation",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W11",
+      "label": "In situ in vivo organ editing: tail-vein AAV-PHP.eB (brain, ~1e12 vg/mouse) and AAV-8/-9 (liver, muscle, heart, lung, ~5e11 vg/mouse) injection of Cas9-EGFP C57BL/6 mice under licenses 35693/BS3191 and 32794/ZH159-2020, 6-week tissue harvest, Miltenyi nuclei extraction, GFP+/dTomato+ FACS",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W12",
+      "label": "scOUT-parse (Evercode v2) library generation: gene-specific B2m/Son primer spike-in at 1% during cDNA amplification, 20-cycle PCR1 with SI-PCR primer, double-sided SPRI (0.6X-0.8X), 12-cycle indexing PCR, NovaSeqX Plus / NextSeq2000 sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 25,
+    "n_X": 0,
+    "S": 25,
+    "W": 12,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/25 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "NI on 25/25 computational steps; readiness upper bound (R-star + RI)/S = 0/25 (0%). The binding constraint is the DATA axis, not the version axis: the paper contains no Data availability section, no Code availability section, and no accession of any kind, and the only availability text is an unfilled placeholder ('These data are available in browsable form at [XYZ]', appearing in both Abstract and Discussion). With data=0 on every step, no step can exceed NI even if Stage-2 were run. Software provenance is comparatively good for a mixed paper - 15 tools carry exact prose versions (CRISPResso v2.3.1, samtools v1.13, Seurat v5.1.0, Cell Ranger 6.0, ParseBiosciences v1.3.1, scanpy v1.10.4, harmony v0.0.10, inferCNV 1.12.0, dplyr 1.1.4, ggplot2 3.5.1, ComplexHeatmap 2.20.0, clusterProfiler v4.14.6, Python v3.11, R v4.5, GraphPad Prism 10) giving version=1 exact_pins_partial on 15 steps - but there is no lockfile, container or conda specification, so version cannot reach 2, and 10 steps are version=0/floating (umi_tools, TIDE, CRISPResso2 in the sentinel screen, and the seven custom pipeline/statistics steps). The core method (the scOUT-seq read-processing, repair-outcome-classification and per-cell allele-assignment pipeline) and all four bespoke enrichment/co-occurrence/indel-size/insertion-sequence statistics are custom code that is not deposited anywhere (code=0 on 10 steps). Two permutation-based statistics report no random seed.",
+    "coverage": "25 computational steps assessed from the bioRxiv JATS Methods prose (source.xml, HTTP 200, title phrase verified). 12 wet-lab steps (cell culture, LSK isolation, RNP generation, sentinel-screen wet-lab, cell-line mixing, 10x scOUT library prep, human HSPC editing, organoid editing, AAV cloning/production/titration, ex vivo mouse HSPC editing, in vivo organ editing, Evercode/scOUT-parse library prep) counted in W and out of computational-reproduction scope. Computational coverage |S|/(|S|+|W|) = 25/37 (68%). The bioRxiv landing page could not be retrieved (curl returned a 17-byte body, request blocked); all evidence is from the JATS XML, which contains the complete Methods, back matter and supporting-information list.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Whole paper - Data availability (Abstract and Discussion: 'These data are available in browsable form at [XYZ]')",
+      "missing": "No Data availability section exists and no accession number of any kind is given (no GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/DDBJ/figshare/Zenodo). The stated browsable-data resource is an UNFILLED PLACEHOLDER literally reading '[XYZ]' in two places. None of the generated scRNA-seq, snRNA-seq, scOUT-seq, scOUT-parse or bulk amplicon-NGS data (1.2 million cells, 9 tissues, ~500,000 alleles) is retrievable, so every computational step scores data=0.",
+      "how_to_close": "Deposit the raw and processed 10x, Parse Evercode and amplicon sequencing data in GEO/SRA (mouse) and an appropriate controlled-access archive (human CD34+ HSPC and airway-organoid donor material), cite the accessions in a Data availability section, and replace the '[XYZ]' placeholder with the actual browser URL plus a versioned archival copy."
+    },
+    {
+      "type": 12,
+      "where": "Whole paper - Code availability; steps C3, C6, C10, C13, C18, C21, C22, C23, C24, C25",
+      "missing": "No Code availability section and no author repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage) anywhere in the paper. The only repository URL present is the third-party Trinity CTAT inferCNV project (https://github.com/broadinstitute/inferCNV), cited as a dependency. The scOUT-seq analysis pipeline that defines the method - barcode whitelisting orchestration, off-target blacklist filtering, repair-outcome classification, alignment-score misprime filtering, UMI-to-barcode integration, proportional allele assignment - is not shared, nor is the bulk-mode variant, the scOUT-parse barcode-manifest handling, or the four bespoke statistical analyses.",
+      "how_to_close": "Publish the scOUT-seq pipeline and all analysis/figure scripts in a public repository with a tagged release and an archival DOI (Zenodo), and add a Code availability section citing it."
+    },
+    {
+      "type": 5,
+      "where": "C3, C10, C18 (scOUT-seq pipeline core); C6 (genotype-call thresholds); C21-C24 (enrichment/co-occurrence/indel/insertion statistics)",
+      "missing": "The method's defining custom code and several of its cutoffs are described in prose only. Unspecified items include: the GAPDH off-target blacklist sequence set, the alignment-score cutoff for 'below what would be expected with their set of edits', the expected-cell-number prior fed to the umi_tools knee estimator, the read/UMI-count rules mapping to allele number per cell, the undocumented 'modified for bulk samples' pipeline variant, and the Monte-Carlo permutation count in C24.",
+      "how_to_close": "Release the pipeline source together with the blacklist file, the threshold configuration, and a worked example dataset so the classification and allele-assignment rules become executable rather than narrative."
+    },
+    {
+      "type": 2,
+      "where": "Computational environment - all 25 steps",
+      "missing": "No environment lockfile, container image, conda/renv/pixi specification or requirements file is claimed anywhere. capture_claim = exact_pins_partial: 15 steps have exact prose version pins but no environment closure (no interpreter+channel+platform declaration), so version is capped at 1 by the rubric's symmetric env-closure gate and no step is R-star-eligible at any stage.",
+      "how_to_close": "Ship a conda-lock/pixi/renv lockfile or a container image digest that pins the Python 3.11 and R 4.5 runtimes together with Seurat, scanpy, harmony, clusterProfiler, inferCNV, samtools, CRISPResso and umi_tools for a declared platform."
+    },
+    {
+      "type": 2,
+      "where": "C1 (CRISPResso2 in sentinel screen), C2 (TIDE), C7 (umi_tools), C20 (MSigDB C8 / C5:GO:BP / C5:GO:MF and KEGG collections), C13 (CellMarker 2.0 is version-tagged but no access date)",
+      "missing": "Version not stated (gap 2a) for umi_tools, TIDE, and the CRISPResso2 invocation used in the sentinel sgRNA screen; the same CRISPResso family is pinned to v2.3.1 elsewhere, so the screen's version is ambiguous rather than merely absent. Gene-set resources (MSigDB collections, KEGG) carry no release version or download date.",
+      "how_to_close": "State exact versions for umi_tools, TIDE and every CRISPResso invocation, and record the MSigDB/KEGG/GO release identifiers and download dates."
+    },
+    {
+      "type": 13,
+      "where": "C4, C9, C11, C14, C15 (hg38 / mm10 references), C13 (CellMarker 2.0), C20 (MSigDB, KEGG, GO)",
+      "missing": "External reference resources are named without pinned distribution: 'the human reference hg38' and 'the mouse reference mm10' with no Cell Ranger reference package version (e.g. refdata-gex-GRCh38-2020-A) or genome patch level; CellMarker 2.0 and the MSigDB/KEGG collections with no release or retrieval date. Stage-1 is prose-only, so no env_capture_class A/B/C is assigned (all n/a); classification requires Stage-2 code inspection, which is moot here because no code is deposited.",
+      "how_to_close": "Cite the exact Cell Ranger reference-transcriptome package name and version, the genome assembly patch, and the versioned release/DOI of every annotation and marker database consumed."
+    },
+    {
+      "type": 4,
+      "where": "C23 (indel-size differential permutation test, 2,000 permutations), C24 (insertion-sequence Monte-Carlo multinomial null), C6/C23 (multinomial rarefaction/downsampling), C5/C12/C14/C16 (Louvain and Leiden clustering, UMAP embedding)",
+      "missing": "No random seed is reported for any stochastic procedure: the label-permutation and Monte-Carlo null distributions, the multinomial rarefaction of the bulk indel distribution, and the graph-clustering / UMAP steps. Reported p-values and cluster assignments are therefore reproducible only distributionally, not exactly.",
+      "how_to_close": "Record and publish the random seeds (or the RNG state) used for permutation testing, rarefaction, clustering and UMAP, and state them in Methods."
+    },
+    {
+      "type": 11,
+      "where": "C25 (GraphPad Prism 10), C25 (biorender.com schematics), C15 (ParseBiosciences Pipeline v1.3.1), C4/C11/C14 (10x Genomics Cell Ranger 6.0)",
+      "missing": "Several steps depend on proprietary or vendor-licensed software: GraphPad Prism 10 for figure generation, BioRender for schematics, and the vendor pipelines Cell Ranger 6.0 and ParseBiosciences Pipeline v1.3.1. These are version-pinned (so not fatal) but are not freely redistributable, and no Prism project files or figure-generation inputs are shared.",
+      "how_to_close": "Provide the plotted source values for every Prism-generated panel, and note the license terms and download source for the vendor pipelines."
+    },
+    {
+      "type": 8,
+      "where": "C13 - cell-type assignment ('the top 3 cell types were evaluated manually before assigning a cell type to the cluster')",
+      "missing": "A manual curation decision sits inside the analysis path that produces the paper's central claim (74 cell types, cell-stereotyped outcomes). The manual adjudication is not encoded as a rule set, so cluster-to-cell-type labels cannot be regenerated deterministically even with the data and the scoring code.",
+      "how_to_close": "Publish the final cluster-to-cell-type mapping table (partially present in Tables S2-S9) alongside the per-cluster top-3 scores and the criteria applied, so the manual step becomes auditable."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: cell culture; murine LSK isolation; Cas9 RNP generation; sentinel sgRNA screening wet-lab; cell-line mixing nucleofection and amplicon library prep; scOUT-seq 10X library generation and sequencing; human CD34+ HSPC editing; upper-airway-organoid editing; AAV cloning/production/iodixanol purification/ddPCR titration; ex vivo mouse HSPC AAV transduction; in vivo tail-vein AAV organ editing and nuclei extraction; Evercode/scOUT-parse library generation",
+      "missing": "Physical sample-processing, genome-editing, animal and sequence-generation steps are out of scope for computational reproduction (OOS); counted in W (12), not verdicted. Wet-lab protocol reporting itself is detailed (catalogue numbers, cycle counts, titres, animal licenses).",
+      "how_to_close": "N/A for Tier-1 computational readiness. The reproducible entry point would be the deposited raw reads, which are currently not provided (see gap type 1)."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE - no Code availability section and no author repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage) appears anywhere in the paper. The single repository URL present is a cited third-party dependency: 'The inferCNV package (version 1.12.0) of the Trinity CTAT Project (https://github.com/broadinstitute/inferCNV)'. Not read at line level (stage1).",
+      "http_status": "n/a (no author code repository exists; third-party inferCNV URL not fetched at stage1)",
+      "checked_at": "2026-07-28",
+      "network_context": "code/data availability prose parsed from bioRxiv JATS source.xml (HTTP 200, 258,371 bytes); title phrase 'Cell-stereotyped DNA repair outcomes' verified present in the fetched document"
+    },
+    {
+      "artifact": "data accession: NONE - no Data availability section, no accession identifier of any archive type (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/DDBJ/figshare/Zenodo). The only availability statement is the verbatim unfilled placeholder 'These data are available in browsable form at [XYZ]' (Abstract) and 'These data are available in an easily browsable form at [XYZ]' (Discussion).",
+      "http_status": "n/a (no accession or URL to check - placeholder never substituted)",
+      "checked_at": "2026-07-28",
+      "network_context": "bioRxiv JATS source.xml prose scan; back matter contains only a Key Resource Table and Supplemental Tables 1-9 (DC1-DC10), no availability statement"
+    },
+    {
+      "artifact": "landing page: https://www.biorxiv.org/content/10.1101/2025.10.23.684114v1",
+      "http_status": "fetch blocked (curl returned a 17-byte body; no usable HTML)",
+      "checked_at": "2026-07-28",
+      "network_context": "assessment proceeded entirely from the JATS source.xml, which contains the complete Abstract, Results, Methods, back matter and supporting-information list"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "a0a588732759ddcf03a3193b8cea198cef1c2f967d8df08980517ce91d974d13",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -429,7 +429,7 @@ class SynoptisAttestorSigningTest < Minitest::Test
   end
 
   # F4 — SynoptisAttestor.build is the only path production takes
-  # (gc_tier1_submit and gc_tier2_submit call nothing else), and it is where the
+  # (gc_tier1_submit and gc_tier3_submit call nothing else), and it is where the
   # wiring lives: which identity attests, which key signs, which value is
   # carried as the submitter. Testing only #issue leaves that wiring undriven,
   # which is the same shape of gap that let the unsigned-proof defect survive.

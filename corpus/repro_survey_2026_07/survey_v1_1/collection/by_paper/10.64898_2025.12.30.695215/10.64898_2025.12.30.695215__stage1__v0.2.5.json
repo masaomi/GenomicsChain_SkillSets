@@ -1,0 +1,899 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "03b99ce879a022971d6173c208bc22560f3fe836f6ed987094f36a14cab6346b",
+  "canonical_id": {
+    "value": "10.64898/2025.12.30.695215",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.30.695215v1",
+      "biorxiv:2025.12.30.695215v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Archaeogenomic reconstruction of the genetic history of medieval Rus': 200 anthropological samples from 46 archaeological sites on the East European Plain, 303 single-stranded genomic libraries sequenced on Illumina MiSeqFGx/NovaSeq6000. Computational target = the full aDNA pipeline from raw reads to population-genetic inference: demultiplexing (bcl2fastq v2.20), adapter trimming (AdapterRemoval v2.3.1), mapping to hg19 and rCRS (BWA v0.7.17, -n 0.01 -o 2 -l 16500), duplicate marking (GATK v4.2.5.0 MarkDuplicates), damage assessment and base-quality rescaling (mapDamage2 v2.2.1), contamination estimation (Schmutzi v1.5.5.5 on mtDNA, ANGSD v0.937 on chrX), genetic sexing (karyo_RxRy v1.0.1), mtDNA haplogrouping (Haplogrep v2.1.20 + PhyloTree Build 17 + YFull MTree v1.02.22369) and median-network phylogeny (mtPhyl v2.8), Y haplogrouping (yHaplo, ISOGG v11 + YFull YTree v12.04.00), pseudo-haploid 1240K genotyping (pileupCaller from sequenceTools v1.4.0 over AADR v54.1), PCA (EIGENSOFT v7.2.1 smartpca, projection onto Human Origins + SGDP + 1000G + Serbians), f3/admixture-f3/f4/qpAdm (AdmixTools v7.0.1 via admixr v0.9.1), unsupervised ADMIXTURE v1.3.0 (K=2-12, 20 random-seed runs, best K=7) with PLINK v2.00a2.3 pruning, kinship (READv2), IBD (SAMtools v1.12 -> BCFtools v1.9 -> GLIMPSE v2.0 -> ancIBD -> custom R/Python), relationship simulation (PEDSIM), UPGMA trees (R ape/phangorn), IBD networks (ForceAtlas2 in iGraph), ROH (hapROH v0.1a4) and HIrisPlex-S pigmentation prediction. Sample collection, DNA extraction, library preparation, sequencing, AMS radiocarbon dating, targeted multiplex PCR/pyrosequencing and the Gerasimov craniofacial reconstruction are W (out of computational-reproduction scope).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis list built from the bioRxiv JATS source XML (https://www.biorxiv.org/content/early/2025/12/30/2025.12.30.695215.source.xml, retrieved by curl, HTTP 200, 195,693 bytes; title string 'Genetic history of Rus' and DOI 10.64898/2025.12.30.695215 both verified present in the fetched file before scoring). The 'Materials and Methods' section (Archaeological Material, Permissions, Radiocarbon data, DNA extraction library preparation and sequencing, Bioinformatics analysis, Analysis of biological relatedness, Phenotyping, Graphic craniofacial reconstruction) plus the 'Data availability' statement are complete in the XML; only the Supplementary Materials (DC1-DC3) were not retrieved, and several parameter sets (qpAdm left/right sets, PCA population lists, the 438 comparison individuals) live there. VERSION-AXIS SCORING RULE APPLIED HERE, stated explicitly because it differs from at least one sibling stage-1 report in this collection: the v0.2.5 guide's Step 8 says 'Unpinned/>= -> version=1' and 'Unknown -> 0', so a NAMED public tool with no version string is scored version=1 with version_subtier 'floating', and version=0 is reserved for steps where no tool is identifiable at all (here only C1, radiocarbon calibration, where no calibration software is named). Under Delta-2 no prose pin can exceed version=1 at stage 1 regardless of subtier. THERE IS NO CODE AVAILABILITY STATEMENT and no repository of the authors' own analysis code anywhere in the paper; the single github.com URL in the text (stschiff/sequenceTools, master branch) is a third-party tool, not the authors' code. No web search was performed to look for an unstated repository.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: aDNA extraction from petrous bones, auditory ossicles or teeth (50-200 mg powder, PrepFiler BTA buffer + 13 mmol DTT + 0.6 mg/ml proteinase K, 56 C for 2-4 h; Qiagen PN I binding, MinElute spin column, Buffer PE wash, 30 ul Buffer EB elution; negative control per extraction cycle; Bioanalyzer 2100 High Sensitivity DNA Chip QC)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: preparation of 303 single-stranded DNA genomic libraries (ref 42 protocol), with PreCR Repair Mix (NEB) pre-treatment for the best-preserved samples selected by test low-coverage sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: sequencing of the 303 libraries on Illumina MiSeqFGx (screening) then Illumina NovaSeq6000 in single-read mode",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Wet-lab: new radiocarbon (AMS) dating of bone and tooth fragments (Supplementary Materials S1.4); laboratory, pretreatment chemistry and per-sample uncalibrated ages are given only in the Supplement",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Wet-lab: targeted HIrisPlex genotyping - multiplex PCR of 24 HIrisPlex markers from 1.5-2.5 ul total DNA using a laboratory-designed oligonucleotide set for highly degraded DNA (primer sequences NOT given), TruSeq DNA PCR Free library prep with TruSeq Dual Indexes, sequenced on Illumina MiSeqFGx 75+75 PE",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W6",
+      "label": "Wet-lab: HERC2 rs12913832 single-marker pyrosequencing assay (ref 86) used to confirm/refine eye-colour genotype in low-coverage samples",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W7",
+      "label": "Non-computational: graphic craniofacial reconstruction by the Gerasimov method, soft-tissue thickness from the Global T-Table (>19,500 adults), nasal profile by the Lebedinskaya method, nasal width from a regression equation; pigmentation taken from the genetic predictions",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Radiocarbon calibration of the new AMS dates against the IntCal20 atmospheric curve - NO calibration software is named (no OxCal/CALIB/rcarbon/BCal reference), no version, no calibration settings; the curve itself (IntCal20, ref 40) is the only pinned element",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Demultiplexing and base calling of the sequencing runs with bcl2fastq (v2.20) - no sample sheet, index set, barcode-mismatch or masking options stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Sequencing-adapter trimming and removal of reads shorter than 25 nt with AdapterRemoval (v2.3.1) - the minimum-length threshold is exact but the adapter sequences, quality-trim and collapse settings are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Read mapping with the BWA package (v0.7.17), parameters -n 0.01 -o 2 -l 16500 (aln/samse-style aDNA settings), against both hg19/GRCh37 and the revised Cambridge Reference Sequence rCRS (NC_012920) - reference builds and all three flags stated exactly",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Duplicate marking with the MarkDuplicates function of GATK (v4.2.5.0) - no optical-duplicate-pixel-distance, validation-stringency or remove-duplicates setting stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Post-mortem DNA damage pattern analysis and damage-aware base-quality rescaling with mapDamage2 (v2.2.1) - --rescale mode implied but rescaling options, --length/--around and Bayesian-estimation settings not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "mtDNA-based contamination estimation from conflicting signals with Schmutzi (v1.5.5.5) - no contamination prior, no deamination profile input and no acceptance threshold stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "X-chromosome contamination estimation for individuals called male with ANGSD (v0.937) - the specific ANGSD contamination method (-doCounts/contamination vs contamination2), HapMap X panel and acceptance threshold are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Genetic sex determination from the ratio of X- and Y-mapped reads to autosome-mapped reads, plus karyo_RxRy (v1.0.1) - the in-house ratio computation and its assignment cut-offs are described in words only, with no thresholds and no script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "mtDNA haplogroup assignment with Haplogrep v2.1.20, supplemented by PhyloTree Build 17 and YFull MTree v1.02.22369 (https://www.yfull.com/) - phylogeny releases pinned exactly, but no quality/rank threshold, no consensus-calling rule and no input format stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Phylogenetic analysis of mtDNA sequences by the median-network method (ref 52) as implemented in the mtPhyl v2.8 package - a Windows GUI tool; no weighting scheme, no epsilon parameter and no reduction settings stated, and the step is not scriptable",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Search for matching mtDNA sequences against GenBank (www.ncbi.nlm.nih.gov), AmtDB (https://amtdb.org) and the AADR database to assess affinity with published present-day and ancient samples - NO search tool, NO query date and NO database release is given for GenBank or AmtDB, so the queried content is unpinned and rolling",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Y-chromosome haplogroup assignment with the yHaplo program (NO version) from informative Y markers, using ISOGG v.11 (April 2016) and YFull YTree v.12.04.00 - the marker databases are pinned exactly but the caller is not versioned and no minimum-coverage/call-confidence rule is given (the paper itself flags that low Y coverage yields incomplete assignments)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Manual visual inspection of every Y-chromosome and mtDNA variant in the IGV v.2.4.10 browser - a human-in-the-loop GUI step; the acceptance criteria applied during inspection are not stated and the step cannot be re-executed programmatically",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Pseudo-haploid genotype generation with pileupCaller from sequenceTools v1.4.0 (https://github.com/stschiff/sequenceTools/tree/master) using the randomHaploid option over the 1240K SNP panel (ref 56) as distributed in The Allen Ancient DNA Resource v.54.1; only samples with >10,000 SNPs retained. Tool version and AADR release are both pinned, but the linked repository URL points at the mutable master branch and no samtools mpileup settings (baseq/mapq/BAQ) are given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Principal component analysis with smartpca from EIGENSOFT (v7.2.1): ancient samples projected onto the first two PCs of present-day Human Origins individuals supplemented by present-day Slavs (SGDP), Finnish (1000 Genomes) and Serbians; a first PCA over 175 Eurasian populations and a second over 78 European-associated populations. Population sets are in Supplementary Table 6 but no smartpca parameter file (lsqproject, shrinkmode, numoutlieriter, autoshrink) is reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Outgroup f3-statistics f3(Anc_Rus, Test; Mbuti) with AdmixTools v.7.0.1 driven by the admixr R package v0.9.1, run against the Human Origins merge for present-day tests and against the 1240K merge for ancient tests; only samples with >20,000 SNPs of the 1240K AADR panel included; comparison groups require >=3 genomes with named single-genome exceptions (Finland_Levanluhta, Saami_IA, Czech_EarlySlavs)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Admixture-f3 statistics f3(Source 1, Source 2; Rus_Middle) using ancient Rus' genetic clusters as candidate ancestral sources, with significance declared at Z < -3 - form, target and threshold all stated; AdmixTools v.7.0.1 / admixr v0.9.1",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "f4-statistics of the form f4(Ancient_Rus', Mbuti; Ancient_pops, Ancient_pops) with the option inbreed set to YES in all f4 calculations - AdmixTools v.7.0.1 / admixr v0.9.1; population lists in Supplementary Table 6",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "f4 cladality tests against present-day populations, f4(Mbuti, Modern_pops; Ancient_Rus', Target), with transitions filtered out - AdmixTools v.7.0.1 / admixr v0.9.1; the Modern_pops and Target sets are enumerated only in the Supplement",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Ancestry-proportion estimation with qpAdm from AdmixTools v.7.0.1 using allsnps: YES on the 1240K dataset, excluding samples with <20,000 SNPs - the left/right (source/outgroup) population sets and the model-selection procedure live in Supplementary Information S2.4, not in the Methods",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Unsupervised model-based clustering with ADMIXTURE (v1.3.0) on 2,377 present-day and ancient individuals (>10,000 SNPs from the 1240K AADR panel plus published ancient samples, transitions filtered, one individual retained per kinship pair): 20 runs with RANDOM starting values for each K from 2 to 12, best K = 7 by lowest cross-validation error. The random seeds are not recorded and per-run outputs are not deposited, so runs cannot be reproduced exactly - only distributionally",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "PLINK (v2.00a2.3) preprocessing for ADMIXTURE: exclusion of variants present in only one individual and LD pruning with --indep-pairwise 200 5 0.5 - tool version and the pruning triple stated exactly; the singleton-exclusion command is described in words",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Kinship estimation with READv2 (major version only, no point release): a first run on the whole sample set, then separate runs for Northern Rus' and for all other samples, with --window_size 20000000 for the Northern set to separate parent-offspring from sibling pairs; analysis restricted to transversions with non-polymorphic and low-frequency variants (maf < 0.01) filtered out",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C25",
+      "label": "IBD stage 1 - BAM filtration by mapping quality MQ > 30 and read length > 30 bases with SAMtools (v1.12); restricted to samples with average mapping coverage > 0.25x",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "IBD stage 2 - genotype calling and SNP filtration at QUAL >= 30 with BCFtools (v1.9); the mpileup/call model flags and the variant-vs-all-sites mode are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C27",
+      "label": "IBD stage 3 - imputation and phasing with GLIMPSE v2.0 using the 1000 Genomes Project (2,505 individuals) as reference panel; chunking, buffer size, ne, and the GLIMPSE1-vs-GLIMPSE2 sub-tool sequence are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "IBD stage 4 - IBD segment calling with ancIBD (NO version stated) over the 1,240,000 SNP panel as markers, reporting fragments longer than 8, 10, 12, 14, 16, 20, 24, 28 and 32 cM; ancIBD's own model parameters and post-processing filters are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C29",
+      "label": "IBD stage 5 - downstream IBD analysis in UNDEPOSITED custom R and Python scripts: computation of IBDP (total genome length covered by shared IBD fragments > 8 cM divided by diploid genome length, as a percentage), comparison against simulated relationship classes, and the Supplementary Fig. 52 plots. The scripts are neither deposited nor linked, and the procedure is delegated to refs 71/72 and 74/75",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C30",
+      "label": "Simulation of IBD distributions for different relationship types with PEDSIM (NO version), 100 simulated individuals per relationship type - the pedigree definition files, genetic map, interference model and random seed are not reported, so the simulated reference distributions cannot be regenerated exactly",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C31",
+      "label": "UPGMA phylogenetic tree of IBDP-based relatedness built with the R ape and phangorn packages (no package versions, no R version) - the distance transformation applied to IBDP before clustering is not specified",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C32",
+      "label": "Cross-study IBD sharing between the ancient Rus' samples and 438 previously published broadly contemporaneous, geographically close individuals (refs 18-20, 27, 29, 61, 65, 76-79), restricted to samples with >400,000 SNPs covered and shared segments >16 cM to suppress false positives - the 438 individuals are cited only by publication, with no per-individual accession or AADR ID list in the Methods",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "IBD connection network layout with the ForceAtlas2 algorithm as implemented in the iGraph R package (no version): undirected graph, 1000 iterations, gravity = 1000, edges weighted by the maximum IBD length from the ancIBD analysis - layout parameters stated exactly but the algorithm is stochastic and no seed is reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C34",
+      "label": "Runs-of-homozygosity inference with hapROH (v.0.1a4) on 83 pseudohaploid samples with >=0.3x whole-genome coverage, using a haplotype reference panel of 5,008 phased haplotypes from 1000 Genomes Phase 3 (release 20130502); ROH blocks counted at >4, >8, >12 and >20 cM - tool version, panel release, coverage cut-off and block thresholds all stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "Phenotype-marker genotyping from whole-genome data: 41 HIrisPlex-S markers examined in samples with average genome coverage >0.4x, with explicit in-house calling rules (genotype = NA when covered by one read or none; an allele supported by <20% of reads makes the call homozygous). The rules are stated but the implementing code is not deposited and no tool is named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    },
+    {
+      "step_id": "C36",
+      "label": "Alignment of the targeted HIrisPlex amplicon reads (MiSeqFGx 75+75 PE) to hg19/GRCh37 with the BWA MEM algorithm (ref 85; the BWA package version 0.7.17 is pinned earlier in the Methods) - no MEM flags, no primer-clipping step and no minimum mapping quality stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C37",
+      "label": "Phenotype probability calculation and prediction of eye, hair and skin colour with the HIrisPlex-S web tool (https://hirisplex.erasmusmc.nl/) - an externally hosted rolling web service with no version, no model release identifier and no recorded query date; the prediction step is therefore outside any locally reconstructable pipeline",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C38",
+      "label": "Inference of the HERC2 rs12913832 genotype in low-coverage samples from the linked proxy markers rs1129038 and rs12916300 (ref 86) - the markers are named but the LD-based inference rule (which proxy takes precedence, what read support is required, how conflicts are resolved) is not formalised and no code is provided",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 36,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 38,
+    "W": 7,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/38 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 36 of 38 computational steps (95%); NI on 2 (C1 radiocarbon calibration - no calibration software named at all; C29 IBD downstream analysis - undeposited custom R/Python scripts). This paper sits at the OPPOSITE corner of the readiness space from a typical no-data/no-code paper: the Data axis is strong (the study's own genomic data are deposited under NCBI SRA BioProject PRJNA1337425, and every reference resource used - AADR v54.1, 1000 Genomes Phase 3 release 20130502, Human Origins, SGDP, PhyloTree Build 17, YFull MTree v1.02.22369, ISOGG v11, IntCal20 - is public and mostly release-pinned), and the Version axis is unusually well documented in prose (23 of 38 steps carry an exact tool version). The binding constraint is instead the CODE axis together with the absence of any environment closure: no analysis code, no scripts, no parameter files, no workflow definition and no code-availability statement of any kind exist, so every computational step scores code=1 (reconstructable from prose by an expert) at best, and the whole pipeline exists only as narrative. Because no lockfile, container digest, conda specification or release tag is claimed anywhere, version is capped at 1 for all steps and NO step can reach R-star even under stage-2 execution. Three further ceilings would bite at Tier-2: two GUI/manual steps that are not scriptable at all (C11 mtPhyl v2.8 median networks, C14 per-variant visual inspection in IGV v2.4.10), one externally hosted rolling web service (C37 HIrisPlex-S), and four stochastic steps run without recorded seeds (C22 ADMIXTURE 20 random-start runs, C30 PEDSIM simulations, C33 ForceAtlas2 layout, and by inheritance C15 randomHaploid pseudo-haploid calling), which are distributional-match targets at best.",
+    "coverage": "38 computational steps assessed from the Methods sections 'Radiocarbon data', 'Bioinformatics analysis', 'Analysis of biological relatedness' and 'Phenotyping'. 7 wet-lab / non-computational steps (aDNA extraction, ssDNA library preparation of 303 libraries, MiSeqFGx+NovaSeq6000 sequencing, AMS radiocarbon dating, targeted HIrisPlex multiplex PCR and library prep, HERC2 pyrosequencing, Gerasimov craniofacial reconstruction) counted in W and excluded from |S| as OOS. Computational coverage = 38/45 (84%).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Whole paper - all 38 computational steps",
+      "missing": "There is NO code availability statement of any kind. The paper's only availability statement reads in full: 'Data availability. The genomic data are available in the NCBI SRA under accession number PRJNA1337425. All other data needed to evaluate the conclusions in this paper are present in the paper and/or the Supplementary Materials.' No GitHub/GitLab/Bitbucket repository, no Zenodo or Software Heritage deposit, no supplementary code archive, no Snakemake/Nextflow/CWL/WDL/Makefile workflow, no shell driver scripts and no parameter files (qpAdm .par files, smartpca parameter files, ADMIXTURE run scripts) are provided. The Author Contributions block lists a 'Software: F.E.G., G.S.D., T.V.U., and T.V.A.' role, confirming that analysis software was written for this study and then not released.",
+      "how_to_close": "Deposit the analysis code - mapping/QC driver, pileupCaller and merge scripts, the AdmixTools/admixr parameter files and R wrappers, the ADMIXTURE replicate driver, the READv2 and IBD pipeline glue, the IBDP computation and plotting scripts, the HIrisPlex-S genotype-calling code and all figure code - in a public repository with a tagged release archived to Zenodo, and add a Code availability statement pointing at the versioned DOI. None of this code carries sample-identifying information, so nothing blocks its release."
+    },
+    {
+      "type": 9,
+      "where": "C29 (IBD downstream analysis), C35 (HIrisPlex-S genotype calling), C9 (X/Y read-ratio sexing), C38 (HERC2 proxy inference)",
+      "missing": "Four steps run on in-house code that is neither deposited nor fully specified. C29 is described only as 'IBD analysis (R and Python scripts)' with the IBDP definition given in one sentence and the rest delegated to refs 71/72 and 74/75 - this is the step that produces the kinship conclusions (Supplementary Fig. 52/53), and it scores code=0. C35's calling rules are stated ('NA' if covered by one read or none; homozygous if the alternative allele is supported by <20% of reads) but no implementation is given. C9's X/Y-to-autosome ratio thresholds are never stated. C38's LD-proxy inference rule for HERC2 rs12913832 from rs1129038/rs12916300 is not formalised.",
+      "how_to_close": "Release the R/Python IBD analysis scripts and the phenotype-calling script, and state the numeric decision thresholds (sexing ratio cut-offs, proxy-precedence rule) in the Methods so the steps are reconstructable even without the code."
+    },
+    {
+      "type": 2,
+      "where": "C13 yHaplo, C24 READv2, C28 ancIBD, C29 R and Python, C30 PEDSIM, C31 R ape and phangorn, C33 iGraph/ForceAtlas2, C37 HIrisPlex-S web tool",
+      "missing": "Eight of the 38 steps name a tool with no resolvable version (2a). yHaplo, ancIBD, PEDSIM, ape, phangorn, iGraph and the HIrisPlex-S web tool carry no version string at all; READv2 gives only the major version, not the point release; and the R and Python interpreter versions are never stated anywhere in the paper, so even the well-pinned steps have no runtime pin (this is what holds every step at version<=1 rather than 2). By contrast 23 steps do carry exact pins (bcl2fastq v2.20, AdapterRemoval v2.3.1, BWA 0.7.17, GATK v4.2.5.0, mapDamage2 v2.2.1, Schmutzi v1.5.5.5, ANGSD v0.937, karyo_RxRy v1.0.1, Haplogrep v2.1.20, mtPhyl v2.8, IGV v2.4.10, sequenceTools v1.4.0, EIGENSOFT v7.2.1, AdmixTools v7.0.1, admixr v0.9.1, ADMIXTURE v1.3.0, PLINK v2.00a2.3, SAMtools v1.12, BCFtools v1.9, GLIMPSE v2.0, hapROH v0.1a4).",
+      "how_to_close": "Add the missing tool versions and the R/Python interpreter versions, then ship a conda-lock / pixi.lock or a container with a recorded digest so the declared environment is closed (interpreter + channel/index + platform + direct dependencies) rather than enumerated in prose."
+    },
+    {
+      "type": 4,
+      "where": "C22 ADMIXTURE, C30 PEDSIM, C33 ForceAtlas2, C15 pileupCaller randomHaploid",
+      "missing": "Four stochastic steps run without recorded random seeds. C22 performs '20 runs with random starting values for K in range from 2 to 12' and selects K=7 by lowest cross-validation error - the seeds are not recorded and the per-run Q matrices are not deposited, so the published ADMIXTURE figure cannot be regenerated bit-for-bit. C30 simulates 100 individuals per relationship type in PEDSIM with no seed and no pedigree definition files. C33's ForceAtlas2 layout (1000 iterations, gravity=1000) is seed-dependent. C15's pileupCaller randomHaploid draws one read per SNP at random, which propagates a stochastic component into every downstream 1240K analysis (PCA, f3, f4, qpAdm, ADMIXTURE, READv2, hapROH).",
+      "how_to_close": "Record and publish the seeds (or deposit the drawn pseudo-haploid genotype matrix, the 20 ADMIXTURE Q/P matrices, and the simulated PEDSIM pedigrees) so downstream results are exactly rather than distributionally reproducible."
+    },
+    {
+      "type": 13,
+      "where": "C12 (GenBank, AmtDB), C13 (yHaplo marker source), C15 (sequenceTools master-branch URL), C37 (HIrisPlex-S web tool)",
+      "missing": "Out-of-band and unpinned reference resources. C12 searches GenBank (www.ncbi.nlm.nih.gov) and AmtDB (https://amtdb.org) with no release identifier and no query date - both are rolling databases, so the matching results are not reproducible from the paper. C15 links https://github.com/stschiff/sequenceTools/tree/master, i.e. the mutable master branch, even though the prose pins v1.4.0. C37 delegates the final pigmentation predictions to an externally hosted web form with no model version and no query date. Positively, AADR v54.1, 1000 Genomes Phase 3 release 20130502, PhyloTree Build 17, YFull MTree v1.02.22369, YFull YTree v12.04.00, ISOGG v11 (April 2016) and IntCal20 ARE release-pinned in prose - but as prose only, with no download rule in any workflow, which is at best a class-B (prose-pin-only) pattern and cannot be confirmed without stage-2 code inspection.",
+      "how_to_close": "Record access dates and release identifiers for GenBank and AmtDB queries, link the sequenceTools tag v1.4.0 rather than master, and either deposit the HIrisPlex-S input/output tables with the tool release used or reimplement the prediction locally from the published model coefficients."
+    },
+    {
+      "type": 11,
+      "where": "C11 mtPhyl v2.8, C14 IGV v2.4.10, C37 HIrisPlex-S web tool",
+      "missing": "Three steps are GUI- or service-bound and cannot be executed non-interactively. mtPhyl v2.8 is a Windows desktop application used here to build the mtDNA median networks; IGV v2.4.10 is used for manual visual inspection of every Y-chromosome and mtDNA variant, with no stated acceptance criteria, which makes a human judgement an undocumented input to the haplogroup calls; the HIrisPlex-S web tool is a remote form. None of these can be placed in a scripted, containerised pipeline as described.",
+      "how_to_close": "Replace or supplement the GUI steps with scriptable equivalents (e.g. Network/PopART command-line or a documented median-joining implementation; an automated variant filter with the same acceptance criteria that were applied by eye; a local implementation of the HIrisPlex-S model), and publish the manual inspection decisions as a per-variant table."
+    },
+    {
+      "type": 1,
+      "where": "SRA BioProject PRJNA1337425 -> all downstream computational steps",
+      "missing": "The Data availability statement gives a single BioProject accession for 303 libraries from 200 individuals but no run/biosample-to-individual mapping in the Methods. The per-sample metadata (individual ID, site, coverage, library, endogenous fraction, contamination estimate, radiocarbon date, SNP count) are said to be in the Supplementary Information/Tables, which were not retrieved at stage 1. Which sample-level table maps SRA run accessions to the analysis IDs used in Supplementary Table 6, and whether the targeted HIrisPlex amplicon libraries (W5/C36) are included in the same BioProject, cannot be determined from the main text.",
+      "how_to_close": "Publish a machine-readable sample manifest (SRA run accession, biosample, individual ID, library type, site, coverage, contamination, SNP count, radiocarbon date) as a supplementary CSV and reference it from the Data availability statement."
+    },
+    {
+      "type": 6,
+      "where": "C1 radiocarbon calibration, C37 HIrisPlex-S prediction",
+      "missing": "Two sub-analyses are externalised out of any reproducible pipeline. The radiocarbon calibration names only the IntCal20 curve, with no calibration software, version or settings, so the calendar dates that anchor the whole chronological argument cannot be regenerated. The pigmentation predictions that support the Fig. 66 / Supplementary Table 35 phenotype claims are produced by a third-party web form.",
+      "how_to_close": "Name the calibration program and version (OxCal/CALIB/rcarbon) with its settings and deposit the uncalibrated ages plus calibration output, and produce the pigmentation predictions with a locally reproducible implementation or deposit the exact web-tool inputs and outputs together with the tool release used."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "Authors' own analysis code repository: NONE STATED. There is no Code availability section. Verbatim and complete availability statement from the paper: 'Data availability. The genomic data are available in the NCBI SRA under accession number PRJNA1337425. All other data needed to evaluate the conclusions in this paper are present in the paper and/or the Supplementary Materials.'",
+      "http_status": "none",
+      "checked_at": "2026-07-28",
+      "network_context": "no repository URL for the authors' code appears anywhere in the article XML; absence recorded as a finding, no web search performed to look for an unstated repository"
+    },
+    {
+      "artifact": "Data accession for the study's own genomic data: NCBI SRA BioProject PRJNA1337425 (verbatim: 'The genomic data are available in the NCBI SRA under accession number PRJNA1337425.')",
+      "http_status": "stated-in-paper (accession string only; no URL given; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "open-archive deposit claimed for ancient human DNA; no controlled-access/dbGaP/EGA route is mentioned and no data-access-committee procedure is described, so the deposit is read as intended-public"
+    },
+    {
+      "artifact": "Third-party tool URL (NOT the authors' code): sequenceTools/pileupCaller - https://github.com/stschiff/sequenceTools/tree/master (prose pins v1.4.0, the URL points at the mutable master branch)",
+      "http_status": "URL-present (stated-in-paper; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "transcribed verbatim from the Bioinformatics analysis section; recorded as a tool reference, it does not constitute code availability for this study"
+    },
+    {
+      "artifact": "Reference resources cited with URLs or release identifiers: The Allen Ancient DNA Resource v.54.1 (1240K panel, ref 57); 1000 Genomes Project Phase 3 release 20130502 (2,505 individuals reference panel for GLIMPSE; 5,008 phased haplotypes for hapROH); Human Origins dataset; Simons Genome Diversity Project; PhyloTree Build 17; YFull MTree v.1.02.22369 (https://www.yfull.com/); YFull YTree v.12.04.00; ISOGG v.11 (April 2016); AmtDB (https://amtdb.org); GenBank (www.ncbi.nlm.nih.gov); HIrisPlex-S web tool (https://hirisplex.erasmusmc.nl/); IntCal20 atmospheric curve (ref 40); human reference hg19/GRCh37 and rCRS NC_012920",
+      "http_status": "URL-present / release-pinned in prose (stated-in-paper; none independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "all strings transcribed verbatim from the Methods. AADR v54.1, 1000G Phase 3 release 20130502, PhyloTree Build 17, YFull MTree v1.02.22369, YFull YTree v12.04.00, ISOGG v11 and IntCal20 are release-pinned; GenBank and AmtDB are queried with no release identifier and no access date; the HIrisPlex-S web tool has no version. No DOI is given for any of them. Because there is no workflow to inspect, env_capture_class stays 'n/a' and no A/B/C assignment is made (stage-1 prose-only)"
+    },
+    {
+      "artifact": "Supplementary Materials referenced as the home of parameter sets and sample metadata: DC1 Supplementary Figures, DC2 Supplementary Tables, DC3 Supplementary Materials (Supplementary Information S1.4 radiocarbon, S2.4 qpAdm details, S2.9 phenotyping, Supplementary Table 6 population/sample lists, Supplementary Table 27 ROH, Supplementary Table 35 pigmentation)",
+      "http_status": "stated-in-paper (bioRxiv supplementary items; not retrieved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "the JATS source XML lists the three supplementary containers but carries no supplementary file content; several params scored 1 rather than 2 are marked 'needs-supplement' for this reason"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "fb32df53099a5b109b243dc48420c42876c8a98bd97a7e98c26035ce3e579f1f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

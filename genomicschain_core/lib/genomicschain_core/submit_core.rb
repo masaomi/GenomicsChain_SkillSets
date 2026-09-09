@@ -227,9 +227,14 @@ module KairosMcp
             if manifest['result_evidence_sha256']
               out[:result_evidence_sha256] = manifest['result_evidence_sha256']
             end
+            # Digest subject first, headline result second, per tier:
+            #   tier1 report_content_hash / static_readiness
+            #   tier2 adjudication_digest  / codescan_evidence_digest
+            #   tier3 jobspec_digest       / result_hash
             out[:idempotency_key] = Digest::SHA256.hexdigest(
-              [manifest['jobspec_digest'] || manifest['report_content_hash'],
-               manifest['result_hash'] || manifest.dig('headline', 'static_readiness'),
+              [manifest['jobspec_digest'] || manifest['report_content_hash'] || manifest['adjudication_digest'],
+               manifest['result_hash'] || manifest.dig('headline', 'static_readiness') ||
+                 manifest['codescan_evidence_digest'],
                pubkey].compact.join('|')
             )
             out

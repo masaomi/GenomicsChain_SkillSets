@@ -1,0 +1,559 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "830c1e2f9085dcad31f8f882edb931e889161f5cf4ae7617538dd1b294daced2",
+  "canonical_id": {
+    "value": "10.1101/2025.10.05.680569",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.05.680569v1",
+      "biorxiv:2025.10.05.680569v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Re-derivation of the early-embryonic-mutation (EEM) based clonal reconstruction of monozygotic twinning from paired parent-child whole-genome sequences: trio alignment (bwa mem to GRCh38, samblaster, GATK v3.8 IndelRealigner), contamination QC (TrioMix v0.0.2a, VerifyBamID2 v2.0.1), trio variant calling with VarScan2 v2.4.4 followed by a fully enumerated hard-filter cascade, VEP v93 / gnomAD v2.0.1 population-frequency filtering, panel-of-normals artifact filtering, beta-binomial overdispersion estimation (rho_wgs = 0.0002568, rho_tgs = 0.0008809), WGS/targeted-sequencing variant curation with phasing-adjusted VAFs plus manual IGV review, beta-binomial clonality calling, the anchor / counter-anchor mutation-cluster algorithm that assigns each twin pair to one of three clonal categories, Manhattan genetic-distance calculation, maximum-likelihood estimation of hematopoietic mixing in monochorionic twins, single-cell EEM presence/absence clustering, placental/umbilical-cord EEM confirmation, mutational-signature decomposition against COSMIC v3, and the R v4.4.1 statistical tests linking clonal category to fetal-membrane subtype. Wet-lab sample collection, library preparation, targeted-capture bait design, single-cell isolation with MDA, and laser-capture microdissection are in-paper but out of computational scope (W = 5).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis. IMPORTANT SOURCE NOTE: the bioRxiv main text carries NO Methods section - the JATS XML body runs Introduction -> Results -> Discussion -> Supporting information, and 'Materials and Methods' plus the 'Data and script availabilities' statement live only in Supplementary File DC1 (media-1.pdf, retrieved via curl and converted with pdftotext -layout). All step scoring therefore comes from that supplementary Methods text. WebFetch of the .source.xml returned HTTP 403; the XML, the landing page, the supplementary-material page, media-1.pdf and media-2.xlsx were all retrieved with curl. Title-phrase check on the fetched XML passed ('Clonal dynamics of monozygotic twinning in early human embryogenesis' present, DOI 10.1101/2025.10.05.680569 present) - no assessor cross-contamination. Per Stage-1 protocol only the repository LANDING page and README prose were read for https://github.com/cjyoon/mztwin; the top-level file listing (7 analysis scripts) was used ONLY to decide whether an author script plausibly exists for a given Methods step, no script source was read line-by-line (that is Stage 2). Supplementary Table S2 (2050 variant rows with per-tissue alt/depth/VAF/phasing columns for twin1/twin2/twin3) and Table S3 (60 rows of cluster/anchor assignments) were inspected at header level only, to decide the DATA axis for downstream steps: analyses that consume the published EEM table score data = 2, analyses that require the raw BAMs score data = 1 because those are behind EGA controlled access (EGAS00001005998). Verdicts are capped at RI by the Stage-1 ceiling; env_capture_class is 'n/a' for every step per Stage-1 protocol, including the VEP/gnomAD/COSMIC database-consuming steps whose true class can only be settled at Stage 2.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Alignment of raw FASTQ to human reference genome GRCh38 with bwa mem (Li 2013) - NO version for bwa, NO GRCh38 build/patch identifier (no analysis-set filename, no accession), no command line given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Duplicate marking with samblaster (Faust and Hall 2014) - no version, no options stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Indel realignment with Genome Analysis Tool Kit (GATK) v3.8 IndelRealigner (McKenna et al. 2010) - exact version pinned in prose; no known-indel resource file or options stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Within-family contamination estimation with TrioMix v0.0.2a (Yoon et al. 2022); twin buccal DNA with estimated contamination < 1% retained for further analysis - version pinned, acceptance threshold stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Cross-individual contamination estimation with VerifyBamID2 v2.0.1 (Zhang et al. 2020) - version pinned; the reference panel resource (1000G SVD set) and its release are not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "SNP and indel calling with VarScan2 v2.4.4 (Koboldt et al. 2012) using family-member BAMs as trios; each twin called independently as two separate trios and then merged - version pinned; no VarScan2 thresholds (min-coverage, min-var-freq, p-value) stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Non-inherited variant extraction and mapping-quality hard-filter cascade (remove any variant with a variant read in either parent; require depth >= 10 in father, mother and twins; drop loci where soft/hard-clipped reads > 20% or where the surrounding +/-150 bp has > 5% clipped-read fraction; drop loci with > 10 MAPQ0 reads and median MAPQ < 40; drop variants with MAPQ difference between variant and reference reads > 20; drop variants with median NM-tag difference > 5) - thresholds fully enumerated in prose, but the implementing script is not identified and no interpreter/library version is given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Annotation with Variant Effect Predictor (VEP v.93) using gnomAD v.2.0.1 population allele frequencies; variants with max population AF > 1% removed - both tool and database pinned in prose to a release string, but no cache build, assembly-cache version, or download date is given and no in-code fetch pin is claimed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Panel-of-normals artifact filtering using BAM files from all parents in the study and all other twin pairs to remove common-SNP artifacts (repository script pon_annotate.py appears to correspond) - the PoN membership list, the rejection threshold, and any script version are not stated in prose",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Per-child depth and VAF distribution estimation from informative heterozygous loci (one parent hom-ref, other parent hom-alt), removal of variants outside the 0.5-99.5 depth percentile to avoid CNV regions, and selection of variants with combined two-twin VAF > 0.1 for targeted-capture bait design - percentile and VAF thresholds stated; no script identified, no version",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Estimation of beta-binomial overdispersion factors for WGS and targeted sequencing from autosomal loci with known true VAF 0.5 (one parent hom-ref, other parent het), yielding rho_wgs = 0.0002568 and rho_tgs = 0.0008809 - fitted values reported to 7 significant figures, but the fitting routine, optimizer, and its version are not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Variant curation combining WGS and targeted-sequencing reads: prefer WGS at loci where targeted depth is lower in either twin; use phasing-adjusted VAF when a nearby phasable SNP gives more informative reads than WGS depth; set VAF to 0.5 when an EEM is completely phased to two haplotypes; double VAFs for non-PAR chromosome X loci in male children - decision rules fully stated in prose; implementing script not identified, no version",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "MANUAL review of all de novo mutations and EEMs with the Integrative Genomics Viewer (IGV) - no IGV version, no acceptance/rejection criteria, no reviewer, and no audit trail of which calls were discarded; this manual gate sits between the automated filters and the entire downstream clonal analysis",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Clonality determination per mutation using a two-tailed 99.9-percentile confidence interval of a beta-binomial with expected heterozygous VAF 0.5 and VAF > 0.3, with rho_wgs = 0.0002568 and rho_tgs = 0.0008809; monozygotic-twin classification rule (clonal in both twins = de novo, subclonal in at least one = EEM) and dizygotic rule (clonal in at least one twin = de novo) - all thresholds stated, and Supplementary Table S2 publishes the alt/depth/VAF columns the rule consumes; no script identified, no version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Anchor / counter-anchor mutation-cluster identification driving the three-category clonal classification: clusters defined as mutations whose maximum pairwise VAF difference is < 0.1 in both twins; cluster centroids computed; the centroid pair whose midpoint is closest to (0.25, 0.25) chosen as anchor clusters; anchor coordinate (a, b) constrained by 0.25 <= a <= 0.5, 0 <= b <= 0.5, a >= b, a + b >= 0.5; fallback to a single cluster when the best midpoint is > 0.1 from (0.25, 0.25); a set to 0.5 when phasing supports clonality; triplets handled pairwise with clonal-in-both EEMs excluded (repository scripts compare_twins.py and pztrio_c.py appear to correspond, and Supplementary Table S3 publishes the resulting cluster/anchor assignments) - algorithm fully specified, no version for the scripts or the Python interpreter",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Genetic distance between co-twins as twice the sum over all EEMs of |VAF_twin1 - VAF_twin2| (Manhattan distance) - closed-form equation given in Methods and input VAFs published in Supplementary Table S2; no script named, no version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C17",
+      "label": "Maximum-likelihood estimation of hematopoietic mixing in monochorionic twins from twin-exclusive EEMs, using a beta-binomial log-likelihood over blood alt/depth counts with rho_wgs = 0.0002568 and shape parameters alpha_e = k_e(1-rho)/rho, beta_e = (1-k_e)(1-rho)/rho (repository script 02_03_monochorionic_mixing_betabinom.R appears to correspond; blood alt/depth/VAF columns are published in Supplementary Table S2) - model fully specified; no optimizer, no R version, and no package versions stated for this step",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Single-cell lineage analysis of 92 (ST314) and 90 (ST317) MDA products: reads 'aligned and processed as described above'; locus dropout as the fraction of heterozygous mutations with <= 1 read; allelic dropout as the fraction lacking both alleles with > 1 read or with VAF outside 0.01-0.99; an EEM counted present in a cell if supported by > 1 variant read at VAF > 0.01; EEMs with similar bulk VAFs grouped and a group counted present if any member is detected; cells lacking all EEMs excluded (n = 13 for both twins); cells then clustered on EEM-group presence/absence - thresholds stated, but the clustering algorithm, distance metric, and all software versions are unstated, and the per-cell genotype matrix is not published (raw single-cell BAMs are in EGA controlled access)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Extraembryonic-tissue EEM confirmation and lineage extension: seven laser-capture placental micropatches (~21.4x) and two umbilical cords (~33.6x) whole-genome sequenced, with a placental variant considered present if supported by > 1 read; EEM clustering across tissues used to build the ST210 lineage model - the presence rule is stated, but no alignment/calling versions are re-stated for this tissue set, no clustering method is named, and the per-sample VAF matrix behind the heatmap is not published as a table",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Mutational-signature analysis: EEM and de novo trinucleotide spectra aggregated across samples and decomposed by non-negative least squares using a 'custom in-house script', fitted against all COSMIC v3 signatures (https://cancer.sanger.ac.uk/signatures/, Alexandrov et al. 2020), then reduced by taking the best-cosine-similarity signature pair and adding signatures stepwise while cosine similarity improved (repository script filter_and_plot_signature_ponupdated_rprm_tripletfix.R appears to correspond; reported fits: de novo SBS1+SBS5 cosine 0.983, EEM SBS1+SBS5+SBS10b+SBS40 cosine 0.935) - procedure described and inputs published in Supplementary Table S2, but the COSMIC pin is a major-version string only (no v3.x point release, no download date, no signature-matrix file), no NNLS implementation or library version is named, and no stopping threshold for the stepwise addition is given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Statistical analysis in R (v4.4.1): Kruskal-Wallis test for genetic distance across fetal-membrane subgroups with post hoc Welch t-tests; Fisher test for the association between fetal membranes and clonal subtypes, using Fisher Monte-Carlo simulation for the 3x3 comparison and Fisher exact for 2x2; Bonferroni adjustment of pairwise comparisons (repository script fig2_fisher.R appears to correspond) - R interpreter version pinned and all tests named; no package versions, and NO RNG seed is reported for the Fisher Monte-Carlo simulation, so that p-value is distributional-only",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Recruitment of 22 monozygotic twins, 1 monozygotic triplet and 6 dizygotic twins at Seoul National University Hospital under IRB SNUH H-1311-045-533 / KAIST KH2019-134 with written parental consent; fetal-membrane confirmation by prenatal ultrasound and post-birth histology; buccal collection with the AccuBuccal Collection Kit (Accugene) and DNA extraction with the DNeasy Blood and Tissue kit (Qiagen)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "WGS library preparation and sequencing: TruSeq PCR-free (Illumina) for blood DNA (> 1 ug) and TruSeq Nano (Illumina) for buccal DNA (< 1 ug); Illumina NovaSeq 6000 at 30x for parental blood and 60x for twin buccal DNA",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Targeted validation sequencing: Integrative DNA Technologies (IDT) Discovery Pool custom baits designed per twin family against the putative EEM and de novo sites from WGS, hybridized to the DNA libraries and sequenced on NovaSeq 6000 at ~700x - the bait coordinate files are not deposited",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W4",
+      "label": "Single-cell processing of DCDA twin cord blood (ST314, ST317): mononuclear isolation with Lymphoprep (STEMCELL Technologies), single-cell deposition into 96-well plates on a BD FACSAria II, whole-genome amplification with the REPLI-g Advanced DNA Single Cell Kit (QIAGEN), TruSeq DNA Nano libraries from 92 and 90 MDA products, hybridization with probes targeting EEMs plus 40 family-specific heterozygous germline sites, NovaSeq 6000 sequencing to mean depth 660 at EEM loci",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W5",
+      "label": "Extraembryonic tissue processing: placental quadrant and umbilical-cord collection at delivery, PAXgene Tissue FIX 48-72 h then PAXgene Tissue STABILIZER storage (QIAGEN), paraffin embedding, 20-30 um sectioning, H&E staining (Abcam), trophoblast-cluster laser microdissection with the PALM MicroBeam (Zeiss) and manual Wharton's jelly dissection, DNA extraction with QIAamp DNA Micro / DNeasy Blood & Tissue (QIAGEN), NEBNext Ultra II FS (NEB) and TruSeq DNA Nano (Illumina) libraries, NovaSeq 6000 WGS at mean depth 21.4 (trophoblast) and 33.6 (cord)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 6,
+    "n_NI": 14,
+    "n_X": 1,
+    "S": 21,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/21 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 6/21 computational steps (C3 GATK v3.8, C4 TrioMix v0.0.2a, C5 VerifyBamID2 v2.0.1, C6 VarScan2 v2.4.4, C8 VEP v93 + gnomAD v2.0.1, C21 R v4.4.1). Two independent constraints bind this paper and they bind different halves of the pipeline. (1) DATA: every step upstream of variant curation consumes whole-genome, targeted and single-cell BAMs that are deposited in the European Genome-Phenome Archive under EGAS00001005998 - controlled access requiring Data Access Committee approval - so data = 1 and no upstream step can exceed RI even in principle. (2) VERSION: the downstream half of the pipeline (C14-C20) has an EXCELLENT data position, because Supplementary Table S2 publishes 2050 curated variants with per-tissue alt/depth/VAF/phasing columns and Table S3 publishes the cluster/anchor assignments, and a reasonable code position, because github.com/cjyoon/mztwin ships the corresponding analysis scripts - but NOT ONE of those downstream steps pins a software version. The custom Python and R scripts have no interpreter version, no package versions, no environment file, and the repository has no release, no tag, no license and no archival DOI, so version = 0 and 14/21 steps fall to NI. Exact prose pins do exist for six upstream tools, but there is no environment closure of any kind - no conda environment.yml, no renv.lock, no Dockerfile, no image digest - so capture_claim is exact_pins_partial and version stays <= 1 at Stage 1. 1/21 is blocked (X): all de novo mutations and EEMs were manually reviewed in IGV with no recorded acceptance criteria, and that manual gate sits directly upstream of the paper's central clonal-category assignment. Note the Delta-5 symmetry caveat - a 0 static_readiness under-claims by construction, because Tier-1 cannot credit an undeclared-but-present dependency specification.",
+    "coverage": "21 computational steps plus 5 wet-lab steps assessed from the SUPPLEMENTARY Materials and Methods (bioRxiv DC1 / media-1.pdf, sections: Sample collection, whole-genome sequencing, and quality control; EEM detection; Target sequencing of twin families; Estimation of overdispersion in whole-genome sequencing and targeted sequencing; Variant curation; Mathematical framework for mutational relationships in monozygotic twins; Identification of anchor mutations for clonal dynamics; Calculation of genetic distances between monozygotic twins; Detection of hematopoietic mixing in the monochorionic monozygotic twins; Single-cell sequencing of blood cells of monozygotic DCDA twins; Sequencing of the placenta and umbilical cords; Mutational signature analysis; Statistical analysis; Data and script availabilities). The bioRxiv MAIN TEXT contains no Methods section at all - a reader who reads only the preprint body sees zero tool names, zero versions, and zero availability statements. W = 5: sample collection and DNA extraction, WGS library prep and sequencing, custom-bait targeted sequencing, single-cell FACS + MDA + targeted sequencing, and placental laser-capture microdissection with cord/placenta WGS.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 21 computational steps)",
+      "missing": "No environment lockfile, container image or digest, and no conda/renv/pixi specification is claimed anywhere in the paper, the supplementary Methods, or the repository README (the README is 3 lines: title, paper title, bioRxiv URL). The repository contains 7 bare analysis scripts (2 Python, 5 R) plus a stray .DS_Store, with no requirements.txt, no environment.yml, no renv.lock, no DESCRIPTION, no Dockerfile, no install or usage instructions, and no run-order document. Exact versions are given for six upstream tools (GATK 3.8, TrioMix 0.0.2a, VerifyBamID2 2.0.1, VarScan2 2.4.4, VEP 93, gnomAD 2.0.1) and for the R interpreter used in the statistics section (4.4.1), but there is no dependency closure. capture_claim is therefore exact_pins_partial, not env_lock_claimed.",
+      "how_to_close": "Ship a conda environment lock (or a container digest) covering bwa, samblaster, GATK 3.8, TrioMix 0.0.2a, VerifyBamID2 2.0.1, VarScan2 2.4.4, VEP 93 with its cache build, samtools, and the Python interpreter, plus an renv.lock for R 4.4.1 and every R package used by the five deposited R scripts, and reference it from the 'Data and script availabilities' statement."
+    },
+    {
+      "type": 3,
+      "where": "Steps C1, C2, C7, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20 - i.e. 15 of 21 steps have no version pin at all",
+      "missing": "No version for bwa (only the 2013 citation), samblaster, or IGV; no version for the Python interpreter behind pon_annotate.py / compare_twins.py / pztrio_c.py; no version for R or any R package behind 02_03_monochorionic_mixing_betabinom.R, 20_pq.R, fig2_fisher.R and filter_and_plot_signature_ponupdated_rprm_tripletfix.R (R 4.4.1 is stated only for the 'Statistical analysis' section and cannot be assumed to cover the other scripts); no numpy/scipy/pandas or NNLS library version for the mutational-signature decomposition; and no version identifier for the GRCh38 reference build (no analysis-set filename, no GCA accession, no patch level), for the VerifyBamID2 reference panel, or for the COSMIC v3 signature matrix beyond the bare major-version string.",
+      "how_to_close": "State a version for every tool, interpreter, and library, name the exact GRCh38 analysis-set file (or its GCA accession and patch), pin COSMIC to a point release (v3.0 / v3.1 / v3.2 / v3.4) with a download date, and name the VerifyBamID2 resource bundle."
+    },
+    {
+      "type": 5,
+      "where": "Code availability - https://github.com/cjyoon/mztwin is public but is not archived, not tagged, not licensed, and does not cover the pipeline",
+      "missing": "The 'Data and script availabilities' statement says only 'Custom scripts used for this project have been uploaded to https://github.com/cjyoon/mztwin'. The repository (created 2025-10-05, last push 2025-10-26, default branch main, 37 KB, Python-dominant) has NO releases, NO tags, NO license file, NO archival DOI (Zenodo / Software Heritage), and the paper cites a bare mutable URL with no commit hash, so the code state matching this manuscript version cannot be recovered deterministically. Substantively, the seven deposited scripts (02_03_monochorionic_mixing_betabinom.R, 20_pq.R, compare_twins.py, fig2_fisher.R, filter_and_plot_signature_ponupdated_rprm_tripletfix.R, pon_annotate.py, pztrio_c.py) are individual analysis fragments, not a pipeline: there is no driver, no run order, no mapping from script to Methods section or figure, and no code at all for alignment, deduplication, indel realignment, contamination QC, VarScan2 calling, the hard-filter cascade, bait design, variant curation, or the single-cell clustering. A committed .DS_Store indicates the upload was a manual drag-and-drop rather than a curated release.",
+      "how_to_close": "Tag a release matching the submitted manuscript, archive it to Zenodo for a versioned DOI, add a license and a README that maps each script to its Methods subsection and figure, add the missing pipeline code (or a Snakemake/Nextflow driver invoking the upstream tools with their exact command lines), remove .DS_Store, and cite the DOI or commit hash in the availability statement."
+    },
+    {
+      "type": 4,
+      "where": "Data availability - EGA study EGAS00001005998 (all raw WGS, targeted and single-cell MDA BAM files)",
+      "missing": "All primary sequence data are under EGA controlled access, which requires a Data Access Committee application, so no step upstream of variant curation can be executed by an independent reader without institutional approval and a signed agreement. The paper does not name the DAC, does not state the access-request procedure or expected turnaround, and does not provide any de-identified intermediate that would let a reader re-run the upstream calling steps. The EGA study record itself is live and matches this work (title 'Tracing the timing of twinning using somatic mutations'), but it carries no PubMed link back to the preprint, and the paper gives no dataset-level (EGAD) accessions, so the mapping from the 29 families and 4 tissue types to specific EGA datasets and file names is not published.",
+      "how_to_close": "Publish the EGAD dataset accessions and a sample-to-file manifest, name the Data Access Committee and its application route in the availability statement, and deposit de-identified intermediate artifacts (per-sample pileup counts at the targeted loci, the pre-curation candidate variant list) that permit the upstream steps to be checked without controlled-access approval."
+    },
+    {
+      "type": 6,
+      "where": "Step C13 - manual IGV review of all de novo mutations and EEMs",
+      "missing": "'All de novo mutations and EEMs were manually reviewed with the Integrative Genomics Viewer (IGV).' No IGV version, no acceptance or rejection criteria, no reviewer identity or number of reviewers, no inter-reviewer concordance, and no record of how many candidates were discarded at this gate. This manual filter sits between the fully specified automated cascade (C7-C12) and the entire downstream clonal analysis, so the 1,631-variant call set that produces the three clonal categories is not machine-reproducible from prose.",
+      "how_to_close": "Publish the pre-review candidate list alongside the post-review call set with a per-variant accept/reject flag and reason, state the IGV version and the visual criteria used, and report how many reviewers examined each locus."
+    },
+    {
+      "type": 1,
+      "where": "Steps C1, C5, C6, C9, C18, C19",
+      "missing": "Parameter under-specification: no bwa mem command line or non-default flags; no VarScan2 thresholds (min-coverage, min-var-freq, min-avg-qual, p-value) despite trio calling being the source of every candidate; no GATK IndelRealigner known-indel resource; no VerifyBamID2 reference panel or SVD set; no panel-of-normals rejection threshold or member list for C9; no clustering algorithm, distance metric, or linkage for the single-cell EEM-group clustering in C18 and the multi-tissue EEM clustering in C19; and no stopping rule for the stepwise signature addition in C20 beyond 'further improvements in cosine similarity'.",
+      "how_to_close": "State every non-default parameter and threshold in Methods, or deposit the exact command lines / driver script and point to the specific script and line where each is set."
+    },
+    {
+      "type": 4,
+      "where": "Step C21 - Fisher Monte-Carlo simulation",
+      "missing": "The 3x3 association between fetal-membrane subtype and clonal category is tested with a Fisher Monte-Carlo simulation, but neither the number of simulation replicates nor an RNG seed is reported, so the reported p-value cannot be regenerated bit-for-bit and the test is distributional-only. This is the paper's headline association (clonal category vs amnionicity).",
+      "how_to_close": "Report the simulate.p.value replicate count (B) and call set.seed() with a stated value in fig2_fisher.R, and report both in Methods."
+    },
+    {
+      "type": 3,
+      "where": "Steps C18 and C19 - single-cell and extraembryonic analyses reuse 'as described above'",
+      "missing": "'Sequenced reads were aligned and processed as described above' is the only processing description for the single-cell libraries, and no re-statement at all is given for the placental micropatch and umbilical-cord libraries. Because those libraries differ substantially from the bulk buccal WGS (MDA-amplified single cells at 660x on a targeted panel; FFPE-derived micropatches at 21.4x), the appropriateness of reusing the bulk filter cascade, the beta-binomial dispersion factors, and the panel-of-normals cannot be judged from prose, and no MDA-specific artifact filtering (allelic imbalance, chimera removal) is described beyond the dropout summary statistics.",
+      "how_to_close": "Give an explicit processing description per library type, state which filters were retained or relaxed for MDA and FFPE material, and report the dispersion factors used for each."
+    },
+    {
+      "type": 1,
+      "where": "Main-text Methods absence (affects every step)",
+      "missing": "The bioRxiv main text contains no Methods section, no data availability statement, and no code availability statement. Every tool name, version, threshold, the EGA accession, and the GitHub URL exist only in Supplementary File DC1 (media-1.pdf), which is a separate download and is not indexed by the JATS XML body. A reader or an automated screening tool that reads the preprint body alone would conclude that this paper names no software and deposits no artifacts.",
+      "how_to_close": "Move Materials and Methods and the 'Data and script availabilities' statement into the main text (or at minimum add a main-text data/code availability section pointing to the EGA study and the repository), as required by most journal policies at submission."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author custom scripts): https://github.com/cjyoon/mztwin - cited verbatim in the supplementary 'Data and script availabilities' section: 'Custom scripts used for this project have been uploaded to https://github.com/cjyoon/mztwin'",
+      "http_status": "200 OK (URL-present, public). Landing page and README prose only: description 'Code developed for \"Clonal dynamics of monozygotic twinning in early human embryogenesis\"'; default branch main; created 2025-10-05T20:14:59Z, last push 2025-10-26T02:49:37Z; size 37 KB; primary language Python; NO releases, NO tags, NO license. README.md is 160 bytes / 3 lines (repo name, paper title, bioRxiv URL) with no install, dependency, or usage prose. Top-level entries: .DS_Store, 02_03_monochorionic_mixing_betabinom.R, 20_pq.R, README.md, compare_twins.py, fig2_fisher.R, filter_and_plot_signature_ponupdated_rprm_tripletfix.R, pon_annotate.py, pztrio_c.py",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl to github.com, api.github.com/repos/cjyoon/mztwin, /contents, /releases, /tags, and raw.githubusercontent.com for README.md; no script source read (stage1 scope)"
+    },
+    {
+      "artifact": "data deposit: European Genome-Phenome Archive study EGAS00001005998 - cited verbatim: 'All whole-genome, targeted sequence, and single-cell MDA amplified PBMC BAM files have been uploaded to the European Genome-Phenome Archive with accession EGAS00001005998'",
+      "http_status": "200 OK (URL-present; CONTROLLED ACCESS). https://ega-archive.org/studies/EGAS00001005998 resolves 200; metadata.ega-archive.org/studies/EGAS00001005998 returns title 'Tracing the timing of twinning using somatic mutations', description matching this work (monozygotic twins and parents, plus placenta and umbilical cord), study_type 'Other', pubmed_ids null. No EGAD dataset accessions and no Data Access Committee identifier are given in the paper; file-level listing requires an approved DAC application and was not attempted",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to ega-archive.org and metadata.ega-archive.org; metadata endpoint only, no data access requested"
+    },
+    {
+      "artifact": "in-paper supplementary data: Supplementary Table S2 (2050 rows: family, CHROM, POS, REF, ALT, vaf1-3, dnm flag, and per-tissue alt/depth/VAF/phasing columns for twin1/twin2/twin3 across blood WGS, buccal WGS and buccal targeted sequencing) and Table S3 (60 rows: family, cluster, vaf1, vaf2, anchor_mutations, singleton); Table S1 is the sample/library inventory",
+      "http_status": "200 OK - https://www.biorxiv.org/content/biorxiv/early/2025/10/06/2025.10.05.680569/DC2/embed/media-2.xlsx (openly downloadable, no accession, no DOI, no license statement beyond the preprint CC-BY 4.0). This is the practical PUBLIC entry point for the downstream half of the pipeline (steps C14-C17, C20-C21) and is the reason those steps score data = 2",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl; workbook sheet names and header rows inspected only"
+    },
+    {
+      "artifact": "supplementary Materials and Methods: https://www.biorxiv.org/content/biorxiv/early/2025/10/06/2025.10.05.680569/DC1/embed/media-1.pdf (3.3 MB; contains 'Materials and Methods', 'Data and script availabilities', Supplementary Discussion 1, and Supplementary Figures S1-S12)",
+      "http_status": "200 OK - this is the ONLY location of the Methods text; the main-text JATS XML body has no Methods, no data availability and no code availability section",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl, converted locally with pdftotext -layout"
+    },
+    {
+      "artifact": "external reference resources named in Methods: GRCh38 human reference genome (no build/patch/accession given), gnomAD v.2.0.1 population allele frequencies via VEP v.93 cache, COSMIC v3 mutational signature catalogue (https://cancer.sanger.ac.uk/signatures/), VerifyBamID2 reference panel (unnamed)",
+      "http_status": "stated-in-paper (version strings for gnomAD 2.0.1, VEP 93 and COSMIC v3 given verbatim; GRCh38 build identifier and the VerifyBamID2 panel are NOT given; no download dates; none fetched at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "not fetched at stage 1; env_capture_class deliberately left 'n/a' per Stage-1 protocol - the true class for these fetch-consuming steps is a Stage-2 question"
+    },
+    {
+      "artifact": "paper full text: https://www.biorxiv.org/content/early/2025/10/06/2025.10.05.680569.source.xml (JATS) and https://www.biorxiv.org/content/10.1101/2025.10.05.680569v1 (landing page)",
+      "http_status": "WebFetch 403 Forbidden; curl with a browser User-Agent returned 200 for both (JATS 113,953 chars). Title-phrase and DOI verification passed against the fetched XML - correct paper, no assessor cross-contamination",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser User-Agent into /tmp/stage1_10.1101_2025.10.05.680569/"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "9e786edc9984d328c21c8a5a80f3e2159d82e55703360bb1a771f66fce05db7f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

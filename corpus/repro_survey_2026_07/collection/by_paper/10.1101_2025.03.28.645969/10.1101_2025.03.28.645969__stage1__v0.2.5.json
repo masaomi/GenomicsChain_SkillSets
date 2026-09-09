@@ -1,0 +1,160 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.03.28.645969",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.03.28.645969v2",
+      "biorxiv:2025.03.28.645969v2"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "Reproduce the computational analyses of the khill_complexity method paper: (1) compute KHILL / block-entropy / excess-entropy / transient-information across all bacterial RefSeq (v223) taxa with >=2 genomes and across k-mer sizes with the khill_complexity program; (2) clade-specific analyses on random subsamples (up to 1000 genomes) of 5 pathogen species and on the 129 Dewar et al. taxa; (3) R linear regressions of KHILL/TI vs pangenome fluidity and genome size; (4) SimBac genome simulations (1000 x 1 Mbase) under varying mutation/recombination rates; (5) runtime benchmarking vs traditional gene-centric pangenomics using prokka annotation + roary orthology on 100 random genomes.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods ('The program', 'Refseq and clade analyses', 'Simulations and annotations'). This is a tool/methods paper whose central artifact is the khill_complexity program. The program's repository is NAMED in prose (https://github.com/narechan/khill_complexity) but returns HTTP 404 at assessment time (also 404 via authenticated gh api; a separate older repo narechan/khill exists but is NOT the cited artifact and was not substituted). No Data availability or Code availability section beyond the inline GitHub URL; data source is public NCBI RefSeq v223 (no per-genome accession list or random-selection seed provided). No custom analysis scripts (R regression code, download/subsampling driver) are provided. All C-layer steps; W=0 (pure computational).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "khill_complexity: KHILL / block-entropy / excess-entropy / transient-information over a directory of per-genome FASTA at k=1-20, murmurhash3 bottom-k sketching (example: -i genomes -t taxon -k 1-20 -p 10 -x 2 -n 100)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["repo-unreachable-404"]
+    },
+    {
+      "step_id": "C2",
+      "label": "RefSeq (v223) genome acquisition: all bacterial taxa with >=2 genomes (10,510 taxa); random subsample up to 1000 assemblies for S. agalactiae, M. tuberculosis, S. aureus, N. meningitidis, H. pylori; all genomes for 129 Dewar et al. taxa",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["random-selection-no-seed", "no-accession-list"]
+    },
+    {
+      "step_id": "C3",
+      "label": "R linear regressions (fitted + residual components): KHILL vs pangenome fluidity, fluidity vs genome size, KHILL vs genome size, transient information vs genome size",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-script", "no-R-version"]
+    },
+    {
+      "step_id": "C4",
+      "label": "SimBac simulation of 1000 x 1 Mbase genomes under varying mutation/recombination rates (example: recombination 0.0001, mutation 0.01)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-simbac-version", "no-seed"]
+    },
+    {
+      "step_id": "C5",
+      "label": "prokka annotation of 100 random genomes from the 129 Dewar et al. taxa (benchmarking baseline)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-prokka-version"]
+    },
+    {
+      "step_id": "C6",
+      "label": "roary ortholog / pangenome construction on the prokka annotations (benchmarking baseline)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["no-roary-version"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 6,
+    "n_X": 0,
+    "S": 6,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/6 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "NI ceiling on all 6/6 computational steps. No step reaches RI at stage1: (a) the central tool khill_complexity carries no version tag / release / lockfile and its named repository returns HTTP 404, so its code axis is unreachable and version axis is floating; (b) prokka, roary, SimBac carry no version numbers; (c) no analysis scripts (RefSeq download/subsampling, R regressions) are provided; (d) genome subsampling ('random up to 1000') and SimBac simulation carry no random seed, so exact input sets are not reconstructable. No env lockfile or container is claimed anywhere, so capture_claim=none and stage2_candidate=false; even under a hypothetical stage2 no step could exceed RI without an executed environment capture, and none is claimed.",
+    "coverage": "6 computational steps assessed from Methods prose (biorxiv v2 JATS XML). 0 wet-lab steps (pure computational tool/methods paper).",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (no Code availability / Data availability section; only inline GitHub URL)",
+      "missing": "No environment lockfile, no container, no conda/env spec, no version pins for any tool. The one named artifact (khill_complexity) has no release/tag and its repo is unreachable (404).",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or container digest pinning khill_complexity and its dependencies (murmurhash3 lib, R, prokka, roary, SimBac), and cite a Zenodo/Software-Heritage archived snapshot rather than a bare GitHub URL."
+    },
+    {
+      "type": 12,
+      "where": "C1 khill_complexity code artifact (https://github.com/narechan/khill_complexity)",
+      "missing": "Named code repository is not retrievable: HTTP 404 on the landing page and via gh api at 2026-07-23 (repo private, renamed, or removed). The method cannot be executed without the source.",
+      "how_to_close": "Restore public access (or archive to Zenodo/Software Heritage) and cite a versioned, permanently-resolvable identifier with a release tag / commit hash."
+    },
+    {
+      "type": 3,
+      "where": "prokka, roary, SimBac (and R) across C3-C6",
+      "missing": "No version numbers recorded for prokka, roary, SimBac, or R; benchmarking baseline and simulations are therefore not version-pinned.",
+      "how_to_close": "Record exact versions (and builds) of prokka, roary, SimBac, and R in Methods or a versions table."
+    },
+    {
+      "type": 1,
+      "where": "C2 RefSeq subsampling and C5/C6 benchmarking genome sets",
+      "missing": "No enumerated list of RefSeq assembly accessions and no random-selection seed for 'up to 1000' genomes per pathogen clade or the '100 random genomes' benchmark set; exact input ensembles cannot be reconstructed.",
+      "how_to_close": "Publish the explicit RefSeq assembly accession lists (or a seeded, scripted selection procedure) as supplementary sample sheets."
+    },
+    {
+      "type": 4,
+      "where": "C4 SimBac simulation",
+      "missing": "No random seed provided for the 1000 x 1 Mbase SimBac simulations, so the exact simulated genome sets are not deterministically reproducible.",
+      "how_to_close": "Record the SimBac random seed(s) (and full command matrix over mutation/recombination rates) or deposit the simulated genomes."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (author tool): https://github.com/narechan/khill_complexity (named in Methods 'The program')",
+      "http_status": "404 Not Found (unauthenticated curl AND authenticated gh api; a separate older repo github.com/narechan/khill exists but is NOT the cited artifact)",
+      "checked_at": "2026-07-23",
+      "network_context": "curl -L and gh api repos/narechan/khill_complexity"
+    },
+    {
+      "artifact": "data source: NCBI RefSeq bacterial genomes, version 223 (no per-paper accession list; public database, ~10,510 taxa with >=2 genomes)",
+      "http_status": "n/a (public reference database named by release version; no deposited accession specific to this paper)",
+      "checked_at": "2026-07-23",
+      "network_context": "prose parse of biorxiv v2 JATS XML"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "54832e79c4096f48955986152c8beccf85b0c3e1557d74c8a420e8333ed91f0c",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

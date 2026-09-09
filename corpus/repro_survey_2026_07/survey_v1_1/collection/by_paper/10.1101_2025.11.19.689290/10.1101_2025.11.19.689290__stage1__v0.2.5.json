@@ -1,0 +1,327 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "5b1498d3111d7db78349a62e92cad2cfda70f94ff5f4987c0c89c763305a56ac",
+  "canonical_id": {
+    "value": "10.1101/2025.11.19.689290",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.19.689290v2",
+      "biorxiv:2025.11.19.689290v2"
+    ]
+  },
+  "paper_type": "hybrid",
+  "reproduction_target": "An entirely dry-lab study that (a) ships a new forward-time polyploid genome simulation engine, DemographiKS, and (b) applies it to derive the paper's scientific claims about how Ks histogram shape responds to polyploid mode of origin, homeologous exchange rate, migration/secondary contact, and population bottlenecks/expansions. Methods verbatim: 'DemographiKS is implemented as a pipeline application in python3. It wraps three major components: SLiM, msprime, and PAML' and 'Architecturally, DemographiKS is designed as a pipeline with six modules, which are executed sequentially for the simulated polyploid. The module functions are (1) running SLiM, (2) initial paralog preparation, (3) gene shedding, (4) final paralog generation, (5) Ks calculation between paralogs, and (6) plotting the Ks histogram.' The reproduction target is therefore the simulated Ks histograms of Figs 1-4 and the supplementary figures (produced by the DemographiKS pipeline driven by XML config files), plus two auxiliary analyses: the analytic/stochastic simulation of Ks for paralogs maintained by selection ('we derived a probability distribution based on the model set forth by Blanc and Wolfe 2004, and used python random.uniform() to sample the required number of Ks values'), and the empirical Ks histograms of Fig. 5 ('Transcriptomic data were sourced from NCBI (NCBI assembly GCF_003713225.1, GCF_902167145.1, and GCA_022457205.1), and the software package KsRates (118) was used to calculate the Ks histograms for each species'). Routed hybrid rather than pure-computational because DemographiKS is simultaneously a shipped, separately-versioned pipeline with its own repository, README, conda environment file and release tags, and the instrument that generates the paper's results; the guide's Step-0 router sends application+shipped-pipeline papers to dual-score and flags them for human decision. Scored here on the application side (Methods prose + repo landing pages + README prose); the tool-executability side is noted in granularity_note and is a Stage-2 target. No wet-lab steps: W = 0.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the 'Methods' section (subsections 'Software implementation', 'Running DemographiKS', 'DemographiKS Output', 'Parallelization and replicates', 'Using DemographiKS to model a genome with different homeologous exchange rates', 'Simulating Ks data for paralogs maintained by selection', 'Source code and data availability', 'Transcriptomic Data') of the v2 JATS full text, plus the README prose of the two cited GitHub repositories. The six DemographiKS modules named in Methods are collapsed to five steps: modules 1 (SLiM), 2 (msprime + initial paralog preparation), 3+4 (gene shedding + final paralog generation, both internal python with no separately named external tool), 5 (PAML codeml) and 6 (plotting + .csv assembly) - because the rubric anchors on named tool invocations, and modules 3 and 4 name no tool. Three further steps come from Methods prose outside the pipeline: cross-run concatenation for homeologous-exchange modelling (C6), the selection-maintained-paralog Ks simulation (C7), and the KsRates empirical analysis (C8). C9 is the manuscript figure generation, which Methods locates in a second repository ('the scripts used to generate the figures are at https://github.com/tamsen/DemographiKS_paper_scripts'). S = 9, W = 0. NOTE on the hybrid route: if a human reviewer re-routes this paper to 'tool/methods', the denominator would be the DemographiKS pipeline modules only (C1-C5, S = 5) and the metric name would change to 'pipeline executability readiness'; if re-routed to 'pure-computational', the step list is unchanged and only paper_type moves. The verdict distribution is insensitive to the pure-computational/hybrid choice.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "DemographiKS module 1 - SLiM forward-time population/genome simulation of the polyploid history. Methods: 'DemographiKS takes as input an XML configuration file listing the simulation parameters, which are given in Supp. Table S20'; 'The tree-sequence recording files with the genealogy data are output to the SLiM_output folder'. SLiM version appears nowhere in the paper; the repository README pins it as 'Run on an environment with SLiM installed. We used v4.2.2.' SLiM sits OUTSIDE the shipped conda environment (README lists it under Prerequisites, not under the environment file). SLiM recipe scripts are present in the repo at SLiM_scripts/.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "DemographiKS module 2 - msprime component and initial paralog preparation. Methods names msprime only in the wrapper sentence ('It wraps three major components: SLiM, msprime, and PAML') and in the seeding sentence ('separate random seeds for SLim, MSPrime, and DemographiKS may be set in the configuration file'); all implementation detail is deferred: 'We give details for each module in the DemographiKS implementation section of the supplemental methods.' No msprime version is stated in the paper or in the README; msprime is presumed to come from the declared conda environment file sample_configs/DemographiKS_environment.yml, whose contents are NOT read at Stage 1.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted",
+        "distributional-only",
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "DemographiKS modules 3 and 4 - gene shedding (diploidization / fractionation) and final paralog generation, emitted as FASTA. Internal python3 code (modules/ in the repository); no external tool named. Methods gives no algorithm in the main text: 'We give details for each module in the DemographiKS implementation section of the supplemental methods.' Parameters are supplied through the XML config (Supp. Table S20). No python3 minor version is stated anywhere in paper or README.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted",
+        "distributional-only",
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "DemographiKS module 5 - pairwise Ks calculation between paralogs with PAML codeml. Methods: the output csv gives 'the CODEML algorithm name used to calculate Ks, the names of the two genes ..., the Ks value, and the path to the CODEML output file from which the Ks value was extracted'. No PAML version in the paper; the README states 'Run on an environment with PAML installed. We suggest v4.10.7.' - a recommendation, not a record of what was executed. codeml control-file templates are deposited in the repo at paml_input_templates/. README also warns of a units convention: 'This file gives the CODEML-calculated roundtrip Ks between the pairwise paralogs *divided by two*. Beware the factor of two.'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "DemographiKS module 6 - Ks histogram plotting and assembly of the primary output ('The primary DemographiKS output file is a .csv file, with each line giving information for a unique gene-pair. ... This file is found in the demographiKS_output subfolder. By default, the file is named [SimName].csv'; default SimName 'allotetraploid_bottleneck'). No plotting library or version is named in the paper or README; visualization/ exists in the repo. README explicitly disclaims this module's output: 'DemographiKS is not intended to produce beautiful histograms. It is left to the user to upload the Ks datafiles generated by DemographiKS to the visualization tools of choice.' - so binning, range and normalisation of the published histograms are not fixed by this step.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "lock-present-unexecuted",
+        "needs-supplement",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Cross-run combination for the homeologous-exchange-rate models. Methods verbatim, in full: 'To combine results from multiple DemographiKS runs, the output file containing the Ks values allotetraploid_bottleneck.csv from each run was concatenated.' No script, no tool, no command is named; the number of runs combined, the exchange-rate value assigned to each run, and the mixing proportions are not given in the main text.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Simulation of Ks for paralogs retained by selection. Methods verbatim: 'To simulate Ks data for paralogs maintained by selection, we derived a probability distribution based on the model set forth by Blanc and Wolfe 2004, and used python random.uniform() to sample the required number of Ks values (representing paralogous pairs) from the given distribution. The number of values generated was configurable and proportional to the number of Ks values output from DemographiKS. Our distribution for a random birth-death process with escape via selection is detained in the Simulating Ks data for paralogs maintained by selection section of the supplementary methods.' The proportionality constant, the birth-death parameters and the RNG seed are not given in the main text; the derivation is supplement-only. The main text does not state which repository holds this code (DemographiKS_paper_scripts contains a modeling/ folder, unread at Stage 1).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "distributional-only",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Empirical Ks histograms for Fig. 5 with KsRates. Methods verbatim, in full: 'Empirical Ks histograms in Fig. 5 were generated from transcriptomic data for Coffea arabica, Zea mays, Populus trichocarpa and Saccharum spontaneum. Transcriptomic data were sourced from NCBI (NCBI assembly GCF_003713225.1, GCF_902167145.1, and GCA_022457205.1), and the software package KsRates (118) was used to calculate the Ks histograms for each species.' FOUR species are named but only THREE assembly accessions are given, and no species-to-accession mapping is provided. No KsRates version, no KsRates configuration file, no ortholog/outgroup species selection, no rate-adjustment settings, and no invocation script are given anywhere; KsRates is not part of the DemographiKS repository or its conda environment.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Manuscript figure generation. Methods verbatim: 'DemographiKS v1.1.0.0 was used in this analysis, and input files used to drive the simulation and the scripts used to generate the figures are at https://github.com/tamsen/DemographiKS_paper_scripts.' That repository resolves 200 and exposes figure_generation/, data_aggregation/, modeling/, modules/ and images/, but its README is two lines in full ('# DemographiKS / population-level simulation to generate KS data'), gives no usage instructions, no figure-to-script mapping, no dependency list and no environment file, and the repository carries no tags or releases (HEAD of main = 8b0ed4bb84519a2463021ba56f1d2356c730ede2 at the time of checking).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 7,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 9,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/9 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Read symmetrically: this zero under-claims by construction - Tier-1 stage-1 caps the Version axis at 1 for every step, so no step can reach R-star here regardless of what the repository actually ships.",
+    "inference_inclusive_upper_bound": "7/9 (78%) steps reach RI at stage 1; the readiness upper bound is 7/9 = 78%, and this is a readiness statement, never a claim that the paper is reproducible. The two steps that do not clear RI are C6 (cross-run concatenation: version = 0, because no tool or command is named at all for the combination, and params = 1, because the number of runs and the per-run homeologous-exchange assignment are not in the main text) and C8 (KsRates empirical histograms: version = 0 with no KsRates version anywhere, params = 0 with no KsRates configuration of any kind, and data = 1 because four species are named against only three assembly accessions with no mapping). The seven RI steps are held at RI, not above it, by the Version axis: the stage-1 ceiling applies, and independently of that ceiling the prose evidence is mixed - SLiM ('We used v4.2.2') and PAML ('We suggest v4.10.7') carry exact pins in the README but no environment closure, while msprime, python3 and the plotting stack carry no version at all and are only implicitly covered by the declared conda environment file. This paper IS a stage-2 candidate: the README's documented install route is 'conda env create -f /PathToDemographiKS/sample_configs/DemographiKS_environment.yml' followed by 'conda activate dgks_env', and that file resolves 200 at raw.githubusercontent.com. Whether it constitutes environment closure under the Step-8 symmetric gate (pinned interpreter, pinned channels/index, declared platform, coverage of direct deps) is exactly the question stage 2 must answer by reading it. Two facts a stage-2 pass must also settle: the paper declares 'DemographiKS v1.1.0.0 was used in this analysis' but the repository's only tag is v1.1.0.2, so the declared snapshot is not retrievable by tag; and SLiM and PAML are declared as prerequisites installed OUTSIDE the conda environment, so even a perfect environment file would leave the two heaviest binaries uncaptured.",
+    "coverage": "9 steps built from the Methods section of the v2 JATS XML (fetched 200 OK via unauthenticated curl from https://www.biorxiv.org/content/early/2025/12/09/2025.11.19.689290.source.xml; title phrase 'Hidden in Plain Sight' confirmed present in the fetched text before scoring), plus the 'Source code and data availability' and 'Transcriptomic Data' statements and the README prose of the two cited repositories. All 9 steps are computational: S = 9, W = 0, computational coverage 9/9 = 100%. NOT read at stage 1, by protocol: the supplementary methods ('DemographiKS implementation', 'The prerequisite of a steady-state', 'Simulating Ks data for paralogs maintained by selection'), Supp. Table S20 (the full simulation parameter table), Supp. Fig. S1/S2 (architecture and underlying model), the conda environment YAML contents, and all source files in both repositories. Every one of those is a stage-2 input. Deferral to the supplement is heavy in this paper: the main-text Methods is a software description and pushes the actual algorithms and every parameter value into the supplement, which is why 'needs-supplement' is flagged on 8 of 9 steps.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "C2 (msprime), C3 (python3 internal modules), C5 (plotting stack), C7 (python random.uniform), C8 (KsRates) - gap subtype 2a, no version recorded",
+      "missing": "The article itself pins exactly one version: 'DemographiKS v1.1.0.0 was used in this analysis'. Every third-party component is unversioned in the article. msprime and PAML and SLiM appear only as bare names ('It wraps three major components: SLiM, msprime, and PAML'); KsRates appears as a bare name with a literature citation ('the software package KsRates (118)'); python is named only as 'python3'. The two exact third-party pins that exist live in the repository README, not the paper, and one of them is phrased as advice rather than as a record: 'Run on an environment with PAML installed. We suggest v4.10.7.' versus 'Run on an environment with SLiM installed. We used v4.2.2.' A reproducer reading the paper alone cannot pin anything.",
+      "how_to_close": "State in Methods the exact versions actually executed for SLiM, msprime, PAML/codeml, python3 and KsRates, and change the PAML statement from 'We suggest' to the version that produced the published Ks values."
+    },
+    {
+      "type": 2,
+      "where": "All steps - the environment claim; gap subtype 2b, floating/unpinned references",
+      "missing": "The declared environment artifact is a conda environment SPECIFICATION, not a lock: README says 'To automatically configure a conda environment suitable for DemographiKS, use the DemographiKS_environment.yml included in the sample_configs folder' with 'conda env create -f /PathToDemographiKS/sample_configs/DemographiKS_environment.yml'. The file resolves (HTTP 200) but at stage 1 its contents are deliberately unread, so whether it pins the interpreter, the channels and the platform is unknown. Two structural limits are visible without reading it: (i) SLiM and PAML are listed under Prerequisites as separately installed binaries, i.e. explicitly outside the environment file, so the two heaviest dependencies are uncaptured by construction; (ii) the platform declaration is prose only and informal - 'Tested on a mac and linux (ubuntu)' - with no architecture, no OS version and no per-platform solve.",
+      "how_to_close": "Ship a resolved lock (conda-lock or pixi.lock) per declared platform rather than an environment.yml, bring SLiM and PAML inside it (both are available as conda packages) or otherwise pin their builds, and state the platform triples the lock was solved for."
+    },
+    {
+      "type": 12,
+      "where": "C1-C5 (the DemographiKS pipeline) and C9 (figure scripts) - the analysis snapshot is not deposited at a retrievable point",
+      "missing": "Methods declares 'DemographiKS v1.1.0.0 was used in this analysis', but the repository https://github.com/tamsen/DemographiKS carries a single tag, v1.1.0.2 (936f085a777aff9157e0ed7517e5c233af456351), and no tag or release named v1.1.0.0; main is at 321cce08bc9a6b056741baa62a1ee66cabe74527 across 145 commits. The exact code that produced the results is therefore not obtainable without guessing a commit. The figure repository https://github.com/tamsen/DemographiKS_paper_scripts carries no tags at all (main only, 8b0ed4bb84519a2463021ba56f1d2356c730ede2, 108 commits), so both code references are to mutable branch state. Neither repository is archived to Zenodo or Software Heritage, and neither has a DOI. The README closes with 'Referencing DemographiKS: Publication forthcoming'.",
+      "how_to_close": "Tag the exact commit used for the manuscript as v1.1.0.0 (or correct the paper to the tag that exists), tag the figure-scripts repository at the manuscript state, archive both tags to Zenodo for DOIs, and cite the DOIs plus commit SHAs in the availability statement."
+    },
+    {
+      "type": 4,
+      "where": "C1, C2, C3 (the stochastic simulation core) and C7 (random.uniform sampling)",
+      "missing": "The paper establishes that seeding is possible but never records the seeds used. Verbatim: 'To facilitate running replicates, separate random seeds for SLim, MSPrime, and DemographiKS may be set in the configuration file.' No seed value for any published figure appears in the main text, no number of replicates per condition is stated in Methods, and C7's random.uniform() sampling has no stated seed at all. Under the rubric's stochastic ceiling these steps can be matched only distributionally, not exactly. Whether the deposited config files in DemographiKS_paper_scripts carry the actual seeds is a stage-2 question.",
+      "how_to_close": "Record, per published figure panel, the three seeds (SLiM, msprime, DemographiKS) and the seed for the selection-model sampler, and state the replicate count per parameter condition; deposit the exact config files keyed to figure panels."
+    },
+    {
+      "type": 1,
+      "where": "C8 - Fig. 5 empirical Ks histograms",
+      "missing": "Four species are named - 'Coffea arabica, Zea mays, Populus trichocarpa and Saccharum spontaneum' - against three accessions - 'NCBI assembly GCF_003713225.1, GCF_902167145.1, and GCA_022457205.1'. One species has no accession and no species-to-accession mapping is given, so a reproducer cannot tell which record backs which panel of Fig. 5. The Methods sentence also says 'transcriptomic data' while citing genome ASSEMBLY accessions, leaving unclear whether CDS/protein sets derived from those assemblies or separate transcriptome records were the actual input. All three cited accessions do resolve (HTTP 200 at NCBI Datasets).",
+      "how_to_close": "Give a per-species table listing the accession, the exact file(s) taken from it (CDS FASTA / protein FASTA / GFF), and the retrieval date; supply the missing fourth accession."
+    },
+    {
+      "type": 12,
+      "where": "C6 (cross-run concatenation) and C8 (KsRates invocation)",
+      "missing": "Two analysis steps have no deposited or linked code. C6 is described in one sentence with no tool: 'the output file containing the Ks values allotetraploid_bottleneck.csv from each run was concatenated' - no script, no command, no record of which runs entered which combined histogram or at what mixing proportion. C8 names KsRates but deposits no configuration file, no wrapper, and no parameter set; the availability statement covers only 'input files used to drive the simulation and the scripts used to generate the figures', which does not name either of these. The figure repository's README is two lines in full and provides no figure-to-script mapping, so even the deposited figure code cannot be tied to specific panels without reading every file.",
+      "how_to_close": "Deposit the concatenation/aggregation script together with the run manifest it consumed, deposit the KsRates configuration files per species, and add a README table mapping each manuscript figure to the script and input file that produce it."
+    },
+    {
+      "type": 6,
+      "where": "C8 - KsRates",
+      "missing": "The empirical arm of the paper is externalised to a third-party pipeline that is outside the shipped artifact entirely: KsRates is not a dependency of DemographiKS, is not in the declared conda environment, is cited only by literature reference (118) with no URL, version, container or configuration, and its own external requirements (ortholog species selection for rate adjustment, the paralog/ortholog Ks distributions it builds, its BLAST/i-ADHoRe stack) are not documented here. Fig. 5 - the figure that connects the simulations to real genomes - is therefore the least reproducible part of the paper despite resting on fully public data.",
+      "how_to_close": "Pin the KsRates version (and preferably a container digest), deposit the per-species KsRates config files including the ortholog species used for rate adjustment, and state the KsRates-internal tool versions it invoked."
+    },
+    {
+      "type": 5,
+      "where": "C5, C6, C9 - the simulation outputs that back every figure",
+      "missing": "The availability statement deposits inputs and scripts but not outputs: 'input files used to drive the simulation and the scripts used to generate the figures are at https://github.com/tamsen/DemographiKS_paper_scripts'. The generated Ks datasets ([SimName].csv, the SLiM_output tree-sequence files) are nowhere stated to be deposited. Because the simulations are expensive - 'The work presented in this paper was done on a 16-node Dual-10 Xeon CPU (E5-2630v4 2.20GHz) 15Tb RAM node (goodmem) on the mesxuuyan HPC at San Diego State University' and 'some simulations described here took more than 10 hours to complete' - a reproducer cannot check the figures against the authors' own numbers without re-running the full compute, and the stochastic seeds needed to land on the same numbers are unrecorded (see gap type 4).",
+      "how_to_close": "Deposit the per-condition Ks output .csv files (and ideally the tree-sequence files) to a DOI-bearing archive, keyed to figure panels, so figure regeneration can be checked independently of re-running the simulation."
+    },
+    {
+      "type": 2,
+      "where": "C1 (SLiM) - correctness prerequisite stated but not machine-enforced",
+      "missing": "Not a version gap in the narrow sense but a documented manual gate that makes the result operator-dependent. Methods verbatim: 'DemographiKS currently includes no hard internal checks to verify that the ancestral population has achieved a steady state before continuing on to initiate parental divergence. This must be verified by the user, and details are given in The prerequisite of a steady-state section of the supplementary methods.' The burn-in generation counts actually accepted for each published run, and the criterion used to judge steady state, are not in the main text, so a reproducer may legitimately choose a different burn-in and obtain different Ks histograms while following the stated Methods exactly.",
+      "how_to_close": "State the steady-state criterion and the accepted burn-in generation count per published configuration, and add the check to the pipeline as an assertion so it is enforced rather than advised."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (primary tool): 'DemographiKS is available from the Github repository https://github.com/tamsen/DemographiKS. DemographiKS v1.1.0.0 was used in this analysis' (Methods, 'Source code and data availability'). Repository is public, MIT licensed, 145 commits. Root files: .gitignore, LICENSE, README.md, config.py, demographiKS.py, log.py, process_wrapper.py, version.py; root directories: SLiM_scripts/, Testing/, modules/, paml_input_templates/, sample_configs/, visualization/. Refs at check time: refs/heads/main = 321cce08bc9a6b056741baa62a1ee66cabe74527; the ONLY tag is refs/tags/v1.1.0.2 = 936f085a777aff9157e0ed7517e5c233af456351 (peeled a59e4ea00840369ac006d58b243cdcb785e0cfbe). There is NO tag v1.1.0.0, i.e. the version the paper declares was used is not retrievable as a tagged snapshot. Status: URL-present, resolves.",
+      "http_status": "200 (landing page); git ls-remote succeeded",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl to https://github.com/tamsen/DemographiKS and git ls-remote --tags --heads on the same URL; README fetched as raw text from https://raw.githubusercontent.com/tamsen/DemographiKS/main/README.md (1842 bytes). Repository SOURCE FILES were not read - stage-1 protocol reads README prose and landing metadata only."
+    },
+    {
+      "artifact": "code repo (paper scripts): 'input files used to drive the simulation and the scripts used to generate the figures are at https://github.com/tamsen/DemographiKS_paper_scripts' (Methods). Repository is public, MIT licensed, 108 commits. Root directories: data_aggregation/, figure_generation/, images/, modeling/, modules/; root files: .gitignore, LICENSE, README.md, config.py, demographiKS.py, log.py, process_wrapper.py, version.py. README is 63 bytes in full: '# DemographiKS' / 'population-level simulation to generate KS data' - no usage instructions, no figure-to-script mapping, no dependency or environment file. Refs at check time: refs/heads/main = 8b0ed4bb84519a2463021ba56f1d2356c730ede2; NO tags, NO releases. Status: URL-present, resolves, but mutable branch reference only.",
+      "http_status": "200 (landing page); git ls-remote succeeded",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl to https://github.com/tamsen/DemographiKS_paper_scripts and git ls-remote --tags --heads; README fetched raw from https://raw.githubusercontent.com/tamsen/DemographiKS_paper_scripts/main/README.md"
+    },
+    {
+      "artifact": "environment capture CLAIM (the reason this paper is a stage-2 candidate): README, 'Configuration' section, verbatim - 'To automatically configure a conda environment suitable for DemographiKS, use the DemographiKS_environment.yml included in the sample_configs folder. Example commands to install and do a short run are below. > conda env create -f /PathToDemographiKS/sample_configs/DemographiKS_environment.yml > conda activate dgks_env > python3 /PathToDemographiKS/demographiKS.py my-test-run.xml'. The file exists at https://raw.githubusercontent.com/tamsen/DemographiKS/main/sample_configs/DemographiKS_environment.yml. Its CONTENTS WERE NOT READ at stage 1 - only existence was confirmed by HEAD. It is an environment specification, not a resolved lock, so its status under the Step-8 symmetric env-closure gate is undetermined. README 'Prerequisites' places SLiM and PAML outside it. README 'OS' section, verbatim and in full: 'Tested on a mac and linux (ubuntu)'. Status: URL-present, resolves.",
+      "http_status": "200 (HEAD only; body not read at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -I to raw.githubusercontent.com; deliberately not fetched as content, per stage-1 prose-only protocol"
+    },
+    {
+      "artifact": "data accessions (C8, Fig. 5): 'Transcriptomic data were sourced from NCBI (NCBI assembly GCF_003713225.1, GCF_902167145.1, and GCA_022457205.1)'. Three versioned NCBI assembly accessions, all public, no controlled-access path involved. All three resolve. Four species are named in the same sentence, so one species has no accession and no species-to-accession mapping is supplied. Status: stated-in-paper, all cited identifiers resolve.",
+      "http_status": "200 for each of GCF_003713225.1, GCF_902167145.1, GCA_022457205.1",
+      "checked_at": "2026-07-28",
+      "network_context": "Unauthenticated curl to https://www.ncbi.nlm.nih.gov/datasets/genome/<accession>/ for each accession"
+    },
+    {
+      "artifact": "third-party software with no deposit or URL in the article: SLiM, msprime, PAML/codeml (cited jointly as references 139-141) and KsRates (cited as reference 118). None of these is an author deposit; none is given a version, URL, DOI or container in the article body. SLiM and PAML acquire prose version pins only in the repository README ('We used v4.2.2', 'We suggest v4.10.7'). Status: stated-in-paper.",
+      "http_status": "n/a (no URL printed in the article for these tools)",
+      "checked_at": "2026-07-28",
+      "network_context": "Full-text scan of the v2 JATS XML; searched for github|gitlab|bitbucket|zenodo|figshare|dryad|osf and for version strings adjacent to each tool name"
+    },
+    {
+      "artifact": "supplementary material (heavily load-bearing, NOT fetched at stage 1). Supporting Information list verbatim: 'DC1 Supplemental Figures DC2 Supplemental Methods and Discussion DC3 Supplemental Tables'. Methods defers to it repeatedly: 'the simulation parameters, which are given in Supp. Table S20'; 'We give details for each module in the DemographiKS implementation section of the supplemental methods'; 'details are given in The prerequisite of a steady-state section of the supplementary methods'; 'Our distribution ... is detained in the Simulating Ks data for paralogs maintained by selection section of the supplementary methods'. Journal supplement only - no separate DOI, no data-repository deposit. Status: stated-in-paper.",
+      "http_status": "not fetched (stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "Supporting-information list in the v2 JATS XML"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "2dd58e7fb0ffc10aa04aaf15c929d37ed3e64fd1a285e89f8febf31baba38fec",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

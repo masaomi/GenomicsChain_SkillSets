@@ -1,10 +1,19 @@
 # frozen_string_literal: true
 
-# genomicschain_tier2 — Tier-2 execute-only package (design v0.4.1 Step 2).
-# Manifest / Signer live in genomicschain_core.
-require 'genomicschain_core'
-require_relative 'genomicschain_tier2/execution/backend'
-require_relative 'genomicschain_tier2/execution/local_backend'
-require_relative 'genomicschain_tier2/execution/thoa_backend'
-require_relative 'genomicschain_tier2/execution/comparator'
-require_relative 'genomicschain_tier2/tier2_executor'
+# genomicschain_tier2 — the code-reading tier, static half.
+#
+# Tier-1 reads the paper, Tier-2 reads the code, Tier-3 executes: one numbering
+# everywhere since 2026-09-09, in package, tool, schema and claim names alike.
+# Before that this package was genomicschain_codescan and the execute package
+# carried the number 2. `trust_tier` on a record is a guarantee level, not a
+# tier index.
+require 'set'
+require_relative 'genomicschain_tier2/pin_strength'
+require_relative 'genomicschain_tier2/parsers'
+require_relative 'genomicschain_tier2/scanner'
+require_relative 'genomicschain_tier2/adjudicator'
+
+module GenomicsChainTier2
+  VERSION = '0.3.0'
+  RUBRIC_VERSION = 'codescan-static-0.1.0'
+end

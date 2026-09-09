@@ -1,0 +1,404 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "edaa69be0c4b648ecd0d080ae2b88ea986bc7ce0a4ff505c2b9e7a3c83e7d6f3",
+  "canonical_id": {
+    "value": "10.1101/2025.10.01.679902",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.01.679902v1",
+      "biorxiv:2025.10.01.679902v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "SpliceDecoder, a bash/python pipeline that maps differential splicing events (DSEs) onto annotated transcripts, simulates the spliced isoform, and predicts its functional consequence (LoF, NMD, PTC-removal, LoD, GoD, CDS alt, UTR alt) plus an Effect Score. Computational target as demonstrated in the paper: STAR (v2.7.3a) 2-pass alignment and rMATS (v4.0.2) differential splicing on public RNA-seq of MCF-10A cells at 0/8/24 h after MYC activation (GSE181968, n=3), rMATS JCEC filtering via the custom script make_input_from_rmats.py, SpliceDecoder DSE-to-transcript tiling against the GENCODE v32 GTF, ORF prediction with CPAT2 using Human.v32.logit.RData, UniProt DB functional-feature assignment via bedtools intersect, four-step functional classification (Frame / NMD 55-nt rule / Domain delta-L / delta-CDS), GENCODE-based NMD validation with GFFcompare, in-silico translation (Make_aa_fa.py) followed by AlphaFold2 structure prediction and PyMOL superposition, FDR/|dPSI| binning of functional-class frequency, Effect Score computation from delta-CDS, delta-L, transcript usage (TPM), splicing occurrence likelihood and ORF priority, and GO/Reactome enrichment with Gseapy. No wet-lab step is reported: all primary RNA-seq data are re-used public data (GSE181968).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS source XML (WebFetch returned HTTP 403; the same .source.xml retrieved cleanly by curl with a browser user-agent and contains the complete 'Materials and Methods' and 'Data Availability' sections). 14 computational steps, 0 wet-lab steps - the study re-uses published RNA-seq (GSE181968) and generates no new experimental data. The code repository named in Data Availability (https://github.com/hyeon9/Splice-decoder) resolves by redirect to https://github.com/hyeon9/SpliceDecoder (default branch v1.2, tag v1.2, last push 2026-03-19); its landing page and README prose were read to record the environment CLAIM only. The repository root carries pkg.yml (conda environment specification: name splice-decoder, channels bioconda/conda-forge) and install.sh, and the README's Quick start states 'conda is required' with 'bash install.sh' as the documented install path - hence capture_claim = env_lock_claimed. Honest caveat recorded up front: the conda specification is a loose env file, not a lock - of its listed dependencies only python=3.9 carries a version, while bedtools, samtools, biopython, pysam and pybedtools are unpinned - so a Stage-2 check may well find that the claimed closure does not hold. That is precisely the discrimination Stage 2 exists to make, and the paper is forwarded on the claim, not on the claim's validity. Version scoring rule applied: a prose pin counts (version=1) only when the paper text itself gives at least major.minor - STAR v.2.7.3a, rMATS v.4.0.2, GENCODE v32 and the CPAT2 model file Human.v32.logit.RData qualify; SpliceDecoder itself, bedtools, GFFcompare, AlphaFold2, PyMOL and Gseapy carry no version anywhere in the paper. The UniProt annotation tracks are cited as 'current_release', a moving FTP path with no release number and no download date, which is a floating dependency and drives the two NI verdicts together with the unversioned AlphaFold2/PyMOL structural step. Repository file CONTENT beyond the two environment-claim files was not evaluated, and nothing was executed.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "env_lock_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Alignment of public MCF-10A MYC-activation RNA-seq (GSE181968; 0, 8, 24 h; n=3) to the human reference genome with STAR (v.2.7.3a) in 2-pass mode, run through the authors' published Nextflow pipeline https://github.com/TheJacksonLaboratory/splicing-pipelines-nf - pipeline URL given without a release tag or commit, and the reference genome build/GTF used for alignment is not named in this passage",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Differential splicing analysis with rMATS (v.4.0.2) comparing MYC activation 0h vs 8h and 0h vs 24h, run through the same splicing-pipelines-nf pipeline, producing JCEC.txt and novelJunction.txt outputs; sample-to-group assignment is deferred to Supplementary Tables 1 and 2 and no rMATS command line or read-length/anchor-length setting is given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Pre-processing of rMATS JCEC output with the custom python script make_input_from_rmats.py: retention of events with >= 5 junction reads and FDR <= 0.05, exon coordinate extraction from the upstream/downstream ES/EE and exonStart_0base/exonEnd (or riExon*/longExon*) fields, and definition of dPSI = group2 (MYC-active) PSI - group1 (MYC-inactive) PSI. The stated third filter, '|IncLevelDifference| <= 0.1', is inconsistent with the repository default and with the paper's own use of a |dPSI| cut-off (the README's Make_config.sh asks for a '|dPSI| cut off ... default 0.1' as a lower bound), so the prose threshold direction is ambiguous",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "SpliceDecoder DS_mapping: generation of all possible splicing cases per event type (CA, RI, A3SS, A5SS, MXE) and tiling-based exact matching of DSE target coordinates against transcript exon structures in the GTF supplied to rMATS (GENCODE v32) to define Ref-TX; zero-mismatch requirement, plus the stated Alt_A3SS/A5SS ordering filters. SpliceDecoder itself carries no version in the paper (repository default branch is v1.2)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Assessment of unmapped DSEs against the rMATS novelJunction.txt file to confirm that mapping failures correspond to novel (non-GTF) junctions rather than mapping error - no counts, script name or command given for this reconciliation step in Methods",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "SpliceDecoder Simulation: construction of simulated transcripts (Sim-TX) by editing the Ref-TX exon structure for simEI/simES, simRI/simSI, simAlt/Can_A3/5SS and simMXE1/2, emitting Ref-TX and Sim-TX BED and FASTA files. Requires a genome FASTA that is not named in the paper (the repository install script fetches GENCODE release_32 GRCh38.primary_assembly, but that is repository-side, not prose)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "ORF prediction for every Ref-TX and Sim-TX with CPAT2 (https://rna-cpat.sourceforge.net) using the Human.v32.logit.RData logit model on the transcript FASTA sequences; top 3 predicted ORFs retained as the default set, chosen by an elbow-point analysis of ORF discovery rate (1-9 ORFs) against GENCODE-annotated ORFs, reported to recover >90% of annotated ORFs. CPAT is given only as 'CPAT2' with no release number and no hexamer/cut-off parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "db-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Assignment of annotated protein features (protein domain, motif, region, DNA-binding region, coiled-coil, chain, disordered region and other structural features) to Ref-TX and Sim-TX by bedtools intersect against the UniProt genome-annotation tracks downloaded from https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/genome_annotation_tracks/, with UTR-located features excluded using the predicted reading frame. The UniProt source is a 'current_release' FTP path with no release number and no access date, and bedtools carries no version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "db-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Functional-consequence classification in four sequential checks: (1) Frame Check (start/stop codon retention; else Loss of Frame and exclusion), (2) NMD Check using the 50-55 nt rule (PTC > 55 bp upstream of the last exon-exon junction => NMD; PTC present in Ref-TX and absent in Sim-TX => PTC removal) with an advanced criterion classifying PTCs < 150 nt downstream of the start codon or inside exons > 407 nt as non-NMD, (3) Domain Check computing per-block delta-L = |Lr - Ls| / max(Lr, Ls) averaged over blocks, with LoD/GoD assignment and delta-L = 1 forced for NMD and PTC-removal, and (4) delta-CDS comparison assigning CDS alt vs UTR alt. Thresholds and formulas are stated explicitly",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Transcript-centric mode: classification of GENCODE transcripts into canonical (Cano-Tx: tagged 'basic' or 'Appris_principal' and lacking the 'could not be confirmed start/end of mRNA or CDS' tag) versus non-canonical (Query-Tx) from the GTF attribute column, comparison of each Query-Tx against the Cano-Tx of the same gene using the highest-coding-potential ORF, and compilation of a transcript dictionary with CDS lengths from GENCODE v32 protein-coding transcripts (https://www.gencodegenes.org/human/release_32.html)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Validation of NMD predictions: intron-chain comparison of NMD-sensitive Sim-TXs against GENCODE v32 with GFFcompare, selection of the 488 Sim-TXs carrying a '=' tag in the refmap file, inspection of their GENCODE transcript types, and re-application of each Sim-TX reading frame to the 103 explainable 'protein coding' matches (n=96 after availability filtering) to test for PTC introduction. GFFcompare carries no version and no command line",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "3D structure comparison for non-NMD cases: custom script Make_aa_fa.py extracts CDS from Ref-TX/Sim-TX FASTA and performs in-silico translation, the resulting amino-acid FASTA files are submitted to AlphaFold2 to generate PDB files, and structures are superposed on shared residues in PyMOL interactive mode with differing residues highlighted. No AlphaFold2 version, no run mode (local ColabFold vs AlphaFold Server - the README points users at https://alphafoldserver.com), no MSA database release, no seed, no model preset, no relaxation setting and no PyMOL version; the alignment is performed interactively rather than by script",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "db-version-unpinned"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Effect Score computation and frequency analysis: binning of -log10 FDR and |dPSI| into 10 bins each with rMATS FDR = 0 replaced by 2.2e-16, per-bin normalisation of functional-class counts using only the pORF1 classification; Effect Score integrating delta-CDS, delta-L, transcript usage TU_i = TPM_i / sum_k TPM_k over transcripts of the same gene, splicing occurrence likelihood (max PSI for inclusion cases, min PSI for skipping cases), |dPSI| and ORF priority weights 1.0/0.5/0.1, scaled to [0,2]; followed by assignment of the group with higher Sim-TX expression per the inclusion/skipping rule. The TPM matrix source is not specified in the paper - no quantification tool, version or command is named for producing TPM from the GSE181968 BAMs (the repository config accepts either a TPM matrix or a BAM list)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Gene-ontology enrichment with the Gseapy python module on GO_Biological_Process_2021 and Reactome_2022 term sets, Padj < 0.05 significance after Gseapy-internal multiple-testing correction; comparison of shared terms between SpliceDecoder and rMATS gene lists using -log10(Padj) differences of >= 0.8 (SpliceDecoder-enriched) and >= 0.2 (rMATS-only). Gene-set library releases are pinned by name (2021 / 2022) but Gseapy itself carries no version, the background gene set is not stated, and no script for the term comparison is named",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "db-version-unpinned"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 12,
+    "n_NI": 2,
+    "n_X": 0,
+    "S": 14,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/14 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 12 of 14 computational steps, NI on 2. This is a strong prose profile: the input data are a public GEO series (GSE181968), the tool is a public GitHub repository with a v1.2 tag and a documented conda install path, the upstream alignment/DS pipeline is a separate public Nextflow repository, and the two upstream tools carry exact prose pins (STAR v.2.7.3a, rMATS v.4.0.2) alongside a pinned annotation release (GENCODE v32) and a pinned CPAT model file (Human.v32.logit.RData). Version stays at 1 for every RI step because Stage 1 credits a lockfile or container only as a CLAIM. The two NI steps are the binding weaknesses: C8 draws UniProt functional-feature tracks from the 'current_release' FTP path, a moving target with no release number and no download date, so the domain annotation that every functional class depends on cannot be reconstructed as it stood; and C12 runs AlphaFold2 plus PyMOL with no version, no run mode, no MSA database release, no seed and an interactive (unscripted) superposition step. Secondary prose defects that do not by themselves lower a verdict: the filter is written '|IncLevelDifference| <= 0.1' where the tool and the analysis imply a lower bound, the TPM matrix underlying transcript usage in the Effect Score has no stated quantification tool, and SpliceDecoder itself is never versioned in the paper even though the repository is tagged. Stage-2 upside is real but bounded: verifying the conda specification could lift the version axis, but the pkg.yml pins only python=3.9 and leaves bedtools, samtools, biopython, pysam and pybedtools unpinned, so the likely Stage-2 finding is that the environment claim does not close.",
+    "coverage": "14 computational analysis steps assessed from the bioRxiv v1 JATS 'Materials and Methods' (Event-based splicing analysis using RNA-seq data; Mapping splicing events to the whole transcriptome; Simulating alternatively spliced transcripts; Identifying open reading frames; Mapping annotated functional features; Estimating and classifying the functional consequence; Assessing functional differences between transcripts; Stratification of canonical and non-canonical isoforms; Validating NMD predictions; Comparing protein structures; Comparing frequency of functional events; Calculating an effect score; Assigning the group with higher expression of Sim-TX; Gene ontology analysis). 0 wet-lab steps: the study generates no new experimental data and re-uses published RNA-seq (GSE181968). Coverage = 14/14 (100%) of enumerated steps.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 4,
+      "where": "C8 (UniProt functional-feature annotation), and by propagation every functional class in C9, C10, C13",
+      "missing": "The UniProt genome-annotation tracks are cited as 'https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/genome_annotation_tracks/' - a path that always serves the newest release. No UniProt release number (e.g. 2025_03), no download date and no checksum is given. Every LoD/GoD call, every delta-L value and therefore every Effect Score depends on which UniProt release was resolved at run time.",
+      "how_to_close": "State the exact UniProt release used (release number plus download date) and deposit the derived BED feature tracks with checksums as supplementary data, or pin the FTP path to the numbered release directory rather than 'current_release'."
+    },
+    {
+      "type": 3,
+      "where": "C4, C6, C8, C9, C10 (SpliceDecoder, bedtools), C11 (GFFcompare), C12 (AlphaFold2, PyMOL), C14 (Gseapy)",
+      "missing": "The paper gives no version for SpliceDecoder itself (the repository is tagged v1.2 and its default branch is v1.2, but the paper cites only the bare repository URL), and no version for bedtools, GFFcompare, AlphaFold2, PyMOL, Gseapy, python or any python dependency. Exact pins are present only for STAR (v.2.7.3a), rMATS (v.4.0.2), the GENCODE annotation (v32) and the CPAT model file (Human.v32.logit.RData); CPAT itself is given only as 'CPAT2'.",
+      "how_to_close": "Cite the SpliceDecoder release tag (or commit SHA) used for the manuscript figures, and add a software table listing an exact version for every auxiliary tool including bedtools, GFFcompare, CPAT, Gseapy, AlphaFold2 and PyMOL."
+    },
+    {
+      "type": 1,
+      "where": "C12 (AlphaFold2 structure prediction and PyMOL superposition)",
+      "missing": "AlphaFold2 is invoked with no version, no execution mode (local, ColabFold, or the AlphaFold Server that the README directs users to), no MSA/template database release, no number of models or recycles, no relaxation setting and no random seed; the PyMOL superposition is performed in 'interactive mode' rather than by a deposited script. The MPRIP and other 3D panels are therefore not reproducible as published even with the amino-acid FASTA in hand.",
+      "how_to_close": "Report the AlphaFold2 implementation, version, database release and seed, deposit the input amino-acid FASTA files and the output PDB files, and replace the interactive PyMOL alignment with a deposited .pml script."
+    },
+    {
+      "type": 3,
+      "where": "C3 (rMATS JCEC filtering in make_input_from_rmats.py)",
+      "missing": "The stated filter reads 'we retained splicing events with >= 5 junction reads and FDR <= 0.05 and |IncLevelDifference| <= 0.1'. A <= bound on |IncLevelDifference| would retain only the least-changed events, which contradicts the analysis (DSEs at 8 h vs control) and contradicts the tool's own configuration prompt, which asks for a '|dPSI| cut off (float [0-1], default 0.1)' used as a minimum. The direction of the published threshold is therefore ambiguous in prose.",
+      "how_to_close": "Correct the inequality direction in Methods and state the exact filtering command (or the config file) used to produce the test dataset."
+    },
+    {
+      "type": 3,
+      "where": "C13 (transcript usage term of the Effect Score)",
+      "missing": "Transcript usage TU_i = TPM_i / sum_k TPM_k requires per-transcript TPM values, but no quantification tool, version, index or command is named anywhere in Methods for producing TPMs from the GSE181968 data, and the TPM matrix itself is not deposited. The repository config accepts either a TPM matrix or a BAM list, so the route taken for the published Effect Scores is undetermined.",
+      "how_to_close": "Name the quantification tool and version (and the annotation used) or state that TPMs were computed from the BAM list by SpliceDecoder itself, and deposit the TPM matrix used for the published Effect_score.tsv."
+    },
+    {
+      "type": 7,
+      "where": "All figure-underlying result tables (Main_table.tsv, Domain_alt.tsv, NMD.tsv, Effect_score.tsv, mapping.stats) for the MCF-10A MYC test dataset",
+      "missing": "The Data Availability statement says only that 'the data underlying this article are available in the article and in its online supplementary material'. The SpliceDecoder output tables that Figures 1-5 are computed from - including the 488 GFFcompare-matched Sim-TXs, the 118/103/96 NMD validation subsets and the Effect Score table - are not deposited as standalone machine-readable files with checksums, and the repository ships only toy_data.zip, which the README notes is not sufficient for the Effect Score function.",
+      "how_to_close": "Deposit the complete SpliceDecoder output directory for the MCF-10A MYC 0h-vs-8h and 0h-vs-24h comparisons (result/, table/, mapping.stats) in Zenodo with checksums, and cross-reference the deposit from the Data Availability statement."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 14 computational steps)",
+      "missing": "The paper text claims no environment capture at all - no container, no lockfile, no conda specification is mentioned in Methods or in Data Availability. The claim recorded here comes from the repository landing page (pkg.yml + install.sh + README 'conda is required'), and that specification is loose rather than locked: within pkg.yml only python=3.9 carries a version, while bedtools, samtools, biopython, pysam and pybedtools are unpinned, so solving the environment today will not reproduce the environment used for the manuscript. The upstream splicing-pipelines-nf pipeline is cited by bare URL with no release tag, container digest or Nextflow version.",
+      "how_to_close": "Ship a solved lockfile (conda-lock / pixi.lock) or a container image referenced by digest alongside the loose pkg.yml, pin the splicing-pipelines-nf release tag used, and reference both from the manuscript's availability statement rather than only from the repository."
+    },
+    {
+      "type": 6,
+      "where": "C7 (CPAT2 distribution), C8 (UniProt FTP), C1/C2 (splicing-pipelines-nf), reference genome download in the repository install path",
+      "missing": "CPAT2 is cited at a SourceForge landing page (https://rna-cpat.sourceforge.net) rather than at a versioned artifact; the UniProt 'current_release' path is by construction a moving target; the splicing-pipelines-nf repository is a mutable GitHub default branch with no tag; and the reference genome/annotation are fetched at install time from EBI FTP by the repository script rather than pinned in the manuscript. None of these carries a persistent DOI or a checksum.",
+      "how_to_close": "Replace landing-page and 'current_release' URLs with versioned artifacts or DOIs, record download dates and checksums for the genome FASTA and GTF, and archive a tagged release of both code repositories to Zenodo."
+    },
+    {
+      "type": 5,
+      "where": "C5 (unmapped-DSE reconciliation), C11 (GFFcompare NMD validation), C14 (GO term comparison), C13 (FDR/|dPSI| binning)",
+      "missing": "The SpliceDecoder tool itself is public, but several manuscript-specific analyses are described only in prose with no named script: the novelJunction.txt reconciliation, the GFFcompare refmap validation and its downstream frame re-application, the FDR/|dPSI| 10-bin normalisation, and the SpliceDecoder-vs-rMATS GO term comparison with its 0.8 / 0.2 -log10(Padj) thresholds. These figure-generating analyses are not identifiable as files in the repository landing page listing.",
+      "how_to_close": "Publish the manuscript analysis scripts (a paper/ or analysis/ directory, or a separate figure-reproduction repository) covering every step from the rMATS outputs to each published figure panel."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (tool): stated verbatim in Data Availability - 'The official documentation and source codes of the SpliceDecoder are available at https://github.com/hyeon9/Splice-decoder'. The README additionally states 'SpliceDecoder can be downloaded from https://github.com/hyeon9/SpliceDecoder/'.",
+      "http_status": "URL-present (resolves by GitHub rename-redirect to https://github.com/hyeon9/SpliceDecoder; default branch 'v1.2', branches main/v1.1/v1.2, tag v1.2, last push 2026-03-19, no releases published, no LICENSE file in the root listing)",
+      "checked_at": "2026-07-27",
+      "network_context": "landing page and README prose only; root listing observed as .github, Main.sh, README.md, code, dat.zip, example.config, install.sh, pkg.yml, toy_data.zip, transcript-toolkit.sh. Only pkg.yml and install.sh were opened, solely to classify the environment claim; no workflow source was read and nothing was executed."
+    },
+    {
+      "artifact": "code repo (upstream pipeline): stated verbatim in Methods - 'using our existing pipeline https://github.com/TheJacksonLaboratory/splicing-pipelines-nf'",
+      "http_status": "URL-present (stated-in-paper; not independently resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "cited as a bare repository URL with no release tag, commit SHA or container digest"
+    },
+    {
+      "artifact": "data accession (input RNA-seq): GEO GSE181968 - 'previously described RNA-seq from human mammary epithelial MCF-10A cells at 0, 8, and 24 hours after MYC activation (n=3; GSE181968)'; re-used public data from a prior publication, not generated by this study",
+      "http_status": "stated-in-paper (accession given; not independently resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "public GEO series identifier; no controlled-access component stated"
+    },
+    {
+      "artifact": "reference resources stated in Methods: GENCODE v32 (https://www.gencodegenes.org/human/release_32.html), CPAT2 (https://rna-cpat.sourceforge.net) with model file Human.v32.logit.RData, UniProt genome annotation tracks (https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/genome_annotation_tracks/), Gseapy term sets GO_Biological_Process_2021 and Reactome_2022",
+      "http_status": "URL-present (stated-in-paper; not independently resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "GENCODE and the Gseapy libraries carry release identifiers; the UniProt path is 'current_release' with no release number or access date; CPAT is a SourceForge landing page with no version"
+    },
+    {
+      "artifact": "data deposit for this study's own derived results: NONE STATED beyond 'The data underlying this article are available in the article and in its online supplementary material' (no figshare/Zenodo/Dryad DOI)",
+      "http_status": "none",
+      "checked_at": "2026-07-27",
+      "network_context": "no supplementary data DOI appears in the preprint; 'Supplementary Data are available at NAR online' refers to a journal version that does not yet exist for this preprint"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c4e23b94ee7cdc3a4758e8292fc8474ea727067693b43422cf9318d2277fac7f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,556 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "532da1766775a97e47dc5db0239f0d15b2f5c85252bfc05e1ab7b1e22671ae7b",
+  "canonical_id": {
+    "value": "10.1101/2025.09.22.677720",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.09.22.677720v2",
+      "biorxiv:2025.09.22.677720v2",
+      "https://github.com/JustiCol/Genome-assembly-T_gamsii_T035",
+      "10.5281/zenodo.17293674"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "A genome-resource announcement for Trichoderma gamsii strain T035 combining wet-lab biocontrol phenotyping with a de novo ONT assembly + annotation pipeline. The computational reproduction target is the pipeline as described in 'Material and methods': ONT basecalling in super-accuracy (SUP) mode; read filtering (reads < 1,000 bp or quality < Q10 removed); de novo long-read assembly with both Canu v2.2 and Flye v2.9.6 (Flye retained as 'the less fragmented assembly'); three rounds of Racon polishing; RagTag scaffolding against the Trichoderma atroviride reference GCF_020647795.1; assembly QC with BUSCO (fungi_odb10) and QUAST against the T. gamsii reference GCF_001481775.2; k-mer spectra from Canu-corrected reads with Jellyfish + GenomeScope2; NanoPlot read-quality scatterplot; BlobToolKit snailplot; MashTree v1.2 / Mash (genome size 40 Mb, sketch size 20,000) neighbour-joining phylogeny visualised in MEGA12; structural annotation with Helixer; annotation validation by mapping nine public RNA-seq datasets with STAR to both the T035 and T6085 annotations; transposable-element annotation with EDTA; functional annotation with EggNOG-mapper; signal-peptide prediction with DeepSig; secondary-metabolite cluster prediction with antiSMASH 8.0 (fungiSMASH); CAZyme annotation with dbCAN3 under stated HMMER / DIAMOND / dbCAN_sub thresholds. Two statistical analyses of the wet-lab assays are also in scope because their input tables and scripts are deposited: the parasitism radar plot (RStudio v2023.12.1, Wilcoxon signed-rank test with FDR correction) and the antibiosis boxplot (area under the growth curve, ANOVA + Tukey, alpha = 0.05). Wet-lab isolation, dual-culture and microplate assays, HMW DNA extraction and ONT library preparation/sequencing are scored OOS.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the 'Material and methods' section of the v2 JATS full text (sub-sections: Sample information, In vitro control of filamentous pathogens, In vitro control of bacterial pathogens, Trichoderma genome comparison, DNA extraction, ONT sequencing, Genome assembly, Annotation), cross-read against the repository landing page and README prose. 22 computational steps (S = 22) and 5 wet-lab steps (W = 5, verdict OOS). Canu and Flye are kept as separate steps because the paper ran both and compared them ('The long-read assemblies were performed using both Canu v2.2 and Flye v2.9.6'); Canu also has an independent downstream role (its corrected reads feed the k-mer analysis). Jellyfish and GenomeScope2 are folded into one k-mer step because the README maps them to a single script plus one web-server analysis. MashTree/Mash distance computation is kept separate from MEGA12 tree visualisation because only the former is scripted in the repository. The repository main branch (release v2.0.0) additionally contains scripts for GFFread extraction, telomere/centromere detection and a JCVI synteny analysis referenced to a 'Figure 6' that does not exist in this v2 preprint; those are NOT counted, because step_source is prose-methods and the v2 Methods do not describe them. Deposited Zenodo snapshot is tag v1.1.1; the live GitHub repo is at v2.0.0, so the archived artifact and the current repo differ.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "release_snapshot",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "ONT basecalling. Methods verbatim: 'Reads were basecalled using the super accuracy (SUP) mode.' No basecaller is named (Dorado / Guppy / MinKNOW), no basecalling model identifier, no software version, no flowcell/chemistry-model pairing. Raw signal data (POD5/FAST5) is not deposited; SRA run SRR35336635 holds basecalled reads only, and no basecalling script exists in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Read filtering before assembly. Methods verbatim: 'with reads filtered before assembly where reads shorter than 1,000 bp or with a quality score below Q10 were removed (De Coster et al., 2018)'. The citation points at NanoPack/NanoFilt but no tool name or version is given in the text; the README maps assembly to 'Genome_assembly_contigs.txt': 'SLURM script to assemble T035 genome de novo using sequencing reads from BioProject PRJNA1327094'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Canu v2.2 long-read assembly and read correction (Koren et al., 2017). Version pinned exactly in prose; no genome-size estimate, no corOutCoverage/minReadLength or any other parameter is stated. Canu-corrected reads are the declared input to the k-mer analysis (C9)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Flye v2.9.6 long-read assembly (Kolmogorov et al., 2019), the assembly actually retained: 'The less fragmented assembly was obtained using Flye'. Version pinned exactly in prose; no read-type mode (--nano-hq / --nano-raw), no --genome-size, no --iterations, and no selection criterion beyond the qualitative 'less fragmented' is stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Racon polishing. Methods verbatim: 'The assembly underwent three additional polishing steps using Racon (Vaser et al., 2017).' Number of rounds is given; no Racon version, no match/mismatch/gap or window-length settings, and no statement of which read set (raw, filtered or corrected) was re-mapped for polishing, nor which mapper produced the overlaps",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "RagTag reference-guided scaffolding (Alonge et al., 2022) against Trichoderma atroviride GCF_020647795.1: 'The obtained contigs were further assembled in scaffolds using RagTag thanks to the reference genome of Trichoderma atroviride (GCF_020647795.1)'. Reference is pinned to a versioned RefSeq accession and a script exists ('Contigs_to_scaffolds_Ragtag'), but no RagTag version and no sub-command/aligner/gap-size options are given. 30 contigs -> 18 scaffolds, 3.09 N's per 100 kbp",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "BUSCO completeness assessment against the fungi_odb10 dataset, reported as 98.8% complete (98.3% single-copy, 0.5% duplicated, 0.4% fragmented, 0.8% missing). Lineage dataset is named and versioned (odb10), but no BUSCO version, no mode (genome/protein/transcriptome), no augustus/metaeuk predictor choice, and no script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C8",
+      "label": "QUAST assembly comparison against the T. gamsii reference GCF_001481775.2 (Mikheenko et al., 2023), producing Table I. Comparison reference is a versioned RefSeq accession; no QUAST version, no flags (--eukaryote, --min-contig, reference-based vs reference-free mode), and no script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C9",
+      "label": "k-mer spectra from Canu-corrected reads with Jellyfish (Marcais & Kingsford, 2011) and GenomeScope2, spelled 'Genoscope2' in the text (Ranallo-Benavidez et al., 2020), producing Supplementary Figures S2-S5. Script 'Quality/k-mer_analysis' exists, but no k value, no hash/count-size, no ploidy or max-coverage setting, and no version for either tool. The README routes the GenomeScope step through the public web server: 'All results can be observed at the following link: http://genomescope.org/genomescope2.0/analysis.php?code=S5DhLvgnW5NZNsCLj1KN'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C10",
+      "label": "NanoPlot read-quality/length scatterplot (Figure 5), described only in the figure legend: 'Scatterplot of Nanopore reads for T. gamsii strain T035, showing read length versus quality score, generated with NanoPlot (kde plot).' Plot type is stated; no NanoPlot version, no input format (summary vs fastq vs bam), no filtering applied before plotting, and no script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C11",
+      "label": "BlobToolKit snailplot of assembly statistics (Figure 3), named only in the figure legend. No BlobToolKit version, no sub-command, no hit/coverage inputs, and no script in the repository. The legend itself flags an interpretation caveat: 'BlobToolKit reports 0.0% N, as the gaps introduced by RagTag during the scaffolding are synthetic and not associated with a raw sequence'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "MashTree v1.2 / Mash pairwise distances and neighbour-joining tree (Katz et al., 2019). Methods verbatim: 'Pairwise genomic distances were computed with Mash (genome size parameter set to 40 Mb, sketch size = 20,000). The distance matrix was used to infer a neighbor-joining tree with MashTree.' Input genome accessions are listed in Supplementary Table S2 and in the repository file 'data/Strains_for_MashTree.xlsx'; script 'Mash_comparison/MashTree' exists. Best-documented step in the paper: exact tool version pin plus both decisive Mash parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "Tree visualisation and annotation in MEGA12 (Kumar et al., 2024): 'The obtained tree was exported in Newick format, and later visualized and annotated using MEGA12 (Fig.2).' Generation-level version label only (no build/release), interactive GUI step with no script, no export settings, no rooting or branch-support display parameters",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C14",
+      "label": "Structural annotation with Helixer (Holst et al., 2023), predicting 13,036 protein-coding genes; output deposited as 'results/T_gamsii_T035.gff'. Helixer is model-driven and its output depends entirely on the chosen lineage model and post-processing settings, none of which are given: no Helixer version, no model (fungi/land_plant/vertebrate), no subsequence length, no overlap/peak-threshold settings, and no script in the repository despite the README claiming it contains 'all data, scripts, and results used in the assembly, annotation, and validation'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "Annotation validation by mapping nine public transcriptomic datasets with STAR (Dobin et al., 2013) against both the T035 and T6085 annotations, producing Table III (reads in annotated features 64% -> 75%). Input datasets are enumerated in Supplementary Table S3 and 'data/List_of_transcriptomic_data.xlsx'; script 'Validation_with_STAR/STAR' exists. No STAR version, no genomeGenerate parameters (--sjdbOverhang, --sjdbGTFfile handling for the two different annotation formats), no filtering flags, and no trimming step described for the public reads",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C16",
+      "label": "Transposable-element annotation with EDTA (Su et al., 2021), reported as 3.3% of the genome (Table IV, Supplementary Table S4). Script 'Annotation/EDTA' exists. No EDTA version, no --species / --step / --sensitive / --anno flags, and no version for the underlying repeat libraries and dependency stack (RepeatMasker, RepeatModeler, TIR-Learner, LTR_retriever), whose library releases materially change TE percentages",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C17",
+      "label": "Functional annotation with EggNOG-mapper (Cantalapiedra et al., 2021), assigning categories to 11,073 of 13,036 genes (Supplementary Table S5); output merged into 'results/T_gamsii_T035_anno.gff'. No emapper version, no eggNOG database release (v5.0 vs v6.0 change the orthology assignments), no search mode (diamond/mmseqs/hmmer), no tax_scope, and no e-value/coverage cutoffs. No script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C18",
+      "label": "Signal-peptide prediction with DeepSig (Savojardo et al., 2018), yielding 1,046 secreted proteins (Supplementary Table S6, Table II). No DeepSig version, no organism model selected (euk/gram+/gram-), no score threshold, and no script in the repository. The paper explicitly compares this count against a SignalP-derived count from the T6085 reference, i.e. a cross-tool comparison whose reproducibility depends on the unstated settings",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C19",
+      "label": "Secondary-metabolite biosynthetic gene cluster prediction with antiSMASH 8.0 (Blin et al., 2025), reported as 44 clusters in T035 vs 45 in T6085 (Supplementary Table S7, Table II). Table II legend calls the same analysis 'FungiSMASH'. Major.minor version pinned in prose; no detection strictness (relaxed/strict/loose), no optional-module selection, no antiSMASH database release, no local-vs-webserver statement, and no script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C20",
+      "label": "CAZyme annotation with dbCAN3 (Zheng et al., 2023), 412 CAZymes in T035 vs 403 in T6085 (Supplementary Tables S8/S9). Thresholds are stated verbatim in the Table II legend: 'matches detected by all tested tools: HMMER: dbCAN (E-value < 1e-15, coverage > 0.35), DIAMOND: CAZy (E-value < 1e-102), and HMMER: dbCAN-sub (E-value < 1e-15, coverage > 0.35)'. The Results text says 'Carbohydrate-active enzymes (CAZymes) were identified using dbCAN2' in the Table II legend while Methods says dbCAN3 - an internal inconsistency. Generation-level tool label only; no run_dbcan release, no CAZyDB / dbCAN-sub HMM database version, and no script in the repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C21",
+      "label": "Statistical analysis of the parasitism dual-culture scores and Figure 4A radar plot. Methods verbatim: 'Statistical analyses were performed in RStudio v2023.12.1. Data were analyzed using a non-parametric analysis of variance (Wilcoxon signed-rank test), and p-values were adjusted for multiple testing using the false discovery rate (FDR) method.' Input table 'In_vitro_tests/df.xlsx' and script 'In_vitro_tests/Parasitism_script.txt' are both deposited and column-documented in the README. Version credit is for the RStudio IDE build only - the R interpreter version and every package version are unstated, so there is no environment closure",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    },
+    {
+      "step_id": "C22",
+      "label": "Statistical analysis of the bacterial antibiosis assay and Figure 4B boxplot: area under the growth curve computed 'as described by Joubert et al. (2010) and Warringer & Blomberg (2003)', then 'Data were analyzed using analysis of variance (ANOVA) followed by Tukey's multiple comparisons test (alpha = 0.05)'. Input table 'In_vitro_tests/test.xlsx' (column E already holds the AUC) and script 'In_vitro_tests/Antibiosis_script' are deposited. No software version of any kind is attached to this analysis - the RStudio pin is stated only for the parasitism section - and the AUC computation itself is delegated to two cited papers rather than to code",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W1",
+      "label": "Strain isolation and maintenance: 5 g rhizosphere soil from Brain-sur-l'Authion, France (47.473936, -0.390684) suspended in 50 mL sterile water, serial dilution-extinction on PDA (39 g/L) with streptomycin (500 mg/L), 20 degrees C dark for seven days, transfer to Malt Agar, cryopreservation at -80 degrees C in 30% glycerol",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "Dual-culture parasitism assay against twelve pathogenic fungal isolates (120 x 120 mm square plates, 5 mm plugs at opposite corners, pathogen inoculated two days before the antagonist, 20 degrees C dark for 20 days, 0-4 overgrowth scale adapted from Pascouau et al. 2023, three technical x three independent biological replicates)",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "Bacterial antibiosis microplate assay: PDB culture filtrates (0.2 um filtered, 7 days, 20 degrees C, 100 rpm) added at 10% v/v to LB inoculated with 1% v/v bacterial suspension at OD 0.05, 300 uL/well, 25 degrees C for 33 h with intermittent shaking, OD600 read every 10 min on a SPECTROstar plate reader, triplicate x three independent experiments",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "High-molecular-weight genomic DNA extraction from a 7-day-old culture on pectocellulosic membrane over PDA, liquid-nitrogen freezing and bead milling, adapted Moller protocol with RNase immediately after proteinase K and resuspension in 10 mM Tris pH 8 instead of TE; A260/280 = 1.85, A260/230 = 2.3, 27 ng/uL by Qubit, majority of gDNA above 10 kb",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "ONT library preparation and sequencing: Native Barcoding Kit 96 V14 (SQK-NBD114.96) with 1.5 ug HMW gDNA per the kit protocol, MinION device. Yield 196,604 reads, ~965 Mb, ~25X coverage, read N50 6,669 bp, median length 3,217 bp, median quality 21.8. Flowcell type and MinKNOW version are not stated",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 3,
+    "n_NI": 18,
+    "n_X": 1,
+    "S": 22,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/22 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification). Under-claims by construction: Tier-1 cannot credit an undeclared-but-present dependency, and the prose read here is an upper bound on what the deposited SLURM scripts actually pin.",
+    "inference_inclusive_upper_bound": "3/22 (13.6%) readiness upper bound - NOT 'reproducible'. Only three steps have all four axes >= 1 at stage 1: C12 (MashTree v1.2 with both decisive Mash parameters - genome size 40 Mb, sketch size 20,000 - plus a deposited script and an accession table), C20 (dbCAN3 with all three verbatim HMMER / DIAMOND / dbCAN_sub E-value and coverage thresholds), and C21 (parasitism statistics with RStudio v2023.12.1, a named test and correction method, and both the input xlsx and the script deposited). The binding constraint across the other 19 steps is the VERSION axis, not data or code: data is uniformly strong (SRA run SRR35336635 under BioProject PRJNA1327094 resolves, both comparison references are pinned to versioned RefSeq accessions GCF_020647795.1 and GCF_001481775.2, the nine validation transcriptomes are enumerated, and the input tables for both statistical analyses are in the repository), and code is present for 11 of 22 steps as named SLURM scripts. But 14 of 22 steps name a tool with no version string at all (basecaller, read filter, Racon, RagTag, BUSCO, QUAST, Jellyfish, GenomeScope2, NanoPlot, BlobToolKit, Helixer, STAR, EDTA, EggNOG-mapper, DeepSig), and the README ships no environment file of any kind while asserting 'Scripts are designed for SLURM-based clusters with Conda environments'. The PARAMS axis is the second blocker: seven steps state no parameter at all, including both assemblers - Flye is the assembly that was kept and no read-type mode or genome-size is given. C1 is scored X rather than NI because raw ONT signal is not deposited and no basecaller is named, so the SUP basecalling cannot be re-derived from any public artifact. The paper IS a stage-2 candidate: capture_claim = release_snapshot (Zenodo DOI 10.5281/zenodo.17293674, an archived GitHub release with a Software Heritage record), and stage 2 has real work to do - it must check whether the 11 SLURM scripts carry module-load version pins or conda environment names that the prose omits, and whether any conda environment specification exists in the archive at all.",
+    "coverage": "27 steps built from the eight 'Material and methods' sub-sections of the v2 JATS full text, plus figure/table legends that carry tool names not present in Methods (NanoPlot in the Figure 5 legend, BlobToolKit in the Figure 3 legend, the dbCAN thresholds in the Table II legend), cross-read against the GitHub landing page, the repository file tree and the full README prose. 22 computational (S = 22), 5 wet-lab OOS (W = 5); computational coverage = 22/27 = 81%. Not fetched or executed at stage 1: the contents of any SLURM script, the Zenodo archive, and the supplementary xlsx tables. Two artifact findings recorded but not scored against the axes: (i) the README states verbatim that the assembly itself is not yet public - 'The resulting assembly has been submitted to the same BioProject (PRJNA1327094) but is not yet publicly available (as of 07/10/2025)' - and an NCBI eutils query on 2026-07-28 returns 0 records in both the assembly and nuccore databases for PRJNA1327094, so the central product of the paper is still undeposited nine months after the stated date; (ii) the archived Zenodo snapshot is tag v1.1.1 while the live repository is at release v2.0.0 and its README describes a 'Figure 6' (telomere/centromere detection, JCVI synteny) absent from this preprint version, so the citable archive and the live code have diverged.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "C1, C2, C5, C6, C7, C8, C9, C10, C11, C14, C15, C16, C17, C18, C22 (15 of 22 computational steps)",
+      "missing": "No version string of any kind for the basecaller, the read filter, Racon, RagTag, BUSCO, QUAST, Jellyfish, GenomeScope2, NanoPlot, BlobToolKit, Helixer, STAR, EDTA, EggNOG-mapper, DeepSig, and no software version at all for the antibiosis statistics. Only five exact-ish pins exist in the whole paper (Canu v2.2, Flye v2.9.6, MashTree v1.2, antiSMASH 8.0, RStudio v2023.12.1) and two generation labels (MEGA12, dbCAN3). No environment specification is shipped anywhere: no conda environment.yml, no conda-lock, no Dockerfile, no image digest, no renv.lock, no requirements.txt, no sessionInfo(). The README asserts an environment discipline it does not deliver - 'Usage: Scripts are designed for SLURM-based clusters with Conda environments' - naming neither the environments nor their contents.",
+      "how_to_close": "Export the conda environments actually used on the cluster (conda env export --no-builds, or better conda-lock for linux-64) and commit them alongside the SLURM scripts, one per analysis directory; move every tool version into a Methods table; state the R version and sessionInfo() for both statistical analyses rather than the RStudio IDE build; name the basecaller, its version and its basecalling model."
+    },
+    {
+      "type": 1,
+      "where": "Paper-level: 'The draft genome sequence has been deposited in NCBI and is available in the BioProject PRJNA1327094' (Discussion) vs README 'Contigs_to_scaffolds_Ragtag' entry",
+      "missing": "The assembled and scaffolded genome - the paper's central product and the input to eight downstream annotation steps (C7, C8, C11, C14, C15, C16, C17, C18, C19, C20) - is not publicly retrievable. The README says verbatim: 'The resulting assembly has been submitted to the same BioProject (PRJNA1327094) but is not yet publicly available (as of 07/10/2025).' An NCBI eutils search on 2026-07-28 returns Count = 0 for PRJNA1327094 in both the assembly and nuccore databases, while the SRA run and BioSample resolve. Only the GFF annotations (results/T_gamsii_T035.gff, results/T_gamsii_T035_anno.gff) are in the repository - there is no FASTA. A reproducer must therefore re-derive the assembly through C1-C6, which is exactly the part of the pipeline with the weakest parameter disclosure, and any coordinate mismatch invalidates the deposited GFFs.",
+      "how_to_close": "Release the GenBank/RefSeq assembly accession under PRJNA1327094 and cite it in the paper, or deposit the scaffolded FASTA in the repository / Zenodo archive alongside the GFFs so that the annotation half of the pipeline can be reproduced independently of the assembly half."
+    },
+    {
+      "type": 12,
+      "where": "C1, C7, C8, C10, C11, C13, C14, C17, C18, C19, C20 (11 of 22 computational steps)",
+      "missing": "The README claims the repository 'contains all data, scripts, and results used in the assembly, annotation, and validation of the T035 genome', but no script exists for basecalling, BUSCO, QUAST, NanoPlot, BlobToolKit, MEGA12, Helixer, EggNOG-mapper, DeepSig, antiSMASH or dbCAN3. Scripts are present for only 11 of 22 steps (Genome_assembly_contigs, Contigs_to_scaffolds_Ragtag, k-mer_analysis, MashTree, STAR, EDTA, Antibiosis_script, Parasitism_script). Helixer in particular is the annotation engine on which the paper's headline claim rests (13,036 genes, >2,000 more than the T6085 reference) and it is invoked with neither a script nor a model identifier.",
+      "how_to_close": "Commit the remaining SLURM/shell invocations, most importantly the Helixer command line with its model and post-processing parameters, and the EggNOG-mapper / DeepSig / antiSMASH / dbCAN3 invocations with their database releases."
+    },
+    {
+      "type": 13,
+      "where": "C7 (BUSCO), C14 (Helixer), C16 (EDTA), C17 (EggNOG-mapper), C19 (antiSMASH), C20 (dbCAN3)",
+      "missing": "Every annotation step consumes an external reference resource whose release is unstated. BUSCO's lineage set is the one exception (fungi_odb10 is a versioned dataset name). Unpinned: the eggNOG database release (v5.0 vs v6.0 changes orthology assignment and therefore the 11,073/13,036 figure), the CAZy/dbCAN and dbCAN-sub HMM database builds behind the 412-CAZyme count, the antiSMASH cluster-rule database behind the 44 clusters, the EDTA repeat libraries (RepeatMasker/Dfam release) behind the 3.3% TE content, and the Helixer trained model. None of these steps has a download rule in the repository, so at stage 2 they are candidates for env_capture_class B or C rather than A.",
+      "how_to_close": "State the release identifier of each reference database in Methods and add an explicit, versioned download step (versioned URL, DOI or checksum) to each annotation script so the step can be classified env_capture_class A at stage 2."
+    },
+    {
+      "type": 6,
+      "where": "C9 (GenomeScope2 k-mer spectra)",
+      "missing": "The GenomeScope half of the k-mer analysis is externalised to a public web service rather than run from the deposited script: the repository script generates only the histogram, and the README points at 'http://genomescope.org/genomescope2.0/analysis.php?code=S5DhLvgnW5NZNsCLj1KN'. The web service is a mutable, unversioned endpoint whose stored analyses are not guaranteed to persist and whose deployed GenomeScope version is not recorded; the four resulting figures (S2-S5) are therefore not re-derivable from the repository alone.",
+      "how_to_close": "Run genomescope.R locally from the pinned GenomeScope2 release, commit the command line with its k, ploidy and max-coverage arguments, and archive the histogram input alongside the plots."
+    },
+    {
+      "type": 7,
+      "where": "All 11 deposited scripts (README 'Usage' section)",
+      "missing": "The deposited artifacts are cluster-specific SLURM batch scripts - 'Scripts are designed for SLURM-based clusters with Conda environments' - not a portable workflow. There is no Snakemake/Nextflow/Makefile wrapper, no configuration file separating paths from logic, and no statement of the scheduler partitions, module system, or absolute paths the scripts assume. Whether the scripts hardcode site paths and module names is a stage-2 question, but the README's own framing indicates a site-bound execution environment with no portability layer.",
+      "how_to_close": "Separate parameters and input paths into a config file, or wrap the chain in a workflow manager; ship the conda environment files the scripts activate; document the scheduler assumptions."
+    },
+    {
+      "type": 4,
+      "where": "C3 (Canu), C4 (Flye), C5 (Racon), C14 (Helixer)",
+      "missing": "No random seed or determinism statement for any step whose output is order- or heuristic-dependent. Long-read assemblers and consensus polishers are sensitive to thread count and read ordering; Helixer's neural post-processing depends on the model and batching. The paper reports exact metrics (30 contigs, 38,792,561 bp, N50 7,178,191 bp, 13,036 genes) with no tolerance statement, so a reproducer has no criterion for what counts as a match.",
+      "how_to_close": "Record thread counts and any seed arguments, and state an acceptance tolerance (for example on contig count, total length and BUSCO completeness) rather than exact-match expectations."
+    },
+    {
+      "type": 10,
+      "where": "W1-W5",
+      "missing": "Five wet-lab steps (soil isolation and culture maintenance, dual-culture parasitism assay, bacterial antibiosis microplate assay, HMW DNA extraction, ONT library prep and MinION sequencing) are out of scope for computational reproducibility and are excluded from S. They are well documented in prose; the ONT step lacks a flowcell type and MinKNOW version, which is the only wet-lab omission with a computational consequence (it is what makes the unnamed SUP basecalling model unrecoverable).",
+      "how_to_close": "Not applicable to the computational score. Recording the flowcell chemistry and MinKNOW/basecaller model would close the C1 gap."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: GitHub, stated in the article's 'Data, scripts, code, and supplementary information availability' section, verbatim: 'Data, supplementary figure and tables, scripts, and code are available online on GitHub and stored with Zenodo: https://doi.org/10.5281/zenodo.17293674 (Colou, 2025).' The reference-list entry gives the repository name verbatim: 'Colou J (2025) JustiCol/Genome-assembly-T_gamsii_T035: T_gamsii genome assembly_08/10/2025. 10.5281/ZENODO.17293674'. Resolved repository: https://github.com/JustiCol/Genome-assembly-T_gamsii_T035 - public, README.md plus data/, results/, scripts/ (11 script files across 7 analysis sub-directories), release tag v2.0.0 present. No environment.yml, no conda-lock, no Dockerfile, no requirements.txt, no workflow file anywhere in the tree. Status: URL-present (via the Zenodo DOI in the availability statement; the bare GitHub URL is printed in the README, not in the article body).",
+      "http_status": "200",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -L -A Mozilla/5.0, unauthenticated; file tree and release list read via the public GitHub API (git/trees?recursive=1 and /releases); README fetched raw from refs/heads/main"
+    },
+    {
+      "artifact": "code/data archive: Zenodo DOI 10.5281/zenodo.17293674, cited in the article availability statement. Record title verbatim: 'JustiCol/Genome-assembly-T_gamsii_T035: T_gamsii genome assembly_08/10/2025', release tag v1.1.1, published 2025-10-08, description 'Supplemented with the k-mer analysis', single file 'JustiCol/Genome-assembly-T_gamsii_T035-v1.1.1.zip' (15.4 MB). This is an automated GitHub-release snapshot archive with a Software Heritage record. Note the divergence: the archived tag is v1.1.1 while the live repository is at release v2.0.0. Status: URL-present, resolves.",
+      "http_status": "403 to unauthenticated curl (Zenodo bot protection); record content retrieved successfully via the WebFetch renderer on the same date, confirming the record exists and is public",
+      "checked_at": "2026-07-28",
+      "network_context": "https://doi.org/10.5281/zenodo.17293674 -> https://zenodo.org/doi/10.5281/zenodo.17293674; the 403 is a user-agent block, not a dead link"
+    },
+    {
+      "artifact": "data accession: NCBI BioProject PRJNA1327094, stated twice in the article (Discussion: 'The draft genome sequence has been deposited in NCBI and is available in the BioProject PRJNA1327094'; availability statement: 'T035 genomic data are available in NCBI BioProject PRJNA1327094') and in the README. Status: stated-in-paper, resolves. IMPORTANT: the BioProject holds raw reads only - an eutils esearch against db=assembly and db=nuccore for PRJNA1327094 returns Count = 0 on the check date, consistent with the README's own statement that the assembly 'is not yet publicly available (as of 07/10/2025)'.",
+      "http_status": "200 (web) / eutils esearch db=bioproject Count=1",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1327094 via curl -L; eutils esearch on db=bioproject, db=assembly and db=nuccore, unauthenticated"
+    },
+    {
+      "artifact": "data accession: SRA run SRR35336635 and BioSample SAMN51264459, plus TaxID 398673. Not printed in the article body - these appear only in the repository README under 'Genome Data Availability'. This is the actual retrievable primary data (196,604 ONT reads, ~965 Mb). Status: URL-present (README), resolves.",
+      "http_status": "200 (SRA web) / eutils esearch db=sra Count=1; 200 (BioSample web)",
+      "checked_at": "2026-07-28",
+      "network_context": "https://www.ncbi.nlm.nih.gov/sra/SRR35336635 and /biosample/SAMN51264459 via curl -L; eutils esearch db=sra, unauthenticated"
+    },
+    {
+      "artifact": "external reference genomes, both pinned to versioned RefSeq accessions in Methods: Trichoderma atroviride GCF_020647795.1 (RagTag scaffolding reference) and Trichoderma gamsii T6085 GCF_001481775.2 (QUAST comparison and annotation-validation reference). Additional comparison genomes for the MashTree analysis are 'retrieved from NCBI RefSeq (accessions listed in Supplementary Table S2)' and duplicated in the repository file data/Strains_for_MashTree.xlsx. Status: stated-in-paper, versioned.",
+      "http_status": "not individually fetched at stage 1 (third-party RefSeq accessions, version-suffixed and therefore immutable by construction)",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods 'Trichoderma genome comparison' and 'Genome assembly' sub-sections of the v2 JATS XML"
+    },
+    {
+      "artifact": "external mutable service: GenomeScope2 web analysis, linked from the repository README - 'All results can be observed at the following link: http://genomescope.org/genomescope2.0/analysis.php?code=S5DhLvgnW5NZNsCLj1KN'. A session-code URL on an unversioned public web server; neither the deployed GenomeScope version nor a retention guarantee is stated. Status: URL-present (README only).",
+      "http_status": "not fetched at stage 1 (third-party web service, plain HTTP)",
+      "checked_at": "2026-07-28",
+      "network_context": "README.md, refs/heads/main"
+    },
+    {
+      "artifact": "input data for annotation validation: nine public transcriptomic datasets, 'public transcriptomic data (Supplementary Table S3)', enumerated in the repository file data/List_of_transcriptomic_data.xlsx ('Origin of transcriptomic data used to confirm the quality of the genome structural annotation'). Individual accessions live inside the xlsx, which was not opened at stage 1. Status: stated-in-paper + URL-present (repository file).",
+      "http_status": "not fetched at stage 1 (supplementary xlsx inside the repository)",
+      "checked_at": "2026-07-28",
+      "network_context": "Methods 'Annotation' sub-section of the v2 JATS XML; repository file tree"
+    },
+    {
+      "artifact": "full text: bioRxiv v2 JATS XML, https://www.biorxiv.org/content/early/2025/10/08/2025.09.22.677720.source.xml. WebFetch returned 403 (bot protection); plain curl with a browser user-agent returned 200 and 133,852 bytes. Identity verified by grepping the fetched XML for 'Trichoderma gamsii' (3 hits) and 'T035' before scoring.",
+      "http_status": "403 (WebFetch) / 200 (curl)",
+      "checked_at": "2026-07-28",
+      "network_context": "curl -sL with a desktop browser user-agent, unauthenticated, into the per-paper scratch directory /tmp/stage1_10.1101_2025.09.22.677720/"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "c2fea48bdc71e6db63f5f5a440be7d2b91d755a0e8504465698debe6c7aafe4f",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "e87b8755cc5d95b8b38ff49a8f40b6caaa3851335e0b24933a26e2b9b747b1bc",
+  "canonical_id": {
+    "value": "10.1101/2025.11.14.688492",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.14.688492v1",
+      "biorxiv:2025.11.14.688492v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "SPrUCE, a Python tool that estimates population-level nucleotide diversity (theta/pi) from MAFFT-aligned ultraconserved-element (UCE) loci by fitting a Gompertz function to per-position diversity across UCE flanks (Stacked and Concatenated least-squares modes, scipy trust-constr). The computational reproduction target is the full evaluation pipeline: public WGS read retrieval from NCBI, BBMap QC/adapter trimming, MEGAHIT de novo assembly, Phyluce UCE extraction at 400 bp / 750 bp flanks, MAFFT alignment, SPrUCE estimation, ANGSD genome-wide pi benchmark (SAF/SFS/theta), alternative-function comparison (GLF, PLF, uncorrected mean), robustness subsampling (loci counts, individual counts, completeness thresholds, runtime), Ne calculation from published UCE alignments, and R figure generation. No wet-lab work is reported; the study is entirely computational.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis from Methods sections 2.1.4 (Implementation details), 2.2.1 (Datasets) and 2.2.2 (Validation criteria). BBMap trimming and BBMap stats are kept as separate steps because they are distinct invocations with different parameter disclosure. Read retrieval from NCBI is folded into the trimming step (accessions live in supplementary Tables S1-S4, not in the main text). ANGSD SAF/SFS/theta is one step (the spruce_analysis README describes it as one workflow directory). The four robustness sub-analyses (loci subsampling, individual subsampling, completeness thresholds, runtime comparison) are folded into one step since they share the same driver and parameter block. No wet-lab steps: W = 0.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Public WGS read retrieval from NCBI (honeybee Apis cerana, finches Certhidea fusca / Geospiza conirostris / Pinaroloxias inornata, sheep Ovis aries, smelt Sillago sinica; read IDs in Tables S1-S4) followed by quality filtering (QC > 20) and adapter trimming with BBMap (Bushnell 2014)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "accessions-in-supplement",
+        "partial-params"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "De novo assembly of each individual with MEGAHIT v1.2.9 (Li et al. 2015)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "params-implicit-default"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Assembly quality assessment with BBMap stats (Bushnell 2014)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "UCE identification and extraction from assemblies through the 'standard Phyluce pipeline (v1.7.1)' (Faircloth 2016), extracting 400 bp and 750 bp flanks on both sides of the conserved core, using the Hymenoptera v2 (2,590 UCE), Acanthomorph (1,314 UCE) and Tetrapods (5,060 UCE) bait sets",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "exact-pin-no-env-closure",
+        "pipeline-called-standard-not-specified"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Cross-individual alignment of UCE loci with MAFFT (Katoh & Standley 2013), one alignment per UCE locus per flank length",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "no-params"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "SPrUCE nucleotide-diversity estimation on WGS-derived UCE alignments: Stacked and Concatenated least-squares Gompertz fits via scipy trust-constr, initial parameters [0.001, 10, 0.009] for theta/beta/gamma, bounds theta in [0, 0.05], beta in [0.1, 30], gamma in [0.004, 0.03]; biallelic sites only; locus included if >= 3 individuals present",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "install-from-git-head-no-tag",
+        "unversioned-dependency-scipy",
+        "params-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "ANGSD (Korneliussen et al. 2014) genome-wide pi benchmark: mapping trimmed reads to a representative reference genome, SAF generation, SFS estimation, theta calculation and theta statistics",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "no-params",
+        "mapper-unnamed",
+        "reference-genome-unspecified"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Alternative fit-function comparison: Generalized Logistic Function (6 parameters), Piecewise Linear Function, and uncorrected mean-of-positions baseline, evaluated across decreasing flank sizes down to 250 bp",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "unversioned-tool",
+        "function-forms-described-not-parameterized"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Robustness analyses: loci subsampling (10/25/50/100/200/400/800 loci, 10 replicates each), individual subsampling (8/5/3 individuals, 10 replicates each), completeness thresholds (50% / 80% / 100%), and single-core runtime comparison of Stacked vs Concatenated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "unversioned-tool",
+        "rng-seed-unstated",
+        "params-fully-stated"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "SPrUCE applied to two previously published UCE MAFFT alignment datasets: Willets (Tringa semipalmata; Oswald et al. 2016) and snow/McKay's buntings (Plectrophenax nivalis / P. hyperboreus; Winker et al. 2018)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "third-party-data-no-accession",
+        "install-from-git-head-no-tag"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Effective population size estimation from theta = 4 Ne mu: passerines mu = 6.75e-10 subs/site/year, generation time 2.7 y (Winker et al. 2018); shorebirds mu = 2.59e-10 subs/site/year, generation time 5.9 y (Oswald et al. 2016 / BirdLife International 2025); comparison to Partners in Flight census sizes",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "third-party-data-no-accession",
+        "no-named-script",
+        "arithmetic-reconstructable"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Manuscript figure generation and correlation analyses (Pearson R^2, Kendall tau, Spearman) with R scripts (spruce_analysis/R_figures)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "none",
+      "subflags": [
+        "r-version-unstated",
+        "no-package-pins"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 2,
+    "n_NI": 10,
+    "n_X": 0,
+    "S": 12,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/12 (0%) — stage1 ceiling only, no R★ (R★ needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "2/12 (17%) steps reach RI at stage 1 (C2 MEGAHIT v1.2.9, C4 Phyluce v1.7.1) — the only two steps carrying an exact version pin. The remaining 10 steps cap at NI because their tools are unversioned in prose (BBMap, MAFFT, ANGSD, scipy, R) or because SPrUCE itself is installed from a git HEAD with no release tag. Code liveness is good: two live public GitHub repositories (the tool and the analysis workflows), so the Code axis is 2 for 11 of 12 steps. The binding constraint is environment/version capture, not code availability. Even under the most generous inference-inclusive reading the paper cannot exceed RI at stage 1, and under rubric Delta-2 an exact_pins_partial paper is capped at version = 1 by the prose read, so a stage-2 code check yields no R★ gain on the pinned steps.",
+    "coverage": "12 computational steps assessed from Methods prose (sections 2.1.4, 2.2.1, 2.2.2) plus the Code and Data Availability statement and the landing/README prose of both linked GitHub repositories. No wet-lab steps (W = 0); the study is entirely computational. Sequencing accessions live in supplementary Tables S1-S4, which were not fetched at stage 1.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment across all 12 computational steps",
+      "missing": "No lockfile, container, or resolved environment specification. The spruce README gives only 'conda create -n spruce_env python=3.10 -y' followed by 'pip install git+https://github.com/dairabel92/spruce.git' — a Python minor-version pin plus an unpinned git HEAD install, with no requirements.txt, environment.yml, conda-lock, pixi.lock, or Dockerfile. The spruce_analysis README documents no dependencies at all. In-prose exact pins exist only for MEGAHIT v1.2.9 and Phyluce v1.7.1; BBMap, MAFFT, ANGSD, scipy, R and all R packages are unversioned.",
+      "how_to_close": "Ship a resolved environment (conda-lock / pixi.lock / container digest) covering the Python side (SPrUCE + scipy) and the external toolchain (BBMap, MEGAHIT, Phyluce, MAFFT, ANGSD), and record the R session/package versions used for figures."
+    },
+    {
+      "type": 4,
+      "where": "SPrUCE tool itself (C6, C9, C10)",
+      "missing": "No release tag, version number, or commit pin for SPrUCE. Installation is from the default branch HEAD, so the software version used for the manuscript results is not recoverable. The analysis repository (15 commits) likewise has no tag or release corresponding to the manuscript.",
+      "how_to_close": "Cut a tagged release of both repositories (or archive to Zenodo with a DOI) and cite that exact version/commit in the Code Availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Raw WGS input data (C1) and published UCE alignment data (C10, C11)",
+      "missing": "The main text states only that reads 'were obtained from NCBI and previously published WGS datasets' with 'read IDs' deferred to supplementary Tables S1-S4; no BioProject/SRA accession appears in the Code and Data Availability statement. The spruce_analysis README explicitly states 'Raw sequencing data are not stored here' and provides no download instructions. The two published UCE alignment datasets (Oswald et al. 2016 Willets; Winker et al. 2018 buntings) are cited by publication only, with no accession or repository URL.",
+      "how_to_close": "State BioProject/SRA accessions and the UCE alignment archive DOIs in the Data Availability statement, and add a fetch script (accession list + downloader) to the analysis repository."
+    },
+    {
+      "type": 5,
+      "where": "C1 (BBMap trimming), C3 (BBMap stats), C5 (MAFFT), C7 (ANGSD), C8 (alternative functions)",
+      "missing": "Parameters are largely absent from prose. BBMap: only 'QC > 20' plus unspecified adapter trimming (adapter file, k, minlength unstated). BBMap stats: no parameters. MAFFT: no algorithm/strategy flags (auto, linsi, einsi). ANGSD: no filters (-minMapQ, -minQ, -doSaf model, -GL), no mapper named, and the 'representative reference genome' is not identified per species. GLF/PLF: functional forms are described verbally but initial values and bounds are not given as they are for Gompertz.",
+      "how_to_close": "Publish the exact command lines (or the driver scripts' parameter blocks) for the trimming, alignment and ANGSD stages, name the reference genome accession used per species, and state the GLF/PLF initialization and bounds."
+    },
+    {
+      "type": 6,
+      "where": "C9 robustness subsampling (loci subsets, individual subsets, completeness thresholds)",
+      "missing": "All subsampling is randomized with 10 replicates per configuration, but no random seed, RNG library, or replicate index scheme is stated, so replicate-level figures are not bitwise reproducible.",
+      "how_to_close": "Record and publish the RNG seeds (or the exact subsampled locus/individual ID lists) used for each replicate."
+    },
+    {
+      "type": 3,
+      "where": "C11 (Ne estimation) and the Phyluce invocation in C4",
+      "missing": "The Ne calculation is described only as a formula application with stated constants; no script is named in the analysis repository's three documented directories (WGS_data_preparation, ANGSD, R_figures). The Phyluce stage is described as 'the standard Phyluce pipeline', which is a pointer to external documentation rather than a recorded set of invocations, though the WGS_data_preparation directory may contain them (not readable at stage 1).",
+      "how_to_close": "Add the Ne computation script and the concrete Phyluce invocation sequence (or a workflow file) to the analysis repository, and reference them from the manuscript."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (tool): https://github.com/dairabel92/spruce — stated verbatim in Section 7 Code and Data Availability: 'The SPrUCE software is publicly available at https://github.com/dairabel92/spruce'. README present with conda + pip-from-git install instructions and full CLI argument documentation; LICENSE file present; no release tags, no requirements.txt/environment.yml/Dockerfile visible on the landing page.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L and WebFetch of the GitHub landing page; status URL-present and resolving"
+    },
+    {
+      "artifact": "code repo (analysis): https://github.com/dairabel92/spruce_analysis — stated verbatim in Section 7 Code and Data Availability: 'Full details for pre-processing scripts procedures for reproducing data are available at: https://github.com/dairabel92/spruce_analysis'. README documents three directories (WGS_data_preparation/, ANGSD/, R_figures/); 15 commits; no release tags; no dependency, environment, or container specification; README states 'Raw sequencing data are not stored here'.",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl -L and WebFetch of the GitHub landing page; status URL-present and resolving"
+    },
+    {
+      "artifact": "data accession: NONE resolvable at stage 1. The paper states 'Raw sequencing reads were obtained from NCBI and previously published whole-genome sequencing (WGS) datasets' and 'See Tables S1 to S4 for read IDs and details'. No BioProject/SRA/ENA accession appears in the main text or in the Code and Data Availability statement. Source studies cited: Wang et al. 2024 (Apis cerana), Zhao et al. 2023 (Sillago sinica), Lamichhaney et al. 2015 (finches), Shi et al. 2023 (Ovis aries).",
+      "http_status": "n/a (accessions deferred to supplementary tables, not fetched at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full-text scan; no GEO/SRA/ENA/PRJ/dbGaP/EGA/figshare/Zenodo/Dryad identifier found in the body or availability statement"
+    },
+    {
+      "artifact": "data accession: NONE for the two published UCE alignment datasets used in C10/C11 — Oswald et al. (2016) Tringa semipalmata and Winker et al. (2018) Plectrophenax spp. alignments are cited by publication only, with no accession, DOI, or repository URL given in this paper.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "JATS XML full-text scan of Methods section 2.2.1 and the Code and Data Availability statement"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "5593768cd5a3f067eda4d771d4316ed00d3b631f02efd4696400226cd2ac2c6d",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

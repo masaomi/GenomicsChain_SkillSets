@@ -1,0 +1,839 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "46207bcb1e2fe993664a4444682c64819dcbaf0737aaa97ab38eae2e96ad6f3c",
+  "canonical_id": {
+    "value": "10.1101/2025.10.09.679175",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Reproduce the computational results of the NIBIT-M4 epi-immunotherapy melanoma study: snRNA+snATAC multiome processing and multimodal clustering, malignant metaprogram (NMF) discovery and characterization, eGRN inference (SCENIC+), Visium HD spatial segmentation/annotation and the custom spatial statistics (PLI, TSPS, ecotypes), transposable-element quantification and TE-TAA discovery, and the external-cohort prognostic/survival validation. Wet-lab sample collection, 10x library preparation and sequencing are out of scope (OOS).",
+  "step_source": "prose-methods",
+  "granularity_note": "Stage-1 prose triage. No code repository is stated anywhere in the paper, so no workflow file exists to anchor granularity; steps were derived one-per-named-tool/analysis-invocation from the Methods section (JATS XML, offsets 111026-158290). 40 computational steps + 3 wet-lab steps. Custom, un-named-tool analyses (PLI, TSPS, optimal transport, ecotypes, tumor region identification, TE-TAA workflow) are counted as one step each because each is a separately named analysis with its own parameters.",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Sample collection - 13 snap-frozen tumor biopsies from 5 patients, phase Ib NIBIT-M4 trial (NCT02608437), longitudinal week 0/4/12",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "10x Genomics Single-Nucleus Multiome (RNA+ATAC) library preparation (CG000505 Rev A, CG000338 Rev F) and NovaSeq X Plus sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Visium HD CytAssist FFPE spatial gene expression library preparation (CG000518 Rev C, CG00685 Rev A) and NovaSeq X Plus sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "Multiome read mapping and count matrix generation - Cell Ranger ARC v2.0.2, reference refdata-cellranger-arc-GRCh38-2020-A-2.0.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "snRNA-seq modality QC, normalization, PCA (3000 HVG), t-SNE (22 PCs), clustering (res 0.2) - Seurat v5.1.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "snATAC-seq modality processing - peak merging via GenomicRanges v1.54.1 reduce, QC filters, TF-IDF, SVD/LSI (2:50), SLM clustering res 0.8 - Signac v1.14.0",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "ATAC peak calling and gene activity scoring - MACS2 v2.2.6 via Signac CallPeaks, GeneActivity",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C5",
+      "label": "RNA+ATAC multimodal integration - Seurat FindMultiModalNeighbors WNN (RNA PC 1:14, ATAC LSI 2:50), WSNN SLM clustering res 0.1, n=38029 nuclei",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Malignant vs non-malignant cell discrimination - SCEVAN v1.0.3 (CNA-based clone inference)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C7",
+      "label": "TME cell-type annotation - non-malignant clustering (12 PCs, res 0.7) + marker signatures + Mann-Whitney-Wilcoxon Gene Set Test NES (implementation and version not named)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Malignant metaprogram identification - NMF over k=4..9 (468 programs), robustness filtering (70% intra-sample overlap, <=20% redundancy, <=20% cross-patient), Jaccard iterative hierarchical clustering; NMF implementation/package not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Malignant cell assignment to MP states - Seurat AddModuleScore (50-gene signatures), score>0.3, simplicity score>=0.1",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "MP functional characterization - hypergeometric ORA + GSEA with clusterProfiler v4.10.1 on memento v0.1.1 differential expression (de_coef >= |ln2|, padj<0.05); GO/Reactome/KEGG/Hallmark/WikiPathways",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Cell-cell communication between MP-stratified malignant cells and TME - CellChat v2.1.2",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Cross-modal concordance - Seurat v5.1.0 FindTransferAnchors (CCA) / TransferData (LSI 2:50), RNA reference to ATAC gene-activity query",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Comparison of MPs with published melanoma signatures - Seurat AddModuleScore + Pearson correlation",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "TF motif enrichment and footprinting - Signac MatchRegionStats + FindMotifs on DA peaks (log2FC>=0.58, padj<0.05), HOCOMOCO v13 PWMs, fold-enrichment>=1.3, top-30 union; Footprint on GRCh38/hg38",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C15",
+      "label": "CRE-TF-gene linkage - mapping of motif-containing regions to ENCODE cCRE PLS/pELS/dELS (release not stated) and ORA with clusterProfiler enricher",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "Enhancer-driven GRN inference - SCENIC+ v1.0a2 Snakemake pipeline with default parameters, pycisTopic v2.0a0, pycisTarget v1.1, AUCell; eRegulon filtering |r|>0.3, top-30 triple ranking",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Visium HD nuclei segmentation and barcode binning - StarDist pre-trained model (version/model name not stated) on H&E, 8x8 um bin aggregation to per-nucleus counts, custom binning procedure repeated over 9 samples",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C18",
+      "label": "Visium HD preprocessing - cell/gene QC (mito>5%, <5 genes, genes in <5 cells), CP10K total-count normalization, log2 transform, z-scaling; software not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C19",
+      "label": "Visium HD malignant vs non-malignant discrimination - Louvain clustering (res 0.5) + cluster differential expression + manual marker-gene inspection; DE method and software not named",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C20",
+      "label": "Optimal-transport annotation transfer snRNA-seq -> Visium HD - Fused Gromov-Wasserstein with spatial constraints (method cited only; no package, no cost/alpha/epsilon hyperparameters, no code)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C21",
+      "label": "Malignant/non-malignant spatial interaction analysis - custom radius-r neighbourhood counting with N=100 label permutations and Z-scores; radius r never given numerically, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Peripheral Localization Index (PLI) - custom convex-hull boundary distance statistic with K=500 random null samples; full formula given, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Tumor State Proximity Score (TSPS) - custom radius-r same-state neighbour fraction; radius r not specified, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C24",
+      "label": "Tumor region identification - custom Gaussian KDE intensity field, adaptive threshold tau=0.5, morphological closing/dilation, 0.5 isocontour polygons, area<100 discarded; KDE bandwidth and structuring elements not specified, no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C25",
+      "label": "Within-sample local ecotype discovery - spatial kNN (k=50), one-hot composition, CLR transform, K-means (n=6 per sample); no code, no seed",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Cross-sample consensus ecotypes - agglomerative hierarchical clustering on cosine distances, 25-threshold grid (10th-90th percentile), Calinski-Harabasz index maximization; no code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "Transposable element annotation - UCSC RepeatMasker GRCh38/hg38 repeats retrieved via AnnotationHub v3.10.1 (snapshot date not stated); TE age from milliDiv / 2.2e-9 substitution rate",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "TE locus-level count/accessibility matrix generation - MATES (version not stated) on snRNA-seq and snATAC-seq, size-factor normalization, log transform, conversion to Seurat v5.1.0 objects",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C29",
+      "label": "TE-based RNA/ATAC modality integration - Seurat v5.1.0 (TME: RNA PC 1-6 / ATAC PC 1-10; malignant: RNA PC 1-9 / ATAC PC 1-10)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C30",
+      "label": "TE differential expression and accessibility - scran v1.30.2 scoreMarkers (rank.AUC, logFC.cohen); significance thresholds not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C31",
+      "label": "TE annotation on cCRE elements - intersection of TE loci with MACS2 peaks, ENCODE cCREs (release not stated) and GeneHancer v4.4 enhancers; cCRE-gene links from ENCODE",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C32",
+      "label": "TE-derived tumor-associated antigen (TE-TAA) discovery workflow - top-1% logFC.cohen TEs, custom R six-frame translation (ORF>=10 aa), BLASTp vs gEVE (both unversioned, >=95% identity, e<0.01), netMHCpan MHC-I binding (unversioned, alleles/thresholds not stated), antigen-quality/NRP metric",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "license-gated",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C33",
+      "label": "Bulk RNA-seq external cohort deconvolution - 8 ICI-treated melanoma cohorts (6 via TIGER, 1 via cBioPortal, 1 = GEO GSE168204); CIBERSORTx webserver with a custom signature matrix derived from this study's snRNA-seq (matrix not provided); tumor purity scaling with ESTIMATE v1.0.13",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C34",
+      "label": "External scRNA-seq melanoma cohort MP scoring - EGA accession EGAS00001006488, 10th-percentile sample filter, 1% gene filter, Seurat AddModuleScore, assignment score>0.05",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C35",
+      "label": "Survival analysis - median-split MP High/Low, Kaplan-Meier, log-rank, Cox PH forest plots; survival v3.5-7, survminer v0.5.0",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C36",
+      "label": "Prognostic assessment of MP proportions - LOOCV generalized linear model with caret v6.0-94, ROC/AUC with pROC v1.18.5; model formula and predictor set only partially specified",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C37",
+      "label": "In-silico TF perturbation - SCENIC+ perturbation workflow, 5 independent iterations, mean signature-expression difference vs baseline; no seed, perturbation magnitude not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C38",
+      "label": "GRN inference on external scRNA-seq melanoma dataset - pySCENIC v0.12.1+8.gd2309fe, regulon refinement at 90th-percentile target weight; cisTarget motif/ranking database version not stated, no seed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "controlled-access",
+        "distributional-only",
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C39",
+      "label": "NFATC2 post-transcriptional activity - decoupleR v2.9.7 ULM regulon activity on bulk RNA-seq, activity subtracted from expression, LOOCV GLM + pROC ROC/AUC pre/post ICI",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C40",
+      "label": "NFATC2 knockdown analysis - GEO GSE101323, differential expression with limma v3.58.1, GSEA over GO BP/KEGG/Reactome/WikiPathways/Hallmark, single-sample MWW-GST on top-50 up-regulated genes (MWW-GST implementation unversioned)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 25,
+    "n_NI": 15,
+    "n_X": 0,
+    "S": 40,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/40 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "25/40 (63%) readiness upper bound (n_R-star + n_RI)/|S| - 'ready for a reproduction attempt', never 'reproducible'. The 0/40 static_readiness under-claims by construction: Tier-1 cannot credit an undeclared-but-present dependency, and here there is no code repository at all to inspect at Stage 2.",
+    "coverage": "computational coverage |S|/(|S|+|W|) = 40/43 (93%); 3 wet-lab steps OOS (biopsy collection, 10x multiome library prep + sequencing, Visium HD library prep + sequencing)",
+    "repro_index": {
+      "value": 0.5,
+      "coverage": "40/43",
+      "S": 40,
+      "weights_provisional": true
+    }
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "whole paper",
+      "missing": "No Code Availability statement and no code repository of any kind (no GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears anywhere in the JATS full text, including back matter). The analysis code for a ~40-step multi-omic + spatial + TE pipeline is entirely undeposited.",
+      "how_to_close": "Deposit the analysis code (R/Python scripts, SCENIC+ Snakemake config, custom spatial-statistics implementations) in a public repository with a versioned release DOI, and add a Code Availability statement."
+    },
+    {
+      "type": 1,
+      "where": "Methods - Sample collection / 10X Multiome / Visium HD; whole paper",
+      "missing": "No Data Availability statement. The primary data generated by this study - 13-sample snRNA+snATAC multiome and 9-sample Visium HD - carry no accession (no GEO/SRA/EGA/dbGaP identifier), and no controlled-access/DAC path is documented. Scored data=1 (missing identifier) rather than 0 (absent/lost) because the data plainly exists; a Stage-2 or post-publication check should re-adjudicate.",
+      "how_to_close": "Deposit raw and processed multiome + Visium HD data under a controlled-access archive (EGA/dbGaP, given human clinical-trial provenance) and state the accession plus the DAC application path."
+    },
+    {
+      "type": 9,
+      "where": "C17, C19-C26, C32 (Visium HD binning, optimal transport, spatial interaction, PLI, TSPS, tumor region ID, ecotypes, TE-TAA workflow)",
+      "missing": "Ten novel/custom analyses are described only in prose (several with formulas rendered as images) with no implementation released. These are the paper's methodological contributions and are the least reconstructable steps.",
+      "how_to_close": "Release the custom scripts, or supply pseudocode plus all missing constants (neighbourhood radius r, KDE bandwidth, morphological kernel sizes, OT cost/alpha/epsilon)."
+    },
+    {
+      "type": 2,
+      "where": "gap subtype 2a (version not stated) - C7 (MWW-GST), C8 (NMF implementation), C17 (StarDist), C18 (preprocessing toolkit), C19 (Louvain/DE), C28 (MATES), C32 (BLASTp, netMHCpan, gEVE), C33 (CIBERSORTx webserver)",
+      "missing": "Software named without any version string, or the tool itself not named (Visium HD preprocessing and Louvain clustering). 9 of 40 computational steps have version=0 on this basis.",
+      "how_to_close": "State exact versions (and for StarDist, the pre-trained model identifier; for netMHCpan, the version and allele set; for CIBERSORTx, the run mode and date)."
+    },
+    {
+      "type": 4,
+      "where": "C2, C3, C5, C8, C16, C21, C22, C25, C37, C38",
+      "missing": "No random seeds are stated anywhere for t-SNE, SLM/Louvain clustering, NMF (k=4..9, 468 programs), K-means (n=6), label permutation tests (N=100), null sampling (K=500), SCENIC+/pySCENIC, or the 5-iteration in-silico perturbation. Reproduction can only be distributional.",
+      "how_to_close": "Record and publish seeds, or state explicitly that results are reported as distributional summaries over repeated runs."
+    },
+    {
+      "type": 5,
+      "where": "C33 - CIBERSORTx deconvolution",
+      "missing": "The custom signature matrix used as the deconvolution reference was generated from this study's snRNA-seq data and is not provided as a supplementary file; without it the external-cohort metaprogram composition (which drives the survival and prognostic results) cannot be recomputed.",
+      "how_to_close": "Publish the CIBERSORTx signature matrix as a supplementary table."
+    },
+    {
+      "type": 6,
+      "where": "C16 - SCENIC+ eGRN inference",
+      "missing": "The SCENIC+ Snakemake pipeline is invoked 'with default parameters'; the pipeline config YAML, the cisTarget motif/ranking database build, and the pycisTopic topic-model selection are not shipped.",
+      "how_to_close": "Ship the SCENIC+ config file and name the cisTarget database build (species, genome, feather file version)."
+    },
+    {
+      "type": 11,
+      "where": "C32 (netMHCpan), C33 (CIBERSORTx webserver)",
+      "missing": "Two license-gated / registration-gated dependencies. CIBERSORTx is a web service whose exact behaviour at run time is not archivable by a third party; netMHCpan requires an academic licence and its version materially changes predictions.",
+      "how_to_close": "Pin versions and, where licence allows, deposit the produced intermediate outputs (deconvolution fractions, peptide-binding tables) so downstream steps remain checkable."
+    },
+    {
+      "type": 13,
+      "where": "C10/C15 (MSigDB/GO/Reactome/KEGG collections), C15 and C31 (ENCODE cCRE release), C16/C38 (cisTarget databases), C27 (AnnotationHub snapshot date), C32 (gEVE release)",
+      "missing": "External reference resources are consumed without version pins. HOCOMOCO v13 (C14) and GeneHancer v4.4 (C31) ARE pinned; the remainder are not. With no workflow code, env_capture_class cannot be assigned (A/B/C is a Stage-2 classification).",
+      "how_to_close": "State the release/date of every external annotation and gene-set database, and fetch them in code by versioned URL or DOI."
+    },
+    {
+      "type": 10,
+      "where": "W1-W3",
+      "missing": "Wet-lab steps (clinical-trial biopsy collection, 10x multiome library prep + NovaSeq X Plus sequencing, Visium HD CytAssist FFPE library prep + sequencing) are out of scope for computational reproducibility; they are documented at protocol-number level (10x CG000505 Rev A, CG000338 Rev F, CG000518 Rev C, CG00685 Rev A).",
+      "how_to_close": "n/a - OOS by NASEM 2019 scope."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository (any)",
+      "http_status": "none - no repository URL stated in the paper",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "JATS XML full text fetched from biorxiv.org and grepped for github/gitlab/bitbucket/zenodo/codeocean/software-heritage: zero hits"
+    },
+    {
+      "artifact": "primary snRNA+snATAC multiome and Visium HD data (this study, NIBIT-M4)",
+      "http_status": "none - no accession stated in the paper",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "no Data Availability section present in the JATS XML; grep for GSE/SRP/PRJ/EGAS/dbGaP/figshare returned only the three external accessions below"
+    },
+    {
+      "artifact": "GEO GSE168204 (external bulk RNA-seq ICI cohort)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "curl -L https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE168204, unauthenticated, macOS"
+    },
+    {
+      "artifact": "GEO GSE101323 (NFATC2 knockdown melanoma cell lines)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "curl -L https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE101323, unauthenticated, macOS"
+    },
+    {
+      "artifact": "EGA EGAS00001006488 (external scRNA-seq melanoma ICI cohort, controlled access)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "curl -L https://ega-archive.org/studies/EGAS00001006488, unauthenticated, macOS; controlled-access study page resolves, DAC application required (not described in the paper)"
+    },
+    {
+      "artifact": "TIGER (Tumor Immunotherapy Gene Expression Resource) - source of 6 of 8 external bulk cohorts",
+      "http_status": "200 over http://tiger.canceromics.org/ (https:// returned 000 / connection failure)",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "curl -L, unauthenticated, macOS; no per-dataset identifiers are given in the paper, only reference citations"
+    },
+    {
+      "artifact": "cBioPortal (source of 1 of 8 external bulk cohorts)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "curl -L https://www.cbioportal.org/, unauthenticated, macOS; the specific study identifier is not given in the paper, only a reference citation"
+    },
+    {
+      "artifact": "bioRxiv landing page https://www.biorxiv.org/content/10.1101/2025.10.09.679175v1",
+      "http_status": "403 (Cloudflare block on WebFetch)",
+      "checked_at": "2026-07-28T07:54:50Z",
+      "network_context": "landing page not readable by the fetch tool; assessment made from the full JATS XML (270,798 bytes) which includes Abstract, Results, Methods, Acknowledgements, competing-interest notes and bibliography - no Data/Code Availability section exists in it"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "2123c1462b2da52cb15e16a5f4ea88835fbd8ef4f82494bc640027365957db65",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

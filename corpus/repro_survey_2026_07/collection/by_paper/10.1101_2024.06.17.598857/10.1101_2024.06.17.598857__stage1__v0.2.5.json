@@ -1,0 +1,193 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2024.06.17.598857",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2024.06.17.598857v2",
+      "biorxiv:2024.06.17.598857v2",
+      "10.1186/s13059-026-03984-5"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "panREPET: a reference-free Snakemake pipeline that detects TE insertions shared between de novo assembled genomes of a species by pairwise comparison. Applied to a Brachypodium distachyon pan-genome (54 -> 42 accessions after QC). Steps: TE reference-library build (TEdenovo/REPET on Bd21 v3.2) and TE annotation (panTEannot, a Snakemake re-implementation of REPET TEannot using Blaster/Censor/RepeatMasker); then panREPET proper: coverage-based TE-copy extraction (covcons), flanking-sequence extension (bedtools slop), reciprocal-best-hit detection (Minimap2 + Matcher), clique detection (NetworkX find_cliques), phylogenetic-distance computation (Biopython Phylo), and downstream ecogenome/climate statistics (Seaborn/statsmodels, kgc R package).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the biorxiv v2 full-text Methods prose (fetched via curl; WebFetch/JATS 403-blocked). Two author code repos exist on ForgeMIA GitLab (panREPET, panTEannot); panREPET landing/README prose was read (stage1) and shows a Snakemake workflow driven by per-rule conda env specs (envs/*.yaml with exact tool pins: biopython=1.79, bedtools=2.30.0, minimap2=2.24) and, alternatively, a published Singularity image 'library://jconfais/repet/panrepet:1.0' bundling minimap/bedtools/matcher. The Singularity reference is TAG-pinned (:1.0), not digest-pinned, and the conda specs are env files (python>=3.5 floating, no channel/build lock) — not lockfiles. Both are CLAIMS only at stage1 (not executed, not validated), so version axis is capped at 1 and all verdicts are capped at RI. No custom-script line reading was performed (stage2). No wet-lab steps (public genome data reuse), so W=0.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "container_digest_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "TE reference-library build with TEdenovo (REPET package, Flutre et al. 2011) from the Bd21 v3.2 genome; library also distributed via RepetDB - no REPET version pinned in prose/repo",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "panTEannot TE annotation (Snakemake re-implementation of REPET TEannot; similarity search via Blaster, Censor, RepeatMasker) - separate ForgeMIA repo exists; REPET/RepeatMasker versions not pinned in prose",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "panREPET Step 1: extract TE copies by coverage percentage (covcons parameter) - custom python in panREPET repo, conda env envs/biopython.yaml (biopython=1.79), covcons set in config/example.yaml",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "panREPET Step 2: add flanking genomic sequence via bedtools slop - envs/bedtools.yaml pins bedtools=2.30.0; also in Singularity image",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "panREPET Step 3: bidirectional (reciprocal) best-hit detection via Minimap2 (Li 2018) then Matcher (Quesneville et al. 2003) - envs/minimap2.yaml pins minimap2=2.24; Matcher provided via Singularity image (no standalone version)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "panREPET Step 4: TE-insertion clique detection with NetworkX version 2.4 (read_edgelist + find_cliques) - version stated in prose (not in shown conda envs)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Phylogenetic pairwise-distance computation between accessions using the Biopython Phylo module (biopython=1.79 pinned in repo conda envs)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "Downstream ecogenome/climate statistics and figures: clustermaps (Seaborn), ANOVA (statsmodels, python 3.10.13), climate-class assignment (kgc R package v1.0.0.2) - analysis/figure scripts not clearly provided in the pipeline repo; Seaborn/statsmodels versions floating",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 5,
+    "n_NI": 3,
+    "n_X": 0,
+    "S": 8,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/8 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 5/8 computational steps — the panREPET-proper pipeline (covcons extraction, bedtools slop, Minimap2+Matcher reciprocal-best-hit, NetworkX find_cliques, Biopython Phylo), which are backed by an author Snakemake repo with per-rule conda env specs (biopython=1.79, bedtools=2.30.0, minimap2=2.24) and a published Singularity image bundling minimap/bedtools/matcher. 3/8 steps cap at NI: TEdenovo library build (C1) and panTEannot annotation (C2) because their REPET/RepeatMasker tool versions are unpinned, and downstream statistics (C8) because figure/stat scripts are not clearly provided and Seaborn/statsmodels versions are floating. R★ not assignable at stage1. The Singularity image is TAG-pinned (:1.0) not digest-pinned and the conda specs are env files without lock closure — both are unvalidated claims, so no step exceeds RI without an executed environment capture in stage2.",
+    "coverage": "8 computational steps assessed from biorxiv v2 Methods prose plus panREPET README/Snakefile/conda-env prose. No wet-lab steps (public de novo assemblies reused), so W=0.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole pipeline environment (panREPET repo: Snakefile conda directives + Singularity image)",
+      "missing": "Reproducibility rests on per-rule conda env files (envs/*.yaml) and a Singularity image 'library://jconfais/repet/panrepet:1.0'. The env files pin tool versions (biopython=1.79, bedtools=2.30.0, minimap2=2.24) but declare 'python >= 3.5' (floating) with no channel/build lock; the Singularity reference is tag-pinned (:1.0), not a content digest. No conda-lock/pixi lockfile or container digest is provided. All of this is a CLAIM only at stage1 (not executed/validated).",
+      "how_to_close": "Publish a resolved lockfile (conda-lock or pixi) and/or a digest-pinned container (Singularity SIF checksum / OCI sha256) covering every tool plus system dependencies, and have stage2 execute it to validate the environment capture."
+    },
+    {
+      "type": 3,
+      "where": "C1 TEdenovo (REPET), C2 panTEannot (Blaster/Censor/RepeatMasker), and Matcher (C5)",
+      "missing": "REPET-family tool versions (TEdenovo, TEannot, Blaster, Censor, RepeatMasker, Matcher) are cited by reference but not version-pinned in prose; Matcher is only available inside the Singularity image with no standalone version. Downstream Seaborn/statsmodels versions are also absent (C8).",
+      "how_to_close": "Record exact versions (and builds) for all REPET-family tools and the downstream Python plotting/stats packages in Methods or a versions table / conda env."
+    },
+    {
+      "type": 1,
+      "where": "Input genome assemblies and TE library (Data availability)",
+      "missing": "Data availability names live databases without versioned accessions: 53 B. distachyon de novo assemblies + annotations from Phytozome (generic https://phytozome.jgi.doe.gov/, Gordon et al. 2017), BdTR7a from Stritt et al. 2019, and the Bd21 TE library/annotation from RepetDB. Specific per-accession genome versions are only loosely referenced (Supplementary Table 1); no accession list with fixed versions/DOIs is given.",
+      "how_to_close": "Provide an explicit accession/version table (or a deposited snapshot/DOI) for every genome assembly and the exact RepetDB TE-library release used."
+    },
+    {
+      "type": 11,
+      "where": "RepetDB and Phytozome database dependencies",
+      "missing": "RepetDB (urgi.versailles.inrae.fr/repetdb) and Phytozome are live, versioned-over-time databases pulled without a pinned snapshot; contents can change, so retrieval is not deterministic. (Note: the generic Phytozome URL in the paper now fails to resolve — content migrated to phytozome-next.jgi.doe.gov.)",
+      "how_to_close": "Record the database release/date-stamped export used, or deposit the retrieved TE library and genome set as a fixed archive (Zenodo/figshare) with a DOI."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: panREPET (author pipeline) — https://forgemia.inra.fr/urgi-anagen/panREPET (Snakemake; README + Snakefile + envs/*.yaml conda specs read at prose level, stage1)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, forgemia.inra.fr (ForgeMIA GitLab)"
+    },
+    {
+      "artifact": "code repo: panTEannot (companion TE-annotation pipeline) — https://forgemia.inra.fr/urgi-anagen/panTEannot",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, forgemia.inra.fr (ForgeMIA GitLab)"
+    },
+    {
+      "artifact": "container CLAIM: Singularity image 'library://jconfais/repet/panrepet:1.0' bundling minimap/bedtools/matcher (referenced in README; tag-pinned not digest-pinned; not pulled/validated at stage1)",
+      "http_status": "n/a (Sylabs library reference, not HTTP-verified at stage1)",
+      "checked_at": "2026-07-23",
+      "network_context": "declared in panREPET README prose"
+    },
+    {
+      "artifact": "data: RepetDB Brachypodium distachyon (Bd21) TE library + annotation — https://urgi.versailles.inrae.fr/repetdb/begin.do (Amselem et al. 2019; live database, no pinned snapshot)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, urgi.versailles.inrae.fr"
+    },
+    {
+      "artifact": "data: B. distachyon de novo assemblies + annotations — Phytozome (https://phytozome.jgi.doe.gov/, Gordon et al. 2017); no versioned accession list",
+      "http_status": "000 (generic legacy URL does not resolve; content migrated to phytozome-next.jgi.doe.gov)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, phytozome.jgi.doe.gov"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "bcc1c76a41af047119959c64f36822465c466f65ea39ded360c7a054a04df09a",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

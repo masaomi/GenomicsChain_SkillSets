@@ -1,0 +1,313 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "8bb2dc54bb316d8ae3264cf8aa0469a6d7a7191a4306fcfacec94efb4fa740e5",
+  "canonical_id": {
+    "value": "10.1101/2025.10.31.685860",
+    "kind": "doi",
+    "aliases": []
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "The SAE-based interpretability, training-data auditing, and steering analyses performed on Nucleotide Transformer (50M/500M) activations over AddGene plasmid sequences: SAE training and evaluation, monosemanticity/Domain-F1 scoring, linear probing, BLAST audit of the NT training corpus, meta-SAE training, and residual-preserving SAE-latent steering (Figures 1-6, Tables 1-2). Boundary call: the paper self-describes as a toolkit ('Decode-gLM: Tools to ...', 'providing a toolkit'), which would suggest tool-methods routing, but no software artifact is released (code stated as 'COMING SOON'), so there is no code repo to serve as the evidence base and the assessable target is the reported computational analyses. Routed pure-computational; flagged for human re-route.",
+  "step_source": "prose-methods",
+  "granularity_note": "No workflow file exists (no repository is released). Steps derived one per named tool/analysis invocation from Methods sections B.1-B.6 plus the Results-section BLAST audit and the Supplementary C.1 probe-characterisation analyses. |S|=11, all layer C; no wet-lab steps (|W|=0).",
+  "funnel_stage": "stage1-prose-only",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Assemble plasmid dataset from AddGene (93,306 training / ~15,551 validation+test plasmids)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ],
+      "notes": "AddGene is a public repository, but the compiled 93,306/15,551 dataset is not deposited, carries no accession, no download date, and no stated query/filter criteria; the exact input set cannot be reconstituted. No download script (no repo released)."
+    },
+    {
+      "step_id": "C2",
+      "label": "Functional annotation of three non-overlapping 1,000-plasmid evaluation sets with pLannotate v1.2.0 (seed 42, detailed + linear)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ],
+      "notes": "Only step with exact prose pins: 'All annotation processing was performed using Python 3.8 with pLannotate v1.2.0, pandas v1.3.5, and BioPython v1.79.' Interpreter version present, but no channel/index, no platform declaration, no lockfile -> version capped at 1 (exact_pins_partial). Fixed random seed 42 stated for set selection. pLannotate consumes internal reference databases whose build is unpinned; env_capture_class cannot be assigned at Stage 1 (prose-only)."
+    },
+    {
+      "step_id": "C3",
+      "label": "Extract MLP-output activations from Nucleotide Transformer 50M (layers 1,4,7,10,12) and 500M (layer 10), models downloaded from HuggingFace",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "notes": "Models stated as 'downloaded from HuggingFace' with no repository identifier, no revision/commit, no snapshot date; no PyTorch/transformers version anywhere in the paper -> version=0 (unknown). Layers, model sizes and max sequence length 512 given; tokenisation/batching/pooling details absent. Input sequences are the non-deposited AddGene set (see C1)."
+    },
+    {
+      "step_id": "C4",
+      "label": "Train BatchTopK sparse autoencoders on NT activations (expansion 8, 100k steps, batch 4096, Adam lr 3e-4, K=16/32)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": "Hyperparameters are unusually complete (expansion factor, steps, batch size, sequence length, optimiser, learning rate, 10% linear warmup / 20% linear decay, K values, activation normalisation, encoder-as-decoder-transpose init, unit-norm decoder columns, gradient clipping, gradient projection). No training random seed is stated -> stochastic-no-seed ceiling (max RI, distributional match only). Implementation follows Bussmann et al. (2024) but no commit/version; authors' own code not released ('COMING SOON') -> code reconstructable only."
+    },
+    {
+      "step_id": "C5",
+      "label": "Evaluate SAEs with proxy metrics (normalised MSE, L1 loss, dead-latent fraction) and correlate latent activations with pLannotate annotations",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "notes": "Metric definitions and the token-annotation rule (a 6-mer token counts as annotated if it shares at least one nucleotide with a pLannotate region) are given; dead-latent threshold (<1 activation per 10M tokens) is given. No software versions; the evaluation code is unreleased. Table 2 reports the metrics but the exact evaluation subsets are not enumerated."
+    },
+    {
+      "step_id": "C6",
+      "label": "Measure monosemanticity via Domain-F1 (Simon & Zou 2025) with activation-threshold sweep on two hold-out test sets",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "notes": "Domain-Recall vs standard-recall definitions are given; threshold selection is described as sweeping 'the observed activation range' and maximising validation F1, without an explicit grid or step size. No versions; code unreleased."
+    },
+    {
+      "step_id": "C7",
+      "label": "Concept validation by linear probing: 30 logistic regressions per concept on pretrained vs randomly initialised NT MLP outputs",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": "Given: 30 repetitions, 50 epochs, early stopping after 20 epochs without >=1e-5 F1 improvement, batch size 128, L4 GPU on Google Colab. Missing: learning rate, regularisation, optimiser, class balance/negative sampling, train/test split sizes, and any seed for the 30 repetitions."
+    },
+    {
+      "step_id": "C8",
+      "label": "BLAST query of all CMV enhancer sequences from the plasmid test set against the Nucleotide Transformer 850-genome training corpus",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-required"
+      ],
+      "notes": "This is the paper's headline auditing claim (Table 1, five near-perfect matches). Prose states only 'we used BLAST to query'. No program variant (blastn/megablast), no E-value cutoff, no word size, no BLAST version, no database build/snapshot of the NT training corpus, and no script. Params=0. The reference corpus is external and unpinned; env_capture_class would require Stage-2 code, which does not exist."
+    },
+    {
+      "step_id": "C9",
+      "label": "Train meta-SAEs on SAE decoder weights (BatchTopK, JumpReLU, Lasso dictionary learning)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": "Given: batch 512, lr 2e-4, 5000 steps, linear L1 warmup over first 1000 steps, JumpReLU bandwidth 0.01 and initial threshold 0.001, encoder-as-decoder-transpose init, Kaiming Uniform init. Missing: the L1/sparsity coefficient value, which of the three sparsity mechanisms and which latent dimensionality produced the reported HIV meta-feature result, and any seed. Input = trained SAE decoder weights, which are announced but not yet released."
+    },
+    {
+      "step_id": "C10",
+      "label": "SAE-latent steering with residual-preserving injection (Algorithm 1) toward the A1408G 16S rRNA substitution",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "notes": "Algorithm 1 and the hook target are specified ('Hooks intercept and substitute the output of the layer-j MLP projection (output.dense)'), and two steering-value policies (fixed v, max-activation) plus position restriction P are described. Missing for the reported kanamycin/A1408G result: the concrete layer j, the amplified and zeroed latent index sets, the steering value v, the position set P, and the input sequences used."
+    },
+    {
+      "step_id": "C11",
+      "label": "Characterise CMV-enhancer probe: motif ablation (E-box, CREB/ATF, NF-kB, CCAAT) and k-mer-preserving decoy shuffles (k=1..5) with Wilcoxon signed-rank test",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ],
+      "notes": "Motif classes, k range, and the statistical test are named, with a reported p<=0.0001 for E-box. Missing: motif coordinate/consensus definitions, number of shuffle replicates, random seed, multiple-testing handling, and the shuffling implementation. Supplementary section C.1."
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 1,
+    "n_NI": 10,
+    "n_X": 0,
+    "S": 11,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/11 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "1/11 (9%) readiness upper bound (R-star + RI); Stage-1 prose-only ceiling, never 'reproducible'. Under-claims by construction - Tier-1 cannot credit an undeclared-but-present dependency, and here no code artifact exists to inspect at all.",
+    "coverage": "computational coverage 11/11 (100%) - |S|=11 C-steps, |W|=0 wet-lab steps; step_source=prose-methods (no workflow file exists because no repository is released)",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 12,
+      "where": "Section 4 'Code and Reproducibility'",
+      "missing": "No code repository URL. Verbatim: 'All code developed for SAE training, evaluation, and analysis, along with the trained model weights and scripts to reproduce our main figures, are made publicly available at COMING SOON.' The availability statement is an unfilled placeholder.",
+      "how_to_close": "Deposit the code and trained SAE/meta-SAE weights in a versioned archive (GitHub release + Zenodo DOI) and replace the placeholder with the resolvable URL/DOI."
+    },
+    {
+      "type": 9,
+      "where": "Methods B.2-B.6 (SAE training, evaluation, meta-SAE, steering) and Supplementary C.1",
+      "missing": "All bespoke analysis code is private. Nine of eleven steps depend on unreleased custom implementations; only the pLannotate annotation step (C2) rests on a public third-party tool with an exact invocation description.",
+      "how_to_close": "Release the training/evaluation/steering code with entry-point scripts per figure."
+    },
+    {
+      "type": 5,
+      "where": "Methods B.1 'Choice of Dataset' and 'Creating Annotated Evaluation Sets'",
+      "missing": "The compiled AddGene dataset (93,306 training + ~15,551 validation/test plasmids) and the three 1,000-plasmid annotated evaluation sets are not deposited; no accession, no AddGene snapshot date, no plasmid ID list, no annotation CSVs.",
+      "how_to_close": "Deposit the plasmid ID manifest, the train/val/test split, and the pLannotate output CSVs (figshare/Zenodo)."
+    },
+    {
+      "type": 2,
+      "where": "Methods B.2-B.6; Results 2.2 (BLAST)",
+      "missing": "No versions for the deep-learning stack (PyTorch/transformers/JAX unnamed), no HuggingFace model repository id or revision for the 50M/500M Nucleotide Transformer, no BLAST version, no scikit-learn/probing library. Exact pins exist only for the annotation sub-pipeline (Python 3.8, pLannotate v1.2.0, pandas v1.3.5, BioPython v1.79).",
+      "how_to_close": "Ship an environment lock (conda-lock/pixi.lock/uv.lock or an image digest) plus pinned HuggingFace revisions."
+    },
+    {
+      "type": 4,
+      "where": "Methods B.2 (SAE training), B.4 (30 logistic-regression probes), B.5 (meta-SAE), Supplementary C.1 (shuffles)",
+      "missing": "Random seeds are stated only for the evaluation-set selection (seed 42). SAE training, meta-SAE training, probe repetitions, and decoy shuffling have no seeds and no statement of whether a seed is consumed; reproduction can target distributional agreement only.",
+      "how_to_close": "Record and publish seeds actually consumed, or report result distributions over documented repetitions."
+    },
+    {
+      "type": 13,
+      "where": "Methods B.1 (pLannotate reference databases); Results 2.2 (Nucleotide Transformer 850-genome training corpus as BLAST subject)",
+      "missing": "Both external reference resources are consumed without a pinned build: pLannotate's bundled databases have no stated version beyond the tool version, and the NT training corpus is referenced only through the citation to Dalla-Torre et al. (2025) with no snapshot or checksum. Class A/B/C cannot be assigned without executable code (Stage-1 prose-only).",
+      "how_to_close": "Pin the pLannotate database build and deposit or checksum the exact BLAST subject database."
+    },
+    {
+      "type": 7,
+      "where": "Methods B.1, final paragraph",
+      "missing": "Execution environment described only as 'We performed almost all our training in Google Colabs, using either a single A100 (for SAE training) or a single L4 GPU (for linear probe training)' - a mutable hosted runtime with no image, no CUDA/driver version, and no notebook released.",
+      "how_to_close": "Publish the notebooks with a pinned base image or an explicit environment specification."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository (GitHub/GitLab/Bitbucket/Zenodo/Software Heritage)",
+      "http_status": "n/a - no URL stated. Paper text verbatim: 'are made publicly available at COMING SOON.'",
+      "checked_at": "2026-07-28T08:14:18Z",
+      "network_context": "JATS XML fetched from biorxiv.org; full-text URL scan of the source XML returned no code-hosting URL of any kind"
+    },
+    {
+      "artifact": "interactive results explorer https://interpretglm.netlify.app/ (stated in Abstract: 'Readers can explore our findings at https://interpretglm.netlify.app/.')",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:14:18Z",
+      "network_context": "curl HEAD-equivalent from assessor host; this is a results-browsing website, NOT a code repository or a data deposit"
+    },
+    {
+      "artifact": "data accession (GEO/SRA/ENA/ArrayExpress/dbGaP/EGA/figshare/Zenodo)",
+      "http_status": "none - no accession of any kind stated in the paper",
+      "checked_at": "2026-07-28T08:14:18Z",
+      "network_context": "Data sources named in prose only: AddGene plasmid repository (no accession, no URL, no snapshot date) and Nucleotide Transformer models 'downloaded from HuggingFace' (no repository id, no revision)"
+    },
+    {
+      "artifact": "paper full text (JATS XML)",
+      "http_status": "200",
+      "checked_at": "2026-07-28T08:14:18Z",
+      "network_context": "https://www.biorxiv.org/content/early/2025/11/03/2025.10.31.685860.source.xml - 174,111 bytes, article-version 1.1; title verified as 'Decode-gLM: Tools to Interpret, Audit, and Steer Genomic Language Models'. The v2 landing page returned HTTP 403 to WebFetch and the v2 source XML could not be retrieved; assessment is based on the retrievable version."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "2d3729c8fd449623aa2732b86118a493ca93f990cb542825478da579fe35a482",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "supersedes_metric_version": null,
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

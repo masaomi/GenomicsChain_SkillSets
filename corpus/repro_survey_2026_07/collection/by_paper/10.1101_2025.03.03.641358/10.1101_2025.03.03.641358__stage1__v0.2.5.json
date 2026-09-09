@@ -1,0 +1,287 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.03.03.641358",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.03.03.641358v3",
+      "biorxiv:2025.03.03.641358v3",
+      "europepmc:PPR986271"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational whole-genome-sequencing analysis pipeline for 686 S. aureus isolates (raw Illumina reads in ENA PRJEB59751): read QC/trimming (TrimGalore), taxonomic ID/contamination (Kraken2, Mash), de novo assembly (SKESA), reference variant calling vs NC_007795.1 (Snippy), annotation (Prokka), pangenome (Roary), core-genome phylogeny (FastTree2), MLST (ABRicate MLST), AMR gene detection (ABRicate over CARD/ResFinder/VFDB; DeepARG), SCCmec/mecA typing (staphopia-sccmec, minimap2, SCCmec_CLA workflow), spa typing (spaTyper), and pangenome-wide GWAS (Scoary). Whole pipeline implemented in CWL and executed on a local Arvados system; source/workflow/config repo at github.com/bio-ontology-research-group/mrsa-sequences.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the Materials and Methods + 'Reproducibility and Implementation of FAIR Data Principles' prose of the biorxiv v3 full text (Cloudflare-blocked initially; retrieved via curl full-text, abstract cross-checked against Europe PMC PPR986271). GitHub repo landing/README (github.com/bio-ontology-research-group/mrsa-sequences) fetched at PROSE level only: contains CWL workflows/ dir, dockers/ dir, requirements.txt, setup.py, and setup instructions (virtualenv + pip install -r requirements.txt) — NOT read at workflow-source line level (that is Stage-2). Wet-lab steps (culture, VITEK-2 AST, DNA isolation, library prep, NovaSeq sequencing) counted in W, not verdicted (layer W / out of computational-reproduction scope). No R★ at stage1; RI is the ceiling.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "container_digest_claimed",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "TrimGalore v0.4.4 adapter trimming / read QC of raw Illumina NovaSeq reads",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Kraken v2.0.8-beta taxonomic identification / contamination screening",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Mash v2.3 sketch-based taxonomic identification / distance",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "SKESA v2.4.0 de novo genome assembly",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "Snippy v4.6.0 variant calling against reference genome NC_007795.1",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "Prokka v1.14.6 genome annotation of assembled contigs",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "Roary v3.13.0 pangenome construction from Prokka GFFs",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "FastTree2 v2.1.10 neighbor-joining/ML core-genome phylogenetic tree from core alignment",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C9",
+      "label": "ABRicate v1.0.1 MLST assignment (MLST tool / PubMLST scheme)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C10",
+      "label": "ABRicate v1.0.1 AMR gene detection against CARD v5.1.1 database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C11",
+      "label": "ABRicate v1.0.1 AMR gene detection against ResFinder v4.0 database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C12",
+      "label": "DeepARG v1.0.2 deep-learning AMR gene prediction",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C13",
+      "label": "ABRicate v1.0.1 virulence-factor detection against VFDB (no VFDB DB version/snapshot given)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["db-version-unpinned"]
+    },
+    {
+      "step_id": "C14",
+      "label": "staphopia-sccmec v1.0.0 mecA / SCCmec typing",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C15",
+      "label": "minimap2 v2.24-r1122 mecA cassette detection against a local SCCmec database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C16",
+      "label": "SCCmec_CLA cassette-arrangement typing workflow (github.com/cdnstp/SCCmec_CLA; no version/commit pinned)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["external-workflow-unpinned"]
+    },
+    {
+      "step_id": "C17",
+      "label": "spaTyper v4.6.1 spa (protein A) typing with its associated database",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-claim-unverified", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C18",
+      "label": "Scoary pangenome-wide association study (bacterial GWAS) on Roary gene presence/absence (no version pinned)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["tool-version-unpinned"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 15,
+    "n_NI": 3,
+    "n_X": 0,
+    "S": 18,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 15/18 computational steps — all carry exact tool version pins in the Methods prose (TrimGalore 0.4.4, Kraken 2.0.8-beta, Mash 2.3, SKESA 2.4.0, Snippy 4.6.0, Prokka 1.14.6, Roary 3.13.0, FastTree2 2.1.10, ABRicate 1.0.1 [x4 uses incl. CARD 5.1.1, ResFinder 4.0], DeepARG 1.0.2, staphopia-sccmec 1.0.0, minimap2 2.24-r1122, spaTyper 4.6.1) plus a CWL/Arvados workflow with source+config+dockers/ dir claimed available. 3/18 steps cap at NI: VFDB virulence DB has no version/snapshot, the SCCmec_CLA external workflow is unpinned (no commit), and Scoary carries no version. Container/CWL execution-environment preservation is CLAIMED (dockers/ dir + 'execution environments preserved') but UNVERIFIED at stage1, so version axis is capped at 1 (exact pins without validated closure); no step exceeds RI without an executed environment capture. R★ not assignable at stage1.",
+    "coverage": "18 computational steps assessed from biorxiv v3 Methods prose + repo README prose. 6 wet-lab steps (TSA culture/ID, VITEK-2 AST, KingFisher DNA isolation, QIASeq FX library prep, Illumina NovaSeq 6000 sequencing, sample collection) counted (W) but out of computational-reproduction scope; raw reads (ENA PRJEB59751) are the reproducible entry point.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole computational pipeline (Reproducibility / Code availability prose + github.com/bio-ontology-research-group/mrsa-sequences repo landing)",
+      "missing": "Container/environment closure is CLAIMED but not validated at prose level: repo has a dockers/ directory, CWL workflows/, requirements.txt and setup.py, and the paper states 'complete workflow definitions and execution environments preserved' on a local Arvados system. However README setup uses 'virtualenv + pip install -r requirements.txt' (pins in requirements.txt not inspected at stage1), no image digest or conda-lock is shown in prose, and no validated env capture is demonstrated. Exact per-tool pins in Methods are therefore partial (no confirmed closure).",
+      "how_to_close": "Stage-2: read the CWL CommandLineTool definitions + dockers/ Dockerfiles and requirements.txt to confirm each tool + dependency is pinned; publish a resolvable container image digest (or conda-lock/pixi lock) per platform and demonstrate a validated environment capture."
+    },
+    {
+      "type": 3,
+      "where": "VFDB virulence detection (C13), SCCmec_CLA workflow (C16), Scoary GWAS (C18)",
+      "missing": "No version for the VFDB database snapshot, no commit/tag for the external SCCmec_CLA workflow, and no version for Scoary — these three steps cannot reach RI at prose level.",
+      "how_to_close": "Record the VFDB database release/date, pin the SCCmec_CLA workflow to a commit/tag, and record the Scoary version (and its parameters) in Methods or a versions table."
+    },
+    {
+      "type": 6,
+      "where": "All tool invocations across the pipeline",
+      "missing": "Per-tool command-line parameters are not given in the Methods prose (tools cited as 'using tool vX'); parameters are claimed to reside in the CWL workflow/config files in the repo but were not read at stage1.",
+      "how_to_close": "Stage-2: extract the exact CWL command definitions / config to confirm invocation parameters; or list key non-default parameters in Methods."
+    },
+    {
+      "type": 8,
+      "where": "Sample/phenotype metadata Zenodo record cited as DOI 10.5281/zenodo.1425085",
+      "missing": "The Zenodo DOI stated in the paper for the RDF phenotype metadata resolves to HTTP 404 (likely a typo / wrong Zenodo ID). ENA raw-read accession PRJEB59751 is live and correct.",
+      "how_to_close": "Correct the Zenodo DOI in the manuscript to the live phenotype/RDF metadata record."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/bio-ontology-research-group/mrsa-sequences (CWL workflows/, dockers/, analyzer/, uploader/, db/, requirements.txt, setup.py; setup = virtualenv + pip install -r requirements.txt) — README prose read only, workflow source NOT read (stage1)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "external workflow repo: github.com/cdnstp/SCCmec_CLA (SCCmec cassette-arrangement typing; no commit pinned in paper)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, github.com"
+    },
+    {
+      "artifact": "data accession: ENA study PRJEB59751 ('MRSA genomic epidemiology in Saudi Arabia'; raw Illumina NovaSeq reads for the isolates)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ebi.ac.uk ENA browser summary API"
+    },
+    {
+      "artifact": "data accession: Zenodo phenotype/RDF metadata cited as DOI 10.5281/zenodo.1425085",
+      "http_status": "404 Not Found (DOI does not resolve — likely typo in manuscript)",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl -L, doi.org redirect"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "90e59d3cc1708be80abb13a541c91767a7ec18aeec94c2255da4512ce1b9d525",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

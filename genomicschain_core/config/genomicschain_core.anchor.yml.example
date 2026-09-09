@@ -1,7 +1,7 @@
 # Anchor deployment profile. Copy to genomicschain_core.yml on the ONE node that
 # signs and records.
 #
-# Turning this on registers gc_tier1_submit and gc_tier2_submit. That node then
+# Turning this on registers gc_tier1_submit and gc_tier3_submit. That node then
 # needs an MMP identity with a signing key; without one the submit path fails
 # closed rather than recording an unattributable proof.
 #

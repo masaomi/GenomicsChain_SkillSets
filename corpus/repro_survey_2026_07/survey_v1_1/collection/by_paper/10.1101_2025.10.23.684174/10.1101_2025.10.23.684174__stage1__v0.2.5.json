@@ -1,0 +1,640 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "94906241a0ae13a01d6990cbacd1fd8b0c647590094cebbf2429cd6537b7e24b",
+  "canonical_id": {
+    "value": "10.1101/2025.10.23.684174",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.23.684174v1",
+      "biorxiv:2025.10.23.684174v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Two coupled targets. (1) The wet-lab target-enriched (TE) metagenomic workflow: a 114,375-bait Mannheimia haemolytica (Mh) bait set, an optimized SureSelect XT HS2 capture protocol tested at five bait/reagent modifications, and TE + conventional shotgun sequencing of nasopharyngeal swabs from feedlot cattle. (2) The computational target: the VARIANT++ Nextflow DSL2 pipeline (QC/trim -> merge -> deduplicate -> host removal -> Kraken2 core-NT classification -> KrakenTools extraction -> Themisto alignment to a custom Mh genome database -> mSWEEP relative-abundance estimation -> GSV count matrix with false-positive count filtration), the upstream construction of the genomic-sequence-variant (GSV) annotation scheme (FastANI all-vs-all over 2,435 Mh genomes -> hclust/cutree -> 2-30 GSV sets), the in-silico benchmarking that selected 8 GSV groups and Kraken2 confidence 0.1, and the downstream R statistics (phyloseq/vegan/ggplot2, Jaccard beta diversity, PERMANOVA, betadisper) that produced the manuscript figures.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse prose-level step list built from the Methods section of the bioRxiv JATS XML (Bait design / Study samples / DNA isolation / 16S rRNA gene sequencing and analysis / Optimization samples / Bioinformatic workflow development / The VARIANT++ bioinformatic workflow / Investigation samples / Shotgun sequencing), plus the Data availability statement. One step per named tool or analysis invocation. The paper links two public repositories (VARIANTplusplus = the pipeline, Manuscript-Mh_TE_validation = the manuscript R code, Zenodo-archived), but at stage 1 only the landing pages, README prose, docs/dependencies.md and the envs/ directory listing were read; no workflow source or environment file contents were read line-by-line. Six wet-lab steps (animal cohort, DNA extraction, 16S amplicon prep, shearing/QC, TE capture library prep, shotgun library prep) are recorded as layer W / verdict X and excluded from the S denominator.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "env_lock_claimed",
+  "stage2_candidate": true,
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Bait design step 1: primary 120-mer bait set generated with CATCH from 70 reference Mh genomes (NCBI accessions CP017484-CP017552 and CP006957) using the verbatim parameters '--cluster-and-design-separately 0.5 -e 50 -pl 120 -ps 120 -m 20'; yielded 51,612 probes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Bait design step 2: refinement of the CATCH probe set with Kraken2 to verify Mh specificity, reducing 51,612 -> 47,011 Mh-specific probes; no Kraken2 database, confidence value or command is stated for this filtering step",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Bait boosting step: 'blastn' within BLAST+ version 2.10.0 aligning three ICE sequences (NCBI accessions CP004752, CP005383, CP017551) against NCBI's 'nt' database; 399 sequence variants at >80% identity extracted -> 2,131 extra probes",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Bait boosting / evaluation with Geneious software (2021.2 Dotmatics): cross-referencing 13 informative Mh loci against the unfiltered bait set (+1,361 probes); Geneious mapper with default settings aligning the final 48,394-bait design to genome M42548 (GCF_000376645.1); Geneious assembler with default settings for incompletely assembled GSV representative genomes",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Bait redundancy removal: CD-hit clustering of the combined three-source bait pool at 98% sequence identity, yielding 48,394 baits (final boosted design = 114,375 baits)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "Bait-coverage assessment across GSV groups: dRep 'dereplicate' function run per GSV genome group to pick a representative genome, then bait alignment to each representative to summarize pairwise identity and mean coverage; also used later for between-GSV pairwise ANI",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C7",
+      "label": "16S rRNA gene analysis: demultiplexed V3-V4 paired-end reads imported into QIIME2 version 2020.11; ASVs generated with DADA2 (quality filtering, chimera removal, paired-end merging), forward reads truncated at 248 bp and reverse at 250 bp",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "16S taxonomy assignment: Naive Bayes classifier trained on the Greengenes version 13_8 99% OTUs database, with reference sequences trimmed to the V3-V4 region bounded by the 341F/805R primer pair",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "GSV database construction step 1: all Mh genomes from GenBank and RefSeq 'as of January 2025' (n=2,435) collected; pairwise all-versus-all whole-genome similarity measured as ANI with FastANI",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "GSV database construction step 2: hierarchical clustering of the pairwise ANI matrix with R (version 4.4.2) hclust using default settings, then cutree to generate GSV annotation sets sequentially from 2 up to 30 groups (Supplementary File 6)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Benchmarking read simulation: custom Python scripts (explained at docs/Benchmarking_explanation.md in the VARIANTplusplus repo) build simulated samples by randomly selecting GSVs (0,1,3,5,7,9 per sample) and 5 genomes per GSV, then InSilicoSeq generates 150nt reads on a NovaSeq error profile, mean fragment size 311, at randomly selected depths (250000, 500000, 1000000, 2000000); off-target Pasteurellaceae genomes (n=5,852) processed in parallel for the 0-GSV false-positive arm",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C12",
+      "label": "Benchmarking classification sweep: simulated reads merged with FLASH, merged/unmerged analyzed in parallel, Kraken2 + core NT classification iterating confidence values (0, 0.1, 0.2, 0.3, 0.4, 0.5), KrakenTools extraction, Themisto alignment, mSWEEP with GSV annotation sets 2-30; precision/recall computed over 1,000 iterations per condition to select 8 GSV groups, confidence 0.1 and the count filter",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "C13",
+      "label": "VARIANT++ pipeline stage 1: fastQC + multiQC HTML sequencing quality reports (Nextflow DSL2 pipeline at https://github.com/Microbial-Ecology-Group/VARIANTplusplus, invoked with --pipeline 'full_GSV_pipeline')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "VARIANT++ pipeline stage 2: quality-control trimming of raw sequencing reads with Trimmomatic; no trimming parameters are given in the paper prose (they live in the pipeline's params.config)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "VARIANT++ pipeline stage 3: read merging with FLASH (justified by an average TE fragment length of 250nt vs 150nt reads); merged and unmerged reads then processed in parallel and recombined per sample at the end of the workflow. FLASH is not listed in the repo's docs/dependencies.md version table",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "VARIANT++ pipeline stage 4: deduplication with seqKit to account for PCR bias producing duplicate reads. seqKit is not listed in docs/dependencies.md",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "VARIANT++ pipeline stage 5: host DNA removal by alignment to a host genome with bwa plus samtools. The bovine host reference genome is named only as 'a host genome' - no assembly name, accession or build is stated in the paper",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "VARIANT++ pipeline stage 6: taxonomic classification of non-host reads with Kraken2 and the core NT database at kraken confidence 0.1. The database is sourced from Ben Langmead's pre-made index page (https://benlangmead.github.io/aws-indexes/k2) with no index build date, size or checksum recorded",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "workflow-ref-unpinned",
+        "fetch-pin-prose-only"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "VARIANT++ pipeline stage 7: extraction of reads at the user-selected taxonomic rank (species, in the Mh lineage) from the Kraken2 output using KrakenTools 'extract_kraken_reads' with the '--include-children' and '--taxid' flags. KrakenTools carries no version anywhere in the paper or the repo dependency table",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "VARIANT++ pipeline stage 8: alignment of extracted Mh reads to the custom Mh reference database (2,435 genomes) using Themisto. The built database itself is not deposited under an accession; only instructions to rebuild it are provided. No Themisto version, no alignment parameters",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "VARIANT++ pipeline stage 9: mSWEEP Bayesian relative-abundance estimation of closely related sequences using the GSV annotation grouping file (8 GSV groups selected by benchmarking). No mSWEEP version, no prior/convergence settings stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "VARIANT++ pipeline stage 10: a custom Python script parses mSWEEP results into GSV count matrices and applies the per-sample count filter, subtracting the estimated number of false-positive reads per GSV derived from the benchmarking. No pipeline release version or commit is cited for the code that computed the published matrices",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "workflow-ref-unpinned"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Figure 2 construction: ANI distance tree of all 2,435 reference Mh genomes plotted with iTOL (v7) with GSV and genotype tip annotations, exported and composed into a single figure with BioRender.com",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Downstream statistics and manuscript figures in R: GSV count matrices processed with phyloseq, vegan and ggplot2; percent reads classified to Mannheimia genus / Mh species / GSVs; false-positive-rate count filtering; Jaccard beta diversity with vegan; pairwise PERMANOVA via 'pairwise.adonis()' with Benjamini-Hochberg correction; dispersion via 'betadisper' + 'permutest'; log-transformed pseudocount heatmap clustered by Mh strata. Code, count matrices and the full R library list are in https://github.com/Microbial-Ecology-Group/Manuscript-Mh_TE_validation, archived at DOI 10.5281/zenodo.16989755 (tag 'code_draft')",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "release_snapshot",
+      "subflags": [
+        "lock-present-unexecuted"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Animal cohort and sample collection: 120 beef steers/bulls purchased at auction, fed at the West Texas A&M University Research Feedlot (mean 235 days), vaccinated/anthelmintic/tildipirosin metaphylaxis, BRD case definition (moderate-severe signs + rectal temp >=40C); nasopharyngeal swabs collected 14 days after arrival with 16-inch proctology swabs, tips into 100% ethanol, frozen at -80C (IACUC protocol 2020.04.003)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W2",
+      "label": "DNA isolation with the QIAamp PowerFecal Pro DNA kit (Qiagen) per manufacturer instructions, quantified by Qubit Flex fluorometry",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W3",
+      "label": "16S rRNA gene amplicon library prep: V3-V4 amplified with 341F/805R primers, Nextera IDT library kit, pooled library sequenced 2x250bp on an Illumina NovaSeq at the University of Colorado Anschutz Genomics and Microarray Core",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W4",
+      "label": "DNA fragmentation and QC for capture: acoustic shearing on a Covaris M220, SPRI bead cleanup per the supplemental protocol, pooled aliquots analyzed on TapeStation, 250ng duplicate aliquots taken as capture input",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W5",
+      "label": "Target-enriched library preparation with the Agilent SureSelect XT HS2 Reagent Kit under five protocol modifications (FULL, HALF, QUARTER, DOUBLE HALF, DOUBLE QUARTER; 48 attempted preps, 39 sequenced) and the selected DOUBLE HALF protocol for the 19 investigation libraries; modifications documented in a .docx at Manuscript-Mh_TE_validation/Methods/; sequenced 2x150bp on NovaSeq 6000 S4 lanes (TAMU IGSS and North Texas Genome Center)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    },
+    {
+      "step_id": "W6",
+      "label": "Parallel conventional shotgun sequencing of the same 23 samples: Illumina DNA Prep Kit with 100ng input, pooled equimolar, 2x150bp on NovaSeq 6000 at the North Texas Genome Center, expected mean depth 109M paired-end reads per sample",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 9,
+    "n_NI": 15,
+    "n_X": 0,
+    "S": 24,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/24 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification); unexecuted; declared environment statically valid but not verified as the env that produced the results. n_exact_capture_unexecuted = 0, n_fetch_required = 0 (both are stage-2 quantities and are structurally 0 at stage 1).",
+    "inference_inclusive_upper_bound": "9/24 (38%) reach the stage-1 ceiling verdict RI; the other 15 computational steps cap at NI. The dominant blocker is the Version axis: of the ~20 distinct third-party tools invoked, only BLAST+ 2.10.0, QIIME2 2020.11, R 4.4.2, Geneious 2021.2 and iTOL v7 are pinned in the paper prose, and the pipeline repo's docs/dependencies.md adds only Trimmomatic 0.39, FastQC 0.11.8, multiQC 1.6, bedtools 2.28.0, bwa 0.7.17, Kraken2 2.0.8, samtools 1.9 - it lists no version at all for FLASH, seqKit, KrakenTools, Themisto, mSWEEP, InSilicoSeq, FastANI, dRep, CD-hit or CATCH, which are exactly the tools that define the novel GSV method. The second blocker is that neither the GSV method-development code (C9-C12) nor the bait-design code (C1-C6) is bound to a released script; the paper points at a docs explainer page, not at the scripts that produced the published numbers. A stage-2 read of envs/*.yaml, envs/containers/ and nextflow.config could plausibly lift the ten VARIANT++ pipeline steps (C13-C22) toward R-star if those environment files carry exact pins for the unlisted tools, so this paper is a genuine stage-2 candidate; the upstream method-development and bait-design steps would not be lifted by that read.",
+    "coverage": "24 computational steps and 6 wet-lab steps assessed from the Methods prose. S = 24 (C-steps only); the 6 W-steps are recorded as verdict X and excluded from the denominator. Coverage of the VARIANT++ pipeline itself is good (the Methods narrate the pipeline stage by stage), but coverage of the GSV-database construction and of the simulation benchmarking is prose-only and points at an explainer document rather than at the scripts; coverage of the bait-design chain is partial because two of its stages ran inside Geneious, a commercial GUI tool with no reproducible invocation record.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "All steps; most acutely C15/C16/C19/C20/C21 (FLASH, seqKit, KrakenTools, Themisto, mSWEEP) and C9/C11 (FastANI, InSilicoSeq)",
+      "missing": "Gap 2a - no version stated. The paper pins BLAST+ 2.10.0, QIIME2 2020.11, R 4.4.2, Geneious 2021.2 (Dotmatics) and iTOL v7, and the VARIANTplusplus repo's docs/dependencies.md pins Trimmomatic 0.39, FastQC 0.11.8, multiQC 1.6, Bedtools 2.28.0, BWA 0.7.17, Kraken2 2.0.8, Samtools 1.9 (plus optional Bracken 2.7, Krona 2.8.1). Neither source states a version for CATCH, CD-hit, dRep, FastANI, DADA2, InSilicoSeq, FLASH, seqKit, KrakenTools, Themisto, mSWEEP, phyloseq, vegan, ggplot2 or pairwise.adonis. The dependency table is also visibly inherited from the AMR++ lineage (it lists RarefactionAnalyzer, ResistomeAnalyzer, AmrPlusPlus_SNP, humann3/metaphlan envs) and does not enumerate the tools that constitute the novel GSV method. The VARIANTplusplus README badge reads 'Nextflow 0.25.1', which is not a plausible pin for a DSL2 pipeline and appears stale.",
+      "how_to_close": "Publish a resolved lock for the exact environment that produced the results (conda-lock / pixi.lock, or a container image referenced by sha256 digest) covering every tool in the GSV path, and state the Nextflow version actually used for the manuscript runs."
+    },
+    {
+      "type": 12,
+      "where": "C1-C6 (bait design), C9-C12 (GSV database construction and in-silico benchmarking)",
+      "missing": "The code that produced the published bait set and the published GSV annotation scheme is not linked as a runnable artifact. For benchmarking the paper gives a prose explainer URL (VARIANTplusplus/docs/Benchmarking_explanation.md) rather than the simulation scripts; for GSV construction it describes hclust/cutree in R without pointing at the script; for bait design it gives the CATCH parameter string but no driver script, and no deposited FASTA of the final 114,375 baits is identified by accession. The Data availability statement covers only 'the bioinformatic and statistical analyses' in the manuscript repo (5 commits, README is a one-line placeholder).",
+      "how_to_close": "Deposit the bait-design, GSV-clustering and benchmarking scripts (plus the final bait FASTA and the 2,435-genome accession list) in the archived release, so that the GSV annotation set used for the published counts can be regenerated rather than only described."
+    },
+    {
+      "type": 2,
+      "where": "C18 (Kraken2 core NT database), C3 (NCBI 'nt'), C8 (Greengenes 13_8), C9 (GenBank/RefSeq Mh genome set), C17 (host genome)",
+      "missing": "Gap 2b applied to external reference databases. The Kraken2 'core NT' index is taken from Ben Langmead's pre-built index page with no build date, no size and no checksum; NCBI 'nt' for the ICE blastn has no snapshot date; the Mh genome set is dated only as 'as of January 2025' with no accession manifest; the bovine host genome used for bwa host removal is named only as 'a host genome' with no assembly or accession. Greengenes is the one well-pinned reference (13_8, 99% OTUs). At stage 1 every one of these is prose-only, so none can be class A.",
+      "how_to_close": "Record the exact index build (URL + date + checksum) for the Kraken2 core NT database, name the host assembly accession, and deposit the frozen 2,435-genome accession manifest alongside the GSV annotations."
+    },
+    {
+      "type": 4,
+      "where": "C11-C12 (simulation benchmarking), C24 (PERMANOVA / permutest)",
+      "missing": "No random seed is stated for any stochastic step. The benchmarking draws random GSVs, random genomes per GSV and a randomly selected sequencing depth, and runs 1,000 iterations per condition; InSilicoSeq read generation is itself stochastic; the downstream pairwise.adonis and permutest are permutation tests with no stated permutation count or seed. Re-running can therefore match only in distribution, not exactly.",
+      "how_to_close": "Set and record RNG seeds for the simulation loop, InSilicoSeq and the permutation tests, and ship the simulated read manifests or the seed table with the benchmarking code."
+    },
+    {
+      "type": 11,
+      "where": "C4 (Geneious 2021.2 mapper, assembler and locus cross-referencing), C23 (iTOL v7 web service, BioRender figure assembly)",
+      "missing": "Two design-critical stages ran inside commercial software with no scriptable record. Geneious contributed 1,361 of the boosted probes, produced the bait-sensitivity alignment against genome M42548 and assembled the incomplete GSV representative genomes, all under 'default settings' with no exported parameter set. The Figure 2 ANI tree was produced on the iTOL web service and composed in BioRender; neither leaves a re-executable artifact.",
+      "how_to_close": "Re-implement the Geneious mapping/assembly stages with an open tool (or export the exact Geneious workflow settings and intermediate files), and ship the tree file plus the plotting configuration used for iTOL."
+    },
+    {
+      "type": 5,
+      "where": "C2 (Kraken2 bait filtering), C14 (Trimmomatic), C20 (Themisto), C21 (mSWEEP), C6 (dRep)",
+      "missing": "Parameters are absent or delegated. No database, confidence or command is given for the Kraken2 pass that removed 4,601 non-specific probes; no Trimmomatic settings appear in the paper (they live in the pipeline's params.config, which stage 1 does not read); Themisto and mSWEEP are named without any alignment or model parameters; dRep 'dereplicate' is named without thresholds. The false-positive count-filter formula ('the estimated number of false-positive reads from each GSV is calculated and subtracted') is described but not specified numerically in the prose.",
+      "how_to_close": "State the parameter set for each stage in the paper or reference the exact params.config values that were used, and give the count-filter formula explicitly with the per-GSV false-positive rates it consumed."
+    },
+    {
+      "type": 6,
+      "where": "C1-C6 wet/dry boundary and the TE protocol modifications",
+      "missing": "Sub-parts of the workflow are externalized to supplementary artifacts rather than the paper: the capture protocol modifications live in a .docx inside the manuscript GitHub repo (Methods/VERO Target Enriched Single & Double Capture.docx), the 13 informative loci are in Supplementary File 5, the 2-30 GSV annotation sets in Supplementary File 6, and within/between-GSV ANI summaries in Supplementary Tables 2-3. Several of these are the actual definition of the method.",
+      "how_to_close": "Promote the protocol and the annotation-set definitions into the archived release as plain-text/tabular files with stable filenames, rather than as a Word document and numbered supplementary files."
+    },
+    {
+      "type": 1,
+      "where": "BioProject PRJNA1309097 vs the study design (39 optimization libraries + 19 TE investigation libraries + 23 shotgun libraries + 16S libraries)",
+      "missing": "Sample-to-run correspondence is not stated in the paper. The Data availability statement is one sentence ('All sequence reads are available through BioProject PRJNA1309097') with no mapping from SRA runs to the FULL/HALF/QUARTER/DOUBLE HALF/DOUBLE QUARTER protocol arms, to the ZERO/LOW/MEDIUM/HIGH/HIGHEST Mh strata, to BRD status, or to the TE-vs-shotgun pairing. The BioProject resolves to 81 SRA records, which does not obviously decompose into the library counts stated in the Methods, and the 16S reads described as 'previously described' may sit under a different project.",
+      "how_to_close": "Publish a run-to-sample mapping table (SRR accession, protocol arm, Mh stratum, BRD status, TE/shotgun pairing) in the manuscript repository and in the BioProject sample metadata."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo (pipeline), stated verbatim in Methods and in the article metadata: 'https://github.com/Microbial-Ecology-Group/VARIANTplusplus'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; public repo, MIT license, 357 commits on branch master, no releases and no DOI badge shown on the landing page. Top level: bin/, config/, data/, docs/, envs/, modules/, subworkflows/, CODE_OF_CONDUCT.md, LICENSE, README.md, main_VARIANT++.nf, nextflow.config, params.config, run_AMR++_slurm.sh. envs/ contains VARIANT++_env.yaml plus 15 per-tool conda yaml files and a containers/ subdirectory; README documents '-profile conda' (and singularity/docker/local) and links docs/dependencies.md. Contents of those env files were NOT read (stage-2 work)."
+    },
+    {
+      "artifact": "code repo (manuscript analyses), stated verbatim in Data availability: 'https://github.com/Microbial-Ecology-Group/Manuscript-Mh_TE_validation'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L with browser user-agent; public, 5 commits on branch main, README is a placeholder line ('Repository for results and R code used in the manuscript...'). Top level: Methods/, data/, scripts/, README.md, staging_script_Mhvalidation.R. No renv.lock, conda env, container or sessionInfo is mentioned in the README prose."
+    },
+    {
+      "artifact": "archive DOI, stated verbatim in Data availability: 'by the corresponding DOI: 10.5281/zenodo.16989755'",
+      "http_status": "403 via https://doi.org/10.5281/zenodo.16989755 and via https://zenodo.org/records/16989755 (Zenodo bot protection); 200 OK via the Zenodo REST API https://zenodo.org/api/records/16989755",
+      "checked_at": "2026-07-28",
+      "network_context": "API record resolves to 'Microbial-Ecology-Group/Manuscript-Mh_TE_validation: Manuscript code draft', version 'code_draft', publication_date 2025-08-28, single file Microbial-Ecology-Group/Manuscript-Mh_TE_validation-code_draft.zip, isSupplementTo https://github.com/Microbial-Ecology-Group/Manuscript-Mh_TE_validation/tree/code_draft. The archive covers ONLY the manuscript R code repo; the VARIANT++ pipeline is not archived under any DOI."
+    },
+    {
+      "artifact": "data accession, stated verbatim in Data availability: 'All sequence reads are available through BioProject PRJNA1309097 at the NCBI's Sequence Read Archive.'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L to https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1309097 returned 200; NCBI eutils esearch db=bioproject resolved UID 1309097 and esearch db=sra for the same accession returned Count=81 records, so the data are released and publicly downloadable, not embargoed."
+    },
+    {
+      "artifact": "in-Methods protocol link, stated verbatim: 'Supplementary text in GitHub: https://github.com/Microbial-Ecology-Group/Manuscript-Mh_TE_validation/blob/main/Methods/VERO%20Target%20Enriched%20Single%20%26%20Double%20Capture.docx'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L; the capture protocol modifications are distributed as a Word document on a mutable main branch"
+    },
+    {
+      "artifact": "in-Methods benchmarking explainer, stated verbatim: 'detailed explanation here: https://github.com/Microbial-Ecology-Group/VARIANTplusplus/blob/master/docs/Benchmarking_explanation.md'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L; mutable master-branch path, no commit pin in the citation"
+    },
+    {
+      "artifact": "external database source, stated verbatim: 'pre-made Kraken2 database sizes available on Beg Langmead's GitHub ( https://benlangmead.github.io/aws-indexes/k2 )'",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl -L; the page serves rolling index builds - the specific core_NT build used by the paper is not identified by date or checksum"
+    },
+    {
+      "artifact": "reference-genome accessions stated in Methods (not fetched): 70 bait-design genomes 'CP017484 - CP017552 and CP006957'; ICE sequences 'CP004752, CP005383, CP017551'; bait-sensitivity target 'M42548, RefSeq Accession: GCF_000376645.1'",
+      "http_status": "not checked (no bulk accession resolution performed at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "recorded verbatim from the Methods; these are public NCBI accessions but were not individually resolved"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "833e37fae58a09a4539ccc14db1f61402c0681b46a56068f128f6619860b59f4",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2024.12.02.626401",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2024.12.02.626401v4",
+      "biorxiv:2024.12.02.626401v4"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational genome-resource pipeline for three invasive insect species (Cydalima perspectalis, Leptoglossus occidentalis, Tecia solanivora): from public HiFi/Hi-C/RNA-seq reads (SRA BioProject PRJNA1140410) to draft de novo assemblies, Hi-C scaffolding, mitogenome assembly, QC (BUSCO/merqury/genomescope2/k-mer), and structural annotation.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods prose + the FARDOMICS_assemblies README (command lines with `module load` version-pinned tools). README read at prose/command level only, not workflow-source line-by-line (stage-1 prose-only). Wet-lab DNA/RNA extraction, library prep and sequencing counted in W, not verdicted (layer W).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": true,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "fastp v0.23.4 — RNA-seq read preprocessing (default parameters)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C2",
+      "label": "minimap2 v2.24 — long-read (-x map-hifi) and Hi-C (-x sr) alignment for QC",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C3",
+      "label": "STAR v2.7.11b — RNA-seq read alignment (default parameters)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C4",
+      "label": "samtools v1.14 — BAM sort + flagstat alignment metrics (default parameters)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C5",
+      "label": "hifiasm (v0.16.1 for C. perspectalis; v0.18.8 for L. occidentalis & T. solanivora) — HiFi de novo assembly, default parameters; README pins module bioinfo/hifiasm-v0.18.8",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C6",
+      "label": "purge_dups v1964aaa — haplotig/k-mer duplication purge for L. occidentalis, default parameters (README: run_purge_dups.py -p slurm, minimap2-2.11)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C7",
+      "label": "juicer v1.6 — Hi-C read processing for scaffolding (C. perspectalis public set ERR11217097; L. occidentalis novel Hi-C); README gives full juicer.sh + bwa 0.7.17 command line",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C8",
+      "label": "3D-DNA release 529ccf4 — Hi-C scaffolding pipeline (run-asm-pipeline.sh -r 0)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C9",
+      "label": "Juicebox v1.11.08 — MANUAL curation of Hi-C scaffolding (interactive GUI, non-scriptable human-in-the-loop step)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["manual-curation"]
+    },
+    {
+      "step_id": "C10",
+      "label": "MitoHiFi v2.2 — mitochondrial genome assembly (README: singularity mitohifi.sif, container named without digest)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "container_digest_claimed",
+      "subflags": ["container-claim-unverified", "capture-static-only"]
+    },
+    {
+      "step_id": "C11",
+      "label": "genomescope2 (README commit 5034ed4) + jellyfish 2.2.10 — genome-size/repeat/heterozygosity estimation from HiFi reads (k=21, -p 2)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C12",
+      "label": "assemblathon_stats.pl (Bradnam et al. 2013) — assembly contiguity metrics; NO version recorded in prose or README",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["version-absent"]
+    },
+    {
+      "step_id": "C13",
+      "label": "BUSCO v5.7.1 with insecta_odb10 — assembly (-m geno) and annotation (-m tran) completeness (README module bioinfo/busco-5.2.2 differs from prose 5.7.1)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "version-discrepancy-prose-vs-readme"]
+    },
+    {
+      "step_id": "C14",
+      "label": "merqury (README commit 1ef2c36) + meryl (k=31) — reference-free QV/completeness; no version in prose",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C15",
+      "label": "D-GENIES / minimap2 whole-genome dot-plots (Cabanettes & Klopp 2018) vs related reference genomes (GCA_951394215.1, GCA_041002905.1, GCA_948473455.1); web-service, no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["version-absent", "web-service"]
+    },
+    {
+      "step_id": "C16",
+      "label": "helixer v0.3.1_cuda_11.2.0 — de novo structural annotation (invertebrate model, default params; README: singularity helixer .sif, GPU/cuda-specific container named without digest)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "container_digest_claimed",
+      "subflags": ["container-claim-unverified", "gpu-cuda-specific"]
+    },
+    {
+      "step_id": "C17",
+      "label": "braker (Gabriel et al. 2021) — RNA-seq-evidence structural annotation; prose gives no version (README module bioinfo/BRAKER/2.0.4 + RepeatModeler 2.0.4 / RepeatMasker 4.1.5). Dropped for L. occidentalis due to poor results.",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "version-absent-in-prose"]
+    },
+    {
+      "step_id": "C18",
+      "label": "AGAT v1.2.0 — merge of helixer + braker annotations (agat_sp_merge_annotations.pl / agat_sp_complement_annotations.pl), default parameters",
+      "layer": "C",
+      "axes": { "data": 2, "code": 2, "version": 1, "params": 2 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["capture-static-only", "syslib-closure-unchecked"]
+    },
+    {
+      "step_id": "C19",
+      "label": "GeSeq v2.03 — mitochondrial genome annotation; web-based organelle annotation server (no CLI/scriptable invocation)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": ["web-service", "no-scriptable-invocation"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 15,
+    "n_NI": 4,
+    "n_X": 0,
+    "S": 19,
+    "W": 19,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/19 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 15/19 computational steps. R★ not assignable at stage1. Even at best, versions are pinned only via cluster `module load` names (no conda lock / no container digest); the two singularity containers (helixer, mitohifi) and all module-loaded tools are CLAIMS only. If stage2 resolves an env lock or container digests for a declared platform, the 15 RI steps become R★-eligible. C9 (manual Juicebox curation), C12/C15 (no version), and C19 (GeSeq web server) cap at NI regardless.",
+    "coverage": "19 computational steps assessed from Methods prose + FARDOMICS_assemblies README command lines; wet-lab DNA/RNA extraction, PacBio/Illumina/Hi-C library prep & sequencing counted in W but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole pipeline software environment (FARDOMICS_assemblies README)",
+      "missing": "No conda env / lockfile / Docker. Software supplied as Genotoul cluster environment-modules (`module load bioinfo/...`) which are site-specific and not portable. README explicitly states 'To reproduce these analyses on another cluster the software packages have to be locally present or installed.' Two singularity containers (helixer .sif, mitohifi.sif) are named but WITHOUT digest/registry pin.",
+      "how_to_close": "Ship a conda-lock/pixi.lock or container digests (including the two singularity images) for a declared OS/arch; stage2 should verify platform coverage and closure."
+    },
+    {
+      "type": 5,
+      "where": "Version pinning consistency (prose vs README)",
+      "missing": "Some tools pinned only in one source and by commit hash (purge_dups 1964aaa, 3D-DNA 529ccf4, genomescope2 5034ed4, merqury 1ef2c36, meryl 1b9294d); BUSCO differs between prose (5.7.1) and README module (5.2.2); braker/merqury/genomescope2 have no version in the paper prose; assemblathon_stats.pl and D-GENIES have no version anywhere.",
+      "how_to_close": "Provide a single authoritative tool-version manifest resolving prose/README discrepancies and recording the missing versions."
+    },
+    {
+      "type": 8,
+      "where": "C9 Juicebox manual curation",
+      "missing": "Hi-C scaffolds were manually curated in the Juicebox GUI (v1.11.08). Manual curation is a non-deterministic, non-scriptable human-in-the-loop step; the exact curation actions are not recorded.",
+      "how_to_close": "Publish the pre-curation and post-curation .assembly/.hic review files and a log of manual edits, or provide the final .review.assembly enabling deterministic reconstruction."
+    },
+    {
+      "type": 11,
+      "where": "C15 D-GENIES and C19 GeSeq (and C12 assemblathon_stats.pl)",
+      "missing": "Web-service / GUI tools with no scriptable, versioned invocation (D-GENIES web, GeSeq organelle annotation server); assemblathon_stats.pl version unrecorded.",
+      "how_to_close": "Record web-service versions/dates or substitute CLI equivalents (e.g. minimap2+dotplot script, MITOS/local annotation) and pin assemblathon_stats.pl."
+    },
+    {
+      "type": 1,
+      "where": "SRA/BioProject run-to-sample mapping (PRJNA1140410)",
+      "missing": "Per-run correspondence of SRA/BioSample accessions to species, tissue, and analysis role (which reads feed which assembly/RNA-seq alignment) is in Tables 2/5, not in machine-readable form tied to the README commands.",
+      "how_to_close": "Provide a sample sheet mapping SRA run accessions to species/library/step used in the pipeline."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: HMW DNA extraction (QIAGEN/PROMEGA kits), SMRTbell library prep, Arima Hi-C, TruSeq RNA prep, PacBio Sequel2 / Illumina NovaSeq6000 sequencing",
+      "missing": "Sample generation and sequencing are out of scope for computational reproduction (OOS); counted in W, not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; scope is the downstream assembly/annotation pipeline."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: FARDOMICS_assemblies README — github.com/chklopp/FARDOMICS_assemblies/blob/main/README.md (command lines with `module load` version-pinned tools + 2 named singularity containers; NO conda env / lockfile / Docker)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, public GitHub (raw README fetched, 5066 bytes)"
+    },
+    {
+      "artifact": "data accession: NCBI SRA BioProject PRJNA1140410 (HiFi long reads, Hi-C, RNA-seq raw reads + genome assemblies; deposited DDBJ/ENA/GenBank)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/bioproject/1140410"
+    },
+    {
+      "artifact": "data accession: Data INRAE (genome/mitogenome annotations + mitogenome sequences) — doi.org/10.57745/WDMFPB",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, DOI resolves (Data INRAE Dataverse)"
+    },
+    {
+      "artifact": "reference genomes (public): GCA_951394215.1 (C. perspectalis), GCA_041002905.1 (L. phyllopus), GCA_948473455.1 (T. luculella); public Hi-C read set ERR11217097 (C. perspectalis)",
+      "http_status": "cited (GenBank/ENA accessions, not individually curled)",
+      "checked_at": "2026-07-23",
+      "network_context": "accessions verbatim from Methods/Figure 2"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "aa643e5b28ecb855273a8878d069be94c33cf227e8c26cdc4ada60e92d2a104d",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

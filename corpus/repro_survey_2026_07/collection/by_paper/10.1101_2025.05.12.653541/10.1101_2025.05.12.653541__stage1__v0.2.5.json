@@ -1,0 +1,152 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.12.653541",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.12.653541v1",
+      "biorxiv:2025.05.12.653541v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Reproduce the BasCoD background-selection results/figures from the manuscript: apply the BasCoD spectral subspace-inclusion test (R, BasCoD.R) to evaluate and select appropriate background datasets for contrastive dimension reduction across single-cell datasets (mouse protein data used with cPCA; Norman et al. Perturb-seq; mouse intestinal data via ContrastiveVI; HCA bone-marrow erythroid post-trajectory analysis via Lamian/Slingshot; Jerber et al. population-scale scRNA-seq with ROT treatment), corroborating previously published cPCA/ContrastiveVI analyses and demonstrating background calibration for a designed scRNA-seq experiment. The repo ships 4 tutorial notebooks that 'reproduce some of the results reported in the manuscript'.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-computational-stage from Methods prose plus repo README/tree (stage-1 prose only; BasCoD.R and 4 .ipynb tutorials NOT read line-by-line). Methods are primarily mathematical (latent-variable models, spectral subspace-inclusion test); named external tools are cPCA, ContrastiveVAE/ContrastiveVI, and Slingshot/Lamian (trajectory). No wet-lab reproduced: the designed scRNA-seq dataset is reused input, not regenerated (W=0).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Data acquisition of the single-cell datasets: mouse protein data (from cPCA GitHub repo, Data_Cortex_Nuclear.csv), Norman et al. Perturb-seq and mouse intestinal data (via ContrastiveVI tutorial), HCA bone-marrow (Lamian slingshot_data.rda), Jerber et al. population-scale scRNA-seq (Zenodo), plus figshare/Google-Drive-hosted tutorial datasets",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["data-via-third-party-links", "google-drive-mutable-source", "no-primary-accession"]
+    },
+    {
+      "step_id": "C2",
+      "label": "Contrastive dimension reduction to obtain target/background low-dimensional embeddings: cPCA (Contrastive PCA) / CVLM for linear cases and ContrastiveVAE/ContrastiveVI for the VAE/variational-inference cases, following the referenced methods' tutorials",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["external-tool-versions-unpinned", "params-in-external-tutorial"]
+    },
+    {
+      "step_id": "C3",
+      "label": "Trajectory / post-trajectory analysis for the HCA bone-marrow erythroid-differentiation case (Slingshot / Lamian), producing the embeddings on which BasCoD post-trajectory background selection operates",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["external-tool-versions-unpinned", "reference-embedding-via-third-party-repo"]
+    },
+    {
+      "step_id": "C4",
+      "label": "BasCoD testing framework (R; code/functions/BasCoD.R): spectral subspace-inclusion goodness-of-fit test to identify valid background datasets (B) and reproduce manuscript figures via the 4 tutorial notebooks; requires R (>=4.2.2) and MASS",
+      "layer": "C",
+      "axes": { "data": 1, "code": 2, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": ["r-floor-pin-only", "no-env-lock", "no-renv-lock-or-DESCRIPTION"]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 4,
+    "n_NI": 0,
+    "n_X": 0,
+    "S": 4,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/4 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on all 4 computational steps. R★ not assignable at stage1. Environment is floating: the BasCoD repo README pins only R (>=4.2.2, a floor) and an unpinned install.packages('MASS'); the repo tree carries no renv.lock, DESCRIPTION, environment.yml, requirements.txt, or Dockerfile, and external tools (cPCA, ContrastiveVI, Slingshot/Lamian) have unspecified versions. Because the capture claim is 'floating' (not exact_pins_partial / release_snapshot / env_lock_claimed / container_digest_claimed), this paper is NOT a stage2 R★ candidate: even a perfect stage2 run could not exceed RI without a pinned/lockable environment.",
+    "coverage": "4 computational steps assessed from Methods prose + repo README/tree (BasCoD.R + 4 tutorial .ipynb notebooks + LICENSE). No wet-lab steps reproduced (W=0); the designed scRNA-seq dataset is reused input, not regenerated.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Software environment (BasCoD repo README + Methods): R implementation using MASS; external cPCA / ContrastiveVI / Slingshot(Lamian)",
+      "missing": "No renv.lock, DESCRIPTION, environment.yml, requirements.txt, or container. README pins only R (>=4.2.2, a floor constraint, not an exact version) and 'install.packages(\"MASS\")' with no version. External Python/R tool versions (cPCA, ContrastiveVI, Slingshot, Lamian) are unspecified. No OS/BLAS closure.",
+      "how_to_close": "Ship an renv.lock (or conda-lock/pixi.lock) capturing R version, MASS and all transitive package versions, plus the exact versions of cPCA/ContrastiveVI/Slingshot used, for a declared platform; or provide a container digest."
+    },
+    {
+      "type": 1,
+      "where": "Input datasets (Data Availability + repo)",
+      "missing": "Datasets are sourced heterogeneously via third-party links rather than primary versioned accessions: mouse protein data from the cPCA GitHub repo (blob), Perturb-seq/mouse-intestinal from the ContrastiveVI tutorial, HCA-BM from Lamian's slingshot_data.rda (GitHub blob), and tutorial data from a Google Drive folder (mutable) and a figshare file. Only the Jerber et al. dataset is on Zenodo (versioned). No GEO/SRA/ENA/dbGaP accession is given for the designed scRNA-seq experiment.",
+      "how_to_close": "Deposit or mirror all input matrices in a versioned archive (Zenodo/figshare with DOI) with a manifest mapping each dataset to the manuscript figures; replace the mutable Google Drive link with an immutable snapshot; cite primary accessions where they exist."
+    },
+    {
+      "type": 6,
+      "where": "Analysis parameters (Methods prose)",
+      "missing": "Parameters for the external contrastive DR steps (cPCA contrast parameter alpha, latent dimensionality; ContrastiveVI latent dims / epochs / seeds) and for the BasCoD test itself (number of retained embedding dimensions, test thresholds/significance levels, random seeds) are not specified in the Methods prose; they are deferred to external tutorials and the repo notebooks.",
+      "how_to_close": "State all analysis parameters and random seeds in the Methods or a supplementary table, and pin them inside the tutorial notebooks."
+    },
+    {
+      "type": 12,
+      "where": "Repository snapshot / citeable version (github.com/keleslab/BasCoD)",
+      "missing": "The repo has a LICENSE but no tagged release and no Zenodo/DOI archive; the paper links a floating HEAD rather than a specific commit or archived snapshot. Reproduction is pinned to whatever HEAD happens to be at read time.",
+      "how_to_close": "Mint a tagged release archived to Zenodo (DOI) and cite the specific commit/DOI in the paper."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: github.com/keleslab/BasCoD (R; code/functions/BasCoD.R + 4 tutorial notebooks Tutorial_Mouse_DS.ipynb, Tutorial_population_scRNA_Jerber.ipynb, Tutorial_inflammation_Liao.ipynb, Tutorial_double_perturbation.ipynb; LICENSE present; README pins R>=4.2.2 + install.packages('MASS'); NO renv.lock/DESCRIPTION/environment.yml/Dockerfile; 12 tree entries total)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "GitHub REST API (git/trees) + raw README, public repo"
+    },
+    {
+      "artifact": "data: Zenodo record https://zenodo.org/records/4333872 (Jerber et al. population-scale scRNA-seq with ROT treatment)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "cited in Data Availability; versioned archive"
+    },
+    {
+      "artifact": "data: cPCA GitHub blob https://github.com/abidlabs/contrastive/blob/master/experiments/datasets/Data_Cortex_Nuclear.csv (mouse protein data)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "third-party GitHub blob, floating master branch"
+    },
+    {
+      "artifact": "data: Lamian GitHub blob https://github.com/Winnie09/Lamian/blob/master/data/slingshot_data.rda (HCA bone-marrow)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "third-party GitHub blob, floating master branch"
+    },
+    {
+      "artifact": "data: figshare file https://figshare.com/ndownloader/files/43390776 and Google Drive folder (tutorial datasets, mutable)",
+      "http_status": "not-checked",
+      "checked_at": "2026-07-23",
+      "network_context": "cited download links; Google Drive is a mutable source"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "aef7c3ee1d926c142e54bc9d782ae3763dd42d1c6a2a4cd78b1183f787034c25",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

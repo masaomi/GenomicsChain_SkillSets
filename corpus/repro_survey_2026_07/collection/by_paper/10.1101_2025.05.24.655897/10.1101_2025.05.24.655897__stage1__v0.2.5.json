@@ -1,0 +1,172 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2025.05.24.655897",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.05.24.655897v1",
+      "biorxiv:2025.05.24.655897v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational differential-expression analysis of mitochondria-associated sense and antisense transcripts in P. falciparum patient samples: (1) consolidation of a mitochondrial gene set via multi-tool localization prediction (TargetP/Cello2GO/MitoFate/PFMpred + PlasmoDB), (2) custom 8x60K microarray feature extraction (Agilent Feature Extraction), (3) microarray normalization + differential expression (Agilent GeneSpring GX; 75th-percentile shift, 40% detection filter, Pearson >=0.8, log2FC +/-0.8), (4) strand-specific RNA-seq alignment (HISAT2 vs GRCh38.p13 then P. falciparum 3D7), (5) differential expression (R package DESeq, size-factor normalization, log2FC +/-0.8), (6) GO functional enrichment (DAVID v6.8). Wet-lab sample processing, microarray hybridization, and RNA-seq library prep/sequencing are W-layer (out of computational-reproduction scope).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from the biorxiv JATS Materials and Methods prose (source XML fetched via curl; WebFetch was 403-blocked). No code/software availability statement exists and no author script repository is named. DAVID and the four localization predictors are hosted web services; the two Agilent tools (Feature Extraction, GeneSpring GX) are proprietary commercial GUI software. HISAT2 and DESeq are open tools but carry no version pins in prose. Wet-lab steps counted in W, not verdicted.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "none",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Mitochondrial gene-set consolidation via multi-tool localization prediction (TargetP, Cello2GO, MitoFate, PFMpred + PlasmoDBv57), consensus of >=2 tools plus literature validation - no versions for predictors",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C2",
+      "label": "Microarray raw-image feature extraction (Agilent Feature Extraction software, 2-fold-above-background) - proprietary GUI, no version",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C3",
+      "label": "Microarray normalization + differential expression (Agilent GeneSpring GX; 75th-percentile shift, >=40% detection filter, Pearson r>=0.8, log2FC +/-0.8) - proprietary GUI, no version",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "Strand-specific RNA-seq alignment (HISAT2 vs Homo sapiens GRCh38.p13, then unaligned reads vs P. falciparum 3D7; R1 vs mRNA, R2 vs reverse-complement; <Q30 filtering) - no version, no command line",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C5",
+      "label": "Differential gene expression (R package DESeq; size-factor library normalization, log2FC cutoff +/-0.8) - no version",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C6",
+      "label": "GO functional enrichment (DAVID v6.8, EASE score p<0.05, custom mitochondrial background list) - version pinned but closed hosted web service, no scriptable/snapshot path",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 1, "params": 2 },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": []
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 6,
+    "n_X": 0,
+    "S": 6,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/6 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "No computational step reaches an RI ceiling. All 6 C-layer steps cap at NI: five tools carry no version pin at all (localization predictors, Agilent Feature Extraction, Agilent GeneSpring GX, HISAT2, DESeq) and the one version-pinned tool (DAVID v6.8) is a closed hosted web service with code axis 0 (no scriptable/snapshot reproduction path). No code/software availability statement, no author scripts, no env lockfile or container claimed; capture_claim=none, so no step could exceed RI even at stage2 and none reaches it here.",
+    "coverage": "6 computational steps assessed from biorxiv JATS Materials and Methods prose. 3 wet-lab steps (blood/erythrocyte processing, microarray labeling+hybridization+scanning, strand-specific RNA-seq library prep + Illumina HiSeq X Ten sequencing) counted (W) but out of computational-reproduction scope.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Whole computational pipeline (no Code/Software availability statement)",
+      "missing": "No author analysis scripts or pipeline repository (GitHub/GitLab/Zenodo) are provided or named. Microarray filtering thresholds, HISAT2 two-level alignment logic, and DESeq DE were run without any published code, so exact reproduction of the analysis steps is not possible from prose alone.",
+      "how_to_close": "Publish the analysis scripts / notebooks (array filtering, HISAT2 alignment commands, DESeq DE) in a version-tagged public repository."
+    },
+    {
+      "type": 3,
+      "where": "All named tools except DAVID (TargetP, Cello2GO, MitoFate, PFMpred, Agilent Feature Extraction, Agilent GeneSpring GX, HISAT2, DESeq)",
+      "missing": "No version numbers recorded; every non-DAVID tool is version-floating and therefore caps at NI.",
+      "how_to_close": "Record exact tool versions (and R/Bioconductor package versions for DESeq) in Methods or a versions table."
+    },
+    {
+      "type": 2,
+      "where": "Software environment",
+      "missing": "No conda/env spec, lockfile, or container. Two core analysis tools (Feature Extraction, GeneSpring GX) are proprietary Agilent GUI software with no open/scriptable equivalent captured.",
+      "how_to_close": "Provide a conda-lock/pixi lockfile or container digest for the open toolchain (HISAT2, DESeq, predictors) and record exact GeneSpring GX / Feature Extraction software versions."
+    },
+    {
+      "type": 1,
+      "where": "RNA-seq raw data (Data availability statement)",
+      "missing": "Only microarray data are deposited (GEO GSE272963). RNA-seq data are stated to be 'provided in the supplementary data files' with no SRA/ENA raw-read accession, so RNA-seq alignment/DE steps lack a fetchable raw-data entry point.",
+      "how_to_close": "Deposit raw strand-specific RNA-seq reads in SRA/ENA and cite the accession."
+    },
+    {
+      "type": 11,
+      "where": "C6 DAVID v6.8 enrichment",
+      "missing": "DAVID is a closed hosted web service; although v6.8 is named, underlying annotation databases and the web interface are not user-controllable/snapshot-pinned, so results are not deterministically reproducible via a script.",
+      "how_to_close": "Record the DAVID annotation-database release date and export, or substitute a scriptable open enrichment tool with a pinned gene-set database."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab: erythrocyte enrichment (histopaque), RNA extraction, Agilent Quick-Amp labeling + SureHyb hybridization + microarray scanning, NEBNext Ultra II Directional library prep, Illumina HiSeq X Ten sequencing",
+      "missing": "Physical sample-processing and sequence-generation steps are out of scope for computational reproduction (OOS); counted in W (3), not verdicted.",
+      "how_to_close": "N/A for Tier-1 computational readiness; deposited microarray data (GSE272963) and (if deposited) raw RNA-seq reads are the reproducible entry point."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE — no Code/Software availability statement and no author script repository named in the paper (stage1 prose scan of biorxiv JATS).",
+      "http_status": "n/a (no author code repository exists)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv source XML parsed via unauthenticated curl"
+    },
+    {
+      "artifact": "data accession: GEO GSE272963 (custom 8x60K P. falciparum microarray results)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-23",
+      "network_context": "unauthenticated curl, ncbi.nlm.nih.gov/geo"
+    },
+    {
+      "artifact": "data accession: RNA-seq raw reads — NONE (no SRA/ENA accession; stated to be in supplementary data files only)",
+      "http_status": "n/a (no accession provided)",
+      "checked_at": "2026-07-23",
+      "network_context": "Data availability statement parsed from biorxiv JATS"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "62f6e1afe7d55cfa45e1d3de7e1a20b88f78a638a12f5308efd99ec48c52a2bf",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

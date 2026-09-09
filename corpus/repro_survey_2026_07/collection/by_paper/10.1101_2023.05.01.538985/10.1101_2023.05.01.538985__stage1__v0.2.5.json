@@ -1,0 +1,240 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-23",
+  "canonical_id": {
+    "value": "10.1101/2023.05.01.538985",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2023.05.01.538985v2",
+      "biorxiv:2023.05.01.538985v2"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Computational re-analysis of published murine liver TCDD/AHR genomics data: (a) ChIP-seq re-processing (trim_galore -> bowtie2 mm10 -> MACS2 peaks -> bedtools merge) of AHR datasets GSE97634/GSE97636, followed by AHR motif (XRE/NC-XRE) scanning with an in-house script, random-control enrichment (Fisher exact), ChromHMM 10-state chromatin annotation over 9 ENCODE histone-mark tracks, HOMER signal/motif enrichment, and motif-run detection; (b) RNA-seq re-processing (trim_galore -> STAR mm10 -> feature_counts -> EdgeR+RUVr DEGs) of GSE109863/GSE62902/GSE87519, GSEA (MSigDB v7.5.1), and custom Over-Representation Analysis (Rajapakshe & Coarfa ORA v4.0; GO BP v7.5.1, CollecTRI v2). Wet-lab validation (CRISPR editing of the Serpine1 5x NC-XRE in Hepa 1-6 cells + qRT-PCR) is out of the computational reproduction target.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool from Methods prose. Computational re-analysis relies on standard public tools (trim_galore, bowtie2, MACS2, bedtools, STAR, feature_counts, EdgeR, RUVr, ChromHMM, HOMER, eulerr, GSEA) plus several unshared in-house/custom scripts (AHR motif search, random-control generation, motif-run detection, ORA v4.0). No code-availability statement and no repository (GitHub/GitLab/Zenodo/SoftwareHeritage) found in paper prose. Data are reused public GEO accessions. Wet-lab steps (cell culture, FACS cloning, CRISPR, genotyping, qRT-PCR) counted as W, excluded from S. Stage-1 prose only; no workflow source read.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "ChIP-seq read trimming (trim_galore) of AHR datasets GSE97634/GSE97636 downloaded from GEO",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "ChIP-seq alignment to UCSC mm10 (bowtie2)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Peak calling with provided controls (MACS2)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Peak merging into male/female/merged sets (bedtools)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "AHR motif (XRE/NC-XRE) scanning within peaks using an in-house script (not shared)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Random-control peak generation matched to chromosome/size distribution 'as previously described' (Coarfa 2020); code/parameters not provided",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Motif enrichment vs random (Fisher exact, p<0.05) and Venn diagrams (eulerr package in R/RStudio)",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Chromatin-state annotation: trim_galore+bowtie2 of 9 ENCODE histone-mark tracks (GSM1000140 etc.), then ChromHMM 10-state HMM segmentation overlaid on AHR peaks (overlay via custom in-house script)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Histone-mark signal distributions across genomic regions and flanking-sequence motif enrichment (HOMER)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Detection of AHR motif runs (successive motifs within max distance) using an in-house Python script + bedtools; script not shared",
+      "layer": "C",
+      "axes": { "data": 2, "code": 0, "version": 0, "params": 0 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C11",
+      "label": "RNA-seq read trimming (trim_galore) of GSE109863/GSE62902/GSE87519 from GEO",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "RNA-seq alignment to UCSC mm10 (STAR)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Gene-level quantification (feature_counts/featureCounts)",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 0 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C14",
+      "label": "Differential expression (EdgeR + RUVr), FC>1.5x and FDR<0.05",
+      "layer": "C",
+      "axes": { "data": 2, "code": 1, "version": 0, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Gene Set Enrichment Analysis (GSEA) on ranked gene list using MSigDB mouse collection v7.5.1",
+      "layer": "C",
+      "axes": { "data": 1, "code": 1, "version": 1, "params": 1 },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Over-Representation Analysis via custom Python script (Rajapakshe & Coarfa ORA v4.0; hypergeometric test) against GO BP v7.5.1 and CollecTRI v2 regulons; script not shared",
+      "layer": "C",
+      "axes": { "data": 1, "code": 0, "version": 1, "params": 1 },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 12,
+    "n_NI": 4,
+    "n_X": 0,
+    "S": 16,
+    "W": 5,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/16 (0%) — stage1 ceiling only, no R★",
+    "inference_inclusive_upper_bound": "RI ceiling on 12 of 16 computational steps (standard public tools run on public GEO data, reproducible-in-principle but with no version pins, no exact commands/parameters, and no environment closure). 4 steps (C5 AHR-motif scan, C6 random-control generation, C10 motif-run detection, C16 ORA v4.0) drop to NI because they depend on in-house/custom scripts that are not deposited and have no code-availability statement or repository. capture_claim is 'floating' (a few isolated version tokens — MSigDB v7.5.1, CollecTRI v2, ORA v4.0, GraphPad Prism 10.2.2 — but no env lock, lockfile, container, or repo), so this paper is NOT a stage2 R★ candidate: even a perfect stage2 run could not exceed RI.",
+    "coverage": "16 computational steps assessed from Methods prose across two re-analysis pipelines (ChIP-seq C1-C10, RNA-seq C11-C16). 5 wet-lab steps (W=5: cell culture, FACS cloning, CRISPR mutagenesis, genotyping, qRT-PCR) present but outside the computational reproduction target. No code repository located in paper prose.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 6,
+      "where": "Custom/in-house analysis code (steps C5, C6, C10, C16)",
+      "missing": "No code-availability statement and no repository (GitHub/GitLab/Zenodo/Software Heritage) found. Multiple analyses rely on unshared in-house scripts: AHR motif scanning, random-control peak generation, motif-run detection, and the Rajapakshe & Coarfa ORA v4.0 Python script. Chromatin-state overlay onto AHR peaks also uses a 'custom in-house script'.",
+      "how_to_close": "Deposit all in-house/custom scripts (motif scanner, random-control generator, motif-run detector, ORA v4.0, overlay scripts) in a versioned, licensed repository with a Zenodo/tagged snapshot cited in the paper."
+    },
+    {
+      "type": 2,
+      "where": "Software environment (whole computational pipeline)",
+      "missing": "No environment.yml / lockfile / container. Core tools (trim_galore, bowtie2, MACS2, bedtools, STAR, feature_counts, EdgeR, RUVr, ChromHMM, HOMER, eulerr, GSEA) are named without version pins; R/RStudio version unspecified. Only a few isolated version tokens exist (MSigDB v7.5.1, CollecTRI v2, ORA v4.0, GraphPad Prism 10.2.2).",
+      "how_to_close": "Ship a conda-lock/pixi.lock or container digest for a declared platform and record the exact version of every tool used."
+    },
+    {
+      "type": 4,
+      "where": "Tool parameters and thresholds",
+      "missing": "Statistical thresholds are partly given (Fisher p<0.05; DEG FC>1.5x, FDR<0.05; 10 kb peak-to-gene window; 10 ChromHMM states), but tool-level parameters (trim_galore/bowtie2/MACS2/STAR/feature_counts/HOMER command lines, MACS2 control mapping, motif-run max-distance) are not specified.",
+      "how_to_close": "Provide exact command lines / parameter settings for each tool, and the max-distance definition for motif runs."
+    },
+    {
+      "type": 1,
+      "where": "Input and intermediate data",
+      "missing": "Primary inputs are reused public GEO accessions (GSE97634, GSE97636, GSE109863, GSE62902, GSE87519, and 9 ENCODE histone GSMs) which are provided — good. However no processed/intermediate artifacts (peak/BED files, count matrices, motif catalogs, ChromHMM segmentations) are deposited, and the random-control set is defined only 'as previously described'.",
+      "how_to_close": "Deposit processed BED/peak files, count matrices, motif tables, and ChromHMM segmentations (e.g., Zenodo) with a manifest keyed to each figure."
+    },
+    {
+      "type": 12,
+      "where": "Repository / snapshot / license",
+      "missing": "No repository, tagged release, DOI snapshot, or license exists for any of the analysis code; there is no citable software artifact at all.",
+      "how_to_close": "Create an OSI-licensed repository with a tagged release / Zenodo DOI and cite the specific commit in the paper."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "reused ChIP-seq data (AHR, murine liver +TCDD): GEO GSE97634 (male), GSE97636 (female)",
+      "http_status": "not-checked (accession cited in Methods)",
+      "checked_at": "2026-07-23",
+      "network_context": "NCBI GEO accessions named verbatim in Methods; not independently HTTP-verified at stage1"
+    },
+    {
+      "artifact": "reused ENCODE histone-mark ChIP-seq: GEO GSM1000140, GSM918718, GSM1000150, GSM1000151, GSM1000152, GSM1000153, GSM769014, GSM769015, GSM751035",
+      "http_status": "not-checked (accessions cited in Methods)",
+      "checked_at": "2026-07-23",
+      "network_context": "NCBI GEO accessions named verbatim in Methods"
+    },
+    {
+      "artifact": "reused RNA-seq data (murine liver +TCDD): GEO GSE109863, GSE62902, GSE87519",
+      "http_status": "not-checked (accessions cited in Methods)",
+      "checked_at": "2026-07-23",
+      "network_context": "NCBI GEO accessions named verbatim in Methods"
+    },
+    {
+      "artifact": "code repository: NONE found — no code-availability statement, no GitHub/GitLab/Zenodo/Software Heritage link in paper prose; analyses use unshared in-house/custom scripts",
+      "http_status": "n/a (no artifact)",
+      "checked_at": "2026-07-23",
+      "network_context": "biorxiv v2 full text (landing HTML) inspected; no repository located"
+    }
+  ],
+  "assessable": { "is_assessable": true },
+  "contested_corrected": [],
+  "human_signoff": { "signed": false, "reviewer_id": "PENDING (stage1 draft)" },
+  "manifest": {
+    "b1_manifest_hash": "0f253fbe58ca5cd624fe23e75f4bac6c8054a214e94b0f9cf5ae84fbd9f62590",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  }
+}

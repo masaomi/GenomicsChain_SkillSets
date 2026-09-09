@@ -1,0 +1,444 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "9131db3d68e3829f236609f18c5c22a17989a30f4c6e11635f55d260b804fc52",
+  "canonical_id": {
+    "value": "10.64898/2025.12.19.694255",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.19.694255v1",
+      "biorxiv:2025.12.19.694255v1"
+    ]
+  },
+  "paper_type": "tool-methods",
+  "reproduction_target": "The scDNA R package (v1.1) itself plus the demonstration analyses shown in Figures 2-6: import of Mission Bio Tapestri h5 / multi-sample VCF single-cell DNA(+Protein) data; variant identification and annotation via variant_ID() against TxDb panels (MSK_RL custom, UCSC.hg19, UCSC.hg38, mm10); extraction into a SingleCellExperiment container with AF/DP/GQ filtering; clone enumeration with bootstrap confidence intervals; two-level cell-confidence classification (amplicon-entropy DNA heuristic, then ECOD outlier detection on protein features with Tukey cutoff); protein normalisation (dsb / CLR via Seurat) with clustering, UMAP and manual cell-type curation; active-learning demultiplexing of a 4-sample AML mixture (iterative variance/GQ thresholding, k-means, nearest-centroid imputation); amplicon-read-depth CNV / ploidy estimation against a user-declared diploid reference; allele-dropout false-positive-rate estimation from ploidy confidence intervals; and Markov-Decision-Process / Q-learning clonal trajectory inference with and without ADO awareness. Patient/PBMC sample acquisition, TotalSeq-D antibody staining, Tapestri DNA+Protein library preparation and sequencing, and the physical 4-sample mixing experiment are wet-lab (W, OOS for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool or named package-function invocation described in the Methods and Results prose of the bioRxiv v1 full text, supplemented by the repository landing page / README prose (github.com/bowmanr/scDNA, master branch) as permitted at stage 1. No workflow source was read line-by-line and no code was executed. Statistical tests reported in Results (2-way ANOVA, post-hoc pairwise Wilcoxon with FDR, hypergeometric test, F1 / Cohen's kappa) are collapsed into a single step because no script is provided for any of them.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "floating",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Upstream primary processing on the Mission Bio Tapestri pipeline (vendor closed-source) producing the h5 input: cell calling from DNA amount / amplicon coverage, GATK genotype calls (NGT), DP, GQ, AF layers; no pipeline version, no parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Variant identification and annotation with scDNA::variant_ID() (GT_cutoff / VAF_cutoff filters; exploratory 0/0 then refinement 35/5 recommended; annotation against panel='MSK_RL' custom TxDb, or UCSC.hg19 / UCSC.hg38 / mm10)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Extraction of VAF / AF / DP / GQ / NGT layers into a SingleCellExperiment container with scDNA::tapestri_h5_to_sce() (AF band filter, e.g. width 20 = +/-10%; DP minimum-read filter; GQ filter) - the numeric AF/DP/GQ values actually used for each figure are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Clone enumeration and clonal statistics with scDNA::enumerate_clones() / compute_clone_statistics() (clone code over NGT 0/1/2/3, rejection of clones containing Missing calls, bootstrap resampling of whole clones with a quantile-based empirical confidence interval) - bootstrap replicate count and quantile level not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "First-level droplet/cell quality classification from DNA content: per-amplicon compositional normalisation, Shannon entropy H_c, uniformity/efficiency U_c against H_max, composite score S_c, empirical CDF upper-tail p-value with p_thresh = 0.025 and the 90%-amplicon-coverage entropy basis (extract_droplet_size / cell-confidence functions)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Second-level cell-confidence classification from protein data: log1p transform, per-cell protein composition CDF, L2 distance and angular smoothness against a uniform reference, ECOD (empirical-cumulative-distribution outlier detection, Li et al.) over [protein distance, protein smoothness, DNA heuristic, total protein counts] with skewness-selected tail and a Tukey inlier/outlier cutoff",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Protein normalisation with scDNA::normalize_protein_data() wrapping dsb and CLR (CLR performed in Seurat), background-droplet selection Droplet_type=='Empty' & dna_size between 0.15 and 1.5, detect_IgG=TRUE - no version stated for dsb, Seurat or flowCore",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Protein-based cell clustering, UMAP embedding and MANUAL curation of cell identities (Figures 2C, 3A, 4A, 5A) - 'We clustered cells based on Protein data, identified cell types by manual curation'; no clustering algorithm, resolution, UMAP parameters, marker gating rules or curation record given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "Active-learning demultiplexing of the 4-sample AML mixture: iterative thresholding of the allele-frequency matrix to full rank (removing low-variance variants and low-GQ cells), k-means with user-supplied k plus one extra doublet cluster, nearest-centroid imputation of excluded cells, UMAP/heatmap for user-guided annotation - the iterative threshold criteria and stopping rule are not specified",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Copy-number / ploidy estimation from h5 amplicon read depth: per-cell amplicon read-depth fraction, median standardisation across amplicons, ratio to a user-declared diploid reference cell set (lymphoid cells in the TP53-mutant complex-karyotype AML example), log2 transform",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Allele-dropout false-positive-rate estimation: lower bound of the 99% t-based confidence interval on mean heterozygous-call ploidy, counting WT/Hom cells falling below that bound, alpha_Het->Mut = n_Het->Mut / n_Mut (reported: 47.9% NRAS-WT, 86.8% NRAS-Hom)",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Clonal trajectory inference with scDNA::trajectory_analysis(use_ADO=TRUE/FALSE): Markov Decision Process {S,A,R,gamma} over theoretical clones with mutation and forward/backward ADO actions, ADO-rate-weighted reward design, Q-learning (model-free temporal differencing) to a converged Q-matrix, then optimal-path extraction - learning rate schedule, gamma, episode/sampling count and random seed are not stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked",
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "Downstream statistics reported in Results with no script provided: differential protein Wilcoxon between clones (Figure 3B), 2-way ANOVA on CNV by chromosome and cell type (F=554.786 / F=5.787) with post-hoc pairwise Wilcoxon and FDR correction (Supplemental Table 2), hypergeometric test of SNP overlap between demultiplexing strategies (p=0.187), F1 scores and Cohen's kappa (0.965) for demultiplexing agreement",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Clonograph and package visualisation outputs (scDNA::clonograph(), ADO-pair annotation, trajectory tree / bubble plots, CNV heatmaps and violin plots) as shown in Figures 5-6",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": [
+        "controlled-access",
+        "workflow-ref-unpinned",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Patient / PBMC specimen acquisition (AML patient samples from Penn and MSKCC, healthy human peripheral blood) - no wet-lab methods section is present in the preprint",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "TotalSeq-D antibody staining (45-plex protein panel) and Mission Bio Tapestri DNA+Protein library preparation and sequencing",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Physical mixing of four AML patient samples at different ratios and design of the custom amplicon panel including individual-identification SNP amplicons (Pakstis et al. panel)",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 10,
+    "n_NI": 4,
+    "n_X": 0,
+    "S": 14,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/14 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI ceiling on 10/14 computational steps. The package implementing those steps is public and MIT-licensed (github.com/bowmanr/scDNA, 'All scripts and software are publicly available'), and the README/DESCRIPTION name a package version (scDNA v1.1) plus a loose interpreter floor (R >= 4.3.1), so those steps clear code and hold version at 1 - never above, because the only installation instruction is remotes::install_github('bowmanr/scDNA', force=TRUE), i.e. moving master HEAD with no tag, release or commit pin (the repository has 0 GitHub releases), and DESCRIPTION Imports lists 30+ Bioconductor/CRAN dependencies (SingleCellExperiment, rhdf5, VariantAnnotation, GenomicFeatures, TxDb.Hsapiens.UCSC.hg19.knownGene, BSgenome.Hsapiens.UCSC.hg19, flowCore, Seurat, ...) with no version constraint on any of them and no renv.lock, conda spec or container. The remaining 4/14 steps cap at NI: the upstream Mission Bio Tapestri pipeline (proprietary, unversioned, parameters unstated), dsb/CLR protein normalisation (no dsb or Seurat version), protein clustering + UMAP + MANUAL cell-type curation (no algorithm, parameters or curation record), and the Results statistics (ANOVA / post-hoc Wilcoxon+FDR / hypergeometric / F1 / kappa) for which no script is deposited. Data is the binding constraint everywhere: the paper states raw files are 'available upon request to the corresponding authors and will be made available on dbGAP prior to final publication' - no accession exists today - so every step sits at data=1 and no step could reach R-star even with a perfect environment.",
+    "coverage": "14 computational steps assessed from the bioRxiv v1 full-text (Methods plus the method-bearing Results paragraphs) and the repository landing page / README prose at github.com/bowmanr/scDNA (master). 3 wet-lab steps counted in W and out of computational-reproduction scope; the preprint contains no wet-lab methods section at all, so W is a floor, not a complete enumeration. Computational coverage 14/17 = 82%.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Data Sharing Statement",
+      "missing": "No data accession of any kind. Verbatim: 'Raw data files are available upon request to the corresponding authors and will be made available on dbGAP prior to final publication.' There is no dbGaP phs identifier, no GEO/SRA/ENA study, no figshare/Zenodo DOI. The specific specimens behind Figures 2-6 (a PBMC DNA+Protein sample, an AML sample with TET2/NPM1/NRAS, a TP53-mutant complex-karyotype AML, and four AML samples UP1-UP4) are not mapped to any retrievable file. The README offers a Google Drive folder said to hold 'H5 files to replicate data from this preprint', which is a non-persistent, unversioned, uncited link with no manifest, no checksums and no sample-to-figure mapping.",
+      "how_to_close": "Deposit the h5 / VCF inputs under a citable controlled-access accession (dbGaP phs, EGA) or an open DOI-bearing archive for the de-identified matrices, cite it in the Data Sharing Statement, and publish a per-figure manifest mapping each specimen to its file and checksum."
+    },
+    {
+      "type": 2,
+      "where": "Repository installation instruction and DESCRIPTION (all 14 computational steps)",
+      "missing": "Floating version floor. Installation is 'remotes::install_github(\"bowmanr/scDNA\", force=TRUE)' against master HEAD; the repository carries 0 GitHub releases, so the stated 'v1.1' cannot be resolved to an immutable artifact. DESCRIPTION Imports names 30+ packages with no version constraint (only Depends: R (>= 4.3.0), and the README's 'best suited for R >= V4.3.1'), and the preprint itself names no software version anywhere in the Methods.",
+      "how_to_close": "Cut a tagged GitHub release (and archive it to Zenodo for a DOI), cite the exact tag/commit in the Methods, add version floors/ceilings to DESCRIPTION Imports, and ship an renv.lock or a container image referenced by sha256 digest."
+    },
+    {
+      "type": 3,
+      "where": "Whole computational environment",
+      "missing": "No environment lock of any kind: no renv.lock, no conda/mamba environment file, no conda-lock/pixi lock, no Dockerfile and no image digest. Bioconductor release train, R version, and the annotation-package versions that determine variant coordinates are all unconstrained.",
+      "how_to_close": "Ship renv.lock (or a conda-lock for a declared platform) plus a container image pinned by digest covering R, Bioconductor and the annotation packages."
+    },
+    {
+      "type": 12,
+      "where": "Steps C8 and C13 (and figure generation generally)",
+      "missing": "The analysis driver code for the manuscript is not deposited - only the library is. There is no script for the protein clustering / UMAP / manual cell-type curation used in Figures 2C, 3A, 4A and 5A, none for the 2-way ANOVA + post-hoc pairwise Wilcoxon with FDR correction feeding Supplemental Table 2, none for the hypergeometric overlap test, the F1 / Cohen's kappa computation, or the differential-protein Wilcoxon ranking of Figure 3B. The Code Availability statement ('All scripts and software are publicly available at https://github.com/bowmanr/scDNA/') is therefore broader than what the repository contains, since it points at the package rather than at per-figure analysis scripts. Vignettes are described in the Discussion as 'readily accessible on github' but are not tied to specific figures.",
+      "how_to_close": "Deposit a per-figure analysis repository (or vignettes explicitly labelled by figure) containing the exact filter values, clustering and UMAP calls, the cell-type gating/curation table, and the statistical test scripts, with the session information recorded."
+    },
+    {
+      "type": 11,
+      "where": "Step C1",
+      "missing": "Proprietary upstream dependency. The h5 inputs are produced by the closed-source Mission Bio Tapestri pipeline (cell calling from DNA amount and amplicon coverage; GATK genotype calls). No pipeline version, no reference build for the primary alignment, and no parameters are stated, so the input matrices cannot be regenerated from raw reads.",
+      "how_to_close": "State the Tapestri pipeline version and its parameter set, name the reference genome build used for the primary calls, and deposit the raw FASTQs alongside the h5 files."
+    },
+    {
+      "type": 13,
+      "where": "Step C2 (variant annotation)",
+      "missing": "Reference-annotation snapshot unpinned and partly private. Annotation uses TxDb.Hsapiens.UCSC.hg19.knownGene / BSgenome.Hsapiens.UCSC.hg19 (Bioconductor annotation packages, version unpinned, and the underlying UCSC snapshot undated), plus hg38 and mm10 panels, plus a custom-built TxDb for the 'MSK_RL' Clonal Evolution Panel that is bundled in the package but whose provenance and build date are not documented. Transcript selection is said to follow cBioPortal canonical transcripts with no release version.",
+      "how_to_close": "Pin the Bioconductor annotation package versions, record the build date and source of the custom MSK_RL TxDb (and the generate_txdb() invocation that produced it), and cite the cBioPortal canonical-transcript release used."
+    },
+    {
+      "type": 4,
+      "where": "Step C12 (and the bootstrap in C4, the k-means in C9)",
+      "missing": "Stochastic procedures with no seed and no hyperparameters. Q-learning is explicitly described as relying on 'sufficient sampling, and random actions'; no random seed, learning-rate schedule, discount factor gamma value, episode count or convergence criterion is given. The clone bootstrap (C4) states neither replicate count nor quantile level; k-means demultiplexing (C9) states no seed or initialisation.",
+      "how_to_close": "Record seeds and all RL/bootstrap/k-means hyperparameters in the Methods and in the deposited analysis scripts, or report distributional agreement across seeds."
+    },
+    {
+      "type": 10,
+      "where": "Steps W1-W3",
+      "missing": "The preprint contains no wet-lab methods section: specimen provenance and consent, TotalSeq-D staining protocol, Tapestri library preparation, sequencing platform and depth, and the mixing ratios used for the four-sample multiplex are all absent. These are out of scope for computational reproduction but are recorded because the computational inputs depend on them.",
+      "how_to_close": "Add a wet-lab methods section covering specimen provenance/consent, antibody panel composition and clone/lot, library preparation kit and version, sequencer and target depth, and the exact mixing ratios."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repository: https://github.com/bowmanr/scDNA/ (Code Availability, verbatim: 'All scripts and software are publicly available at https://github.com/bowmanr/scDNA/.')",
+      "http_status": "200 OK (public, MIT licence, default branch 'master', created 2023-04-19, last push 2026-07-15, 0 GitHub releases; README.md and DESCRIPTION fetched 200 OK from raw.githubusercontent.com/bowmanr/scDNA/master)",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA; api.github.com (repo + releases; tags/contents calls hit the anonymous rate limit) and raw.githubusercontent.com"
+    },
+    {
+      "artifact": "package documentation site: https://bowmanr.github.io/scDNA/ (URL field of DESCRIPTION)",
+      "http_status": "200 OK",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA"
+    },
+    {
+      "artifact": "data: no accession stated. Data Sharing Statement verbatim: 'Raw data files are available upon request to the corresponding authors and will be made available on dbGAP prior to final publication.' README prose additionally states: 'H5 files to replicate data from this preprint can be found here', linking https://drive.google.com/drive/folders/1rE3GFlLC0fj0hX6jFdk536iCyh1gB2_j?usp=drive_link",
+      "http_status": "no accession to check (none exists); Google Drive folder URL returns 200 OK but is a non-persistent, unversioned link with no manifest or checksums and is not cited in the paper",
+      "checked_at": "2026-07-27",
+      "network_context": "unauthenticated curl with browser UA; drive.google.com; no web search performed for an unstated accession"
+    },
+    {
+      "artifact": "paper full text (bioRxiv v1)",
+      "http_status": "source.xml 403 via WebFetch; the same source.xml path fetched by curl returned 200 but served the WRONG article (10.1101/2025.11.05.686701, an unrelated BPP/gene-flow preprint, DOI 694255 absent from the payload) and was discarded; the v1.full HTML at biorxiv.org/content/10.64898/2025.12.19.694255v1.full returned 200 OK and carries the complete Abstract, Introduction, Results, Methods, Data Sharing Statement and Code Availability, and was used as the assessment source",
+      "checked_at": "2026-07-27",
+      "network_context": "WebFetch (403) then unauthenticated curl with browser UA; api.biorxiv.org details endpoint returned HTTP 500"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "355df9c2693bebd9e8a7fbe99d652ed16cf2c9a94551a25a2c83c39043888afb",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

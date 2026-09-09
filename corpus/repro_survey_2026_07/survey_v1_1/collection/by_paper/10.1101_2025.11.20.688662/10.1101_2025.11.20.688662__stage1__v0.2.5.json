@@ -1,0 +1,594 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "556f70c24148aeddd075488da62cf1c28df9f9b92b829053c7516209cfedac5c",
+  "canonical_id": {
+    "value": "10.1101/2025.11.20.688662",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.11.20.688662v1",
+      "biorxiv:2025.11.20.688662v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "De novo genome assembly and functional annotation of a Hiroshima-derived Pacific oyster (Magallana gigas) from a single individual. Wet-lab target: HMW DNA extraction, SMRTbell library construction and PacBio Sequel IIe HiFi sequencing (2.3 M reads, 38.6 Gbp, mean 16.7 kb). Computational target: GenomeScope v2.0 k-mer profiling (k=31, haploid size ~471 Mb, heterozygosity 3.36%); Hifiasm v0.22.0 --primary de novo assembly; FCS-GX v0.5.4 contaminant screening (one Vibrio-phage contig removed); purge_dups haplotig purging; SeqKit v2.10.0 assembly statistics (707 Mb, contig N50 7.9 Mb); BUSCO v5.7.1 mollusca_odb10 genome-mode completeness (99.9%); Merqury v1.3 consensus QV (60.34); minimap2 v2.28 -x map-hifi read realignment with SAMtools v1.19.2 flagstat (99.8% alignment rate); repeat library construction with EDTA v2.1.0 plus RepeatModeler (Dfam TEtools v1.88.5), CD-HIT-EST v4.8.1 redundancy removal at 90% identity, RepeatMasker soft-masking, TRF tandem-repeat masking and a second CD-HIT-EST pass (53.2% of the genome masked); GALBA v1.0.11.2 ab initio gene prediction (--AUGUSTUS_ab_initio) against a custom five-oyster-species protein database (44,639 protein-coding genes); BUSCO v5.7.1 protein-mode completeness (98.6%); Fanflow functional annotation via ggsearch36 (fasta-36.3.8i) and HMMSCAN (HMMER v3.3.2) against Pfam v37.3 (43,806 / 98.1% of genes annotated); and comparative alignment against the UK reference xbMagGiga1.1 (GCA_963853765.1) with minimap2 v2.28 -x asm5 visualised by a modified dotPlotly R script.",
+  "step_source": "prose-methods",
+  "granularity_note": "One step per named tool or named analysis invocation in the Methods section of the bioRxiv v1 full text (JATS XML retrieved by curl 2026-07-28 from https://www.biorxiv.org/content/early/2025/11/24/2025.11.20.688662.source.xml; WebFetch returned HTTP 403, curl with a browser User-Agent returned 200 / 66,625 bytes; identity confirmed by grepping 'Hiroshima' and 'Magallana gigas' in the fetched XML). Sample collection, DNA extraction/QC/shearing and library preparation + PacBio sequencing are lumped into 3 W steps and are out of computational-reproduction scope. There is no workflow repository for this paper (no Snakefile, CWL, Nextflow or Makefile is cited), so the step list is derived purely from Methods prose. The only deposited code is a single modified R visualisation script on figshare; its figshare API record and file listing were read (landing-page equivalent), but the script source was not read line-by-line - that is stage-2 work. Tables 2 and 4, which enumerate the reference protein and domain datasets used for gene prediction and functional annotation, are not present in the JATS body text and were not retrieved at stage 1.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "W1",
+      "label": "Wet-lab: collection of seven-month-old oysters from aquaculture farms in Mitsu Bay, Akitsu, Higashi-Hiroshima, Hiroshima Prefecture, Japan (34.31 N, 132.80 E); a single individual was used for sequencing. No ethical approval required (invertebrate).",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W2",
+      "label": "Wet-lab: genomic DNA extraction from adductor muscle of a single individual with the NucleoBond HMW DNA kit (Macherey-Nagel), quality and quantity assessed on a Qubit 4 fluorometer (Thermo Fisher) and a Femto Pulse system (Agilent), then shearing to 10-30 kb fragments with a g-TUBE device (Covaris).",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Wet-lab: SMRTbell library construction for HiFi sequencing using the SMRTbell Prep Kit version 3.0 (Pacific Biosciences) and sequencing on the PacBio Sequel IIe platform (SMRT Cell 8M, Sequel II Binding Kit version 3.2), yielding approximately 2.3 million HiFi reads totalling 38.6 Gbp with a mean read length of 16.7 kb.",
+      "layer": "W",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C1",
+      "label": "K-mer profiling of the PacBio HiFi reads with GenomeScope version 2.0 at k = 31 to estimate haploid genome size and heterozygosity. Version and k are pinned in prose; the upstream k-mer counting tool (jellyfish / meryl / KMC) that produces the required histogram is not named anywhere, and no ploidy or max-coverage setting is stated. Input reads are declared as deposited at DDBJ BioProject PRJDB38101, which is registered but has no released BioSample, SRA run or assembly object at check time.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "De novo assembly of the PacBio HiFi reads with Hifiasm version 0.22.0 using the '--primary' option, generating primary (p_ctg) and alternate (a_ctg) contigs. Version and the single non-default flag are stated; the input reads are declared at DDBJ PRJDB38101 but no read object is released there at check time.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C3",
+      "label": "Contaminant screening and removal from the primary assembly with FCS-GX version 0.5.4 (referred to in Results as 'GenomeClean version 0.5.4'), which removed one prokaryotic viral contig similar to Vibrio phage 252E42.2. Version pinned; the GX reference database release / build date, the declared taxid and the action-report thresholds are not stated, and the pre-screen assembly is an unreleased intermediate.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Haplotig purging with purge_dups using default parameters. No version is stated for purge_dups anywhere in the paper, and the multi-stage invocation (read alignment step, pbcstat / calcuts cutoff selection, split_fa / get_seqs) is not described beyond the phrase 'default parameters'.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Basic assembly statistics (total length 707 Mb, contig N50 7.9 Mb, Table 1) computed with SeqKit version 2.10.0. Version pinned; the subcommand and its options are not stated. The soft-masked final assembly is publicly deposited on figshare (MgigHiroshima_genome_v1.sm.fa.gz, CC BY 4.0, md5 13859b9cf9f4cee0db7cc3868d7b09e1).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C6",
+      "label": "Assembly completeness assessment with BUSCO version 5.7.1 in genome mode against the mollusca_odb10 lineage dataset (99.9% complete; single 94.3%, duplicated 5.6%, fragmented 0.2%, missing 0.1%). Version, mode and lineage are all stated; the mollusca_odb10 download date / OrthoDB snapshot and the gene-predictor backend (metaeuk vs augustus) are not pinned.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Base-level consensus accuracy estimation with Merqury version 1.3, yielding QV 60.34 for the primary contigs. Merqury version is pinned, but Merqury requires a meryl k-mer database built from the HiFi reads and neither the meryl invocation, its version, nor the k value used is stated; the input reads are not released at the declared DDBJ accession.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C8",
+      "label": "Realignment of the PacBio HiFi reads to the final assembly with minimap2 version 2.28 using the preset -x map-hifi, to verify assembly consistency (99.8% average alignment rate). Version and preset are pinned; SAM/BAM output flags, secondary-alignment handling and thread count are not stated, and the input reads are not released.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C9",
+      "label": "Summarisation of mapping statistics with SAMtools flagstat version 1.19.2. Version and subcommand are fully stated; the input BAM is the unreleased intermediate produced by C8.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C10",
+      "label": "De novo repeat identification with EDTA version 2.1.0 as one of the two arms of the repeat-library construction, following the repeat-masking strategy described in the GALBA study. Version pinned; none of EDTA's controlling options (--species, --step, --sensitive, --anno, --evaluate) are stated. The genome input and the resulting composite repeat library are publicly deposited on figshare.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C11",
+      "label": "De novo repeat family discovery with RepeatModeler, run from Dfam TEtools version 1.88.5. The container distribution is named with an exact tag but RepeatModeler's own version is not stated and the tag carries no image digest; the RepeatModeler invocation (BuildDatabase step, -engine, -LTRStruct) is not described.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "Merging of the EDTA and RepeatModeler consensus sequences and removal of redundant sequences with CD-HIT-EST version 4.8.1 at 90% sequence identity to generate the initial non-redundant repeat library. Version and identity threshold are stated; word size (-n), alignment coverage (-aS/-aL), memory and thread flags are not.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C13",
+      "label": "Soft-masking of the genome with RepeatMasker (included in Dfam TEtools version 1.88.5) using the initial non-redundant repeat library. RepeatMasker's own version, its search engine (RMBlast / HMMER / cross_match), the Dfam or RepBase library release bundled in the container, and the -xsmall / -pa flags are not stated; only the container tag is pinned, without a digest.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Detection of tandem repeats with TRF and masking of them onto the soft-masked genome. No TRF version is stated, and none of TRF's seven required numeric parameters (match, mismatch, delta, PM, PI, minscore, maxperiod) nor the masking procedure used to apply the TRF output are given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C15",
+      "label": "Combination of the TRF-derived tandem repeat library with the initial repeat library and a second redundancy-removal pass with CD-HIT-EST at 90% identity to produce the final composite repeat database (deposited on figshare as Mgigas.Repeatlib.fa). Identity threshold stated; the version is carried from C12 (4.8.1) but is not restated, and the remaining CD-HIT-EST options are not given.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C16",
+      "label": "Protein-coding gene prediction with GALBA version 1.0.11.2 in ab initio mode (--AUGUSTUS_ab_initio) on the soft-masked assembly (53.2% masked), supported by a custom protein database assembled from five closely related oyster species retrieved from NCBI, yielding 44,639 predicted genes. GALBA version and the mode flag are pinned; the five NCBI protein datasets are enumerated only in Table 2, which is not in the JATS body and was not retrieved at stage 1, so their accessions, releases and download date cannot be read from prose. The AUGUSTUS species model, training rounds and thread settings are not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Assessment of predicted gene-model completeness with BUSCO version 5.7.1 in protein mode against mollusca_odb10 (98.6% complete; single 69.3%, duplicated 29.3%, fragmented 0.4%, missing 1%). Version, mode and lineage stated; the lineage dataset snapshot is not pinned. Input protein FASTA is publicly deposited on figshare (MgigHiroshima_genome_v1.sm_protein.fa).",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Functional annotation of the predicted proteins with the Fanflow workflow, annotating 43,806 of 44,639 genes (98.1%). Fanflow is cited only as a journal publication (Bono et al., Insects 13:586, 2022) - no repository URL, no version, no commit and no container are given anywhere in the paper, and the Code Availability statement covers only the modified dotPlotly script. The workflow's orchestration (which reference datasets in which order, best-hit selection rules, reciprocal-best-hit criteria) is therefore not recoverable from prose; its inputs and outputs are public on figshare but the workflow itself is not deposited or linked.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Pairwise comparison of the predicted amino acid sequences against annotated protein datasets with ggsearch36, included in fasta-36.3.8i. The package build is pinned exactly; no E-value or score threshold, no output format, no matrix, no gap penalties and no best-hit filtering criteria are stated, and the reference protein datasets are enumerated only in Table 4, which was not retrievable at stage 1.",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Protein domain identification with HMMSCAN (HMMER version 3.3.2) using Pfam version 37.3 as the domain database. Tool version and, unusually for this paper, the external database release are both pinned in prose; the E-value / --cut_ga gathering-threshold choice, the --domtblout output selection and the CPU settings are not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Retrieval of the UK-derived reference genome xbMagGiga1.1 (GCA_963853765.1) from the NCBI Genome database and recomputation of its basic assembly statistics with SeqKit and BUSCO to ensure consistency with the Hiroshima-derived genome (Table 1). The reference is cited by a versioned GenBank assembly accession, which resolves; SeqKit and BUSCO versions are not restated here but are pinned earlier in the Methods, and the download date, subcommands and BUSCO lineage for this recomputation are not stated.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "fetch-required"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Pre-alignment filtering: exclusion of sequences shorter than 1 Mb from both the Hiroshima-derived and the UK-derived assemblies. The threshold is fully stated but no tool, script or command is named, and no filtering code is deposited; the filtered FASTA files are not released, so the exact contig set entering the alignment cannot be recovered.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C23",
+      "label": "Pairwise whole-genome alignment of the Hiroshima-derived contigs against the UK reference with minimap2 version 2.28 using the -x asm5 preset, producing a PAF alignment file. Version and preset are pinned; thread count, --cs/-c flags and secondary-alignment settings are not stated, and the PAF intermediate is not deposited.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial"
+    },
+    {
+      "step_id": "C24",
+      "label": "Visualisation of the PAF alignment as a dot plot (Figure 3) with dotPlotly at default settings, using a modified pafCoordsDotPlotly.R script deposited on figshare (10.6084/m9.figshare.30480377.v1, single file pafCoordsDotPlotly_modified.R, 16,291 bytes, md5 18c007a6a17933d4b98e58f97433942e, CC BY 4.0, described as adapted from dotPlotly under MIT with changes to line thickness, colour scheme and axis labels). The exact modified code is therefore public and versioned, but no R version, no upstream dotPlotly commit or release, and no versions for the required R packages (ggplot2, plotly, dplyr, optparse) are stated anywhere, so the execution environment is entirely uncaptured.",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 17,
+    "n_NI": 7,
+    "n_X": 0,
+    "S": 24,
+    "W": 3,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/24 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 17 of 24 computational steps (C1 GenomeScope 2.0, C2 Hifiasm 0.22.0, C3 FCS-GX 0.5.4, C5 SeqKit 2.10.0, C6 BUSCO 5.7.1 genome mode, C8 minimap2 2.28 map-hifi, C9 SAMtools 1.19.2 flagstat, C10 EDTA 2.1.0, C11 RepeatModeler via TEtools 1.88.5, C12 CD-HIT-EST 4.8.1, C13 RepeatMasker via TEtools 1.88.5, C15 CD-HIT-EST second pass, C16 GALBA 1.0.11.2, C17 BUSCO 5.7.1 protein mode, C20 HMMER 3.3.2 with Pfam 37.3, C21 UK reference retrieval and stats, C23 minimap2 2.28 asm5) and NI on the remaining 7 (C4 purge_dups, C7 Merqury/meryl, C14 TRF, C18 Fanflow, C19 ggsearch36, C22 1 Mb filtering, C24 dotPlotly). This is a version-disciplined paper by prose standards: fifteen distinct tools carry exact version strings in the Methods (GenomeScope 2.0, Hifiasm 0.22.0, FCS-GX 0.5.4, SeqKit 2.10.0, BUSCO 5.7.1, Merqury 1.3, minimap2 2.28, SAMtools 1.19.2, EDTA 2.1.0, Dfam TEtools 1.88.5, CD-HIT-EST 4.8.1, GALBA 1.0.11.2, HMMER 3.3.2, fasta-36.3.8i, plus Pfam 37.3 as a pinned external database), which is why the capture claim is exact_pins_partial rather than floating. Under the Delta-2 rule every one of those pins is capped at version = 1 because no environment closure of any kind is declared: there is no lockfile, no conda or pixi specification, no image digest, no requirements file, no analysis repository and no release tag - the Code Availability statement deposits exactly one R visualisation script and otherwise states that 'all other analyses were performed using publicly available software as described in the Methods section'. Four tools are named with no version at all (purge_dups, TRF, Fanflow, and the R environment behind dotPlotly), which is version = 0 and drops those steps to NI. Two further constraints bind independently of version. First, the raw HiFi reads and the assembly are declared at DDBJ BioProject PRJDB38101, but that accession is registered (NCBI BioProject uid 1370162, registered 2025/11/26) with zero linked BioSample, SRA run or assembly records at check time, so every step that consumes reads (C1, C2, C3, C4, C7, C8, C9) scores data = 1 as accidental gating rather than 2; the derived artifacts (soft-masked genome, repeat library, GFF3/GTF, protein and CDS FASTA, functional annotation table) are genuinely public on figshare under CC BY 4.0 with md5 checksums, which is what keeps the middle of the pipeline at data = 2. Second, Fanflow - the tool that produced the paper's headline annotation result (98.1% of genes annotated) - is cited only as a 2022 journal article with no repository, no version and no deposited configuration, so the single most result-bearing computational component of the paper is the one least recoverable from what is stated.",
+    "coverage": "24 computational analysis steps assessed from the bioRxiv v1 full-text Methods subsections ('Sample collection and DNA sequencing' computational tail, 'Genome assembly', 'Repeat masking', 'Gene and functional annotations', 'Comparative genome alignment'), the Results and discussion section (which restates several versions and adds the GenomeClean 0.5.4 naming), and the Data availability and Code availability statements, plus the figshare API records for the four deposits. 3 wet-lab steps (oyster collection, HMW DNA extraction and shearing, SMRTbell library preparation and PacBio Sequel IIe sequencing) counted in W and out of computational-reproduction scope. Coverage = 24/27 (89%) of enumerated steps. Eight steps consume an external reference resource (C3 GX database, C6 and C17 mollusca_odb10, C13 the TEtools-bundled Dfam/RepBase library, C16 the five NCBI oyster protein datasets, C19 the Table 4 reference protein datasets, C20 Pfam 37.3, C21 GCA_963853765.1) and carry the fetch-required subflag, but n_fetch_required is reported as 0 because that count is defined over R-star-eligible steps and stage 1 produces none; no env_capture_class A/B/C assignment is made because that requires reading executable workflow code, which does not exist for this paper. Tables 1-5 are not present in the JATS body text and were not retrieved at stage 1; Table 2 (reference protein datasets for GALBA) and Table 4 (protein and domain reference datasets for Fanflow) are load-bearing for C16 and C19 and their absence is recorded as needs-supplement rather than as a scored gap.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 24 computational steps); version=0 specifically at C4 (purge_dups), C14 (TRF), C18 (Fanflow), C22 (1 Mb filtering), C24 (R / dotPlotly packages)",
+      "missing": "No environment capture of any kind is claimed. The paper declares no lockfile, no conda or pixi environment specification, no Docker or Singularity image (Dfam TEtools 1.88.5 is named as a versioned distribution but with no digest and no statement that it was run as a container), no requirements file and no module list. The Acknowledgements state only that 'computational analyses were performed using computing resources provided by the Bio-DX Organization and internal servers at PtBio Inc.', with no description of the software stack on those servers. Within that unlocked environment, fifteen tools are pinned exactly in prose - which is why the capture claim is exact_pins_partial - but four are named with no version at all: purge_dups, TRF, Fanflow, and the R interpreter plus every R package (ggplot2, plotly, dplyr, optparse) required by the deposited dotPlotly script. RepeatModeler and RepeatMasker have no versions of their own; only the Dfam TEtools 1.88.5 wrapper tag is given.",
+      "how_to_close": "Publish a conda-lock (or pixi.lock) resolved for at least linux-64 covering every tool in the Methods, or a digest-pinned container image, and add the missing version strings for purge_dups, TRF, Fanflow, RepeatModeler, RepeatMasker, R and the R packages used by the dot-plot script; record the R sessionInfo() alongside the deposited script."
+    },
+    {
+      "type": 12,
+      "where": "The whole assembly and annotation pipeline (C1-C23); the only deposited code is the C24 visualisation script",
+      "missing": "There is no analysis repository. The Code availability statement reads in full: 'The modified dotPlotly code used in this study is available on figshare. The visualization script used for constructing comparative genome dot plots was adapted from dotPlotly (MIT License), with minor modifications to improve visual clarity. All other analyses were performed using publicly available software as described in the Methods section.' No GitHub, GitLab, Bitbucket, Zenodo-code or Software Heritage deposit is cited for the assembly, purging, repeat-masking, gene-prediction or functional-annotation steps, and no workflow file (Snakefile, Nextflow, CWL, WDL, Makefile or shell driver) exists. The chain of 23 tool invocations therefore has to be reconstructed by a reader from prose alone, with no command lines recorded anywhere. This also means the paper offers no object for a stage-2 code check apart from a single R script.",
+      "how_to_close": "Deposit the actual driver scripts or a workflow definition (Snakemake / Nextflow) for the full assembly-to-annotation chain in a public repository, cut a tagged release and archive it to Zenodo with a DOI, and cite that DOI in the Code availability statement."
+    },
+    {
+      "type": 5,
+      "where": "Fanflow functional annotation (C18) and its component invocations (C19 ggsearch36, C20 HMMSCAN); custom filtering at C22",
+      "missing": "Fanflow, which produced the paper's headline annotation result (43,806 of 44,639 genes annotated, 98.1%), is cited only as a journal reference (Bono et al., Insects 13:586, 2022) with no repository URL, no version, no commit hash and no configuration file. Its orchestration logic - which reference dataset is searched in which order, the best-hit and reciprocal-best-hit acceptance criteria, the E-value or identity thresholds, how ggsearch36 and HMMSCAN outputs are merged into the released annotation table - is not described in the Methods and is not deposited. Separately, the 1 Mb length filter applied to both assemblies before comparative alignment (C22) names no tool and deposits no script, and the filtered FASTA files are not released.",
+      "how_to_close": "Cite Fanflow by repository URL plus an exact version or commit, deposit the Fanflow configuration and the parameter set actually used (thresholds, dataset order, hit-acceptance rules) alongside the annotation table, and deposit the one-line filtering command or script used for the 1 Mb cut-off."
+    },
+    {
+      "type": 13,
+      "where": "External reference resources at C3, C6, C13, C16, C17, C19, C20, C21",
+      "missing": "Most external reference resources are consumed without a pinned snapshot. The FCS-GX GX database build/release used for contaminant screening (C3) is not named, nor is the declared taxid. The BUSCO mollusca_odb10 lineage dataset (C6, C17) is named by lineage but not by OrthoDB release or download date. The Dfam or RepBase repeat library bundled inside Dfam TEtools 1.88.5 and used by RepeatMasker (C13) is not identified. The five NCBI oyster protein datasets used to support GALBA (C16) and the reference protein datasets used by Fanflow (C19) appear only in Tables 2 and 4, with no accessions, assembly versions or download dates visible in the prose. The two positive exceptions are Pfam version 37.3 (C20), which is pinned exactly, and the UK reference xbMagGiga1.1 / GCA_963853765.1 (C21), which is a versioned GenBank accession that resolves. Because no workflow code exists, none of these can be promoted to env_capture_class A even at stage 2 - the fetch is entirely manual and undocumented.",
+      "how_to_close": "State the exact release identifier and download date for the FCS-GX GX database, the BUSCO/OrthoDB lineage snapshot and the RepeatMasker library, list the NCBI protein dataset accessions and their assembly versions inline in the Methods (not only in a table), and record checksums for every downloaded reference so a reader can confirm they obtained the same bytes."
+    },
+    {
+      "type": 1,
+      "where": "Raw PacBio HiFi reads and the assembled genome deposited at DDBJ BioProject PRJDB38101; binding on C1, C2, C3, C4, C7, C8, C9",
+      "missing": "The Data availability statement asserts that 'all datasets generated and analysed in this study are publicly available' and that 'raw PacBio HiFi sequencing reads and assembled genome sequences have been deposited in the DNA Data Bank of Japan (DDBJ) under the BioProject accession number PRJDB38101'. At check time the BioProject record exists (NCBI BioProject uid 1370162, registered 2025/11/26, 'Genome sequencing of pacific oyster derived in Hiroshima', objectives Raw Sequence Reads + Assembly) but carries zero linked BioSample, zero linked SRA run and zero linked assembly, and the DDBJ search entry page returns no metadata body. The reads are therefore not retrievable from the stated accession, so no step upstream of the released soft-masked FASTA can actually be entered. This is normal pre-publication hold behaviour for a preprint and may resolve on journal publication, but as of the assessment date the availability claim overstates what is retrievable. Note the asymmetry: the derived artifacts on figshare (soft-masked genome, repeat library, GFF3/GTF, protein and CDS FASTA, functional annotation table) are genuinely public with checksums, so the annotation half of the pipeline is enterable while the assembly half is not.",
+      "how_to_close": "Release the BioSample, SRA/DRA run and assembly records under PRJDB38101, and state the run-level accessions (DRR/DRX) in the Data availability statement rather than only the BioProject umbrella accession."
+    },
+    {
+      "type": 6,
+      "where": "Persistent identification of the deposited artifacts and of the assembly pipeline as a whole",
+      "missing": "The four figshare deposits do carry versioned DOIs (.v1) and md5 checksums, which is the strongest part of this paper's artifact story. Everything else lacks a persistent identifier: the analysis pipeline has no repository and therefore no release or archive; the DDBJ accession is an umbrella BioProject with no released child records; and the paper's Methods reference the upstream dotPlotly project only as 'Poorten, T. tpoorten/dotPlotly. (2025)' with no commit, tag or archive, so the base version that the deposited script modifies cannot be identified. Reference 6 and reference 8 in the bibliography are the same Penaloza et al. GigaScience paper duplicated, and reference 20 cites a TEtools paper (Lerat et al., NAR 2017) that is a different tool from the Dfam TE Tools container actually used - both are citation defects that would mislead a reader trying to obtain the right software.",
+      "how_to_close": "Cite the upstream dotPlotly base commit or release tag that the modified script derives from, archive the modified script's provenance (a git fork rather than a bare figshare file would be better), and correct the duplicated Penaloza citation and the TEtools mis-citation."
+    },
+    {
+      "type": 7,
+      "where": "Intermediate artifacts underpinning the reported statistics (C2, C3, C4, C7, C8, C22, C23)",
+      "missing": "No machine-readable release is stated for the intermediates on which the paper's quality claims rest: the pre-purge Hifiasm p_ctg and a_ctg assemblies, the FCS-GX action report identifying the removed Vibrio-phage contig, the post-purge_dups assembly, the meryl k-mer database and Merqury QV report, the read-realignment BAM and its flagstat output, the 1 Mb-filtered FASTA pair, and the PAF alignment file that Figure 3 is drawn from. Only the final soft-masked assembly and the annotation products were deposited. Consequently each reported number (contig N50 7.9 Mb, QV 60.34, 99.8% alignment rate, 53.2% masked) can be compared only against a full re-run, not against a released intermediate.",
+      "how_to_close": "Deposit the key intermediates (or at minimum the tool report files: FCS-GX action report, Merqury QV report, flagstat output, the PAF used for Figure 3) alongside the existing figshare items, with checksums."
+    },
+    {
+      "type": 4,
+      "where": "Stochastic and heuristic steps C2 (Hifiasm assembly graph), C4 (purge_dups cutoff selection), C10/C11 (EDTA and RepeatModeler de novo repeat discovery), C16 (GALBA / AUGUSTUS ab initio training)",
+      "missing": "No random seed is reported for any step. Hifiasm is deterministic given identical input and thread count, but the thread count is not stated and the paper does not claim determinism; RepeatModeler's sampling of the genome for family discovery and AUGUSTUS's ab initio training inside GALBA are both stochastic and unseeded; purge_dups selects coverage cutoffs from the data, so a different read subset or aligner setting changes which haplotigs are purged. None of the reported assembly or gene-count figures can therefore be claimed as bit-reproducible from what is stated, only as distributionally comparable.",
+      "how_to_close": "Report thread counts and any seeds for RepeatModeler and the GALBA/AUGUSTUS training step, and state explicitly which steps the authors consider deterministic; where a step is inherently stochastic, deposit the concrete output (the repeat library already is deposited - extend the same treatment to the AUGUSTUS parameter set)."
+    },
+    {
+      "type": 3,
+      "where": "Data availability statement, DDBJ BioProject PRJDB38101",
+      "missing": "The DDBJ search entry page at https://ddbj.nig.ac.jp/search/entry/bioproject/PRJDB38101 returns HTTP 200 but serves an empty single-page-application shell (4,774 bytes, no metadata in the HTML body), and the JSON resource path returns the same shell rather than a record, so the accession cannot be verified from DDBJ itself; verification had to be routed through the NCBI BioProject mirror. This is a resolution defect of the stated link rather than a dead link, but a reader following the Data availability statement literally sees nothing.",
+      "how_to_close": "Cite a directly resolvable DDBJ or INSDC URL (or the DRA submission accession) in the Data availability statement, and confirm the record renders for an anonymous reader after release."
+    },
+    {
+      "type": 9,
+      "where": "Naming inconsistency binding on C3, and figure/table material not present in the retrieved full text",
+      "missing": "The Methods call the contamination screen 'FCS-GX (version 0.5.4)' while the Results call the same step 'FCS-GX (GenomeClean version 0.5.4)'; 'GenomeClean' is not an established name for this tool and a reader could search for the wrong software. 'Hifiasm' is also spelled 'Hfiasm' in the Results. More materially, Tables 1-5 are not carried in the JATS body and Table 2 (the five NCBI oyster protein datasets supporting GALBA) and Table 4 (the protein and domain reference datasets used by Fanflow) are exactly where the reference-dataset identities live; without them, C16 and C19 cannot be specified from the article text alone.",
+      "how_to_close": "Standardise the tool name to FCS-GX throughout, fix the Hfiasm typo, and lift the accessions from Tables 2 and 4 into the Methods prose (or into a supplementary text file deposited with the figshare items) so they are readable independently of the typeset tables."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code deposit (verbatim from Code availability): 'The modified dotPlotly code used in this study is available on figshare. The visualization script used for constructing comparative genome dot plots was adapted from dotPlotly (MIT License), with minor modifications to improve visual clarity. All other analyses were performed using publicly available software as described in the Methods section.' Reference 35: 'The modified R script of dotplotly. figshare https://figshare.com/articles/code/The_modified_R_script_of_dotplotly/30480377/1 (2025) doi: 10.6084/m9.figshare.30480377.v1.'",
+      "http_status": "202 via https://doi.org/10.6084/m9.figshare.30480377.v1 (figshare edge returns 202 to curl); figshare API https://api.figshare.com/v2/articles/30480377 returns the record: title 'The modified R script of dotplotly', defined_type_name 'software', version 1, license CC BY 4.0, published 2025-11-21T01:11:12Z, one file 'pafCoordsDotPlotly_modified.R' (16,291 bytes, md5 18c007a6a17933d4b98e58f97433942e)",
+      "checked_at": "2026-07-28",
+      "network_context": "DOI transcribed verbatim from the bioRxiv v1 full text and resolved through the figshare v2 API. This is the ONLY code artifact deposited by the paper. It is a single R script, versioned (.v1) and checksummed, covering the figure-3 visualisation step only. Its description states the modifications are 'adjusting line thickness, modifying plot color schemes, and refining axis labels'. No upstream dotPlotly commit or tag is identified. The script source was not read line-by-line - that is stage-2 work. No GitHub / GitLab / Bitbucket / Software Heritage repository is cited anywhere in the paper for any other step."
+    },
+    {
+      "artifact": "data accession (verbatim from Data availability): 'Raw PacBio HiFi sequencing reads and assembled genome sequences have been deposited in the DNA Data Bank of Japan (DDBJ) under the BioProject accession number PRJDB38101.'",
+      "http_status": "DDBJ https://ddbj.nig.ac.jp/search/entry/bioproject/PRJDB38101 -> HTTP 200 but an empty 4,774-byte SPA shell with no record in the HTML body; NCBI BioProject esearch -> 1 hit, uid 1370162; esummary -> project_acc PRJDB38101, project_title 'Genome sequencing of pacific oyster derived in Hiroshima', taxid 29159, registration_date 2025/11/26, project_data_type 'Genome sequencing', objectives 'Raw Sequence Reads' + 'Assembly', submitter Hiroshima University, sequencing_status 'Unknown'; NCBI SRA esearch for PRJDB38101 -> 0 hits; NCBI assembly esearch -> 0 hits; NCBI biosample esearch -> 0 hits",
+      "checked_at": "2026-07-28",
+      "network_context": "Accession transcribed verbatim and resolved directly. The BioProject umbrella record is registered and public, but no child record (BioSample, DRA/SRA run, or assembly) is linked or released at check time, so neither the raw HiFi reads nor the unmasked assembly is retrievable from the stated accession. Recorded as accidental gating (data axis = 1) on the seven read-consuming steps, not as absent (0), because a registered identifier exists and pre-publication hold on a preprint is the most likely explanation. Absence recorded as a finding; no alternative source was searched for."
+    },
+    {
+      "artifact": "data deposit (verbatim from Data availability, item (i)): 'the repeat library, repetitive sequence statistics, and masked genome'. Reference 32: figshare 10.6084/m9.figshare.30476822.v1 (2025).",
+      "http_status": "202 via doi.org; figshare API returns: title 'Repeat library, repetitive sequence statistics, and masked genome of Hiroshima-derived Magallana gigas', type dataset, version 1, CC BY 4.0, published 2025-11-21T01:08:31Z, files MgigHiroshima_genome_v1.sm.fa.gz (223,293,971 bytes, md5 13859b9cf9f4cee0db7cc3868d7b09e1), Repetitive_sequences_statistic_TableS1.xlsx (9,889 bytes, md5 f5e174a0728c15be9fe4ccae7932f7fb), Mgigas.Repeatlib.fa (9,363,231 bytes, md5 78db562a20495e69fdb9876e45ee67ec)",
+      "checked_at": "2026-07-28",
+      "network_context": "resolved through the figshare v2 API. Live, public, versioned DOI, per-file md5 checksums. This deposit carries the soft-masked final assembly, which is the entry point that keeps the repeat-masking and annotation half of the pipeline at data = 2 despite the unreleased DDBJ records."
+    },
+    {
+      "artifact": "data deposit (verbatim from Data availability, item (ii)): 'predicted gene models in GFF3, protein, and transcript FASTA formats'. Reference 33: figshare 10.6084/m9.figshare.30477014.v1 (2025).",
+      "http_status": "202 via doi.org; figshare API returns: title 'Predicted gene models of Hiroshima-derived Magallana gigas (GFF3, protein and transcript FASTA)', type dataset, version 1, CC BY 4.0, published 2025-11-21T01:10:30Z, files MgigHiroshima_genome_v1.sm_cds.fa (87,634,900 bytes, md5 acb99b310f32f42fcd6b39b94a97e429), MgigHiroshima_genome_v1.sm_protein.fa (29,615,826 bytes, md5 64a520a7dd7b63a05a186982545ad92a), MgigHiroshima_genome_v1.sm.gff3 (125,296,973 bytes, md5 47708b6e7dc6e800eb58f0f2ffc8f7cd), MgigHiroshima_genome_v1.sm.gtf (133,987,067 bytes, md5 b569c86e176c4804019edfbd89ed0a8d)",
+      "checked_at": "2026-07-28",
+      "network_context": "resolved through the figshare v2 API. Live, public, versioned DOI, per-file md5 checksums."
+    },
+    {
+      "artifact": "data deposit (verbatim from Data availability, item (iii)): 'functional annotation resources generated using Fanflow'. Reference 34: figshare 10.6084/m9.figshare.30477098.v1 (2025).",
+      "http_status": "202 via doi.org; figshare API returns: title 'Functional annotation of predicted genes from Hiroshima-derived Magallana gigas', type dataset, version 1, CC BY 4.0, published 2025-11-21T01:10:54Z, one file Functional_annotation_Supplementary_TableS2.txt (24,297,330 bytes, md5 007e055484cdede853b36ba43d229de8)",
+      "checked_at": "2026-07-28",
+      "network_context": "resolved through the figshare v2 API. Live, public, versioned DOI, md5 checksum. This is the OUTPUT of the Fanflow step; the Fanflow workflow itself is not deposited or linked anywhere."
+    },
+    {
+      "artifact": "external reference genome consumed at C21/C23 (verbatim from Methods): 'The UK-derived reference genome (xbMagGiga1.1; GCA_963853765.1) was downloaded from the NCBI Genome database.'",
+      "http_status": "200 (https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_963853765.1/)",
+      "checked_at": "2026-07-28",
+      "network_context": "resolved directly. A versioned GenBank assembly accession, which is the correct way to pin this resource; download date is not stated but the accession version makes that immaterial for the FASTA. Recorded as the paper's second well-pinned external resource alongside Pfam 37.3."
+    },
+    {
+      "artifact": "external resource cited without any accession or release: the Fanflow workflow (C18), cited only as reference 27 'Bono, H., Sakamoto, T., Kasukawa, T. & Tabunoki, H. Systematic Functional Annotation Workflow for Insects. Insects 13, 586 (2022).'",
+      "http_status": "none (no URL, repository, version, commit or container is stated anywhere in the paper)",
+      "checked_at": "2026-07-28",
+      "network_context": "The paper names Fanflow only by journal citation. Per protocol, absence of a stated repository is recorded as a finding; no web search was performed to locate a Fanflow repository. This is the most consequential absence in the paper because Fanflow produced the headline annotation result (98.1% of genes annotated)."
+    },
+    {
+      "artifact": "external reference databases consumed without a pinned snapshot: the FCS-GX GX database (C3), the BUSCO mollusca_odb10 lineage dataset (C6, C17), the Dfam/RepBase library bundled in Dfam TE Tools 1.88.5 (C13), the five NCBI oyster protein datasets listed only in Table 2 (C16), and the reference protein datasets listed only in Table 4 (C19)",
+      "http_status": "none (no release identifier, URL, accession or download date stated for any of these)",
+      "checked_at": "2026-07-28",
+      "network_context": "recorded from prose. The one counter-example is Pfam, which IS pinned exactly: 'The protein domains were identified using HMMSCAN (HMMER version 3.3.2) with Pfam version 37.3 as the domain database.' Because no workflow code exists for this paper, none of these fetches can be promoted to env_capture_class A even at stage 2 - every download is manual and undocumented. Absences recorded as findings, not resolved by searching."
+    },
+    {
+      "artifact": "environment capture (lockfile / container digest / conda specification / release tag): NONE CLAIMED anywhere in the paper. The closest thing is the phrase 'Dfam TEtools version 1.88.5', a versioned tool distribution named without a digest and without a statement that it was run as a container.",
+      "http_status": "none",
+      "checked_at": "2026-07-28",
+      "network_context": "No conda-lock, pixi.lock, renv.lock, requirements.txt, environment.yml, Dockerfile, Singularity definition, image digest or release tag exists, because no analysis repository exists. The Acknowledgements state only that 'computational analyses were performed using computing resources provided by the Bio-DX Organization and internal servers at PtBio Inc.' Boundary call: fifteen exact version strings in prose with no interpreter, channel or platform declaration is exactly the Delta-2 'scattered exact pins' case, so the capture claim is recorded as exact_pins_partial and every version axis is capped at 1. Under protocol v0.2.6 exact_pins_partial is not on the positive stage-2 gate, so stage2_candidate is false."
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "3b48e0470f27a33da81253ef3c54e2163d5393ab780d7e161f65c7c671933edf",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

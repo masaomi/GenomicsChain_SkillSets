@@ -1,0 +1,34 @@
+{
+  "recorded_at": "2026-08-02",
+  "scope": "SUBMIT-LEVEL ONLY",
+  "effect_on_analysis": "none — N stays 200, every statistic in stats_stage1.rb is unchanged",
+  "distinct_from": "exclusions.json (frame-level, removes from the denominator)",
+  "preregistration_rule": "v1.0 §3 — exclusions are 'recorded as counts, not as silence'",
+  "ruling": "option A, masaomi, 2026-08-02: exclude from submit rather than edit the assessment content",
+  "rationale": "Each rejection would require rewriting what the assessor recorded (gaps shape, OOS axis values, step count), which changes report_content_hash. Editing an assessment to satisfy a transport gate is a content change, not a format change.",
+  "count": 3,
+  "reopen_condition": "schema v0.2.7 relaxing the OOS/gaps shapes, or a corpus correction ruled separately, re-admits these; re-run build_submit_set.rb and they return.",
+  "excluded": [
+    {
+      "canonical_id": "10.1101/2025.10.22.684019",
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.10.22.684019/10.1101_2025.10.22.684019__stage1__v0.2.5.json",
+      "gate": "SubmitError",
+      "error": "report_schema_v0_2_6 violation: The property '#/gaps' of type object did not match the following type: array in schema report_schema_v0_2_6.submit_gate.json",
+      "report_retained": true
+    },
+    {
+      "canonical_id": "10.1101/2025.11.18.689066",
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.18.689066/10.1101_2025.11.18.689066__stage1__v0.2.5.json",
+      "gate": "DoSGateTripped",
+      "error": "params serialized size 74016 bytes exceeds gate 65536",
+      "report_retained": true
+    },
+    {
+      "canonical_id": "10.1101/2025.11.26.690746",
+      "file": "survey_v1_1/collection/by_paper/10.1101_2025.11.26.690746/10.1101_2025.11.26.690746__stage1__v0.2.5.json",
+      "gate": "SubmitError",
+      "error": "report_schema_v0_2_6 violation: The property '#/steps/2/axes/data' of type null did not match the following type: integer in schema report_schema_v0_2_6.submit_gate.json",
+      "report_retained": true
+    }
+  ]
+}

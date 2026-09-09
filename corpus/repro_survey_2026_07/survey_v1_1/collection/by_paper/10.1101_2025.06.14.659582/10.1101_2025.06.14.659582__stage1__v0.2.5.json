@@ -1,0 +1,269 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "5ac65d77d8d845a88a4578a3d319648a357370842d45ffbc16ce6b57d4c9a907",
+  "canonical_id": {
+    "value": "10.1101/2025.06.14.659582",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.06.14.659582v2",
+      "biorxiv:2025.06.14.659582v2"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "A systematic literature review (meta-research, no primary data generation and no wet-lab work) of studies that use genomic data to inform the identification of Evolutionary Significant Units (ESUs). The reproduction target is the review pipeline itself: a Web of Science search with a fully stated Boolean string (publications up to 2024-01-30), a supplementary Scopus search with 'the same set of search terms', combination and de-duplication of the two result sets, title/abstract screening 'manually screened with the assistance of ASReview (ASReview LAB developers, 2023)' [reference list gives Version 1.3.2], full-text review against stated inclusion criteria (415 candidate articles -> 126 included studies -> 130 species-level data entries), manual extraction/coding of study attributes into Supplemental Tables S2 and S3, descriptive summarisation (counts and percentages by continent, taxon, publication year, ESU definition cited, sequencing type, analysis method, gene-flow finding, direction of change in ESU number), and figure generation: 'All plots were generated in R (R Core Team, 2024) using ggplot2 (Wickham, 2016) and patchwork (Pedersen, 2024)'. Two of the eight steps (full-text inclusion adjudication and per-study attribute coding) are human-judgement curation and are scored OOS rather than counted in S.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the 'Literature Review' Methods subsection and the single sentence on plotting. Web of Science and Scopus searches are kept separate because their retrieval sources and parameter disclosure differ (the Boolean string is given verbatim once and Scopus is described only as 'the same set of search terms'). Combination + de-duplication is kept separate from screening because no tool or rule is named for it. Full-text inclusion adjudication (C5) and per-study attribute coding into Tables S2/S3 (C6) are recorded as layer C but verdict OOS: they are human-judgement curation with no machine-executable target, so they are excluded from S (S = 6, not 8). Descriptive summarisation (C7) is separated from figure generation (C8) because the former is arithmetic over the deposited supplement while the latter invokes named R packages. No wet-lab steps: W = 0.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Web of Science literature search, verbatim Boolean string: '(genom* OR (WGS OR \"whole genome\" OR *seq OR GBS OR \"genotyping-by-sequencing\" OR SNP* OR \"single nucleotide polymorphism*\" OR \"target capture\" OR \"target DNA\" OR ddRAD OR \"reduced representation sequencing\" OR \"next-generation sequencing\" OR NGS OR transcript* OR *omics OR \"adaptive loci\" OR \"adaptive locus\") AND (\"conservation unit*\" OR \"evolutionary significant unit*\" OR \"evolutionarily significant unit*\" OR \"adaptive unit*\" OR \"distinct population segment*\" OR \"designatable unit*\")', restricted to title/abstract/keywords, publications up to 2024-01-30",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Supplementary Scopus search: 'We supplemented our search with articles from Scopus using the same set of search terms.' No Scopus-specific field syntax, index selection, or execution date is given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "controlled-access"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Combination and de-duplication of the two database result sets: 'Resulting studies from both databases were combined and duplicate studies were removed.' No tool, matching rule, or reference-manager named; output candidate list reported as 415 articles (Table S1)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Title/abstract screening with ASReview LAB: 'The titles and abstracts of the retrieved articles were manually screened with the assistance of ASReview (ASReview LAB developers, 2023)'; the reference list pins the tool as 'ASReview LAB - A tool for AI-assisted systematic reviews (Version 1.3.2), Zenodo'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "Full-text review against stated inclusion criteria (genomic data defined as high-throughput sequencing with >= 1000 markers; exclusion of <1000 SNP, mtDNA, microsatellite and cpDNA datasets; exclusion of studies making no explicit suggestion on ESU number; synthesis papers mined for cited references). 415 candidates -> 126 included studies -> 130 species-level entries",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "Manual extraction and coding of per-study attributes into Supplemental Tables S2/S3 (sampling details, genomic dataset used, whether an ESU definition with a supporting reference was given, sequencing type in six categories, analysis methods categorised as assessing discreteness vs evolutionary significance per Table 2, gene flow reported, direction of change in suggested ESU number). 'Additional details are provided in the supplementary material on how data for each column was extracted from the studies (Table S3)'",
+      "layer": "W",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "Descriptive summarisation of the 130 entries into the reported counts and percentages (e.g. 93 studies (72%) RRS; 57 (44%) North American; 37 (28%) fish; 46 (35%) providing a written ESU definition; 68% suggesting an increase in ESU number). No script named; arithmetic over the deposited Table S2",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Manuscript figure generation: 'All plots were generated in R (R Core Team, 2024) using ggplot2 (Wickham, 2016) and patchwork (Pedersen, 2024).' The reference list pins patchwork as 'R package version 1.3.0'; the R interpreter is cited by year only (R Core Team, 2024) and ggplot2 by book citation (Wickham, 2016) with no version",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 5,
+    "n_X": 1,
+    "S": 6,
+    "W": 2,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/6 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "0/6 (0%) steps reach RI at stage 1. Even under the most generous inference-inclusive reading, no step clears RI, because no step has all four axes >= 1 simultaneously: the two database-search steps (C1, C2) have version = 0 (Web of Science and Scopus are mutable subscription indexes and neither an execution date nor an index edition is recorded - only a 2024-01-30 publication cutoff), the de-duplication step (C3) has code = 0 (no tool or matching rule named at all) and is scored X, and the two steps that do carry a version pin (C4 ASReview LAB v1.3.2, C8 patchwork 1.3.0) have params = 0 - ASReview's model, feature-extraction, query strategy, stopping rule, prior-knowledge set and seed are all unstated, and no plotting parameters are given. The binding constraint is the total absence of code: the paper publishes no repository, no scripts, and no screening decision log. The paper is not a stage-2 candidate (capture_claim = exact_pins_partial, which under protocol v0.2.6 is off the positive gate; and there is in any case no code artifact to verify).",
+    "coverage": "8 steps built from the 'Literature Review' Methods subsection and the single plotting sentence of the v2 JATS full text, plus the Data Availability Statement and the Supporting Information list. 2 of the 8 (C5 full-text inclusion adjudication, C6 per-study attribute coding) are human-judgement curation and are scored OOS, so S = 6. No wet-lab steps (W = 0). This is meta-research: the paper analyses 130 published-study entries, not primary sequence data, so there are no sequencing accessions to check by construction. Supplemental Tables S1-S3 carry the candidate list, the included-study table and the extraction protocol; they were not fetched at stage 1.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 3,
+      "where": "All computational steps (C3 de-duplication, C4 screening configuration, C7 summarisation, C8 figures)",
+      "missing": "The paper publishes no code repository of any kind. There is no Code Availability statement; the only availability statement in the article is 'Data Availability Statement: The authors have nothing to report.' No GitHub/GitLab/Bitbucket/Zenodo/Software Heritage URL appears anywhere in the full text. Consequently no de-duplication script, no ASReview project file or screening log, no summarisation script, and no ggplot2/patchwork figure script exist for a reproducer to run.",
+      "how_to_close": "Deposit a repository (and archive it to Zenodo with a DOI) containing the exported search results, the ASReview project/state file, the de-duplication script, the summarisation script that regenerates every count and percentage quoted in Results, and the R figure scripts; cite it in a Code Availability statement."
+    },
+    {
+      "type": 1,
+      "where": "All steps - the review's own dataset",
+      "missing": "The Data Availability Statement reads verbatim 'The authors have nothing to report.' The extracted review dataset exists only as journal supplementary material (Supporting Information lists 'Supplemental Figures (1 to 4)', 'Supplemental Table S1', 'Supplemental Table S2', 'Supplemental Table S3'), with no deposit in a data repository, no DOI, no license and no stated machine-readable format. The raw Web of Science and Scopus record exports (the input to C3/C4) are not deposited at all.",
+      "how_to_close": "Deposit the raw database exports (RIS/BibTeX with retrieval timestamps), the de-duplicated candidate set, and the coded extraction table (Tables S1-S3) as a versioned, DOI-bearing, machine-readable dataset (CSV + codebook) rather than only as journal supplements, and cite it in the Data Availability Statement."
+    },
+    {
+      "type": 4,
+      "where": "C1 (Web of Science) and C2 (Scopus)",
+      "missing": "Both sources are mutable subscription indexes whose contents change continuously through back-filling and re-indexing. The paper records only a publication cutoff ('published until January 30, 2024'), not the date the query was executed, the Web of Science edition/collection searched (e.g. Core Collection, which indexes and which year spans), or the Scopus field-tag translation of the Boolean string. A re-run today will not return the same 415 records, and the retrieval is therefore not re-derivable even in principle.",
+      "how_to_close": "Record the query execution date, the exact database editions/collections and their index coverage windows, and the verbatim source-specific query strings; deposit the result exports so the retrieval step can be replayed from a frozen snapshot rather than from a live index."
+    },
+    {
+      "type": 5,
+      "where": "C4 (ASReview LAB screening), C3 (de-duplication), C2 (Scopus query)",
+      "missing": "ASReview is invoked with no configuration disclosed: no classifier/model, no feature-extraction method, no query strategy, no balance strategy, no prior-knowledge (seed relevant/irrelevant records) set, and no stopping criterion for the human-in-the-loop screening. De-duplication has no stated matching rule (DOI exact match? fuzzy title? reference manager?). Scopus is described only as 'the same set of search terms' without the source-specific syntax that would be needed to reproduce it.",
+      "how_to_close": "State the ASReview model/feature-extractor/query-strategy/balance-strategy, the prior-knowledge records used to initialise active learning, and the stopping rule actually applied; name the de-duplication tool and matching criteria; give the Scopus query verbatim."
+    },
+    {
+      "type": 6,
+      "where": "C4 (ASReview LAB screening) and C5/C6 (human adjudication and coding)",
+      "missing": "ASReview's active-learning ranking is stochastic and order-dependent, and screening is human-in-the-loop, so the 415 -> 126 reduction is a path-dependent trajectory. No random seed, no screening decision log, no per-record label history, and no inter-rater reliability information (number of screeners, double-screening protocol, disagreement resolution) is reported for either the title/abstract stage or the full-text and coding stages.",
+      "how_to_close": "Publish the ASReview state/project file (which carries the seed, the label order and the full decision history), report the number of independent screeners/coders with an agreement statistic, and document the disagreement-resolution procedure."
+    },
+    {
+      "type": 2,
+      "where": "C4 (ASReview) and C8 (R figures)",
+      "missing": "No environment specification of any kind: no lockfile, container, conda environment, renv.lock, or sessionInfo(). The R interpreter is cited only as 'R Core Team, 2024' with no version number; ggplot2 is cited by book (Wickham, 2016) with no version. Only two exact version pins exist in the entire paper, both in the reference list rather than in Methods: ASReview LAB 1.3.2 and patchwork 1.3.0. ASReview 1.3.2's own Python dependency closure is not specified.",
+      "how_to_close": "Report the exact R version and sessionInfo() for the figure environment, ship an renv.lock (or container digest) for the R side and a resolved Python environment (conda-lock/requirements with hashes, or an image digest) for ASReview, and move the version pins into Methods."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: NONE. The article contains no Code Availability statement and no GitHub / GitLab / Bitbucket / Zenodo / Software Heritage / OSF URL for the authors' own code. Full-text scan of the v2 JATS XML returns no such identifier outside the reference list. Status: none.",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "Full-text scan of https://www.biorxiv.org/content/biorxiv/early/2025/11/18/2025.06.14.659582.source.xml (JATS XML, v2, fetched 200 OK via unauthenticated curl); searched for github|gitlab|bitbucket|zenodo|dryad|figshare|osf.io and for a Code Availability heading"
+    },
+    {
+      "artifact": "data accession: NONE. Data Availability Statement verbatim: 'Data Availability Statement The authors have nothing to report.' No GEO / SRA / ENA / ArrayExpress / dbGaP / EGA / figshare / Zenodo / Dryad identifier appears anywhere in the article body. The review's own dataset is present only as journal supplementary material; Supporting Information list verbatim: 'DC1 Supplemental Figures (1 to 4) DC2 Supplemental Table S1 DC3 Supplemental Table S2 DC4 Supplemental Table S3'. Status: none (supplement-only, no repository, no DOI).",
+      "http_status": "n/a (not present)",
+      "checked_at": "2026-07-27",
+      "network_context": "Full-text scan of the v2 JATS XML; searched for accession|SRA|ENA|GenBank|BioProject|PRJ[A-Z]+[0-9]+|GEO|dbGaP|EGA|figshare|zenodo|dryad"
+    },
+    {
+      "artifact": "third-party software cited with a version, no URL given in text: 'ASReview LAB developers (2023). ASReview LAB - A tool for AI-assisted systematic reviews (Version 1.3.2) Zenodo.' (reference list). This is a citation of an external tool archive, not a deposit by these authors; no DOI or resolvable URL is printed in the reference. Status: stated-in-paper.",
+      "http_status": "n/a (no URL printed in the article)",
+      "checked_at": "2026-07-27",
+      "network_context": "Reference-list entry in the v2 JATS XML; not resolved at stage 1 (no identifier to resolve)"
+    },
+    {
+      "artifact": "third-party software cited with a version and a URL: 'Pederson T (2024). _patchwork: The Composer of Plots_. R package version 1.3.0, <https://CRAN.R-project.org/package=patchwork>.' (reference list). External CRAN package, not an author deposit. Status: URL-present.",
+      "http_status": "not fetched (stage1: third-party package index, not an author artifact)",
+      "checked_at": "2026-07-27",
+      "network_context": "Reference-list entry in the v2 JATS XML"
+    },
+    {
+      "artifact": "literature data sources (inputs to C1/C2): Web of Science and Scopus, both named in Methods, both subscription-gated and mutable. No snapshot, export, or institutional-access statement is provided. Status: stated-in-paper.",
+      "http_status": "n/a (subscription database, controlled access)",
+      "checked_at": "2026-07-27",
+      "network_context": "Methods 'Literature Review' subsection of the v2 JATS XML"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "b8c0ac650f11ff2d3bdbba424f79bb540d3c26b0f32078a5aa96b822e8507987",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

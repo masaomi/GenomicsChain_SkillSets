@@ -1,0 +1,481 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "10e4caaf8372168e186a5564401a9a0a8fffb6d9a936e0d21bfc797fba787f3c",
+  "canonical_id": {
+    "value": "10.64898/2025.12.18.695158",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.64898/2025.12.18.695158v1",
+      "biorxiv:2025.12.18.695158v1",
+      "europepmc:PPR1230791"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "Transcriptomic profiling of the glucocorticoid (methylprednisolone) response of the human non-coding genome across nine human primary cell types at 2 h and 6 h. Computational reproduction target = the two secondary-analysis branches applied to the study's own newly generated sequencing data: (a) total-RNA-seq lncRNA branch — bcl2fastq2 demultiplexing, Cutadapt trimming, FastQC, STAR alignment to GRCh38, StringTie de novo assembly + merge, GFFcompare against GENCODE 43 with class-code selection (u/i/x) and merge into an extended reference GTF, featureCounts (Subread) gene-level counting, DESeq2 differential expression per cell type and time point; (b) small-RNA-seq miRNA branch — bcl2fastq2, Cutadapt, Fastx Toolkit barcode removal, then the OpenOmics mir-seek v0.3.0 pipeline (fastp, FastQC, miRDeep2 known-miRNA quantification against miRBase hsa v22, and a two-pass cohort-level novel-miRNA discovery/quantification), followed by DESeq2 differential expression; plus (c) the R shiny interactive figure that renders the results. Cell purification, primary-cell culture, in vitro GC treatment, RNA purification/QC and Illumina library preparation + sequencing are wet-lab (W, out of scope for computational reproduction).",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool-invocation list built from the bioRxiv v1 full-text Methods prose. The JATS source XML and the WebFetch route both returned HTTP 403/429 (Cloudflare error 1015 rate-limit); the full text was retrieved by curl of https://www.biorxiv.org/content/10.64898/2025.12.18.695158v1.full (HTTP 200, 56,852 bytes) and the distinctive title phrase 'Glucocorticoids regulate the human non-coding genome' plus the abstract were verified against the bioRxiv details API record for this DOI before scoring, so the fetch is confirmed to be this paper. The Methods are organised as two parallel branches ('Long non-coding RNA data analysis', 'Micro-RNA data analysis') plus an 'Interactive figure' paragraph; each named tool invocation in those paragraphs is one step (18 C-steps). The mir-seek v0.3.0 pipeline is retained as its own orchestration step (C12) in addition to the four constituent tool invocations the prose explicitly attributes to it (C13-C16), because the paper names it as a distinct versioned, publicly released artifact; assessors who fold C12 into its constituents would report S=17. Six wet-lab steps counted in W and not verdicted. NOTE: the paper has NO Code availability statement and NO repository for its own analysis code, so no README prose existed to read; the only code artifact named anywhere is the third-party pipeline citation 'Kuhn, S. & Zhang, G. 2024. OpenOmics/mir-seek:v0.3.0. Zenodo version= v0.3.0.' (reference list, no URL/DOI printed in the text).",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "bcl2fastq2 v2.20 (Illumina) - BCL to FASTQ conversion of total-RNA sequencing runs",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Cutadapt v1.10 in Python v2.7.9 - adapter trimming of total-RNA reads; both TruSeq adapter sequences given verbatim; trimmed reads under 20 bases discarded",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "FastQC (Andrews, 2010) - quality control of adapter-trimmed total-RNA sequences; no version stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C4",
+      "label": "STAR v2.7.9 - alignment of adapter-trimmed FASTQ to reference human genome assembly GRCh38 (GENCODE release 43 GTF); no alignment parameters stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "StringTie v2.2.1 - de novo transcript assembly per sample from BAM, then merge into a non-redundant assembled transcript set; user-selected prefix ATRNS0523 stated; no other options given",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "GFFcompare v0.11.6 - contrast de novo transcripts against GENCODE 43; retain class codes u, i, x (3,905 novel transcripts reported); merge retained set with GENCODE 43 into the study reference GTF",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C7",
+      "label": "featureCounts of Subread v1.5.3 - un-normalized count matrix; paired-end exonic fragments grouped at gene level against the merged known+novel reference GTF",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "DESeq2 v1.40.2 (R) - differential expression of lncRNA/gene counts, per cell type and time point, GC-treated vs vehicle with vehicle as reference; no R version, no design formula beyond the contrast, no shrinkage/filtering/alpha thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C9",
+      "label": "bcl2fastq2 v2.20 (Illumina) - BCL to FASTQ conversion of small-RNA sequencing runs",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "license-gated",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Cutadapt v1.10 in Python v2.7.9 - first-round adapter trimming of small-RNA reads; adapter sequence given verbatim; trimmed reads under 18 bases discarded",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Fastx Toolkit v0.0.14 - removal of the 5' and 3' four-nucleotide barcodes introduced by the NEXTflex small RNA-seq v3 library chemistry",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C12",
+      "label": "OpenOnmics/OpenOmics mir-seek v0.3.0 pipeline (Kuhn and Zhang, 2024; Zenodo release) - orchestration of known and novel mature miRNA quantification; no pipeline config, profile, or invocation command given in the paper",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C13",
+      "label": "fastp v0.23.4 (inside mir-seek v0.3.0) - second round of adapter-sequence trimming; minimum-length option used to remove reads of length <= 16 bases",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "FastQC (inside mir-seek v0.3.0) - quality control before and after adapter trimming of small-RNA reads; no version stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "floating",
+      "subflags": []
+    },
+    {
+      "step_id": "C15",
+      "label": "miRDeep2 suite v0.1.3 known-miRNA quantification - mapper.pl collapse + align to GRCh38, then miRDeep2.pl estimating expression of known mature miRNAs using miRBase human (hsa) v22; no command-line flags stated (2,656 known miRNAs in the resulting matrix, 1,729 with >=1 read)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C16",
+      "label": "miRDeep2 suite v0.1.3 novel-miRNA two-pass cohort-level quantification - pass 1 concatenate all trimmed reads to one FASTA, mapper.pl collapse/align to GRCh38, miRDeep2.pl to build a cohort-level predicted-novel-miRNA FASTA; pass 2 quantifier.pl per sample; no flags stated (1,994 candidate novel miRNAs)",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement",
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "DESeq2 v1.40.2 (R) - differential expression of miRNA counts, per cell type and time point, GC-treated vs vehicle with vehicle as reference; no R version, no thresholds stated",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "R package shiny (Chang et al., 2025; reference list gives '1.11.1 ed.') - interactive web application rendering the study results (Interactive Figure 1); no application URL, no source code, no deployment location given anywhere in the paper",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "X",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "needs-supplement"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 0,
+    "n_NI": 0,
+    "n_X": 18,
+    "S": 18,
+    "W": 6,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/18 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "All 18/18 computational steps are X, and the cause is a single upstream blocker rather than 18 independent ones: the Data availability statement reads in full 'The total RNA-seq and small-RNA-seq datasets will be publicly available through the Sequence Read Archive (SRA) and Gene Expression Omnibus (GEO) upon publication.' No SRA/GEO/BioProject accession appears anywhere in the paper (a full-text sweep for GSE/SRP/SRR/PRJNA/phs patterns returned zero hits), so the input artifact for every computational step is absent at the preprint stage and Data = 0 throughout. This is an embargo, not a loss: if the accessions are released the Data axis would move to 2 and the steps would re-score on their other three axes, where the paper is unusually strong for a wet-lab-led study - 16/18 steps carry exact tool version pins (bcl2fastq2 v2.20, Cutadapt v1.10 with Python v2.7.9, STAR v2.7.9, StringTie v2.2.1, GFFcompare v0.11.6, Subread v1.5.3, DESeq2 v1.40.2, Fastx Toolkit v0.0.14, mir-seek v0.3.0, fastp v0.23.4, miRDeep2 v0.1.3) together with pinned reference resources (GENCODE release 43, miRBase hsa v22) and verbatim adapter sequences and length cutoffs. Even on that counterfactual the ceiling would be RI, not R-star: Version is capped at 1 because there is no lockfile, no container digest and no conda/renv specification anywhere, the R version is never stated, and FastQC and (in Methods prose) shiny carry no version at all. Separately, the paper has no Code availability statement and no repository for its own analysis code, so C1-C11, C17 and C18 rest on prose reconstruction only; the sole public code artifact is the third-party pipeline OpenOmics/mir-seek v0.3.0 archived on Zenodo (record 13834238), which covers C12-C16.",
+    "coverage": "18 computational steps assessed from the bioRxiv v1 full-text Methods prose (lncRNA branch C1-C8, miRNA branch C9-C17, interactive figure C18). 6 wet-lab steps counted in W but out of computational-reproduction scope: hematopoietic cell purification, non-hematopoietic primary cell culture, in vitro methylprednisolone/vehicle treatment, TRIzol/BCP RNA purification + Qubit/Bioanalyzer QC, NEXTflex small RNA-seq v3 library prep + HiSeq 3000 sequencing, TruSeq Stranded Total RNA Ribo-Zero Gold library prep + HiSeq 2000/3000 sequencing.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Data availability - all newly generated total-RNA-seq and small-RNA-seq data, i.e. the input to every one of the 18 computational steps",
+      "missing": "The statement in full: 'The total RNA-seq and small-RNA-seq datasets will be publicly available through the Sequence Read Archive (SRA) and Gene Expression Omnibus (GEO) upon publication.' No accession of any kind is given - a full-text regex sweep for GSE/SRP/SRR/PRJNA/phs identifiers returned zero matches - and no reserved/embargoed accession is named. No processed artifact is deposited either: the count matrices (the 2,656-known-miRNA and 1,994-novel-miRNA matrices, and the lncRNA/gene featureCounts matrix) and the DESeq2 result tables are described but not released.",
+      "how_to_close": "Deposit the raw FASTQ under a GEO SuperSeries / SRA BioProject and print the accession in the Data availability statement even while embargoed, and deposit the derived count matrices and DESeq2 result tables so the downstream steps (C7-C8, C15-C17) can be reproduced independently of raw-read reprocessing."
+    },
+    {
+      "type": 9,
+      "where": "Code availability - the entire study",
+      "missing": "The paper has no Code availability statement and names no repository (no GitHub, GitLab, Bitbucket, Zenodo or Software Heritage URL for the authors' own code). The only URLs anywhere in the full text are the article DOI, hpc.nih.gov, and two ROR institution identifiers. The lncRNA branch (C1-C8), the pre-mir-seek small-RNA preprocessing (C9-C11), the DESeq2 differential-expression analyses (C8, C17) and the shiny application (C18) exist only as prose descriptions; there are no scripts, no workflow file, and no supplementary code archive.",
+      "how_to_close": "Publish the analysis scripts (trimming/alignment/assembly drivers, the GFFcompare class-code filtering and GTF merge, featureCounts invocation, the DESeq2 R scripts and the shiny app source) in a public repository with an archival DOI, and add a Code availability statement pointing to a tagged release."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment (all 18 computational steps)",
+      "missing": "No environment lockfile, no container image or digest, no conda/mamba environment file, no renv.lock and no module list is claimed by the paper. The only environment-adjacent facts stated are 'Python v2.7.9' (as the interpreter for Cutadapt v1.10) and the NIH HPC reference (hpc.nih.gov) in the acknowledgements. The R version underlying DESeq2 v1.40.2 and shiny is never stated, and no transitive dependency closure exists for either the Python/CLI stack (STAR, StringTie, GFFcompare, Subread, fastp, miRDeep2 and its Perl/Bowtie/ViennaRNA/randfold dependencies) or the R stack.",
+      "how_to_close": "Ship a conda-lock / pixi lockfile or a container digest covering the full CLI + R stack, or at minimum an renv.lock plus sessionInfo() output for the DESeq2 and shiny steps."
+    },
+    {
+      "type": 3,
+      "where": "C3 and C14 (FastQC), C8 and C17 (R interpreter), C18 (shiny in Methods prose)",
+      "missing": "FastQC is cited only as '(Andrews, 2010)' with no version in either branch. The R version used to run DESeq2 v1.40.2 and shiny is never stated. shiny carries no version in the Methods prose; '1.11.1 ed.' appears only in the reference-list entry (Chang et al., 2025), which is a weaker pin location than Methods. bcl2fastq2 is given as 'v2.20', a minor-version label rather than a full build (e.g. 2.20.0.422).",
+      "how_to_close": "State FastQC's version, the R version (and ideally the Bioconductor release), the shiny version in Methods rather than only in the bibliography, and the full bcl2fastq2 build string."
+    },
+    {
+      "type": 6,
+      "where": "C12-C16 - the externalised OpenOmics mir-seek v0.3.0 pipeline",
+      "missing": "The miRNA quantification is delegated in full to a third-party pipeline cited as 'Kuhn, S. & Zhang, G. 2024. OpenOmics/mir-seek:v0.3.0. Zenodo version= v0.3.0.' - a good exact pin, but the paper prints no URL or Zenodo DOI for it, gives no invocation command, no config/profile, no resource or execution profile, and does not state which reference bundle the pipeline was pointed at. The prose describes the internal steps (fastp, FastQC, miRDeep2 mapper.pl / miRDeep2.pl / quantifier.pl) but not the flags the pipeline passes to them. Note also that the pipeline name is written 'OpenOnmics' in Methods and 'OpenOmics' in the reference list; the live artifact is OpenOmics.",
+      "how_to_close": "Print the Zenodo DOI (record 13834238) or the GitHub URL with the v0.3.0 tag, and publish the pipeline config / command line and the reference bundle actually used."
+    },
+    {
+      "type": 12,
+      "where": "C18 - the interactive web application ('Interactive Figure 1')",
+      "missing": "The abstract, Results and Discussion all state that the results are 'accessible through an interactive web application', and Methods state it 'was generated with the R package shiny', but no URL, no hosting location, no source code, no README and no run instructions are given anywhere in the preprint. A claimed public access route to the study's results is therefore not actually reachable from the paper.",
+      "how_to_close": "Publish the application URL and the shiny app source (ui/server code plus the data objects it loads) in the code repository, with run instructions."
+    },
+    {
+      "type": 13,
+      "where": "C4, C5, C6, C15, C16 - external reference resources",
+      "missing": "Reference resources are named and mostly well pinned (GENCODE release 43; miRBase human hsa v22) but the genome is given only as 'the reference human genome assembly (GRCh38)' with no patch level, source (GENCODE vs Ensembl vs UCSC vs NCBI analysis set), or checksum, in both the STAR alignment and the miRDeep2 mapper.pl steps. The STAR index build (which GTF, which sjdbOverhang) is not described. The derived reference GTF that merges the 3,905 GFFcompare-selected novel transcripts (prefix ATRNS0523) into GENCODE 43 is the load-bearing annotation for C7-C8 and is not deposited.",
+      "how_to_close": "State the exact GRCh38 build/patch and source URL plus checksum, describe the STAR index build parameters, and deposit the merged known+novel reference GTF (the ATRNS0523 annotation) as a supplementary artifact."
+    },
+    {
+      "type": 11,
+      "where": "C1 and C9 - bcl2fastq2 v2.20",
+      "missing": "bcl2fastq2 is Illumina-distributed software whose download is account-gated rather than openly redistributable, and older builds are not reliably retrievable. It is exactly pinned in the paper (v2.20), so this is a licence/availability constraint rather than a documentation gap, but it caps these two steps independently of the data embargo.",
+      "how_to_close": "Deposit the demultiplexed FASTQ (rather than only BCL-level provenance) so the demultiplexing step does not need to be re-executed, or note an openly redistributable equivalent (e.g. bcl-convert) and the equivalence checked."
+    },
+    {
+      "type": 10,
+      "where": "Wet-lab / physical steps (W = 6)",
+      "missing": "Six physical steps are out of scope for computational reproduction and are counted in W without verdicts: (1) hematopoietic cell purification from NIH Clinical Center leukapheresis/whole blood under NIH study 99-CC-0168 with SepMate/Ficoll gradient and EasySep enrichment; (2) primary non-hematopoietic cell culture (Lonza/Cell Applications/iXCells myoblasts, preadipocytes, dermal microvascular endothelial cells, fibroblasts, osteoblasts, passages 3-5, lot numbers given); (3) in vitro treatment with methylprednisolone 22.7 uM or ethanol vehicle 0.08%, harvest at 2 h and 6 h; (4) TRIzol/BCP RNA purification with Zymo RNA Clean & Concentrator-5, Qubit and Bioanalyzer QC; (5) NEXTflex small RNA-seq v3 library prep with 150 bp gel size selection and 50 bp single-read HiSeq 3000 sequencing; (6) TruSeq Stranded Total RNA Ribo-Zero Gold library prep with 2x94 bp HiSeq 2000 (replicate 1) or 2x75 bp HiSeq 3000 (replicates 2-4) sequencing. These are documented in unusually good detail (catalogue and lot numbers throughout) but are replication-scope, not reproduction-scope.",
+      "how_to_close": "N/A for Tier-1 computational readiness. The reproducible entry point would be the deposited FASTQ once SRA/GEO accessions exist; note that the donor material is human primary cells under an NIH protocol, so any future deposit may legitimately be controlled-access rather than open."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "data accession: total RNA-seq and small-RNA-seq datasets - stated verbatim as 'will be publicly available through the Sequence Read Archive (SRA) and Gene Expression Omnibus (GEO) upon publication'",
+      "http_status": "none - no accession identifier stated, nothing to resolve (full-text sweep for GSE/SRP/SRR/PRJNA/phs returned zero matches)",
+      "checked_at": "2026-07-28",
+      "network_context": "regex sweep of the curl-retrieved biorxiv v1 full-text HTML (HTTP 200, 56,852 bytes), text-stripped"
+    },
+    {
+      "artifact": "code repo (authors' own analysis code): none stated - the paper has no Code availability statement and no repository URL anywhere",
+      "http_status": "none - no URL stated, nothing to resolve",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text URL sweep found only doi.org/10.64898/2025.12.18.695158, hpc.nih.gov, and two ror.org institution identifiers"
+    },
+    {
+      "artifact": "code artifact (third-party pipeline, cited): 'Kuhn, S. & Zhang, G. 2024. OpenOmics/mir-seek:v0.3.0. Zenodo version= v0.3.0.' - no URL or DOI printed in the paper",
+      "http_status": "200 OK - Zenodo record 13834238 'OpenOmics/mir-seek: v0.3.0' resolves (zenodo.org/records/13834238); the source repository github.com/OpenOmics/mir-seek also returns 200",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl of the Zenodo REST API (q=\"mir-seek\", 1 hit) and of the two landing pages; the artifact was located from the paper's own reference-list string, not by open web search for a substitute repository"
+    },
+    {
+      "artifact": "interactive web application ('Interactive Figure 1', R shiny) - claimed in abstract, Results, Discussion and Methods",
+      "http_status": "none - no URL stated anywhere in the paper, nothing to resolve",
+      "checked_at": "2026-07-28",
+      "network_context": "full-text sweep for shinyapps.io / any application URL returned zero matches"
+    },
+    {
+      "artifact": "paper full text (assessment source): https://www.biorxiv.org/content/10.64898/2025.12.18.695158v1.full",
+      "http_status": "200 OK (after two prior attempts returned Cloudflare 'error code: 1015' rate-limit and HTTP 403 on the .source.xml JATS route and HTTP 429 via WebFetch)",
+      "checked_at": "2026-07-28",
+      "network_context": "unauthenticated curl with browser UA; identity cross-checked against api.biorxiv.org/details/biorxiv/10.64898/2025.12.18.695158 (title and abstract match) and against Europe PMC PPR1230791 (no full text there, isOpenAccess=N)"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "5c3e9e3716a1e93dcdfa87864765d3d5494e9d8ad9ecf10948bfa9431fd0cf13",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

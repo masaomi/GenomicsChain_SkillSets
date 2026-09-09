@@ -1,0 +1,287 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-27",
+  "report_content_hash": "239a71960352c216926cc44e11fdd01aee2d2a84f7fd58b25052b45fa2e765e3",
+  "canonical_id": {
+    "value": "10.1101/2025.10.14.682350",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.14.682350v1",
+      "biorxiv:2025.10.14.682350v1"
+    ]
+  },
+  "paper_type": "pure-computational",
+  "reproduction_target": "Training and evaluation of FlashRNA, a transformer-based genomic sequence-to-function model that replaces Borzoi/Enformer's hand-crafted relative positional encoding with FlashAttention + Rotary Positional Encoding. Computational target: (1) assembly of the training corpus from the open-sourced Borzoi RNA-seq / DNase-seq / ATAC-seq track dataset 'after some additional processing'; (2) from-scratch pre-training on a single Nvidia H100 with AdamW, shift augmentation up to 1,024 bases, dropout 0.3, weight decay 0.1, GELU activations, Group Normalization and bias-free linear layers; (3) throughput / memory benchmarking against Borzoi (examples per second forward and forward-backward, maximum training batch size, maximum inference sequence length); (4) held-out coverage prediction on the Borzoi 'fold3' test set with the inverse-normalisation transform of Linder et al. and Pearson correlation across four replicates; (5) variant-effect prediction on fine-mapped GTEx eQTLs using Borzoi's 'logSED' score (Spearman and Pearson); (6) training a 16-model ensemble and distilling it into a single model; (7) fine-tuning on ChIP-seq tracks from the Borzoi dataset (head-only vs full fine-tuning, 3 epochs); (8) fine-tuning on the Saluki RNA half-life dataset; and (9) fine-tuning on the RiboNN translation-efficiency dataset. There is no wet-lab component, so there are no W-layer steps.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-analysis, built from the bioRxiv v1 full text (WebFetch of both the .source.xml and the .full HTML returned HTTP 403; a direct curl with a browser User-Agent against https://www.biorxiv.org/content/10.1101/2025.10.14.682350v1.full returned HTTP 200 / 156,000 bytes and contained the complete Abstract, Methods (section 2), Results (section 3) and Discussion). This is a short preprint: the entire Methods section is a single ~350-word narrative paragraph with no separate 'Data availability' or 'Code availability' block. The only availability statement in the whole paper is the single line at the end of the Abstract: 'Code: https://github.com/deepgenomics/flashrna'. The repository landing page and README were read as prose (README fetched from raw.githubusercontent.com, HTTP 200). The README states verbatim: 'This repository contains the FlashRNA model code, instructions for downloading model weights, and example usage code. We plan on open-sourcing code for model training and evaluation shortly, along with more details on our approach.' and 'We have provided the model itself for use. Open-source training and inference setup is coming soon.' Therefore the Code axis is 0 for every training, evaluation, benchmarking, ensembling, distillation and fine-tuning step - the code for those steps is explicitly declared not-yet-released - and is 2 only for the single released-model-inference step. The repository's environment.yml (a declared setup artifact named in the README's Setup block, read for capture-claim classification only) pins einops=0.8.1, jaxtyping=0.2.36, pandas=2.2.3, python=3.12, torch==2.8.0, flash-attn==2.8.3, lightning==2.5.3 and jsonargparse[signatures]==4.40.2, but leaves tqdm and wandb unpinned and captures no transitive closure, no build strings and no CUDA/driver stack; it is a conda environment specification, not a lock file, so capture_claim is exact_pins_partial rather than env_lock_claimed. Note also that FlashAttention makes the numerical result hardware-dependent - the README says FlashRNA 'currently only runs on GPUs that support FlashAttention' - and no GPU/CUDA/cuDNN versions are stated anywhere.",
+  "funnel_stage": "stage1-prose-only",
+  "stage2_candidate": false,
+  "capture_claim": "exact_pins_partial",
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Assembly of the training corpus: RNA-seq, DNase-seq and ATAC-seq tracks taken from the open-sourced Borzoi dataset, with CAGE and ChIP-seq tracks deliberately excluded, then 'after some additional processing' (README) - the additional processing is never described in the paper or the README, and no accession, download URL or file manifest for the track set appears in the paper itself",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C2",
+      "label": "From-scratch pre-training of FlashRNA on a single Nvidia H100 GPU with the AdamW optimizer: FlashAttention + Rotary Positional Encoding replacing Borzoi's relative positional encoding, shift augmentation up to 1,024 bases, dropout 0.3, weight decay 0.1, GELU replacing ReLU, Group Normalization replacing Batch Normalization, no additive biases in linear layers, 'substantially larger batch sizes' and 'higher learning rates' (neither quantified), one day wall-clock. Training code explicitly not released: 'We plan on open-sourcing code for model training and evaluation shortly'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C3",
+      "label": "Computational efficiency benchmarking against Borzoi on a single H100: examples per second for forward and combined forward-backward passes, maximum training batch size, and maximum inference input length before out-of-memory (Figure 1, reported as 6.1x faster inference, 2.4x faster back-propagation, 4.0x larger batches, 3.5x longer sequences up to 3.6 Mb context). No benchmarking harness, no Borzoi implementation identified (PyTorch port vs original TensorFlow), no precision (fp16/bf16/tf32), no CUDA/cuDNN/driver versions, no repetition count",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C4",
+      "label": "Held-out coverage evaluation on 'the same fold3 test set used in Borzoi' for RNA-seq, ATAC-seq and DNase-seq tracks, applying 'inverse normalization transformations, as described in [14]' to both predictions and target tracks before computing Pearson correlations, over four model replicates (Table 1). The transform is delegated to the Borzoi paper by citation, the fold3 interval list is not distributed with this study, and the evaluation code is declared not-yet-released",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C5",
+      "label": "Variant-effect prediction on fine-mapped GTEx eQTLs (GTEx Consortium 2020, reference [5]) scored with 'the same logSED score used in Borzoi', reporting Spearman correlation of 0.406 for FlashRNA vs 0.399 for Borzoi and Pearson correlations for four replicates (Table 2, Figure 2). No accession, no fine-mapping release, no variant list, no flanking-context or aggregation settings for logSED, and no scoring code",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C6",
+      "label": "Training a 16-model ensemble, measuring how eQTL performance scales with ensemble size (1 -> 0.406, 4 -> 0.440, 16 -> 0.454 Spearman), and distilling the 16-model ensemble into a single model reaching 0.452. The distillation procedure is described only as 'we distilled the 16-model ensemble into a single model': no distillation objective, loss weighting, temperature, distillation corpus, training length or replicate seeds are given, and the code is declared not-yet-released",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Fine-tuning on ChIP-seq tracks from the Borzoi dataset: a ChIP-seq prediction head is added to pre-trained FlashRNA and two regimes are compared - head-only (rest frozen) and full fine-tuning - for 3 epochs, evaluated on the fold3 held-out set with Pearson correlations and standard deviations across four replicates (Table 3, 0.593 full vs 0.595 Borzoi vs 0.574 head-only). Head architecture, learning rate, schedule and batch size are not stated; fine-tuning code is declared not-yet-released",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C8",
+      "label": "Fine-tuning for RNA half-life prediction using 'the same datasets as Saluki [1]' and 'following their respective training and evaluation setups', with a task-specific head over pooled FlashRNA embeddings, sequence input only (Table 4, human held-out Pearson). Dataset identity is delegated to Agarwal & Kelley 2022 by citation with no accession; the pooling scheme, head architecture and all optimisation settings are unstated; code is declared not-yet-released",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Fine-tuning for translation-efficiency prediction using 'the same datasets as ... RiboNN [20]' and following that paper's training and evaluation setup, with a task-specific head over pooled FlashRNA embeddings, sequence input only, compared against sequence-only and sequence-plus-annotation variants of RiboNN (Table 4). Same deficits as C8: dataset by citation only, no accession, no head or optimisation parameters, code declared not-yet-released",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C10",
+      "label": "Loading and running the released FlashRNA models for inference: public model code at https://github.com/deepgenomics/flashrna (Apache-2.0), conda environment.yml + 'pip install .' setup, FlashRNA.from_ckpt() with either a Wandb artifact identifier or a local checkpoint path, and the worked example examples/basic_setup.ipynb. Released weights are the four single-model replicates (single-model-rep-1:v0 ... rep-4:v0) and distilled-model:v0, all versioned Wandb artifacts under deep-genomics-open-source/FlashRNA",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a"
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 1,
+    "n_NI": 9,
+    "n_X": 0,
+    "S": 10,
+    "W": 0,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/10 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "1/10 (10%) RI, 9/10 NI. The binding constraint is a self-declared partial code release. A public Apache-2.0 repository exists (https://github.com/deepgenomics/flashrna) and it is unusually good on the one axis it covers - model code, a pinned conda environment.yml, an example notebook, and five versioned Wandb model artifacts (four replicates plus the distilled model) - which lifts the released-model inference step C10 to RI. But the README states in two separate places that everything else is still withheld: 'We plan on open-sourcing code for model training and evaluation shortly' and 'Open-source training and inference setup is coming soon.' That single fact drives Code = 0 for the nine steps that constitute every quantitative claim in the paper (dataset preparation, pre-training, efficiency benchmarking, held-out coverage evaluation, GTEx eQTL scoring, ensembling and distillation, and the three fine-tuning tasks), so none of them can exceed NI. Data is compounding rather than binding: the paper contains no data availability statement at all, and all four datasets are cited by reference only - the Borzoi track dataset (via the README's link to https://github.com/calico/borzoi, with unspecified 'additional processing'), fine-mapped GTEx eQTLs [5], the Saluki half-life dataset [1] and the RiboNN translation-efficiency dataset [20] - with no accession, release, fold definition or checksum anywhere, giving Data = 1 throughout. Parameters are thin by design: this is a 4-page preprint whose Methods is a single narrative paragraph, and the authors say themselves 'We will be sharing an updated version with more details soon!' Only regularisation and augmentation values are quantified (shift 1,024, dropout 0.3, weight decay 0.1); learning rate, batch size, step count, schedule, precision, seeds, distillation objective and all fine-tuning head configurations are absent. Version is capped at 1: the repository's environment.yml pins most direct dependencies exactly (torch==2.8.0, flash-attn==2.8.3, lightning==2.5.3, jsonargparse==4.40.2, einops=0.8.1, jaxtyping=0.2.36, pandas=2.2.3, python=3.12) but leaves tqdm and wandb floating, captures no transitive closure or build strings, and states no CUDA, driver or GPU-architecture pin - which matters here because FlashAttention makes the numerics hardware-dependent and the README concedes the model 'currently only runs on GPUs that support FlashAttention'. Even under a successful stage-2 code check no step could exceed RI. If the promised training and evaluation release lands, this paper would be worth re-assessing: the artifact base it already has (versioned weights, pinned env, permissive licence) is the part most papers lack.",
+    "coverage": "10 computational steps enumerated from the bioRxiv v1 Methods (section 2) plus the Results (section 3), which is where the training setup, evaluation protocol, ensembling/distillation and the three fine-tuning tasks are actually described in this preprint. No wet-lab steps exist (W = 0). Coverage = 10/10 (100%) of enumerated steps are C-layer.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 5,
+      "where": "Code availability - C1 through C9 (dataset preparation, pre-training, benchmarking, held-out evaluation, eQTL scoring, ensembling and distillation, all three fine-tuning tasks)",
+      "missing": "Training, evaluation, benchmarking, distillation and fine-tuning code is explicitly withheld. The repository README states verbatim: 'This repository contains the FlashRNA model code, instructions for downloading model weights, and example usage code. We plan on open-sourcing code for model training and evaluation shortly, along with more details on our approach.' and 'We have provided the model itself for use. Open-source training and inference setup is coming soon.' The paper's only availability statement is the one-line 'Code: https://github.com/deepgenomics/flashrna' at the end of the Abstract; there is no Code availability section, no Zenodo DOI, no Software Heritage identifier, no release tag and no commit hash. Consequently every number in Tables 1-4 and Figures 1-2 rests on code that a third party cannot obtain.",
+      "how_to_close": "Publish the training driver (data loader, augmentation, optimiser configuration, schedule), the evaluation scripts for fold3 coverage correlation and logSED eQTL scoring, the benchmarking harness used for Figure 1, the ensemble/distillation script, and the three fine-tuning task heads and configs - in the same repository, with a tagged release archived to Zenodo, and cite the tag (not the bare repository URL) from the paper."
+    },
+    {
+      "type": 8,
+      "where": "Data availability - C1, C4, C5, C6, C7 (Borzoi track dataset and fold3 test set; fine-mapped GTEx eQTLs), C8 (Saluki dataset), C9 (RiboNN dataset)",
+      "missing": "The paper has no data availability statement of any kind. All four datasets are identified only by citation: the Borzoi RNA-seq/DNase-seq/ATAC-seq track set (reference [14], with the README adding a link to https://github.com/calico/borzoi and the phrase 'after some additional processing' - the additional processing is nowhere described), the fine-mapped GTEx eQTL set (reference [5], no GTEx release, no fine-mapping method output, no variant list), the Saluki RNA half-life dataset (reference [1]) and the RiboNN translation-efficiency dataset (reference [20]). No GEO/SRA/ENA/Zenodo/figshare accession appears anywhere in the paper. The 'fold3' test-set interval definition, on which Tables 1 and 3 depend, is likewise inherited by citation and not redistributed.",
+      "how_to_close": "Add a data availability statement naming, for each of the four datasets, the exact download location, release or version, and a checksum or file manifest; deposit the post-'additional processing' training corpus (or the processing script plus a checksum of its output) and the fold3 interval BED so that the held-out split is byte-identical for a reproducer."
+    },
+    {
+      "type": 1,
+      "where": "C2, C6, C7, C8, C9 - all training, ensembling, distillation and fine-tuning runs",
+      "missing": "No random seed is reported anywhere in the paper. Four 'model replicates' are used throughout (Tables 1-3) and a 16-model ensemble is trained (Figure 2), but what distinguishes replicates - seed, initialisation, data order, augmentation stream - is never stated. Weight initialisation, dropout at rate 0.3, shift augmentation up to 1,024 bases, batch shuffling and the 16-member ensemble are all stochastic. Additionally, FlashAttention kernels are not bitwise deterministic and the numerical result is GPU-architecture dependent, so even a seeded rerun on different hardware will not match; no determinism claim or tolerance is offered.",
+      "how_to_close": "Report the seed for each replicate and each ensemble member, state whether replicates differ only by seed, and specify the determinism regime (deterministic kernels on/off, expected tolerance) together with the exact GPU model the reported numbers were produced on."
+    },
+    {
+      "type": 9,
+      "where": "C2 (optimisation settings), C6 (distillation), C7/C8/C9 (fine-tuning heads)",
+      "missing": "The Methods is a single narrative paragraph and quantifies only the regularisation and augmentation choices: shift margins up to 1,024 bases, dropout 0.3, weight decay 0.1, AdamW, GELU, Group Normalization, no linear biases. Absent: learning rate ('higher learning rates' is stated without a value), batch size ('substantially larger batch sizes', unquantified), number of steps or epochs for pre-training, warmup and decay schedule, sequence/context length used in training, loss function, numerical precision, model dimensions and layer counts, the number of tracks retained, the distillation objective/temperature/corpus, the pooling scheme and head architecture for the RNA half-life and translation-efficiency tasks, and the head architecture and optimisation settings for ChIP-seq fine-tuning. The authors acknowledge this: 'We will be sharing an updated version with more details soon!'",
+      "how_to_close": "Publish the full hyperparameter tables (or, equivalently, the released config files) for pre-training, distillation and each of the three fine-tuning tasks, including precision, context length, batch size, learning-rate schedule and step counts, and state the loss functions explicitly."
+    },
+    {
+      "type": 2,
+      "where": "Whole analysis environment - all 10 steps",
+      "missing": "No lock file, container image or digest is claimed. The only environment artifact is the repository's conda environment.yml, which pins most direct dependencies exactly (python=3.12, einops=0.8.1, jaxtyping=0.2.36, pandas=2.2.3, torch==2.8.0, flash-attn==2.8.3, lightning==2.5.3, jsonargparse[signatures]==4.40.2) but leaves tqdm and wandb unpinned, records no transitive closure, no channel priority pin and no build strings, and captures nothing about the CUDA toolkit, driver, cuDNN or GPU architecture. flash-attn in particular is compiled against a specific CUDA/PyTorch pair and the README itself flags it as fragile ('try commenting this out and install separately if there are issues'). This is why capture_claim is exact_pins_partial rather than env_lock_claimed.",
+      "how_to_close": "Ship a conda-lock file (or a container image cited by digest) covering the CUDA/driver/PyTorch/flash-attn stack, pin tqdm and wandb, and state the GPU architecture and CUDA version the published numbers were produced under."
+    },
+    {
+      "type": 3,
+      "where": "The paper text - all 10 steps",
+      "missing": "The paper itself pins no software version whatsoever. FlashAttention, FlashAttention-2, PyTorch, Lightning, Borzoi and Flashzoi are all referred to by name and citation only. Every version pin available for this work exists solely in the repository's environment.yml, i.e. outside the publication record, and tracks the repository's moving default branch rather than the state of the code at the time the reported experiments were run.",
+      "how_to_close": "Add a software table to the paper listing the exact version of every component used for the reported results (PyTorch, flash-attn, Lightning, CUDA, Python, and the FlashRNA commit or release tag), and cite a frozen release of the repository rather than the bare URL."
+    },
+    {
+      "type": 6,
+      "where": "External artifacts: the GitHub repository https://github.com/deepgenomics/flashrna and the five Wandb model artifacts under deep-genomics-open-source/FlashRNA",
+      "missing": "Both classes of artifact are moving or access-gated. The repository is cited as a bare URL with no commit, tag or release, and the README explicitly announces future content changes ('coming soon', 'will be added soon'), so the code that a reader fetches today is not the code that produced the paper and will not be the code fetched tomorrow. The model weights are hosted only as Wandb Artifacts and the README notes 'Requires Wandb login' for the programmatic path - a third-party platform account is therefore interposed between a reader and the published weights, with no DOI-bearing mirror (Zenodo, HuggingFace, S3) and no checksum for any checkpoint file. The artifact identifiers do at least carry an explicit version suffix (':v0'), which is better than nothing.",
+      "how_to_close": "Tag a release corresponding to the preprint and archive it to Zenodo; mirror the five checkpoints to a login-free, DOI-bearing host and publish a sha256 for each checkpoint file alongside the Wandb artifact identifier."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo for this study: https://github.com/deepgenomics/flashrna - stated verbatim in the paper as the single line 'Code: https://github.com/deepgenomics/flashrna' at the end of the Abstract, and again in the README as the FlashRNA repository (Apache License 2.0, (C) Deep Genomics Inc. 2025)",
+      "http_status": "URL-present (repository landing page and README retrieved at stage 1; raw README fetch returned HTTP 200)",
+      "checked_at": "2026-07-27",
+      "network_context": "no commit hash, no tag and no release is cited; the README declares partial content - model code, weight-download instructions and examples/basic_setup.ipynb are present, while training and evaluation code are explicitly 'coming soon'"
+    },
+    {
+      "artifact": "released model weights: five Wandb Artifacts under deep-genomics-open-source/FlashRNA - single-model-rep-1:v0, single-model-rep-2:v0, single-model-rep-3:v0, single-model-rep-4:v0, distilled-model:v0",
+      "http_status": "URL-present (stated in README; not independently resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "listed only in the repository README, not in the paper; each carries an explicit ':v0' artifact version, but the README states 'Requires Wandb login' for the from_ckpt(wandb_artifact=...) path and no checksum is published for any checkpoint file"
+    },
+    {
+      "artifact": "environment specification: environment.yml in the repository root, invoked by the README's Setup block as 'conda env create -f environment.yml; conda activate flashrna; pip install .'",
+      "http_status": "URL-present (stated in README; file retrieved at stage 1, HTTP 200)",
+      "checked_at": "2026-07-27",
+      "network_context": "read for capture-claim classification only; pins python=3.12, einops=0.8.1, jaxtyping=0.2.36, pandas=2.2.3, torch==2.8.0, flash-attn==2.8.3, lightning==2.5.3, jsonargparse[signatures]==4.40.2, and leaves tqdm and wandb unpinned - a conda environment spec, not a lock file"
+    },
+    {
+      "artifact": "training data: the open-sourced Borzoi track dataset (RNA-seq, DNase-seq, ATAC-seq) - NO ACCESSION STATED. The paper gives no data availability statement; the README says verbatim 'we train FlashRNA with the open-sourced that was processed and shared by the authors of [Borzoi](https://github.com/calico/borzoi/blob/main/README.md), after some additional processing'",
+      "http_status": "stated-in-paper (source named by citation; URL present only in the README, no accession, no release, no manifest)",
+      "checked_at": "2026-07-27",
+      "network_context": "the 'additional processing' applied by this study is never described, and no post-processing corpus is deposited; the 'fold3' held-out split used in Tables 1 and 3 is inherited from Borzoi and not redistributed"
+    },
+    {
+      "artifact": "evaluation data: fine-mapped GTEx eQTLs (cited as reference [5], GTEx Consortium, Science 369:1318-1330, 2020) - NO ACCESSION STATED",
+      "http_status": "stated-in-paper (publication citation only)",
+      "checked_at": "2026-07-27",
+      "network_context": "no GTEx release version, no fine-mapping output file, no variant list and no URL; the logSED scoring convention is likewise delegated to the Borzoi paper by citation"
+    },
+    {
+      "artifact": "fine-tuning data: the Saluki RNA half-life dataset (reference [1], Agarwal & Kelley, Genome Biology 23:245, 2022) and the RiboNN translation-efficiency dataset (reference [20], Zheng et al., Nature Biotechnology, 2025) - NO ACCESSIONS STATED",
+      "http_status": "stated-in-paper (publication citations only)",
+      "checked_at": "2026-07-27",
+      "network_context": "the paper says only 'the same datasets as Saluki [1] ... and RiboNN [20] ... following their respective training and evaluation setups'; no accession, no URL, no split definition"
+    },
+    {
+      "artifact": "third-party code referenced from the README: Borzoi (https://github.com/calico/borzoi), Flashzoi / borzoi-pytorch (https://github.com/johahi/borzoi-pytorch/tree/main), FlashAttention (https://github.com/Dao-AILab/flash-attention)",
+      "http_status": "URL-present (stated in README; not independently resolved at stage 1)",
+      "checked_at": "2026-07-27",
+      "network_context": "these are baselines and dependencies rather than this study's own code; none is pinned to a commit, and the borzoi-pytorch link points at a branch"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "35e4060531d9848af9e46a78edd5a99db92d618d6cd3c7c6cb799f48c6f9d693",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-27T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}

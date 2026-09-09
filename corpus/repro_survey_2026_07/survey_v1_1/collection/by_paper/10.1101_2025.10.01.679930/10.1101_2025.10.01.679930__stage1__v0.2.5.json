@@ -1,0 +1,711 @@
+{
+  "rubric_version": "0.2.5",
+  "metric_semantics_version": "0.2.5",
+  "rubric_hash": "4024d4d8817abb0feb76ca9e91effcb11fcea53b1caae2a2ee4efc985e4ca3b1",
+  "assessor_id": "claude (stage1 subagent) + masaomi",
+  "assessed_at": "2026-07-28",
+  "report_content_hash": "f287fa2b4856f4b3727660916532c7fb8abba27eb06e54f43aae88fc05a96ccf",
+  "canonical_id": {
+    "value": "10.1101/2025.10.01.679930",
+    "kind": "doi",
+    "aliases": [
+      "https://www.biorxiv.org/content/10.1101/2025.10.01.679930v1",
+      "biorxiv:2025.10.01.679930v1"
+    ]
+  },
+  "paper_type": "mixed",
+  "reproduction_target": "The computational half of a TE-invasion population-genomics study: discovery and characterization of Kuruka, a newly invading gypsy/gypsy-superfamily endogenous retrovirus in natural Drosophila melanogaster populations. Computational target = (i) detection of Kuruka from public Chinese D. melanogaster short-read datasets [Chen et al., 2024] via bwa mem (v0.7.17-r1188) mapping to GCA 000001215.4, samtools (v1.13) unmapped-read extraction, a custom Python3 divergence filter (badmapped-finder.py, >5% divergence), contaminant filtering against a custom laboratory-contaminant database, SPAdes (v3.13.1) de novo assembly and BLASTx against a transposable-element protein database (Novak 2023, v3.1 metazoa, identity >80%, alignment >250 bp); (ii) consensus reconstruction and structural annotation from newly generated Oxford Nanopore long reads (Dorado 1.0 basecalling, hifiasm assembly, RepeatMasker v4.1.2-p1 with a custom Kuruka library, MAFFT v7.526, the custom majority-rule script MSA2consensus.py, ORFfinder + BLASTx, a VectorBuilder dot plot); (iii) copy-number estimation across 1072 publicly available D. melanogaster short-read datasets with bwa bwasw and the authors' DeviaTE tool normalized against three BUSCO single-copy genes (29at7147, 591at7147, 898at7147); (iv) a new D. erecta genome assembly (Guppy v6.5.7+ca6d6af, 100x filtering, Canu v2.2, three rounds of Minimap2 v2.30 + Racon v1.5.0, Pilon v1.24 with published Illumina reads) and flamenco localization; (v) a RepeatMasker survey of 49 D. melanogaster, 305 drosophilid and 1211 arthropod genome assemblies with manual biogeographic-realm assignment; (vi) Bayesian phylogenetics with MAFFT v7.526 + BEAST v2.7.5, plus bedtools v2.30.0 flank extraction and LTRharvest from GenomeTools v1.6.5; and (vii) piRNA abundance / ping-pong-signature computation with previously described Python scripts and EarlGrey v4.4.5 de novo TE annotation. Wet-lab steps (ONT MinION and PromethION sequencing, D. erecta ovary HMW-DNA extraction, PCR screening of Kuruka insertions) are scope-split out as OOS.",
+  "step_source": "prose-methods",
+  "granularity_note": "Coarse one-step-per-named-tool/analysis, built from the bioRxiv v1 JATS source XML fetched with curl and a browser user-agent to /tmp/stage1_10.1101_2025.10.01.679930/paper.xml (title-phrase check passed: 'The ongoing invasion of the endogenous retrovirus Kuruka' present; 4 occurrences of 'Kuruka' in the raw XML header/body region checked). The XML contains the complete section 4 'Materials and Methods' (4.1-4.9) and the 'Data Availability' paragraph. 32 steps total: 28 computational (C1-C28) and 4 wet-lab (W1-W4, verdict OOS, excluded from |S|). The code repository named in Data Availability (https://github.com/rpianezza/Kuruka) was opened at landing-page level only: HTTP 200, public, 11 commits on branch main, NO repository description, NO rendered README, NO releases and NO tags ('There aren't any releases here'), root listing observed as ORFs/, data/, demo/, deviaTE/, documentation/, figures/, metadata/, ref/, scripts/, transposon-proteins/, utilities/, commands.txt. No environment file (no conda env.yml, no Dockerfile, no renv.lock, no requirements.txt) is visible at the root listing and none is claimed in the paper, so capture_claim = exact_pins_partial and stage2_candidate = false under the tightened v0.2.6 gate. Version scoring rule applied: a prose pin counts (version=1, subtier exact_pins_partial) only when the paper text itself gives at least a major.minor identifier - bwa 0.7.17-r1188, samtools 1.13, SPAdes 3.13.1, RepeatMasker 4.1.2-p1, MAFFT 7.526, BEAST 2.7.5, bedtools 2.30.0, GenomeTools 1.6.5, Canu 2.2, Minimap2 2.30, Racon 1.5.0, Pilon 1.24, Guppy 6.5.7+ca6d6af, Dorado 1.0, EarlGrey 4.4.5 and the TE protein database (v3.1, metazoa) qualify; hifiasm, DeviaTE, BLASTx/BLAST, ORFfinder, VectorBuilder, Python3 itself and every custom script (badmapped-finder.py, MSA2consensus.py, the piRNA scripts of Kofler et al. 2018 / Selvaraju et al. 2024) carry no version anywhere in the paper and drive most NI verdicts. Data axis convention used here: third-party datasets re-used by citation or listed in Supplementary File S1 score data=2 (public, one indirection, subflag needs-supplement); this study's OWN newly generated reads and assembly score data=1 ('missing id') because Data Availability reads verbatim 'available at NCBI under accession number xxx' - a placeholder, not an accession; a truly absent required input (the undocumented custom contaminant database, the unstated small-RNA input for the piRNA analysis) scores data=0. Code axis: the Data Availability statement claims 'The analysis performed in this work have been documented with RMarkdown and have been made publicly available' at the GitHub repository, and the root listing shows scripts/, utilities/, documentation/ and commands.txt, so analysis-shaped steps are credited code=2 at PROSE level; whether those files actually cover each Methods step is exactly the Stage-2 question and was NOT checked. Repository file CONTENT was not read and nothing was executed.",
+  "funnel_stage": "stage1-prose-only",
+  "capture_claim": "exact_pins_partial",
+  "stage2_candidate": false,
+  "steps": [
+    {
+      "step_id": "C1",
+      "label": "Mapping of public D. melanogaster short-read datasets from China 2017/2020 [Chen et al., 2024] to the reference genome GCA 000001215.4 with bwa mem (v0.7.17-r1188) 'with default parameters'",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C2",
+      "label": "Extraction of unmapped reads from the bwa mem alignments with samtools (v1.13); no subcommand or flag set is given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C3",
+      "label": "Extraction of reads with more than 5% sequence divergence using the custom Python3 script badmapped-finder.py; the divergence threshold is stated but neither the script version/commit nor the Python3 version is given",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C4",
+      "label": "Contaminant filtering of the divergent reads by aligning with bwa mem (v0.7.17-r1188) against 'a custom database containing genomes of common laboratory contaminants (e.g., Homo sapiens, Wolbachia)'; the database composition is given only as an open-ended example list, no assembly accessions, no deposit",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C5",
+      "label": "De novo assembly of the remaining filtered reads with SPAdes (v3.13.1); no assembler options, k-mer set or mode (careful/meta/isolate) is stated",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C6",
+      "label": "BLASTx query of the assembled contigs against a transposable element protein database [Novak, 2023] (v3.1, metazoa), retaining contigs with sequence identity >80% and alignment length >250 bp; the database carries a version but BLAST/BLASTx itself carries none",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "W1",
+      "label": "Oxford Nanopore MinION long-read sequencing of new D. melanogaster iso-female lines collected in North Dakota 2023 (ND1-3, three lines pooled, sequenced at North Dakota State University) and Fargo/Washington D.C. 2025 (DW7, DC1)",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C7",
+      "label": "Basecalling of the D. melanogaster MinION reads with Dorado (1.0, ARM64); no basecalling model (fast/hac/sup, chemistry-specific model name) and no command line is given, and the resulting reads carry the placeholder accession 'xxx'",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C8",
+      "label": "Assembly of the D. melanogaster long reads with hifiasm [Cheng et al., 2021, 2025]; no version, no mode (ONT vs HiFi) and no parameters are given",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C9",
+      "label": "Detection of Kuruka insertions in the raw long reads with RepeatMasker (v4.1.2-p1) using options '-no is -s -nolow' and a custom TE library containing only the Kuruka contig assembled from the short reads; insertions longer than 80% of the query retained",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C10",
+      "label": "Multiple sequence alignment of the retained Kuruka insertions with MAFFT (v7.526); no alignment strategy (--auto, L-INS-i, etc.) or gap parameters are stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C11",
+      "label": "Consensus sequence reconstruction from the MSA with the custom Python3 script MSA2consensus.py applying a majority-rule nucleotide call; no script version/commit, no tie-breaking or minimum-coverage rule stated",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C12",
+      "label": "Protein-domain identification in the Kuruka consensus with ORFfinder followed by BLASTx against the NCBI protein database; no version for either tool, no NCBI nr release date, no ORFfinder minimum-length or genetic-code setting",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C13",
+      "label": "Dot plot of the Kuruka consensus generated using VectorBuilder [VectorBuilder Inc., 2025] - a commercial hosted web service with no version, no parameters and no deposited input/output",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "env-hardcoded"
+      ]
+    },
+    {
+      "step_id": "C14",
+      "label": "Alignment of 1072 publicly available D. melanogaster short-read datasets [nine cited sources] to a database of the Kuruka consensus plus three BUSCO single-copy genes (29at7147, 591at7147, 898at7147) with bwa bwasw (v0.7.17-r1188)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C15",
+      "label": "Copy-number estimation with the authors' tool DeviaTE [Weilguny and Kofler, 2019], normalizing Kuruka coverage by the coverage of the three single-copy genes; no DeviaTE version and no command line are given (the repository has a deviaTE/ directory)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "W2",
+      "label": "Collection of ovaries from ~300 D. erecta (strain 14021-0224.01) in ice-cold 1xPBS and high-molecular-weight DNA extraction with the Monarch Genomic DNA Purification Kit (T3060, New England Biolabs)",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "W3",
+      "label": "Library preparation and sequencing at the Vienna BioCenter Core Facilities with the Oxford Nanopore Ligation Sequencing Kit V14 (SQK-LSK114) on a PromethION flow cell",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C16",
+      "label": "Basecalling of the D. erecta PromethION reads with Guppy (v6.5.7+ca6d6af); the build hash is given but no basecalling model/config file, no flowcell-kit pairing and no command line",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "C17",
+      "label": "Filtering of the D. erecta raw reads to 100x genome coverage and assembly with Canu v2.2 [Koren et al., 2017]; the target coverage is stated but the filtering tool/criterion (length? quality? random subsample?), the assumed genome size and all Canu options are not",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C18",
+      "label": "Polishing of the D. erecta assembly through three rounds of Minimap2 (v2.30) + Racon (v1.5.0); the number of rounds is stated but no minimap2 preset (-x map-ont etc.) and no Racon options",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C19",
+      "label": "Refinement of the polished D. erecta assembly with Pilon (v1.24) using published Illumina reads from D. erecta populations [Selvaraju et al., 2024]; the Illumina source is a citation with no accession, and no Pilon fix modes or read-alignment step are described",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C20",
+      "label": "Localization of flamenco in the new D. erecta assembly by retrieving the flamenco sequence from the D. erecta reference coordinates of van Lopik et al. [2023] and mapping it with bwa mem (v0.7.17-r1188); the reference assembly version/coordinates are given only by citation",
+      "layer": "C",
+      "axes": {
+        "data": 1,
+        "code": 1,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C21",
+      "label": "Identification of Kuruka insertions in 49 D. melanogaster, 305 drosophilid and 1211 other arthropod genome assemblies (overview in Supplementary File S1) with RepeatMasker (v4.1.2-p1; -no-is -s -nolow) and a custom library containing the Kuruka consensus",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked",
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C22",
+      "label": "Manual assignment of an ancestral biogeographic realm to each drosophilid species based on Markow and O'Grady [2005], falling back to the GBIF portal [GBIF, 2024] when no information was available; a human-judgement step with no script, no decision rule and no GBIF snapshot/download DOI",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 0,
+        "version": 0,
+        "params": 1
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C23",
+      "label": "Phylogenetic classification of Kuruka: RT-region identification in the consensus sequences of known D. melanogaster TEs and Kuruka by BLASTx against the NCBI protein database, MAFFT (v7.526) alignment and a Bayesian tree with the BEAST package (v2.7.5); BLASTx is unversioned and no substitution model, clock model, priors, chain length, burn-in or convergence criterion is reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "distributional-only"
+      ]
+    },
+    {
+      "step_id": "C24",
+      "label": "Extraction of Kuruka sequences plus 3 kb flanking regions from the RepeatMasker output with bedtools (v2.30.0)",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C25",
+      "label": "Selection of insertions carrying two LTRs (removing flanking regions and fragmented insertions) with the LTRharvest tool from GenomeTools (v1.6.5); no LTRharvest length/similarity/motif thresholds are reported",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 1
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    },
+    {
+      "step_id": "C26",
+      "label": "Construction of the cross-species Kuruka insertion tree with MAFFT and BEAST [Katoh et al., 2002; Bouckaert et al., 2019]; versions are given for these tools elsewhere in the Methods but this passage reports no model, priors, chain length, burn-in or seed",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "distributional-only",
+        "capture-static-only"
+      ]
+    },
+    {
+      "step_id": "W4",
+      "label": "PCR screening for Kuruka with primers designed on the D. erecta sequence (F CCCCTCCTGCTTGTTTACGT, R TGGTACGGTCAACTTCCAGC, Invitrogen) in D. erecta 14021-0224.01 (positive control), D. simulans SZ129, D. melanogaster w1118 (negative controls) and four Fargo 2023 D. melanogaster strains",
+      "layer": "W",
+      "axes": {
+        "data": 1,
+        "code": 0,
+        "version": 0,
+        "params": 2
+      },
+      "verdict": "OOS",
+      "env_capture_class": "n/a"
+    },
+    {
+      "step_id": "C27",
+      "label": "Computation of piRNA abundance, piRNA distribution within the P-element and the ping-pong signature using 'previously described Python scripts' [Kofler et al., 2018; Selvaraju et al., 2024]; the small-RNA input datasets are never named or accessioned anywhere in the Methods, the scripts are cited rather than linked, and no version or parameter is given",
+      "layer": "C",
+      "axes": {
+        "data": 0,
+        "code": 1,
+        "version": 0,
+        "params": 0
+      },
+      "verdict": "NI",
+      "env_capture_class": "n/a",
+      "subflags": [
+        "needs-supplement"
+      ]
+    },
+    {
+      "step_id": "C28",
+      "label": "De novo annotation of D. erecta TEs in the D. erecta reference genome with EarlGrey (v4.4.5; option -c yes) to generate the control TE set; the resulting consensus library is stated to be deposited in the GitHub repository",
+      "layer": "C",
+      "axes": {
+        "data": 2,
+        "code": 2,
+        "version": 1,
+        "params": 2
+      },
+      "verdict": "RI",
+      "env_capture_class": "n/a",
+      "version_subtier": "exact_pins_partial",
+      "subflags": [
+        "capture-static-only",
+        "syslib-closure-unchecked"
+      ]
+    }
+  ],
+  "counts": {
+    "n_R": 0,
+    "n_RI": 14,
+    "n_NI": 14,
+    "n_X": 0,
+    "S": 28,
+    "W": 4,
+    "n_fetch_required": 0,
+    "n_exact_capture_unexecuted": 0
+  },
+  "headline": {
+    "static_readiness": "0/28 (0%) - stage1 ceiling only, no R-star (R-star needs stage-2 code verification)",
+    "inference_inclusive_upper_bound": "RI on 14 of 28 computational steps, NI on 14, X on 0 (readiness upper bound 14/28 = 50%). The prose profile is a classic 'well-versioned tools, weakly-deposited data' pattern. Strengths: an unusually dense set of exact prose version pins (16 tools carry at least major.minor, several with build strings: bwa 0.7.17-r1188, RepeatMasker 4.1.2-p1, Guppy 6.5.7+ca6d6af), explicit RepeatMasker and bwa command options, an explicitly versioned TE protein database (v3.1, metazoa), named BUSCO gene IDs, and a public GitHub repository that the Data Availability statement says holds the RMarkdown analysis, the figures and the EarlGrey-derived D. erecta consensus library. Version stays at 1 for every RI step because there is no environment lock of any kind - no conda environment file, no container, no lockfile, no requirements.txt is claimed in the paper or visible on the repository root - so the pins are exact_pins_partial with no closure over interpreter, channel or platform. The 14 NI steps split into three binding weaknesses: (1) unversioned tools - hifiasm, DeviaTE, BLASTx, ORFfinder, VectorBuilder and all custom Python3 scripts carry no version anywhere (C3, C6, C8, C11, C12, C13, C15, C23); (2) undeposited or undescribed inputs - the custom laboratory-contaminant database is described only as 'e.g., Homo sapiens, Wolbachia' with no accessions (C4), and the small-RNA datasets underlying the entire piRNA analysis are never named (C27); (3) unreported stochastic-inference settings - both BEAST analyses report no substitution model, priors, chain length, burn-in or seed (C23, C26), so those trees are at best distributional-match targets. Overshadowing all of this at the paper level: the Data Availability statement reads verbatim 'available at NCBI under accession number xxx' - an unfilled placeholder - so the newly generated D. erecta assembly and the D. melanogaster ND1-4 long reads have NO retrievable identifier, and every step downstream of new sequencing (C7-C13, C16-C20) is scored data=1 'missing id' on the assumption that a real accession lands at journal publication. If the placeholder is never replaced, those thirteen steps fall to data=0 and the upper bound drops to 8/28 (29%).",
+    "coverage": "28 of 32 total steps are computational (|S|/(|S|+|W|) = 28/32 = 87.5%); the 4 wet-lab steps (ONT MinION sequencing of new D. melanogaster lines, D. erecta ovary HMW-DNA extraction, PromethION library prep/sequencing, PCR screening of Kuruka insertions) are scope-split out as OOS per the mixed-paper route.",
+    "repro_index": null
+  },
+  "levers": {
+    "software_env_lock": false,
+    "in_code_db_pin_classA": false,
+    "has_validated_env_capture": false,
+    "software_env_platform_coverage": "unverified (stage1)"
+  },
+  "gaps": [
+    {
+      "type": 1,
+      "where": "Data Availability; affects every step downstream of newly generated sequencing (C7, C8, C9, C10, C11, C12, C13, C16, C17, C18, C19, C20) and the wet-lab steps W1-W3",
+      "missing": "The Data Availability statement reads verbatim: 'The newly assembled D. erecta genome and raw reads for D. melanogaster lines ND1-4 are available at NCBI under accession number xxx.' The accession is an unfilled placeholder. There is no BioProject, no SRA run accession and no assembly accession anywhere in the manuscript. Additionally the Methods name lines ND1-3, DW7 and DC1 while the Data Availability names 'ND1-4', so the sample-to-accession correspondence is not even internally consistent.",
+      "how_to_close": "Replace 'xxx' with the real NCBI BioProject accession plus a per-line table mapping each iso-female line (ND1, ND2, ND3, DW7, DC1 and any ND4) to its SRA run accessions and the D. erecta assembly to its GCA accession, and reconcile the ND1-3 / ND1-4 discrepancy."
+    },
+    {
+      "type": 2,
+      "where": "C3 and C11 (custom Python3 scripts), C6, C12 and C23 (BLASTx), C8 (hifiasm), C13 (VectorBuilder), C15 (DeviaTE), C22 (GBIF), C27 (piRNA scripts)",
+      "missing": "No version is reported for hifiasm, DeviaTE, BLAST/BLASTx, ORFfinder, VectorBuilder, Python3 itself, or for any of the custom scripts named in the Methods (badmapped-finder.py, MSA2consensus.py, MSA/piRNA scripts of Kofler et al. 2018 and Selvaraju et al. 2024). The GitHub repository carries no release and no tag, so there is not even a commit-level anchor for the scripts. The NCBI protein database used by two BLASTx steps is cited with no release or download date, and GBIF is cited as a portal with no download DOI or access date - both are rolling resources.",
+      "how_to_close": "Add a software table giving an exact version for every tool including hifiasm, DeviaTE, BLAST, ORFfinder and Python; cut a tagged release (or cite a commit SHA) of https://github.com/rpianezza/Kuruka for the manuscript figures; and state the NCBI nr release and the GBIF download DOI with access dates."
+    },
+    {
+      "type": 5,
+      "where": "C4 (contaminant filtering)",
+      "missing": "The contaminant-screening reference is described only as 'a custom database containing genomes of common laboratory contaminants (e.g., Homo sapiens, Wolbachia)'. The 'e.g.' leaves the membership open, no assembly accessions are listed, and the database is not deposited. Which reads survive this filter - and therefore what SPAdes assembles in C5 and what BLASTx recovers in C6 - depends entirely on this undocumented database.",
+      "how_to_close": "List every genome in the contaminant database with its assembly accession and version, or deposit the FASTA (with a checksum) alongside the GitHub repository."
+    },
+    {
+      "type": 12,
+      "where": "Whole paper: the GitHub repository https://github.com/rpianezza/Kuruka",
+      "missing": "The repository is public and reachable (HTTP 200) but carries NO repository description, NO rendered README, NO releases and NO tags. Its root is a bare directory listing (ORFs/, data/, demo/, deviaTE/, documentation/, figures/, metadata/, ref/, scripts/, transposon-proteins/, utilities/, commands.txt) with no entry point, no stated run order and no environment specification. The paper's claim that 'the analysis performed in this work have been documented with RMarkdown' therefore cannot be mapped onto the Methods steps from prose alone, and there is no way to tell which of the 28 computational steps the deposited code actually covers.",
+      "how_to_close": "Add a README that names, for each Methods subsection (4.1-4.9), the script or RMarkdown file that implements it and the order in which they are run; cut a release tagged to the manuscript."
+    },
+    {
+      "type": 7,
+      "where": "Whole paper; concretely C1-C6, C9-C12, C14-C21, C23-C26, C28",
+      "missing": "No environment capture of any kind is claimed or visible: no conda environment.yml or conda-lock, no Dockerfile or image digest, no renv.lock, no requirements.txt, no interpreter version, no channel/index pinning and no declared platform. The 16 exact tool pins in the prose are scattered version strings, which the rubric classes as exact_pins_partial - they fix tool identity but not the resolution environment (Python version for the custom scripts, BLAST+ toolkit build, RepeatMasker's search engine and library configuration, BEAST package set).",
+      "how_to_close": "Ship a conda-lock / pixi.lock or a container image with a recorded digest covering the declared platform, or at minimum an environment.yml pinning interpreter, channels and every direct dependency."
+    },
+    {
+      "type": 4,
+      "where": "C23 and C26 (both BEAST v2.7.5 Bayesian analyses)",
+      "missing": "Neither Bayesian analysis reports a substitution model, clock model, tree prior, MCMC chain length, sampling frequency, burn-in, convergence diagnostic (ESS) or random seed. No BEAST XML input file is cited or deposited. Both published trees - the gypsy-superfamily classification tree and the cross-species Kuruka insertion tree, which carries the horizontal-transfer-from-D. erecta conclusion - are therefore not re-derivable as published; the best available target is distributional agreement of the posterior.",
+      "how_to_close": "Deposit the BEAST XML input files (which record model, priors, chain length and seed) and the resulting log/trees files, and state the ESS values achieved."
+    },
+    {
+      "type": 12,
+      "where": "C27 (piRNA abundance, P-element distribution and ping-pong signature)",
+      "missing": "The entire piRNA section rests on 'previously described Python scripts [Kofler et al., 2018, Selvaraju et al., 2024]' - cited but not linked, not versioned and not stated to be in the repository - and, more seriously, the small-RNA sequencing datasets that these scripts consume are never named, accessioned or cited anywhere in the Methods or in Data Availability. The claim that 'the presence of an active host defense (piRNAs) suggests that Kuruka is silenced in D. erecta' therefore has no identified input.",
+      "how_to_close": "Name the small-RNA libraries used (accession per library, whether newly generated or re-used) and either deposit the analysis scripts in the Kuruka repository or cite the exact repository/commit where they live."
+    },
+    {
+      "type": 11,
+      "where": "C13 (dot plot)",
+      "missing": "The dot plot is produced by VectorBuilder [VectorBuilder Inc., 2025], a commercial hosted web service. There is no version, no parameter set, no deposited input sequence for the plot and no exported data file; the figure cannot be regenerated except by hand through a third-party GUI whose behaviour may change without notice. Per the rubric's proprietary-dependency ceiling this step is capped at NI.",
+      "how_to_close": "Regenerate the dot plot with an open, versioned tool (e.g. dotter/D-GENIES/mummer) and deposit the input FASTA and the plotting script, or at minimum deposit the underlying coordinate table."
+    },
+    {
+      "type": 6,
+      "where": "C22 (biogeographic realm assignment)",
+      "missing": "Ancestral biogeographic realms for 305 drosophilid species were 'manually assigned' from Markow and O'Grady [2005] with GBIF as fallback. There is no decision rule for ambiguous species, no record of which species were resolved from which source, no GBIF query or download DOI and no script. This human-curation step feeds directly into the horizontal-transfer donor inference.",
+      "how_to_close": "Deposit the per-species assignment table with a source column (Markow and O'Grady page/entry vs GBIF occurrence download DOI) and state the rule applied when sources disagreed."
+    },
+    {
+      "type": 10,
+      "where": "W1-W4 (ONT MinION sequencing of new D. melanogaster lines; D. erecta ovary HMW-DNA extraction; PromethION library preparation and sequencing; PCR screening of Kuruka insertions)",
+      "missing": "Four wet-lab steps are out of scope for a computational-reproducibility assessment and are excluded from |S|. Noted for completeness: these steps are documented to a reasonable standard for a preprint (kit catalogue numbers T3060 and SQK-LSK114, flow-cell types, strain identifiers 14021-0224.01 / SZ129 / w1118, and both primer sequences are given), and the only material gap on the wet-lab side is that their sequencing OUTPUT inherits the placeholder accession recorded under gap type 1.",
+      "how_to_close": "n/a (out of scope). The deposition placeholder is tracked under gap type 1."
+    },
+    {
+      "type": 2,
+      "where": "C5 (SPAdes), C8 (hifiasm), C10 (MAFFT), C12 (ORFfinder), C15 (DeviaTE), C17 (Canu, coverage filtering), C18 (Minimap2/Racon), C19 (Pilon), C25 (LTRharvest)",
+      "missing": "A large fraction of the pipeline is described as 'assembled with X' / 'aligned with Y' with no command line and no statement that defaults were used. Only C1 explicitly says 'with default parameters'; RepeatMasker (C9, C21), the bwa bwasw database (C14), the BLASTx filters (C6) and the badmapped-finder threshold (C3) are the only steps whose parameters are fully pinned in prose. Notably absent: the tool and criterion used to filter D. erecta reads to '100x genome coverage', the assumed genome size for Canu, the minimap2 preset used for ONT polishing, and the hifiasm read-type mode.",
+      "how_to_close": "Deposit commands.txt-style exact command lines for every step in the repository README, or state explicitly where defaults were used."
+    }
+  ],
+  "liveness": [
+    {
+      "artifact": "code repo: stated verbatim in Data Availability - 'The analysis performed in this work have been documented with RMarkdown and have been made publicly available, together with the resulting figures and the library of D. erecta TE families consensus sequences generated with EarlGrey, at GitHub ( https://github.com/rpianezza/Kuruka ).' The same URL also appears in the article's front matter.",
+      "http_status": "URL-present, HTTP 200 (public repository; 11 commits on branch main; 0 stars, 0 forks, 0 open issues; NO repository description; NO rendered README on the landing page; tags/releases page returns \"There aren't any releases here\" - no releases and no tags)",
+      "checked_at": "2026-07-28",
+      "network_context": "landing page and tags page only; root listing observed as ORFs/, data/, demo/, deviaTE/, documentation/, figures/, metadata/, ref/, scripts/, transposon-proteins/, utilities/, commands.txt. No environment file (conda env, Dockerfile, renv.lock, requirements.txt) appears in the root listing and none is claimed in the paper. No file content was opened and nothing was executed. A GitHub REST API query for README/releases/tags/contents returned HTTP 403 'API rate limit exceeded' for this host, so the README-absence and release-absence findings rest on the rendered landing page and tags page."
+    },
+    {
+      "artifact": "data accession for this study's OWN newly generated data: stated verbatim in Data Availability - 'The newly assembled D. erecta genome and raw reads for D. melanogaster lines ND1-4 are available at NCBI under accession number xxx.'",
+      "http_status": "none (placeholder 'xxx'; no BioProject, no SRA, no GCA identifier appears anywhere in the manuscript)",
+      "checked_at": "2026-07-28",
+      "network_context": "unresolvable by construction - nothing to resolve. Typical preprint-stage placeholder; recoverable at journal publication, which is why the affected steps are scored data=1 (missing id) rather than data=0 (absent/lost)."
+    },
+    {
+      "artifact": "reference genome stated in Methods 4.1: D. melanogaster assembly accession 'GCA 000001215.4' (rendered without the underscore in the JATS text; i.e. GCA_000001215.4)",
+      "http_status": "stated-in-paper (versioned INSDC assembly accession; not independently resolved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "the single cleanest identifier in the paper - accession plus version"
+    },
+    {
+      "artifact": "re-used third-party short-read data: '1072 publicly available D. melanogaster short-read datasets [Grenier et al., 2015; Schwarz et al., 2021; Lange et al., 2021; Rech et al., 2022; Kapun et al., 2021; Shpak et al., 2023; Pool et al., 2012; Chen et al., 2024; Nunez et al., 2025]' and, for C1, 'Short-read datasets from various D. melanogaster strains collected in China in 2017 and 2020 [Chen et al., 2024]'",
+      "http_status": "stated-in-paper (public, but cited by publication only - no accession list appears in the Methods text; the repository has a metadata/ directory that was not opened)",
+      "checked_at": "2026-07-28",
+      "network_context": "public data reachable via one indirection through nine source publications; scored data=2 with subflag needs-supplement"
+    },
+    {
+      "artifact": "re-used genome assemblies: '49 D. melanogaster, 305 drosophilids, and other 1211 arthropod genome assemblies. For an overview of all analysed assemblies, see Supplementary File S1.'",
+      "http_status": "stated-in-paper (deferred to Supplementary File S1, which was not retrieved at stage 1)",
+      "checked_at": "2026-07-28",
+      "network_context": "1565 assemblies; the accession list lives entirely in a supplementary file - subflag needs-supplement"
+    },
+    {
+      "artifact": "reference databases and external resources named in Methods: transposable element protein database [Novak, 2023] (v3.1, metazoa); NCBI protein database (BLASTx, C12 and C23); GBIF portal [GBIF, 2024]; D. erecta reference genome flamenco coordinates [van Lopik et al., 2023]; published D. erecta Illumina reads [Selvaraju et al., 2024]",
+      "http_status": "stated-in-paper (only the TE protein database carries a version, v3.1 metazoa; NCBI nr and GBIF are rolling resources cited with no release number and no access date)",
+      "checked_at": "2026-07-28",
+      "network_context": "no env_capture_class assigned - stage1 is prose-only and A/B/C classification requires reading the workflow (protocol delta-B)"
+    },
+    {
+      "artifact": "hosted third-party service: VectorBuilder [VectorBuilder Inc., 2025], used to generate the dot plot",
+      "http_status": "stated-in-paper (commercial web service, no version, no deposited input or output)",
+      "checked_at": "2026-07-28",
+      "network_context": "proprietary dependency - rubric ceiling caps the step at NI"
+    }
+  ],
+  "assessable": {
+    "is_assessable": true
+  },
+  "contested_corrected": [],
+  "human_signoff": {
+    "signed": false,
+    "reviewer_id": "PENDING (stage1 draft)"
+  },
+  "manifest": {
+    "b1_manifest_hash": "a8aff956505cca2b12298e7bedd06dc0ab06d52c2a790bf74f4095faa6083e88",
+    "chain_record": "not-yet-recorded",
+    "supersedes": null
+  },
+  "assessor_stack": {
+    "operator_id": "masaomi",
+    "llm": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-6",
+      "invoked_at": "2026-07-28T12:00:00Z"
+    },
+    "stage": "stage1-prose-only"
+  }
+}
