@@ -79,6 +79,11 @@ no third party can reach.
   `min_core_version` in `genomicschain_core/skillset.json` and enforced: on an
   older core the package is skipped with a message rather than loaded.
 - `synoptis` and `llm_client` — ship with the gem and install automatically.
+- `ed25519` and `json-schema` gems (`gem install ed25519 json-schema`).
+  `genomicschain_core` verifies operator signatures with the first and validates
+  manifests and verdicts with the second; both are required lazily, so a missing
+  one surfaces as a `NameError` / `LoadError` at submit time, not at load. The
+  kairos-chain gem does not pull them in, so install them on the anchor.
 - `mmp` — ships inside the gem but is **not** auto-installed. It supplies the
   anchor's identity and signing key; without it the submit path fails closed.
   `install.sh` installs it for you.
