@@ -18,7 +18,7 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 |---|---|---|
 | `genomicschain_core` | 0.5.0 | Submit path: digest, admission gates, signing, Synoptis recording |
 | `genomicschain_tier1` | 0.2.1 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
-| `genomicschain_tier2` | 0.3.0 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
+| `genomicschain_tier2` | 0.4.0 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
 | `genomicschain_tier3` | 0.5.0 | Tier-3 execution — backends, comparator, cost estimation |
 
 The four version independently but install as a set: `tier1` and `tier3` declare
@@ -66,7 +66,7 @@ no third party can reach.
 |---|---|---|
 | `gc_tier1_assess` | tier1 | always |
 | `gc_tier1_submit` | core | `anchor_profile: true` only |
-| `gc_tier2_scan` | tier2 | always |
+| `gc_tier2_scan` | tier2 | always — takes an on-disk `path`, or since 0.4.0 the repository as `files: [{path, content}]` for a caller that cannot put bytes on the anchor's disk |
 | `gc_tier2_adjudicate` | tier2 | always |
 | `gc_tier2_submit` | core | `anchor_profile: true` only |
 | `gc_tier3_submit` | core | `anchor_profile: true` only |

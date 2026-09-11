@@ -1,6 +1,6 @@
 {
   "name": "genomicschain_tier2",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GenomicsChain Tier-2, the code-reading tier. gc_tier2_scan reads a workflow repository's declared software, container and data resources and classifies how strongly each is pinned; gc_tier2_adjudicate reads a Tier-1 report against that scan, assigns env_capture_class A/B/C and proposes the rubric's per-step caps. Reads only — never evaluates a workflow.",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",

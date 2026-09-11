@@ -5,7 +5,7 @@ description: Read a workflow repository's declared resources, classify how stron
 
 # genomicschain_tier2
 
-The **code-reading tier**: between reading the paper and executing the workflow. Prototype, v0.3.0.
+The **code-reading tier**: between reading the paper and executing the workflow. Prototype, v0.4.0.
 
 Two layers, and the split is the point:
 
