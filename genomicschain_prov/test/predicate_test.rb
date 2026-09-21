@@ -193,7 +193,13 @@ class PredicateTest < Minitest::Test
                'python3 3.11.4' => 'versioned', 'openjdk11 11.0.22' => 'versioned', 'gcc-13 13.2.0' => 'versioned',
                'GNU bash, version 5.2.21' => 'versioned', 'GATK ~1.2' => 'ranged', 'main.py 1.2' => 'versioned',
                '1.0 latest' => 'floating', 'latest 1.0' => 'floating', '5.2.21(1)-release' => 'floating',
-               '1.0 0-unknown' => 'floating', '4.5.0.0 2.0.dev3' => 'floating', 'GATK >' => 'ranged', '~' => 'ranged' }
+               '1.0 0-unknown' => 'floating', '4.5.0.0 2.0.dev3' => 'floating', 'GATK >' => 'ranged', '~' => 'ranged',
+               # review round 4: a range mark as its own word, a tool name with a digit and a veto piece,
+               # a veto word glued to a digit, Unicode whitespace, a trailing comma
+               '> 1.0' => 'ranged', '>= 1.0' => 'ranged', '1.0 *' => 'ranged', 'GATK > 4' => 'ranged', '1.0 >=2' => 'ranged',
+               'python3-dev 3.11.4' => 'versioned', '1.0latest' => 'floating', '1.0.0latest' => 'floating',
+               "GATK\u00a04.5.0.0" => 'versioned', "1.0\u30004.0" => 'versioned',
+               '4.5.0.0,' => 'versioned', 'GATK 4.5.0.0, HTSJDK 3.0.5' => 'versioned', '1.0,2.0' => 'ranged' }
     expect.each do |version, level|
       assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
     end
@@ -354,6 +360,17 @@ class PredicateTest < Minitest::Test
     assert_equal({ 'recorded' => true, 'detection' => 'heuristic' }, P.grade(np)['seed'])
     assert_equal({ 'recorded' => false, 'detection' => 'heuristic' }, P.grade(np(seed_recorded: false))['seed'])
     refute P.grade(np)['counts'].key?('seed_recorded')
+  end
+
+  # Round 4 (opus5): a bundle without SCM — gc_prov_write from shell/R, a local
+  # Nextflow launch — could never rise above floating on the workflow. A
+  # checksum on the script, joined from the extension, names its bytes.
+  def test_workflow_reaches_immutable_through_a_script_checksum
+    no_scm = { 'name' => 'toy', 'version' => nil, 'repository' => nil, 'commit' => nil, 'ref_kind' => nil, 'path' => nil,
+               'script' => 'file:///home/x/toy/run.sh', 'checksum' => nil }
+    assert_equal 'floating', P.workflow_grade(no_scm).first
+    assert_equal 'immutable', P.workflow_grade(no_scm.merge('checksum' => { 'sha256' => 'a' * 64 })).first
+    assert_equal 'absent', P.workflow_grade(no_scm.merge('script' => nil)).first
   end
 
   def test_outputs_digest_tolerates_a_nil_name

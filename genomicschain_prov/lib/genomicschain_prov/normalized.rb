@@ -24,7 +24,7 @@ module GenomicsChainProv
     :format,          # 'bco' | 'wrroc'
     :format_version,  # BCO spec_version URL / WRROC conformsTo profile
     :producer,        # {'name','version'} or nil when the bundle does not say
-    :workflow,        # {'name','version','repository','commit','ref_kind','path','script'}
+    :workflow,        # {'name','version','repository','commit','ref_kind','path','script','checksum'} — checksum: the script's sha256 from the extension, or nil
     :runtime,         # {'engine','version','locator','checksum'} or nil — checksum / digest let it grade immutable
     :software,        # [{'name','version','locator','checksum','stage'}] every tool named, runtime excluded
     :containers,      # [{'ref','name','stage'}] the software entries whose locator is an OCI image reference

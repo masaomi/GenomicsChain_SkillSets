@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.1'
+    PREDICATE_VERSION = 'prov-predicate-0.3.2'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -80,14 +80,24 @@ module GenomicsChainProv
 
     # --- the version-string rule, in words (design §5, review rounds 2–3) ----
     # A BCO `version` is free text. Split it on whitespace into words.
+    #   words:  split on Unicode whitespace (NBSP and U+3000 included).
     #   veto:   a word that is, whole, a NOT_A_RELEASE word (optionally with
-    #           trailing digits: latest, dev3), or ANY candidate whose - + . _ ~
-    #           pieces contain one (0-unknown, 1.0-SNAPSHOT, 2.0.dev3) → the
-    #           whole string is floating, before any candidate is graded.
-    #           "1.0 latest", "latest 1.0" and "1.0 0-unknown" alike.
+    #           digits around it: latest, dev3, 0latest), or any DIGIT-LEADING
+    #           candidate whose - + . _ ~ pieces contain one (0-unknown,
+    #           1.0-SNAPSHOT, 2.0.dev3, 1.0latest) → the whole string is
+    #           floating, before any candidate is graded. "1.0 latest",
+    #           "latest 1.0" and "1.0 0-unknown" alike. A letter-leading word
+    #           is a tool name and its pieces are not vetoed ("python3-dev
+    #           3.11.4" is versioned, review round 4).
+    #   range:  a word made only of range marks (">", ">=", "*", "~"), or a
+    #           range mark inside ANY candidate, is a range on the whole
+    #           string ("> 1.0", "GATK > 4", "1.0 *", "1.0 >=2" → ranged;
+    #           round 4: skipping it as a tool name, or reading marks only on
+    #           the deciding candidate, let "> 1.0" sign above ">=1.0").
     #   candidates: the words that contain a digit, in order, each with a
-    #           Debian epoch "N:" dropped. A word without a digit is a tool
-    #           name and is skipped ("GATK 4.5.0.0", "GNU bash, version 5.2.21").
+    #           Debian epoch "N:" dropped and a trailing "," removed. A word
+    #           without a digit is a tool name and is skipped ("GATK 4.5.0.0",
+    #           "GNU bash, version 5.2.21", "GATK 4.5.0.0, HTSJDK 3.0.5").
     #   each candidate, left to right:
     #     - a constraint operator (< > ! ,), a wildcard (*) or a leading ~ / ^
     #       → ranged ("GATK >=4", "~1.2");
@@ -104,7 +114,8 @@ module GenomicsChainProv
     RANGE_MARK    = /[<>!,*]|\A[~^]/
     NOT_A_RELEASE = %w[latest unknown head master main dev devel nightly snapshot stable current trunk none null
                        unversioned].freeze
-    NOT_A_RELEASE_TOKEN = /\A(?:#{NOT_A_RELEASE.join('|')})\d*\z/i
+    NOT_A_RELEASE_TOKEN = /\A\d*(?:#{NOT_A_RELEASE.join('|')})\d*\z/i
+    RANGE_ONLY_WORD = /\A[<>!~^*]+=*\z/
     # A DOI is a DOI only when the whole locator is one (optionally as a
     # doi.org URL or a doi: URI). A `10.1234/` directory inside a path is a
     # name (review round 3, reproduced: a directory rename lifted an input two
@@ -184,17 +195,20 @@ module GenomicsChainProv
 
     def version_grade(name, version)
       raw = version.to_s.strip
-      words = raw.split(/\s+/)
+      words = raw.split(/[[:space:]]+/)
       floating = ['floating', "version #{raw.inspect} names no release"]
+      ranged = ['ranged', "version #{raw.inspect} admits more than one release"]
       return floating if words.any? { |w| w =~ NOT_A_RELEASE_TOKEN }
 
       candidates = release_candidates(raw)
-      return floating if candidates.any? { |v| v.split(/[-+._~]+/).any? { |t| t =~ NOT_A_RELEASE_TOKEN } }
-      return ['ranged', "version #{raw.inspect} admits more than one release"] if candidates.empty? && raw =~ RANGE_MARK
+      vetoed = candidates.any? { |v| v =~ /\A\d/ && v.split(/[-+._~]+/).any? { |t| t =~ NOT_A_RELEASE_TOKEN } }
+      return floating if vetoed
+      return ranged if words.any? { |w| w =~ RANGE_ONLY_WORD }
+      return ranged if candidates.any? { |v| v =~ RANGE_MARK }
+      return ranged if candidates.empty? && raw =~ RANGE_MARK
 
       candidates.each do |v|
         pieces = v.split(/[-+._~]+/)
-        return ['ranged', "version #{raw.inspect} admits more than one release"] if v =~ RANGE_MARK
         return ['ranged', "version #{raw.inspect} admits more than one release (.x)"] if pieces.any? { |t| t =~ /\A[xX]\z/ }
         return ['versioned', "#{name} #{v} — a release name; stable by convention only"] if v =~ RELEASE_LIKE
       end
@@ -204,7 +218,7 @@ module GenomicsChainProv
     # The words of a free-text version that carry a digit, in order, each
     # with a Debian epoch dropped. Empty when no word does.
     def release_candidates(raw)
-      raw.split(/\s+/).select { |w| w =~ /\d/ }.map { |w| w.sub(/\A\d+:/, '') }
+      raw.split(/[[:space:]]+/).select { |w| w =~ /\d/ }.map { |w| w.sub(/\A\d+:/, '').sub(/,\z/, '') }
     end
 
     # An input is `immutable` only through a checksum field. The locator
@@ -234,6 +248,11 @@ module GenomicsChainProv
       if w['repository'].nil? && w['commit'].nil? && w['script'].nil?
         return ['absent', 'no repository, no commit, no script location']
       end
+      # A script whose bytes are named by a checksum (extension checksums[]
+      # keyed by the script's locator) is as pinned as a commit hash — the
+      # route a bundle without SCM (gc_prov_write from shell/R/Python, a
+      # locally launched Nextflow run) needs to reach above floating (round 4).
+      return ['immutable', 'script carries a checksum'] if w['checksum']
 
       case w['ref_kind']
       when 'commit' then ['immutable', 'commit hash — the tree is named by its own hash']

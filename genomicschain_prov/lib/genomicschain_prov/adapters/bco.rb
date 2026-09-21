@@ -44,7 +44,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.1'
+      VERSION = 'prov-adapter-bco-0.3.2'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -53,7 +53,13 @@ module GenomicsChainProv
       COMMIT_HASH = /\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z/i
       URL_SCHEME  = %r{\A(?:https?|ftp|s3|gs|file)://}i
       OCI_SCHEME  = %r{\A(?:docker|oci|shub)://}i
-      OCI_DIGEST  = /@sha256:[0-9a-f]{64}/i
+      # An image reference carrying a digest: optional scheme, registry/repo
+      # path, optional tag, @sha256:<64 hex>, nothing else — the same shape the
+      # predicate uses for the runtime. "/opt/tools/awk@sha256:…" is a path
+      # (round 4: the unanchored form let a path grade the container route).
+      OCI_DIGEST  = %r{\A(?:(?:docker|oci|shub)://)?[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)*(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}\z}i
+      SHA1_HEX    = /\A[0-9a-f]{40}\z/i
+      SHA256_HEX  = /\A[0-9a-f]{64}\z/i
       # registry[:port]/repo[/repo]:tag. An untagged, unschemed name ("biocontainers/fastqc")
       # is indistinguishable from a path and is NOT taken as an image; write docker:// for those.
       OCI_TAGGED  = %r{\A(?:[a-z0-9.-]+(?::[0-9]+)?/)?[a-z0-9._-]+(?:/[a-z0-9._-]+)*:[A-Za-z0-9._-]+\z}
@@ -75,6 +81,7 @@ module GenomicsChainProv
         params = Array(bco['parametric_domain']).select { |p| p.is_a?(Hash) }
         extension = genomicschain_extension(bco)
         sha256_by_locator = checksums_from(extension)
+        notes << 'a checksum field that is not a hex digest was ignored' if malformed_checksum?(bco, extension)
 
         runtime = runtime_of(ed, notes, sha256_by_locator)
         software = software_of(ed, steps, runtime, sha256_by_locator)
@@ -95,7 +102,7 @@ module GenomicsChainProv
           format: 'bco',
           format_version: bco['spec_version'].to_s,
           producer: producer,
-          workflow: workflow_of(bco, ed),
+          workflow: workflow_of(bco, ed, sha256_by_locator),
           runtime: runtime,
           software: software,
           containers: containers,
@@ -121,7 +128,9 @@ module GenomicsChainProv
         end
         bco
       rescue JSON::ParserError
-        raise FormatError, 'bundle is not valid JSON'
+        # cause: nil — the parser's message quotes the offending bytes, and a
+        # full exception rendering would print the cause (round 4, codex).
+        raise FormatError, 'bundle is not valid JSON', cause: nil
       end
 
       # [[position, step], ...] sorted on step_number. Position is the stage id.
@@ -145,11 +154,13 @@ module GenomicsChainProv
 
       # --- the seven conditions -------------------------------------------------
 
-      def workflow_of(bco, ed)
+      def workflow_of(bco, ed, sha256_by_locator = {})
         pd = bco['provenance_domain'].is_a?(Hash) ? bco['provenance_domain'] : {}
         scm = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
                                             .find { |s| s.is_a?(Hash) }
         commit = scm && blank_to_nil(scm['scm_commit'])
+        first = Array(ed['script']).first
+        script = blank_to_nil(first.is_a?(Hash) ? (first['uri'].is_a?(Hash) ? first['uri']['uri'] : first['uri']) : first)
         {
           'name' => blank_to_nil(pd['name']),
           'version' => blank_to_nil(pd['version']),
@@ -159,7 +170,9 @@ module GenomicsChainProv
           # (a tag, a branch) cannot be told apart here and is left symbolic.
           'ref_kind' => commit.nil? ? nil : (commit =~ COMMIT_HASH ? 'commit' : 'symbolic'),
           'path' => scm && blank_to_nil(scm['scm_path']),
-          'script' => blank_to_nil(Array(ed['script']).first)
+          'script' => script,
+          # extension checksums[] joined by the script's locator (round 4)
+          'checksum' => script && sha256_by_locator[script] ? { 'sha256' => sha256_by_locator[script] } : nil
         }
       end
 
@@ -169,9 +182,13 @@ module GenomicsChainProv
         engine = blank_to_nil(ed['script_driver'])
         return nil if engine.nil?
 
-        entry = Array(ed['software_prerequisites']).find { |s| s.is_a?(Hash) && s['name'].to_s.casecmp?(engine) }
-        notes << 'runtime has no version entry in software_prerequisites' if entry.nil?
-        se = entry && software_entry(entry, nil, sha256_by_locator)
+        entries = Array(ed['software_prerequisites']).select { |s| s.is_a?(Hash) && s['name'].to_s.casecmp?(engine) }
+        notes << 'runtime has no version entry in software_prerequisites' if entries.empty?
+        notes << 'runtime declared more than once; the weakest declaration is taken' if entries.length > 1
+        # Two entries naming the engine are two declarations; the weaker one
+        # decides, like every other category (round 4: `find` took the first
+        # and the order of two lines chose the signed grade).
+        se = weakest_runtime_entry(entries, sha256_by_locator)
         # locator and checksum are what would let the runtime grade above
         # `versioned` (a digest-pinned engine image, a checksummed launcher);
         # nf-prov writes a release-tag URL and no checksum. The enricher writes
@@ -320,17 +337,47 @@ module GenomicsChainProv
         { 'name' => p['name'].to_s, 'version' => blank_to_nil(p['version']) }
       end
 
+      # Of several software_prerequisites entries naming the engine, the one
+      # that grades weakest under Predicate.runtime_grade. The predicate is
+      # not loaded here, so the order is the predicate's: checksum > OCI
+      # digest > a version string > nothing, with the version string left to
+      # the predicate by keeping the entry as declared.
+      def weakest_runtime_entry(entries, sha256_by_locator)
+        ses = entries.filter_map { |e| software_entry(e, nil, sha256_by_locator) }
+        rank = lambda do |x|
+          next 3 if x['checksum']
+          next 2 if x['locator'].to_s =~ OCI_DIGEST
+          next 1 if x['version']
+
+          0
+        end
+        ses.min_by { |x| [rank.call(x), x['version'].to_s] }
+      end
+
+      # checksums[] entries whose sha256 is not 64 hex are ignored — a checksum
+      # field holds a digest or nothing (round 4: "x" graded immutable).
       def checksums_from(extension)
         Array(extension['checksums']).each_with_object({}) do |c, acc|
-          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && blank_to_nil(c['sha256'])
+          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && c['sha256'].to_s =~ SHA256_HEX
 
           acc[c['uri'].to_s] = c['sha256'].to_s.downcase
         end
       end
 
+      def malformed_checksum?(bco, extension)
+        ext_bad = Array(extension['checksums']).any? { |c| c.is_a?(Hash) && blank_to_nil(c['sha256']) && c['sha256'].to_s !~ SHA256_HEX }
+        io = bco['io_domain']
+        io_bad = (Array(io['input_subdomain']) + Array(io['output_subdomain'])).any? do |i|
+          u = i.is_a?(Hash) && i['uri'].is_a?(Hash) ? i['uri'] : {}
+          blank_to_nil(u['sha1_checksum']) && u['sha1_checksum'].to_s !~ SHA1_HEX
+        end
+        ext_bad || io_bad
+      end
+
       def checksum_of(uri, locator, sha256_by_locator)
         h = {}
         sha1 = blank_to_nil(uri['sha1_checksum'])
+        sha1 = nil if sha1 && sha1 !~ SHA1_HEX
         h['sha1'] = sha1.downcase if sha1
         sha256 = locator && sha256_by_locator[locator]
         h['sha256'] = sha256 if sha256

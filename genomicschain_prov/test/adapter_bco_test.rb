@@ -389,6 +389,53 @@ class AdapterBcoTest < Minitest::Test
     refute_match(/patient42/, err.message)
   end
 
+  # --- review round 4 ---------------------------------------------------------------
+
+  # Two software_prerequisites entries naming the engine are two declarations;
+  # the weaker decides whatever their order (round 4, customer skeptic).
+  def test_duplicate_runtime_entries_take_the_weakest_in_any_order
+    weak = { 'name' => 'shell', 'version' => 'latest' }
+    strong = { 'name' => 'shell', 'version' => '5.2.21', 'uri' => { 'uri' => "docker://library/bash:5.2@sha256:#{'a' * 64}" } }
+    [[weak, strong], [strong, weak]].each do |order|
+      b = enriched_bco
+      b['execution_domain']['software_prerequisites'] = order
+      n = Bco.parse(b)
+      assert_equal 'latest', n.runtime['version']
+      assert_equal 'floating', GenomicsChainProv::Predicate.grade(n)['grades']['runtime']
+      assert_includes n.notes, 'runtime declared more than once; the weakest declaration is taken'
+    end
+  end
+
+  # The script's checksum comes from the extension keyed by its locator.
+  def test_script_checksum_joins_from_the_extension
+    b = enriched_bco
+    b['extension_domain'].delete_at(0)
+    b['extension_domain'][0]['genomicschain_extension']['checksums'] << { 'uri' => 'file:///home/x/toy/run.sh', 'sha256' => 'C' * 64 }
+    n = Bco.parse(b)
+    assert_nil n.workflow['repository']
+    assert_equal({ 'sha256' => 'c' * 64 }, n.workflow['checksum'])
+    assert_equal 'immutable', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+  end
+
+  # A path with a digest suffix is not an image reference (the same shape the
+  # runtime rule refuses); a checksum field holds a hex digest or nothing.
+  def test_digest_shapes_and_checksum_fields_are_checked
+    refute Bco.oci_ref?("/opt/tools/awk@sha256:#{'a' * 64}")
+    assert Bco.oci_ref?("quay.io/x/awk:1@sha256:#{'a' * 64}")
+    b = enriched_bco
+    b['io_domain']['input_subdomain'][0]['uri']['sha1_checksum'] = '?'
+    b['extension_domain'][1]['genomicschain_extension']['checksums'][0]['sha256'] = 'x'
+    n = Bco.parse(b)
+    assert_nil n.inputs.find { |i| i['name'] == 'a.txt' }['checksum']
+    assert_includes n.notes, 'a checksum field that is not a hex digest was ignored'
+  end
+
+  def test_format_error_drops_the_parser_cause
+    err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-patient42"') }
+    assert_nil err.cause
+    refute_match(/patient42/, err.full_message)
+  end
+
   # --- refusals -------------------------------------------------------------------
 
   def test_rejects_what_is_not_a_bco
