@@ -344,14 +344,18 @@ module GenomicsChainProv
       # the predicate by keeping the entry as declared.
       def weakest_runtime_entry(entries, sha256_by_locator)
         ses = entries.filter_map { |e| software_entry(e, nil, sha256_by_locator) }
-        rank = lambda do |x|
-          next 3 if x['checksum']
-          next 2 if x['locator'].to_s =~ OCI_DIGEST
-          next 1 if x['version']
+        levels = %w[immutable versioned ranged floating local_path absent]
+        grade = lambda do |x|
+          next 'immutable' if x['checksum'] || x['locator'].to_s =~ OCI_DIGEST
+          next 'absent' unless x['version']
+          # the version string is graded by the predicate's rule when it is
+          # loaded (it always is through genomicschain_prov.rb); the adapter
+          # itself never grades a string
+          next 'versioned' unless defined?(GenomicsChainProv::Predicate)
 
-          0
+          GenomicsChainProv::Predicate.version_grade(x['name'], x['version']).first
         end
-        ses.min_by { |x| [rank.call(x), x['version'].to_s] }
+        ses.max_by { |x| levels.index(grade.call(x)) }
       end
 
       # checksums[] entries whose sha256 is not 64 hex are ignored — a checksum

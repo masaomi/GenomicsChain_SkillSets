@@ -404,6 +404,15 @@ class AdapterBcoTest < Minitest::Test
       assert_equal 'floating', GenomicsChainProv::Predicate.grade(n)['grades']['runtime']
       assert_includes n.notes, 'runtime declared more than once; the weakest declaration is taken'
     end
+    # two version strings: the predicate's rule decides which is weaker, not the string order
+    [[{ 'name' => 'shell', 'version' => '24.04.4' }, { 'name' => 'shell', 'version' => 'latest' }],
+     [{ 'name' => 'shell', 'version' => '> 1.0' }, { 'name' => 'shell', 'version' => '1.0' }]].each do |pair|
+      [pair, pair.reverse].each do |order|
+        b = enriched_bco
+        b['execution_domain']['software_prerequisites'] = order
+        assert_equal pair[0]['version'] == '24.04.4' ? 'latest' : '> 1.0', Bco.parse(b).runtime['version']
+      end
+    end
   end
 
   # The script's checksum comes from the extension keyed by its locator.
