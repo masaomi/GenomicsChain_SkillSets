@@ -1,18 +1,24 @@
 ---
 name: genomicschain_prov
-description: Read a pipeline's provenance bundle (BioCompute Object; Workflow Run RO-Crate in v0.2) into the seven recorded conditions and grade how far a stranger holding only the bundle could rebuild from it. Reads only — the bundle stays with the customer.
+description: Write a pipeline's provenance bundle, or fill in one that was written thin, and read it back into the seven recorded conditions — grading how far a stranger holding only the bundle could rebuild from it. The bundle stays with the customer.
 ---
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.4
-(adapter 0.3.3, predicate 0.3.3) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
+Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.5
+(writer 0.1.0, adapter 0.3.7, predicate 0.3.7) — design `docs/design/prov_anchoring_design_v0_1.md`
+(frozen at v0.1.10), implementation units §9.
 
 ```
+        a computation ─────────┐
+        (shell / R / Python)   │  gc_prov_write --plan            (U1b)
+                               ▼
 customer's pipeline ──▶ bundle (bco.json / ro-crate-metadata.json)
-                              │
+        (Nextflow + nf-prov)   ▲
+                               │  gc_prov_write --from-nextflow-run  (U1b, enricher)
+                               │
                               ▼
-        Adapters::Bco.parse  ──▶  NormalizedProvenance   (U1, this version)
+        Adapters::Bco.parse  ──▶  NormalizedProvenance   (U1)
                               │      seven conditions: inputs, code, tools, reference,
                               │      parameters, seed, runtime
                               ▼
@@ -95,12 +101,56 @@ environment, per-level software and container counts, inputs with checksum / int
 checksum, `outputs_digest` over the checksum column, params); `coverage` is the `own/total` the claim
 carries. `items` carries each item's grade and reason for people.
 
+## The writer (U1b) — `gc_prov_write`, two faces of one tool
+
+`bin/gc_prov_write.rb`. It lives in `bin/`, not `tools/`, because `Skillset#load!` requires every
+`tools/*.rb` on every node and a CLI's option parsing would then run when the anchor starts
+(design §7, review round 3). The logic is in `lib/` and a Tier-3 executor calls it directly.
+
+**Producer** — `--plan plan.json`. The customer writes the stages; the tool collects what the
+machine can measure. Nothing is tied to Nextflow: the adapter reads the format, so a shell, R or
+Python computation reaches the same record.
+
+```jsonc
+{ "name": "two-step-arithmetic", "script": "run.sh",
+  "runtime": { "engine": "sh", "version_command": "/bin/sh --version", "uri": "/bin/sh" },
+  "params":  [{ "param": "divisor", "value": "2", "step": 2 }],
+  "stages":  [{ "name": "add", "inputs": ["a.txt", "b.txt"], "outputs": ["sum.txt"],
+                "tools": [{ "name": "add.sh", "version": "1.0.0", "uri": "tools/add.sh" }] }] }
+```
+
+**Enricher** — `--from-nextflow-run <launch_dir>`. nf-prov's bundle grades `absent` (above);
+everything missing is still in the run directory.
+
+| read from | written to | why there |
+|---|---|---|
+| `results/pipeline_info/*_versions.yml` | that stage's `prerequisite[]` | per-stage only: copied up to `software_prerequisites[]` it becomes a fallback covering every stage and the coverage in the claim stops meaning anything (round 2) |
+| `work/<hash>/.command.run` (or a trace with a container column) + `docker image inspect` | the same entry's `uri`, as `ref@sha256:…` | the one form the container route reads as `immutable` (§5) |
+| the framework jar, the script, the io files | extension `checksums[]`, keyed by the item's own locator; io SHA-1 in `sha1_checksum` | the exact-locator join is what the adapter reads for a tool, the runtime and the script alike (round 3) |
+
+Collection rules, both faces: **never substitute** — a file that is not there, a Docker that is not
+running, a jar that is not found each leave the field empty, add a note and let the grade fall;
+**never run a plan's commands** unless `--run-version-commands` says so, because a plan is a data
+file and a `version_command` in it is a command line. `docker image inspect` is a fixed argv and
+stays on (`--no-docker` turns it off). Every note goes to stderr beside the grade, because the one
+moment to see the gaps is before the bundle is signed.
+
+Measured on the fixture, `--no-docker --container-digests <capture>`: `0/8` → `7/8` stages with
+their own environment, container `absent` → `immutable`, runtime `versioned` → `immutable` with
+`--nextflow-jar`. Overall stays `absent`: the fixture's `versions.yml` names no tool for MULTIQC and
+that stage's work directory is gone, and the environment is the weakest stage. The rule working, not
+a defect in it.
+
 ## Tests
 
 ```bash
-ruby genomicschain_prov/test/adapter_bco_test.rb
-ruby genomicschain_prov/test/predicate_test.rb
+ruby genomicschain_prov/test/adapter_bco_test.rb   # 44
+ruby genomicschain_prov/test/predicate_test.rb     # 33
+ruby genomicschain_prov/test/prov_write_test.rb    # 26 — 103 / 644 assertions in all
 ```
 
-No gem beyond minitest, no network. The predicate finds `PinStrength` through the sibling
-`../genomicschain_tier2/lib` when it is not already on the load path.
+No gem beyond minitest, no network, no Docker (the writer's tests pass `--no-docker`'s equivalent
+and a captured digest file). The predicate finds `PinStrength` through the sibling
+`../genomicschain_tier2/lib` when it is not already on the load path. The producer's tests actually
+run the two-step computation the principle demo shows — `(223 + 553) / 2 = 388` — so the checksums
+in the bundle under test are checksums of files that exist.

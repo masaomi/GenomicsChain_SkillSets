@@ -16,13 +16,20 @@
 require_relative 'genomicschain_prov/normalized'
 require_relative 'genomicschain_prov/adapters/bco'
 require_relative 'genomicschain_prov/predicate'
+require_relative 'genomicschain_prov/writer'
 
 module GenomicsChainProv
-  VERSION = '0.1.2'
+  VERSION = '0.1.3'
 
   # Part of the signed identity (`adapter_version`, design §6): the same bundle
   # under a different adapter version may normalise differently, so the record
   # names the adapter that produced the grade. The constant lives with the
   # adapter; this is its public name.
   ADAPTER_BCO_VERSION = Adapters::Bco::VERSION
+  # The writer names itself in the bundles it produces, so this one reaches the
+  # record too — as `producer_name` / `producer_version` (§6), the bundle's own
+  # statement of what wrote it. `Writer::Environment` and
+  # `Writer::NextflowRun` touch the machine and are required on demand, not
+  # here: the anchor loads this file and has no business shelling out.
+  WRITER_VERSION = Writer::VERSION
 end

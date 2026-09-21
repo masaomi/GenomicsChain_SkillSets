@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
+**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.11 —— 凍結後の個別改訂を 1 件反映（§14 の先頭行。U1b の実装が突き当たった事実 2 件で、review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
 round 5〜8 は名目上は設計 review だったが、産出物の 9 割近くが adapter の実装修正であり、設計の review に test が走っていること
 自体がその徴候だった。残る懸案は review の巡ではなく**実装の queue** に置く。設計に変更が要るときは、実装が突き当たった事実を
 持って個別に改訂する。以下は凍結時点の状態の記録（round 8
@@ -122,7 +122,7 @@ SCM の宣言も同じ規則に従う（round 7）。**同じ強さの宣言が�
 | producer | 対象 | 自動度 | 到達できる固定度 | 状態 |
 |---|---|---|---|---|
 | Nextflow + nf-prov（既定） | Nextflow で回す pipeline | 全自動（config に 1 block。fixture の `prov.config` は 13 行） | **そのままでは `absent`**（U0 実測 §13: container もツールの版も checksum も束に無い）。`gc_prov_write --from-nextflow-run` で補うと、tag だけなら versioned、digest と checksum まで取れば immutable | v0.1。U0 済（2026-09-20、fixture あり） |
-| `gc_prov_write`（汎用の最小書き出し器。§13 以降は nf-prov 束の補完器も兼ねる） | shell・R・Python・SUSHI/ezRun など、実行系を問わない。Nextflow の実行 dir を渡せば nf-prov の束を補う | 半自動: 段の一覧（コマンド）を顧客が書き、ツールの版・container digest・入出力の checksum・パラメータ・seed・実行系の版は script が集める | 記録した分だけ。checksum を取れば immutable、取らなければ floating 止まり — 等級がそのまま見せる | **v0.1 に入れる**。Tier-3 の実行系（local / thoa）が自分の実行を束にするのにも使う |
+| `gc_prov_write`（汎用の最小書き出し器。§13 以降は nf-prov 束の補完器も兼ねる） | shell・R・Python・SUSHI/ezRun など、実行系を問わない。Nextflow の実行 dir を渡せば nf-prov の束を補う | 半自動: 段の一覧（コマンド）を顧客が書き、ツールの版・container digest・入出力の checksum・パラメータ・seed・実行系の版は script が集める | 記録した分だけ。checksum を取れば immutable、取らなければ floating 止まり（floating を超えられない、の意。入力が相対 path なら全体は `local_path` まで落ちる——v0.1.11 で実測） — 等級がそのまま見せる | **U1b 済（2026-09-21）**。writer 0.1.0、`bin/gc_prov_write.rb` ＋ `lib/genomicschain_prov/writer*`。Tier-3 の実行系（local / thoa）が自分の実行を束にするのにも使う |
 | SUSHI/ezRun の書き出し器 | FGCZ の SUSHI で回した解析 | 全自動（SUSHI 側に Ruby で足す） | SUSHI が持つ版情報の範囲 | v0.2 候補。SUSHI は自前なので足せる |
 | 他の実行系が自分で出す WRROC | Galaxy、CWL（cwlprov → WRROC）、WfExS | 実行系まかせ | 実行系の記録の範囲 | WRROC アダプタ（U6）で読む。Snakemake・WDL は出す物があるか未確認 |
 
@@ -431,6 +431,7 @@ submission_key も変わるので、同じ束・同じ鍵でも新しい proof �
 
 | tool / script | 置き場所 | 動く場所 | 網 | 何をするか |
 |---|---|---|---|---|
+| `gc_prov_write` | `genomicschain_prov/bin/`（同じ理由で `tools/` には置かない。実装時に gem の `Skillset#load!` を読んで確認済——`Dir[tools/*.rb].sort.each { require }` が `anchor_profile` に関係なく走る。v0.1.11 で §9 の `tools/` 表記を訂正）。logic は `lib/genomicschain_prov/writer.rb`（純粋な組み立て）・`writer/environment.rb`（機械を触る側）・`writer/nextflow_run.rb`（補完器）に分け、Tier-3 executor は CLI を経ずに lib を呼ぶ | 顧客の workstation（off-anchor） | 使わない | `--plan` で段の一覧から BCO を書き、`--from-nextflow-run` で nf-prov の束を補完する（§4.1、§13.4-1）。集められなかったものは値を作らず note にして stderr へ。`--run-version-commands` は既定 off——plan は data file であり、その中の `version_command` は command line なので、他人の plan を読むだけで shell が走らない |
 | `gc_prov_check` | `genomicschain_prov/bin/`（`tools/` には置かない: `Skillset#load!` が `tools/*.rb` をどの node でも eager に require するので、CLI の option parse が anchor の起動時に走る——round 3） | 顧客の workstation（off-anchor） | 使わない | 束を読み、digest・等級・数・`signed_params` を出す。`--json` で機械可読 |
 | `gc_submit_client.rb --tier prov` | `scripts/`（既存に 1 tier 足す） | 顧客の workstation | anchor へ HTTPS | `signed_params` に署名して `gc_prov_submit` を呼ぶ。`--dry-run` / `--print-only` は既存のまま |
 | `gc_prov_submit` | `genomicschain_prov/tools/`（prov の `skillset.json` の `anchor_profile_tool_classes`。core の登録を汎用化して読む） | anchor のみ | — | Tier-2 submit と同じ骨。ただし束の gate は §6 の Gate A。`dry_run` で `signed_params` を返す |
@@ -549,7 +550,7 @@ Synoptis の engine と Verifier の語彙をそのまま使い、検証者が�
 |---|---|---|
 | U0 | nf-core の test profile（例 `nf-core/rnaseq -profile test`）を nf-prov つきで 1 本走らせ、`bco.json` と `ro-crate-metadata.json` を fixture として `genomicschain_prov/test/fixtures/` に置く | 2 ファイルがある。各欄がどこまで埋まっているかを 1 表にして L2 に記録 |
 | U1 | BCO アダプタ `adapters/bco.rb` → `NormalizedProvenance` | `adapter_bco_test.rb`: fixture から 7 種類が取れる。空欄は nil |
-| U1b | 汎用の最小書き出し器 `tools/gc_prov_write.rb`（§4.1）: 段の一覧を受け取り、版・digest・checksum・パラメータ・seed・実行系の版を集めて BCO を書く。Tier-3 executor から呼べる形 | `prov_write_test.rb`: 2 段の shell 計算（デモの 223, 553, 2）から BCO が出て、U1 のアダプタで読める。checksum を省くと等級が floating になる |
+| U1b | 汎用の最小書き出し器 `bin/gc_prov_write.rb`（§4.1。v0.1.11 で `tools/` から訂正——§7 の規則どおり、`Skillset#load!` は `tools/*.rb` をどの node でも eager に require する）: 段の一覧を受け取り、版・digest・checksum・パラメータ・seed・実行系の版を集めて BCO を書く。Tier-3 executor から呼べる形（logic は `lib/genomicschain_prov/writer*`、CLI は bin） | **済（2026-09-21）**。`prov_write_test.rb` 26 本: 2 段の shell 計算（デモの 223, 553, 2 → 388、test の中で実際に走らせる）から BCO が出て、U1 のアダプタで読め、全部集めると `immutable`。checksum を省くと **`local_path`**（v0.1.11 で訂正——workflow は予告どおり `floating` に落ちるが、入力の相対 path は §5 で floating より下の `local_path` なので、最弱である全体はそこで止まる。§4.1 の「floating 止まり」＝ floating を超えられない、は正しい）。checksum が上げていた 4 分類（workflow・runtime・environment・inputs）がすべて落ちることを 1 本で押さえる |
 | U2 | 述語 `predicate.rb`（PinStrength を呼ぶ） | `predicate_test.rb`: 手書きの小さな正規化来歴 6 つで 6 等級が出る。fixture の等級が固定される（数値を test に書く） |
 | U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`、`lib/genomicschain_prov/place_extension.rb`（`gc_prov_proof` route）。core の 4 か所（§7）と prov の core pin | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本のうち prov に対応のある 11 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復。toolchain_ruby・tier1 content hash・applied stage の 3 本は prov に無い）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 100 年で Tier-2 の proof は 24 時間のままの 1 本、`idempotency_key` が束ごとに違う 1 本、版ずれの拒否が三つの版を返す 1 本、`gc_prov_proof` route が prov の envelope を §7 の欄だけで返し、未知の id と Tier-2 の id に 404 を返し、`actor_user_id` を含まない 1 本、**Authorization header 無しで route が答え、同じ条件で prov の `tools/call` は拒まれる** 1 本（§0 の約束の test、round 4。unit test ではなく U4 と同じ使い捨て local anchor で回す——route と `/mcp` の順序は `HttpServer` にある、round 5）、SCM 無しの束が null の repo hash で記録される 1 本、script の checksum で workflow が immutable になる 1 本を足す |
 | U4 | `gc_prov_check` と client の `--tier prov` | `submit_client_test.rb` に prov の 1 本。使い捨て local anchor で dry_run → 実提出 → 回復まで（09-09 の Tier-2 と同じ手順） |
@@ -787,6 +788,7 @@ registry の形のときだけ image、checksum の経路には locator が要�
 
 | 版 | 日付 | 何が変わったか |
 |---|---|---|
+| v0.1.11 | 2026-09-21 | **凍結後、最初の個別改訂。** review の巡ではなく、U1b の実装が突き当たった事実 2 件（凍結の記の「設計を改訂する条件」）。(1) §9 の U1b が `tools/gc_prov_write.rb` と書いていたが、§7 は round 3 に「CLI は `tools/` に置かない——`Skillset#load!` が `tools/*.rb` をどの node でも eager に require する」と決めている。gem の `skillset.rb` を読んで再確認したうえで §9 を `bin/` に訂正し、§7 の表に `gc_prov_write` の行を足した（v0.1 の §9 は round 3 より前に書かれた行が残っていた）。(2) §9 の完了の印「checksum を省くと等級が floating」を実測 `local_path` に訂正。workflow は予告どおり `floating` に落ちるが、plan が入力を相対 path で名指すため入力は §5 で floating より下の `local_path` になり、最弱である全体はそこで止まる。§4.1 の「floating 止まり」は正しい（floating を超えられない、の意）。意図——「等級は集めた分だけ上がる」——は test が 4 分類すべての落下で押さえている。U1b の実装そのもの: writer 0.1.0、`prov_write_test.rb` 26 本、prov 全体で 103 本 / 644 assertions 緑 |
 | v0.1 | 2026-09-20 | 起草。§0–§12 |
 | v0.1.1 | 2026-09-20 | U0 の実測（§13）、unknowns pass（§10-1/9/10/11） |
 | v0.1.2 | 2026-09-20 | review round 1（REVISE）の 5 件: §5 段ごとの環境と版の形、§13.4-3 出力の証拠による内部入力、§6 記録の契約、§6/§8 proof の寿命と検証者の言い方、§7 配置 |
