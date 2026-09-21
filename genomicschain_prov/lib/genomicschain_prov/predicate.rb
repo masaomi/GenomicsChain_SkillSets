@@ -81,9 +81,10 @@ module GenomicsChainProv
     # --- the version-string rule, in words (design §5, review rounds 2–3) ----
     # A BCO `version` is free text. Split it on whitespace into words.
     #   veto:   a word that is, whole, a NOT_A_RELEASE word (optionally with
-    #           trailing digits: latest, dev3), or a candidate whose - + . _ ~
+    #           trailing digits: latest, dev3), or ANY candidate whose - + . _ ~
     #           pieces contain one (0-unknown, 1.0-SNAPSHOT, 2.0.dev3) → the
-    #           whole string is floating. "1.0 latest" and "latest 1.0" alike.
+    #           whole string is floating, before any candidate is graded.
+    #           "1.0 latest", "latest 1.0" and "1.0 0-unknown" alike.
     #   candidates: the words that contain a digit, in order, each with a
     #           Debian epoch "N:" dropped. A word without a digit is a tool
     #           name and is skipped ("GATK 4.5.0.0", "GNU bash, version 5.2.21").
@@ -97,7 +98,8 @@ module GenomicsChainProv
     #     - otherwise the next candidate ("python3 3.11.4": python3 is not a
     #       release, 3.11.4 is — naming the tool never grades below the bare
     #       version, review round 3).
-    #   no candidate decided → floating (unknown, HEAD, r122); "*" alone → ranged.
+    #   no candidate decided → floating (unknown, HEAD, r122). With no
+    #   candidate at all, a range mark anywhere ("*", "GATK >") → ranged.
     RELEASE_LIKE  = /\A[vV]?\d+(?:\.\d+)*(?:[-+._~]+[A-Za-z0-9]+)*\z/
     RANGE_MARK    = /[<>!,*]|\A[~^]/
     NOT_A_RELEASE = %w[latest unknown head master main dev devel nightly snapshot stable current trunk none null
@@ -187,11 +189,11 @@ module GenomicsChainProv
       return floating if words.any? { |w| w =~ NOT_A_RELEASE_TOKEN }
 
       candidates = release_candidates(raw)
+      return floating if candidates.any? { |v| v.split(/[-+._~]+/).any? { |t| t =~ NOT_A_RELEASE_TOKEN } }
       return ['ranged', "version #{raw.inspect} admits more than one release"] if candidates.empty? && raw =~ RANGE_MARK
 
       candidates.each do |v|
         pieces = v.split(/[-+._~]+/)
-        return floating if pieces.any? { |t| t =~ NOT_A_RELEASE_TOKEN }
         return ['ranged', "version #{raw.inspect} admits more than one release"] if v =~ RANGE_MARK
         return ['ranged', "version #{raw.inspect} admits more than one release (.x)"] if pieces.any? { |t| t =~ /\A[xX]\z/ }
         return ['versioned', "#{name} #{v} — a release name; stable by convention only"] if v =~ RELEASE_LIKE

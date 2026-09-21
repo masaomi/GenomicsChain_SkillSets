@@ -192,7 +192,8 @@ class PredicateTest < Minitest::Test
                # review round 3: a tool name carrying a digit, a comma in a dropped word, the veto anywhere
                'python3 3.11.4' => 'versioned', 'openjdk11 11.0.22' => 'versioned', 'gcc-13 13.2.0' => 'versioned',
                'GNU bash, version 5.2.21' => 'versioned', 'GATK ~1.2' => 'ranged', 'main.py 1.2' => 'versioned',
-               '1.0 latest' => 'floating', 'latest 1.0' => 'floating', '5.2.21(1)-release' => 'floating' }
+               '1.0 latest' => 'floating', 'latest 1.0' => 'floating', '5.2.21(1)-release' => 'floating',
+               '1.0 0-unknown' => 'floating', '4.5.0.0 2.0.dev3' => 'floating', 'GATK >' => 'ranged', '~' => 'ranged' }
     expect.each do |version, level|
       assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
     end
