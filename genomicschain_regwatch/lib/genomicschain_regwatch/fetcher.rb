@@ -44,10 +44,28 @@ module GenomicsChainRegwatch
                           bytes: body.bytesize)
       end
 
+      # A body that normalises to nothing is not a page that said nothing — it
+      # is a page that was not served. EUR-Lex answers an automated request with
+      # HTTP 202 and a 2,038-byte script-only interstitial; `text` strips the
+      # script and leaves the empty string, whose digest is the well-known
+      # e3b0c442…b855. Recorded as a baseline, that source then reads `unchanged`
+      # on every later run: a permanent green light on the Official Journal text
+      # the published dates rest on.
+      #
+      # This is the failure the package exists to prevent, arriving through a
+      # door the guard was not watching — the scanner only ever asked whether
+      # the fetch failed, and this fetch succeeded. Found 2026-09-14, on the
+      # first run that reached the network with this source on the list.
+      if normalised.to_s.strip.empty?
+        return Result.new(url: url, ok: false, status: status, bytes: body.bytesize,
+                          reason: "HTTP #{status} returned #{body.bytesize} bytes that normalised to " \
+                                  'nothing — script-only challenge or interstitial, not the document')
+      end
+
       Result.new(
         url: url, ok: true, status: status,
         digest: Digest::SHA256.hexdigest(normalised),
-        excerpt: normalised[0, 240],
+        excerpt: excerpt_of(normalised),
         bytes: body.bytesize
       )
     rescue StandardError => e
@@ -60,6 +78,29 @@ module GenomicsChainRegwatch
       Result.new(url: url, ok: false, status: status, reason: reason)
     end
 
+    # The excerpt is the only field of a finding that reaches JSON as text, and
+    # it is the only one that has to be a real string. Net::HTTP hands back
+    # ASCII-8BIT, so `normalised` is a binary string carrying UTF-8 bytes: json
+    # 2.x warns on it and json 3.0 raises, which meant that until 2026-09-14 a
+    # scan of any page containing a single non-ASCII character — an apostrophe
+    # in "Shaping Europe's digital future" was the one that surfaced it — died
+    # while serialising its own result. `changed` and `new` are the two statuses
+    # that carry an excerpt, so the failure hit exactly the runs that had
+    # something to report and never the quiet ones.
+    #
+    # This deliberately does not touch `normalised` itself. The digest is taken
+    # over those bytes, and re-encoding them would silently invalidate every
+    # recorded baseline — turning a display bug into a false `changed` on every
+    # watched source at once.
+    def excerpt_of(normalised)
+      # 4 KiB is far more than 240 characters of any encoding, and avoids
+      # scrubbing several megabytes of PDF to show one line of it.
+      normalised.byteslice(0, 4096).to_s
+                .dup.force_encoding(Encoding::UTF_8)
+                .scrub('') # a PDF is mostly not valid UTF-8; drop those bytes rather than fail
+                .gsub(/[[:cntrl:]]/, ' ').gsub(/\s+/, ' ').strip[0, 240]
+    end
+
     def get(url, depth = 0)
       return [nil, 'too many redirects'] if depth > MAX_REDIRECTS
 
@@ -70,6 +111,13 @@ module GenomicsChainRegwatch
 
       case resp
       when Net::HTTPSuccess
+        # Net::HTTPSuccess is the whole 2xx family, and only 200 means "here is
+        # the document". 202 in particular means the opposite — accepted, not
+        # done — and is what EUR-Lex's WAF answers an automated request with.
+        # Digesting a 202 body compares an interstitial against an interstitial
+        # and calls the result unchanged, so anything but 200 is a finding.
+        return [nil, "#{resp.code} (not 200; no document body to compare)"] unless resp.code == '200'
+
         [resp.body.to_s.byteslice(0, MAX_BODY), resp.code]
       when Net::HTTPRedirection
         loc = resp['location']

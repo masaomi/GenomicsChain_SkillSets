@@ -1,8 +1,15 @@
 # Regulatory and standards watchlist — GenomicsChain / KairosChain
 
 **Seeded 2026-09-01** from the ten-pass primary-source survey recorded at L2
-`eu_clinical_data_regulation_survey_2026_09`. Every entry here earned its place by
-appearing in that survey as either a dated trigger or an unresolved question.
+`eu_clinical_data_regulation_survey_2026_09`. Every entry from that seeding earned its
+place by appearing in the survey as either a dated trigger or an unresolved question.
+
+**Second admission route, from 2026-09-14.** An entry may also be added because a
+*published* page of ours rests on it. The EU AI Act page at `/eu-ai-act` names 15 sources;
+each now carries a `watch_status`, and the 7 marked `watched` point at ids on this list.
+The join is recorded on the guidance side (`data/eu_ai_act/guidance.json`, key `watch`) and
+computed by `scripts/gc_regcheck_staleness.rb`, so that a published claim can be told that
+the text underneath it moved. An entry admitted this way says so in its `why`.
 
 ## How to edit this file
 
@@ -223,10 +230,58 @@ operator decides what that means.
 - binds: SPHN member institutions
 - why: The clearest unmet requirement found in Europe: the framework obliges institutions to have mechanisms ensuring consent revocations are "swiftly acted upon across the Network", and ships no mechanism. Also note SPHN has already committed its federated-query layer to Tune Insight (homomorphic encryption plus secure multi-party computation) — a TEE-first pitch lands in the other camp.
 
+## ai-act-definition-guidelines
+- kind: undated
+- title: Commission guidelines on the definition of an AI system
+- url: https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application
+- watch: text
+- binds: providers and deployers
+- why: Admitted by the second route — the `/eu-ai-act` page cites it as `definition-guidelines`. It decides whether a rule-based pipeline is an AI system at all, which is the first question every check has to answer and the one that keeps most genomics tooling outside the Regulation. If it moves, the point `not-every-tool-is-an-ai-system` moves with it.
+
+## ai-act-gpai-guidelines
+- kind: undated
+- title: Commission guidelines on the scope of the obligations for providers of general-purpose AI models
+- url: https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act
+- watch: text
+- binds: providers of general-purpose AI models, and anyone who fine-tunes one
+- why: Admitted by the second route — cited as `gpai-guidelines`. It carries the fine-tuning threshold that decides whether someone adapting a third-party model becomes a downstream provider. Two published points rest on it (`calling-an-api`, `fine-tuning`), and both are the answer researchers most often get wrong.
+
+## ai-act-transparency-guidelines
+- kind: undated
+- title: Commission guidelines on transparency obligations for AI-generated content (Art. 50)
+- url: https://digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content
+- watch: text
+- binds: providers and deployers of systems that interact with people or generate content
+- why: Admitted by the second route — cited as `transparency-guidelines`. Article 50 is the one obligation that actually reaches this project's own services, so this is the single most self-implicating page on the list: our published pages are themselves AI-drafted text about AI regulation. Two points rest on it (`art-50-is-live`, `art-50-carve-outs`), and the record already carries one discrepancy about this document's own date.
+
+## ai-act-highrisk-draft-guidelines
+- kind: undated
+- title: Draft Commission guidelines on the classification of high-risk AI systems
+- url: https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems
+- watch: text
+- binds: providers of Annex I and Annex III systems
+- why: Admitted by the second route — cited as `highrisk-draft-guidelines`. Still marked draft on 2026-09-13, and its finalisation is precisely the event the published page needs to notice, because `no-conformity-target-yet` says out loud that no harmonised target exists to build against.
+
+## ai-act-highrisk-guidelines-page
+- kind: undated
+- title: Commission status page for the high-risk classification guidelines
+- url: https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems
+- watch: text
+- binds: —
+- why: Admitted by the second route — cited as `highrisk-guidelines-page`. The status page usually moves before the document does, so it is the earlier of the two signals that the draft above has been settled.
+
+## mdcg-2025-6-mdr-ai-interplay
+- kind: undated
+- title: MDCG 2025-6 — interplay between the Medical Device Regulations and the AI Act
+- url: https://health.ec.europa.eu/document/download/b78a17d7-e3cd-4943-851d-e02a2f22bbb4_en?filename=mdcg_2025-6_en.pdf
+- watch: full
+- binds: manufacturers of AI that is, or is a safety component of, an MDR/IVDR device
+- why: Admitted by the second route — cited as `mdcg-2025-6`. It is the bridge between the dated trigger `ai-act-annex-i-high-risk` and what a genomic pipeline inside a companion diagnostic actually has to do, and it is the only guidance that reads the two regimes together. A PDF, so raw bytes are the right comparison.
+
 ## eur-lex-ai-omnibus
 - kind: undated
 - title: Regulation (EU) 2026/1744 — the AI omnibus, Official Journal text
 - url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng
 - watch: text
 - binds: —
-- why: Expected to be permanently unreachable — EUR-Lex sits behind a WAF that returns a challenge page to every automated route tried during the survey. It stays on the list precisely so the gap keeps showing: the dates below were corroborated across four law-firm analyses and the OJ text has never been read first-hand, and whether the co-legislators kept a standards-readiness trigger or fixed dates is still unresolved.
+- why: Permanently unreachable, and since 2026-09-14 the mechanism is known rather than assumed: EUR-Lex answers this route with **HTTP 202 and a 2,038-byte script-only interstitial**. Stripping the script leaves the empty string, whose digest is `e3b0c442…b855`. Recorded as a baseline it would have read `unchanged` on every later run — a permanent green light on the Official Journal text that the published high-risk dates rest on. The fetcher now rejects both halves (non-200, and a body that normalises to nothing), so this reports `unreachable`. It stays on the list precisely so the gap keeps showing: the dates were corroborated across four law-firm analyses, the OJ text has never been read first-hand, and whether the co-legislators kept a standards-readiness trigger or fixed dates is still unresolved.

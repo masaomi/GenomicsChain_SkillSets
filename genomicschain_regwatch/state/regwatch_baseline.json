@@ -1,0 +1,36 @@
+{
+  "rules_version": "regwatch-scan-0.1.0",
+  "recorded_at": "2026-09-14T07:42:15Z",
+  "entries": {
+    "ai-act-definition-guidelines": {
+      "digest": "2960f5d95fecb1b12e5fcf81c4ac6bf1f3530aba912f8c97e95df2b194565e51",
+      "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application",
+      "seen_at": "2026-09-14T07:42:15Z"
+    },
+    "ai-act-gpai-guidelines": {
+      "digest": "f078b3ac866fe78d57c2e77383aa668829e1c4678140b5c64e1d416b2dd07685",
+      "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act",
+      "seen_at": "2026-09-14T07:42:15Z"
+    },
+    "ai-act-transparency-guidelines": {
+      "digest": "117cf021e3adb15fd970d1153d600ab3a3c20c7a0477d68e00585fccdf917af8",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content",
+      "seen_at": "2026-09-14T07:42:15Z"
+    },
+    "ai-act-highrisk-draft-guidelines": {
+      "digest": "1d8fd7e7b47f91ca29bb12844ddde339d07e7e73f2604c4833ab630307111d92",
+      "url": "https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems",
+      "seen_at": "2026-09-14T07:42:15Z"
+    },
+    "ai-act-highrisk-guidelines-page": {
+      "digest": "ef83570e844dba0df6a6bb187c520717c872dec4e1f154e714107f7f44e6b1fa",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems",
+      "seen_at": "2026-09-14T07:42:15Z"
+    },
+    "mdcg-2025-6-mdr-ai-interplay": {
+      "digest": "48db859581fb5f1677068cd4eca770e062c5fcc2a8483d6459daceeb98478626",
+      "url": "https://health.ec.europa.eu/document/download/b78a17d7-e3cd-4943-851d-e02a2f22bbb4_en?filename=mdcg_2025-6_en.pdf",
+      "seen_at": "2026-09-14T07:42:15Z"
+    }
+  }
+}

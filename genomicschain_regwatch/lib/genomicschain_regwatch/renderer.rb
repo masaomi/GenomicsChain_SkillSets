@@ -21,6 +21,8 @@ module GenomicsChainRegwatch
         subtitle: 'GenomicsChain / KairosChain',
         scanned: 'Scanned', rules: 'Rules', baseline: 'Baseline',
         never: 'never recorded', items: 'items',
+        partial: 'Partial pass: %{examined} of %{total} watched sources were examined. ' \
+                 'The rest were not looked at, and nothing here says anything about them.',
         h_deadlines: 'Dated triggers', h_findings: 'Watched sources',
         h_warnings: 'Watchlist warnings', h_limits: 'What this scan cannot see',
         col_due: 'Due', col_days: 'Days', col_what: 'What', col_binds: 'Binds',
@@ -39,6 +41,8 @@ module GenomicsChainRegwatch
         subtitle: 'GenomicsChain / KairosChain',
         scanned: '走査日時', rules: '規則版', baseline: '基準値',
         never: '未記録', items: '件',
+        partial: '一部走査: 監視対象 %{total} 件のうち %{examined} 件のみを調べた。' \
+                 '残りは見ていない。この報告は残りについて何も述べていない。',
         h_deadlines: '期日のある事項', h_findings: '監視している資料',
         h_warnings: '監視表の警告', h_limits: 'この走査が見られないもの',
         col_due: '期日', col_days: '残り', col_what: '内容', col_binds: '拘束する相手',
@@ -116,6 +120,20 @@ module GenomicsChainRegwatch
       b = @r['baseline'] || {}
       stale = b['stale_rules'] ? %(<p class="alert">#{@t[:stale]}</p>) : ''
       off = @r['offline'] ? %(<p class="alert">#{@t[:offline]}</p>) : ''
+
+      # A narrowed scan (`only:`) produced a report indistinguishable from a
+      # full sweep: the counts tiles add up to whatever was examined, and
+      # nothing said the rest had not been looked at. On a page meant for
+      # publication that is the same failure as scoring a blocked source as a
+      # pass — a partial check reading as a complete one.
+      examined = @r['examined'].to_i
+      total = @r['watchlist_items'].to_i
+      partial = if total.positive? && examined < total
+                  fmt = @t[:partial].sub('%{examined}', examined.to_s).sub('%{total}', total.to_s)
+                  %(<p class="alert">#{fmt}</p>)
+                else
+                  ''
+                end
       <<~HTML
         <header>
           <h1>#{@t[:title]}</h1>
@@ -123,7 +141,7 @@ module GenomicsChainRegwatch
             #{@t[:scanned]} <span class="mono">#{h(@r['scanned_at'])}</span> &middot;
             #{@t[:baseline]} <span class="mono">#{h(b['recorded_at'] || @t[:never])}</span>
             (#{b['entries'].to_i} #{@t[:items]})</p>
-          #{stale}#{off}
+          #{partial}#{stale}#{off}
         </header>
       HTML
     end

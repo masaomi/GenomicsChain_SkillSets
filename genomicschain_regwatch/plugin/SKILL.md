@@ -35,13 +35,22 @@ only the result" as the weakest of four arrangements. So the tool emits a status
 |---|---|
 | `changed` | the normalised digest differs from the baseline. **Someone must read the source.** |
 | `unchanged` | fetched, compared, identical |
-| `unreachable` | could not be fetched. Not a pass — a hole |
+| `unreachable` | could not be fetched. Not a pass — a hole. Also covers two answers that *look* like success: any 2xx other than 200, and a 200 whose body normalises to nothing |
 | `new` | fetched, but no baseline exists for this id yet |
 | `not_checked` | an offline pass: nothing fetched, nothing compared |
 
 `not_checked` exists because the first cut of this package lacked it, and an offline pass
 therefore reported all 24 sources as `unchanged` — committing, in its own offline path,
 exactly the error the package was built to prevent.
+
+The same error arrived a second time, from outside, on 2026-09-14. EUR-Lex answers an
+automated request with **HTTP 202 and a script-only interstitial**; 202 is a 2xx, so the
+fetch counted as success, and `text` normalisation stripped the script and left the empty
+string. The digest recorded would have been the SHA-256 of nothing, and that source would
+have read `unchanged` forever — a permanent green light on the Official Journal text the
+published high-risk dates rest on. Both halves are now rejected. The lesson generalises:
+**the guard asked whether the fetch failed, and this fetch succeeded.** A blocked source
+does not always arrive as an error.
 
 ## Workflow
 

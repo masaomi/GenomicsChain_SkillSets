@@ -20,9 +20,16 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 | `genomicschain_tier1` | 0.2.1 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
 | `genomicschain_tier2` | 0.4.0 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
 | `genomicschain_tier3` | 0.5.0 | Tier-3 execution — backends, comparator, cost estimation |
+| `genomicschain_regwatch` | 0.1.1 | Regulatory watch — `gc_regwatch_scan`, `gc_regwatch_report`, a 30-source watchlist |
 
-The four version independently but install as a set: `tier1` and `tier3` declare
+The first four version independently but install as a set: `tier1` and `tier3` declare
 `genomicschain_core >= 0.2.0`; `tier2` depends on nothing and reads only what is on disk.
+
+`regwatch` is on a separate axis and depends on nothing. It watches the law rather than a
+paper, and since 2026-09-14 it also carries the join that tells the published EU AI Act
+commentary which of its claims the sources underneath still support — see
+[`docs/REGCHECK.md`](docs/REGCHECK.md), which also records why the check half of that line
+is deliberately still a script rather than a package.
 
 One numbering, everywhere, since 2026-09-09: Tier-1 reads the paper, Tier-2 reads the
 code, Tier-3 executes. Package names, tool names, schemas and the signed claim prefixes
