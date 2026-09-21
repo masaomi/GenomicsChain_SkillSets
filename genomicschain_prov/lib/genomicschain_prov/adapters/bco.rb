@@ -44,7 +44,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.2'
+      VERSION = 'prov-adapter-bco-0.3.3'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -62,7 +62,9 @@ module GenomicsChainProv
       SHA256_HEX  = /\A[0-9a-f]{64}\z/i
       # registry[:port]/repo[/repo]:tag. An untagged, unschemed name ("biocontainers/fastqc")
       # is indistinguishable from a path and is NOT taken as an image; write docker:// for those.
-      OCI_TAGGED  = %r{\A(?:[a-z0-9.-]+(?::[0-9]+)?/)?[a-z0-9._-]+(?:/[a-z0-9._-]+)*:[A-Za-z0-9._-]+\z}
+      # The first character must be alphanumeric: "./x:1.0" and "../x:1.0" are
+      # paths (round 5).
+      OCI_TAGGED  = %r{\A(?:[a-z0-9][a-z0-9.-]*(?::[0-9]+)?/)?[a-z0-9][a-z0-9._-]*(?:/[a-z0-9._-]+)*:[A-Za-z0-9._-]+\z}
       SEED        = /seed/i
       # A guess by name, and recorded as one (`reference_detection: heuristic`, §5).
       REFERENCE_HINT = /genome|reference|\.fa(?:sta)?(?:\.gz)?\z|\.fai\z|\.dict\z|\.gtf|\.gff3?|index/i
@@ -159,8 +161,14 @@ module GenomicsChainProv
         scm = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
                                             .find { |s| s.is_a?(Hash) }
         commit = scm && blank_to_nil(scm['scm_commit'])
-        first = Array(ed['script']).first
-        script = blank_to_nil(first.is_a?(Hash) ? (first['uri'].is_a?(Hash) ? first['uri']['uri'] : first['uri']) : first)
+        # Every script[] entry counts (round 5, three seats): the workflow is
+        # checksum-pinned only when ALL of them join a digest — reading the
+        # first alone let the array order decide the signed grade.
+        scripts = Array(ed['script']).filter_map do |e|
+          blank_to_nil(e.is_a?(Hash) ? (e['uri'].is_a?(Hash) ? e['uri']['uri'] : e['uri']) : e)
+        end
+        script = scripts.first
+        all_pinned = !scripts.empty? && scripts.all? { |l| sha256_by_locator[l] }
         {
           'name' => blank_to_nil(pd['name']),
           'version' => blank_to_nil(pd['version']),
@@ -171,8 +179,11 @@ module GenomicsChainProv
           'ref_kind' => commit.nil? ? nil : (commit =~ COMMIT_HASH ? 'commit' : 'symbolic'),
           'path' => scm && blank_to_nil(scm['scm_path']),
           'script' => script,
-          # extension checksums[] joined by the script's locator (round 4)
-          'checksum' => script && sha256_by_locator[script] ? { 'sha256' => sha256_by_locator[script] } : nil
+          'scripts_total' => scripts.length,
+          'scripts_with_checksum' => scripts.count { |l| sha256_by_locator[l] },
+          # extension checksums[] joined by every script locator (rounds 4–5):
+          # the first script's digest, present only when all scripts have one
+          'checksum' => all_pinned ? { 'sha256' => sha256_by_locator[script] } : nil
         }
       end
 

@@ -254,6 +254,8 @@ class AdapterBcoTest < Minitest::Test
     assert Bco.oci_ref?('registry.example:5000/img:2.1')
     refute Bco.oci_ref?('https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6')
     refute Bco.oci_ref?('s3://bucket/key:1')
+    refute Bco.oci_ref?('./x:1.0'), 'a relative path with a colon is not an image (round 5)'
+    refute Bco.oci_ref?('../x:1.0')
   end
 
   # --- stage identity and the internal-input rule (review round 2) -----------------
@@ -423,7 +425,27 @@ class AdapterBcoTest < Minitest::Test
     n = Bco.parse(b)
     assert_nil n.workflow['repository']
     assert_equal({ 'sha256' => 'c' * 64 }, n.workflow['checksum'])
+    assert_equal [1, 1], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
     assert_equal 'immutable', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+  end
+
+  # Round 5 (three seats): with several script entries the workflow is pinned
+  # only when every one of them carries a checksum, whatever their order.
+  def test_every_script_entry_must_be_checksummed_in_any_order
+    a = 'file:///x/helper.sh'
+    m = 'file:///x/main.nf'
+    [[a, m], [m, a]].each do |order|
+      b = enriched_bco
+      b['extension_domain'].delete_at(0)
+      b['execution_domain']['script'] = order
+      b['extension_domain'][0]['genomicschain_extension']['checksums'] << { 'uri' => a, 'sha256' => 'C' * 64 }
+      n = Bco.parse(b)
+      assert_nil n.workflow['checksum'], "order #{order.inspect}: main.nf has no checksum"
+      assert_equal [2, 1], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
+      assert_equal 'floating', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+      b['extension_domain'][0]['genomicschain_extension']['checksums'] << { 'uri' => m, 'sha256' => 'D' * 64 }
+      assert_equal 'immutable', GenomicsChainProv::Predicate.grade(Bco.parse(b))['grades']['workflow']
+    end
   end
 
   # A path with a digest suffix is not an image reference (the same shape the

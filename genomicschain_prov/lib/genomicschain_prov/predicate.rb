@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.2'
+    PREDICATE_VERSION = 'prov-predicate-0.3.3'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -82,18 +82,19 @@ module GenomicsChainProv
     # A BCO `version` is free text. Split it on whitespace into words.
     #   words:  split on Unicode whitespace (NBSP and U+3000 included).
     #   veto:   a word that is, whole, a NOT_A_RELEASE word (optionally with
-    #           digits around it: latest, dev3, 0latest), or any DIGIT-LEADING
-    #           candidate whose - + . _ ~ pieces contain one (0-unknown,
-    #           1.0-SNAPSHOT, 2.0.dev3, 1.0latest) → the whole string is
+    #           digits around it: latest, dev3, 0latest), or any candidate the
+    #           release shape could accept (a digit, or v/V then a digit, first)
+    #           whose - + . _ ~ pieces contain one (0-unknown, 1.0-SNAPSHOT,
+    #           v1.0-SNAPSHOT, 2.0.dev3, 1.0latest) → the whole string is
     #           floating, before any candidate is graded. "1.0 latest",
-    #           "latest 1.0" and "1.0 0-unknown" alike. A letter-leading word
-    #           is a tool name and its pieces are not vetoed ("python3-dev
-    #           3.11.4" is versioned, review round 4).
-    #   range:  a word made only of range marks (">", ">=", "*", "~"), or a
-    #           range mark inside ANY candidate, is a range on the whole
-    #           string ("> 1.0", "GATK > 4", "1.0 *", "1.0 >=2" → ranged;
-    #           round 4: skipping it as a tool name, or reading marks only on
-    #           the deciding candidate, let "> 1.0" sign above ">=1.0").
+    #           "latest 1.0" and "1.0 0-unknown" alike. Any other letter-
+    #           leading word is a tool name and its pieces are not vetoed
+    #           ("python3-dev 3.11.4" is versioned, review round 4).
+    #   range:  "< > ! *" anywhere in any word, or a word starting with ~ / ^,
+    #           or a "," inside a candidate, is a range on the whole string
+    #           ("> 1.0", "GATK > 4", "GATK> 4", "1.0 *", "1.0 >=2" → ranged;
+    #           rounds 4–5: skipping a mark as part of a tool name let "> 1.0"
+    #           and "GATK> 4" sign above ">=1.0").
     #   candidates: the words that contain a digit, in order, each with a
     #           Debian epoch "N:" dropped and a trailing "," removed. A word
     #           without a digit is a tool name and is skipped ("GATK 4.5.0.0",
@@ -201,11 +202,16 @@ module GenomicsChainProv
       return floating if words.any? { |w| w =~ NOT_A_RELEASE_TOKEN }
 
       candidates = release_candidates(raw)
-      vetoed = candidates.any? { |v| v =~ /\A\d/ && v.split(/[-+._~]+/).any? { |t| t =~ NOT_A_RELEASE_TOKEN } }
+      # a candidate the release shape could accept (digit-leading, or v/V then
+      # a digit — round 5: "v1.0-SNAPSHOT" slipped past as a tool name) has
+      # its pieces vetoed
+      vetoed = candidates.any? { |v| v =~ /\A[vV]?\d/ && v.split(/[-+._~]+/).any? { |t| t =~ NOT_A_RELEASE_TOKEN } }
       return floating if vetoed
-      return ranged if words.any? { |w| w =~ RANGE_ONLY_WORD }
+      # a range mark on ANY word (round 5: "GATK> 4" glued the mark to a tool
+      # name); the comma is a mark only inside a candidate ("GNU bash, version
+      # 5.2.21" stays versioned)
+      return ranged if words.any? { |w| w =~ /[<>!*]|\A[~^]/ }
       return ranged if candidates.any? { |v| v =~ RANGE_MARK }
-      return ranged if candidates.empty? && raw =~ RANGE_MARK
 
       candidates.each do |v|
         pieces = v.split(/[-+._~]+/)

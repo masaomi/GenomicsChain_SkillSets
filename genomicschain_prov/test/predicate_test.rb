@@ -199,7 +199,10 @@ class PredicateTest < Minitest::Test
                '> 1.0' => 'ranged', '>= 1.0' => 'ranged', '1.0 *' => 'ranged', 'GATK > 4' => 'ranged', '1.0 >=2' => 'ranged',
                'python3-dev 3.11.4' => 'versioned', '1.0latest' => 'floating', '1.0.0latest' => 'floating',
                "GATK\u00a04.5.0.0" => 'versioned', "1.0\u30004.0" => 'versioned',
-               '4.5.0.0,' => 'versioned', 'GATK 4.5.0.0, HTSJDK 3.0.5' => 'versioned', '1.0,2.0' => 'ranged' }
+               '4.5.0.0,' => 'versioned', 'GATK 4.5.0.0, HTSJDK 3.0.5' => 'versioned', '1.0,2.0' => 'ranged',
+               # review round 5: v-led veto, a mark glued to a tool name
+               'v1.0-SNAPSHOT' => 'floating', 'v2.0.dev3' => 'floating', 'V1.0-nightly' => 'floating',
+               'GATK> 4' => 'ranged', 'GATK>= 4' => 'ranged', '>=GATK 4' => 'ranged', '4 <=x' => 'ranged' }
     expect.each do |version, level|
       assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
     end

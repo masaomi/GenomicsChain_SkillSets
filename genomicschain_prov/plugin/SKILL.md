@@ -5,8 +5,8 @@ description: Read a pipeline's provenance bundle (BioCompute Object; Workflow Ru
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.3
-(adapter 0.3.2, predicate 0.3.2) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
+Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.4
+(adapter 0.3.3, predicate 0.3.3) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
 
 ```
 customer's pipeline ──▶ bundle (bco.json / ro-crate-metadata.json)
