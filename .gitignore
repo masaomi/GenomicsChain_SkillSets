@@ -28,3 +28,7 @@ log/
 # only until the author decides where it should be published. Remove this rule at that
 # point; do not let the rule become the reason the data is lost a second time.
 docs/research/
+
+# Python bytecode from the report generators under docs/reports.
+__pycache__/
+*.pyc
