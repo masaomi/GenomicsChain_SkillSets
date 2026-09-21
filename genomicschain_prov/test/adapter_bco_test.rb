@@ -529,6 +529,77 @@ class AdapterBcoTest < Minitest::Test
     end
   end
 
+  # Round 6 (three seats concordant): round 5 kept an unreadable OBJECT but
+  # still dropped an element that is not an object at all, so the same
+  # inversion survived on every list — a bare string or a null shortened the
+  # signed denominator.
+  def test_a_non_object_element_is_kept_in_every_signed_denominator
+    b = enriched_bco
+    b['io_domain']['input_subdomain'] = [
+      'https://example.org/data/raw.fa',
+      { 'uri' => { 'uri' => 'https://example.org/data/a.txt', 'sha1_checksum' => 'A' * 40 } }
+    ]
+    outputs_before = GenomicsChainProv::Predicate.grade(Bco.parse(b))['counts']['outputs_total']
+    b['io_domain']['output_subdomain'] << nil
+    g = GenomicsChainProv::Predicate.grade(Bco.parse(b))
+    assert_equal 2, g['counts']['inputs_total'], 'a bare string is an entry, not an absence'
+    assert_equal 1, g['counts']['inputs_with_checksum']
+    assert_equal 'absent', g['grades']['inputs']
+    assert_equal outputs_before + 1, g['counts']['outputs_total']
+  end
+
+  def test_a_non_object_prerequisite_is_the_stage_own_declaration
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'].find { |s| s['step_number'] == 1 }['prerequisite'] = ['bc 1.07.1']
+    st = GenomicsChainProv::Predicate.grade(Bco.parse(b))['stages'].find { |s| s['id'] == 1 }
+    assert_equal 'own', st['source']
+    assert_equal 'absent', st['grade']
+  end
+
+  # The all-entries test was evaluated over a list the adapter had already
+  # pruned, so omitting a script's uri signed immutable where declaring it
+  # signed floating (round 6, opus5 + codex).
+  def test_an_unreadable_script_entry_still_counts_in_the_all_entries_test
+    m = 'file:///x/main.nf'
+    b = enriched_bco
+    b['extension_domain'].delete_at(0)
+    b['execution_domain']['script'] = [{ 'uri' => { 'uri' => m } }, { 'uri' => { 'filename' => 'helper.sh' } }]
+    b['extension_domain'][0]['genomicschain_extension']['checksums'] << { 'uri' => m, 'sha256' => 'C' * 64 }
+    n = Bco.parse(b)
+    assert_equal [2, 1], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
+    assert_nil n.workflow['checksum']
+    assert_equal 'floating', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+  end
+
+  # Round 6 (cursor): with the enricher writing a block of its own beside a
+  # producer's, `find` let the array order decide which checksums were read.
+  def test_checksums_merge_across_every_extension_block_in_any_order
+    a = 'file:///x/helper.sh'
+    m = 'file:///x/main.nf'
+    first  = { 'genomicschain_extension' => { 'checksums' => [{ 'uri' => a, 'sha256' => 'C' * 64 }] } }
+    second = { 'genomicschain_extension' => { 'checksums' => [{ 'uri' => m, 'sha256' => 'D' * 64 }] } }
+    [[first, second], [second, first]].each do |order|
+      b = enriched_bco
+      b['extension_domain'] = order
+      b['execution_domain']['script'] = [a, m]
+      n = Bco.parse(b)
+      assert_equal [2, 2], n.workflow.values_at('scripts_total', 'scripts_with_checksum'), "order #{order.equal?(first) ? 1 : 2}"
+      assert_equal 'immutable', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+    end
+  end
+
+  def test_one_locator_with_two_different_checksums_is_not_pinned
+    a = 'file:///x/helper.sh'
+    b = enriched_bco
+    b['extension_domain'] = [{ 'genomicschain_extension' => { 'checksums' => [
+      { 'uri' => a, 'sha256' => 'C' * 64 }, { 'uri' => a, 'sha256' => 'D' * 64 }
+    ] } }]
+    b['execution_domain']['script'] = [a]
+    n = Bco.parse(b)
+    assert_equal [1, 0], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
+    assert_includes n.notes, 'the extension gives one locator more than one checksum; that locator is not pinned'
+  end
+
   def test_format_error_drops_the_parser_cause
     err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-patient42"') }
     assert_nil err.cause

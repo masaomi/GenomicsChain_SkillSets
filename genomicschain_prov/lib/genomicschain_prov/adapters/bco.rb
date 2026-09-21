@@ -50,7 +50,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.4'
+      VERSION = 'prov-adapter-bco-0.3.5'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -89,7 +89,7 @@ module GenomicsChainProv
         steps = ordered_steps(bco)
         params = Array(bco['parametric_domain']).select { |p| p.is_a?(Hash) }
         extension = genomicschain_extension(bco)
-        sha256_by_locator = checksums_from(extension)
+        sha256_by_locator = checksums_from(extension, notes)
         notes << 'a checksum field that is not a hex digest was ignored' if malformed_checksum?(bco, extension)
 
         runtime = runtime_of(ed, notes, sha256_by_locator)
@@ -181,11 +181,15 @@ module GenomicsChainProv
         # Every script[] entry counts (round 5, three seats): the workflow is
         # checksum-pinned only when ALL of them join a digest — reading the
         # first alone let the array order decide the signed grade.
-        scripts = Array(ed['script']).filter_map do |e|
+        # Every element counts, including one with no readable locator (round
+        # 6): pruning before the all-entries test evaluated "all" over a
+        # shortened list, so omitting a script's uri signed `immutable` where
+        # declaring it signed `floating`.
+        scripts = Array(ed['script']).map do |e|
           blank_to_nil(e.is_a?(Hash) ? (e['uri'].is_a?(Hash) ? e['uri']['uri'] : e['uri']) : e)
         end
-        script = scripts.first
-        all_pinned = !scripts.empty? && scripts.all? { |l| sha256_by_locator[l] }
+        script = scripts.compact.first
+        all_pinned = !scripts.empty? && scripts.all? { |l| l && sha256_by_locator[l] }
         {
           'name' => blank_to_nil(pd['name']),
           'version' => blank_to_nil(pd['version']),
@@ -197,7 +201,7 @@ module GenomicsChainProv
           'path' => scm && blank_to_nil(scm['scm_path']),
           'script' => script,
           'scripts_total' => scripts.length,
-          'scripts_with_checksum' => scripts.count { |l| sha256_by_locator[l] },
+          'scripts_with_checksum' => scripts.count { |l| l && sha256_by_locator[l] },
           # extension checksums[] joined by every script locator (rounds 4–5):
           # the first script's digest, present only when all scripts have one
           'checksum' => all_pinned ? { 'sha256' => sha256_by_locator[script] } : nil
@@ -258,8 +262,7 @@ module GenomicsChainProv
       # tool honestly. The same argument `ordered_steps` already makes for a
       # non-object step — a dropped entry shrinks a signed denominator.
       def software_entry(entry, stage, sha256_by_locator = {})
-        return nil unless entry.is_a?(Hash)
-
+        entry = readable(entry)
         uri = entry['uri'].is_a?(Hash) ? entry['uri'] : { 'uri' => entry['uri'] }
         name = blank_to_nil(entry['name'])
         locator = blank_to_nil(uri['uri'])
@@ -293,9 +296,8 @@ module GenomicsChainProv
       # a path signed 1/2 and `local_path`. Omitting a field must never grade
       # above declaring it.
       def inputs_of(io, internal, sha256_by_locator)
-        Array(io['input_subdomain']).filter_map do |i|
-          next nil unless i.is_a?(Hash)
-
+        Array(io['input_subdomain']).map do |raw|
+          i = readable(raw)
           uri = i['uri'].is_a?(Hash) ? i['uri'] : { 'uri' => i['uri'] }
           locator = blank_to_nil(uri['uri'])
           name = blank_to_nil(uri['filename']) || locator
@@ -308,9 +310,8 @@ module GenomicsChainProv
       end
 
       def outputs_of(io, sha256_by_locator)
-        Array(io['output_subdomain']).filter_map do |o|
-          next nil unless o.is_a?(Hash)
-
+        Array(io['output_subdomain']).map do |raw|
+          o = readable(raw)
           uri = o['uri'].is_a?(Hash) ? o['uri'] : { 'uri' => o['uri'] }
           locator = blank_to_nil(uri['uri'])
 
@@ -365,9 +366,22 @@ module GenomicsChainProv
         s =~ OCI_TAGGED ? true : false
       end
 
+      # Every `genomicschain_extension` block, not the first (round 6, cursor):
+      # with the enricher writing a block of its own beside a producer's, the
+      # array order decided which checksums were read. The blocks are merged,
+      # `checksums[]` by concatenation. Two blocks naming different producers
+      # is a bundle saying two things, so neither is recorded — the order must
+      # not choose.
       def genomicschain_extension(bco)
-        e = Array(bco['extension_domain']).find { |x| x.is_a?(Hash) && x['genomicschain_extension'].is_a?(Hash) }
-        e ? e['genomicschain_extension'] : {}
+        blocks = Array(bco['extension_domain']).filter_map do |x|
+          x['genomicschain_extension'] if x.is_a?(Hash) && x['genomicschain_extension'].is_a?(Hash)
+        end
+        return blocks.first || {} if blocks.length <= 1
+
+        merged = { 'checksums' => blocks.flat_map { |b| Array(b['checksums']) } }
+        producers = blocks.filter_map { |b| b['producer'] }.uniq
+        merged['producer'] = producers.first if producers.length == 1
+        merged
       end
 
       def producer_of(extension)
@@ -396,12 +410,19 @@ module GenomicsChainProv
 
       # checksums[] entries whose sha256 is not 64 hex are ignored — a checksum
       # field holds a digest or nothing (round 4: "x" graded immutable).
-      def checksums_from(extension)
-        Array(extension['checksums']).each_with_object({}) do |c, acc|
+      # Two entries naming the same locator with different digests is a bundle
+      # that says two things about one file; it has pinned nothing, and which
+      # digest won must not depend on the array order (round 6). The locator is
+      # dropped and the disagreement noted.
+      def checksums_from(extension, notes = [])
+        by_locator = Array(extension['checksums']).each_with_object({}) do |c, acc|
           next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && c['sha256'].to_s =~ SHA256_HEX
 
-          acc[c['uri'].to_s] = c['sha256'].to_s.downcase
+          (acc[c['uri'].to_s] ||= []) << c['sha256'].to_s.downcase
         end
+        conflicting = by_locator.count { |_, v| v.uniq.length > 1 }
+        notes << 'the extension gives one locator more than one checksum; that locator is not pinned' if conflicting.positive?
+        by_locator.filter_map { |k, v| [k, v.first] if v.uniq.length == 1 }.to_h
       end
 
       def malformed_checksum?(bco, extension)
@@ -431,6 +452,21 @@ module GenomicsChainProv
 
       def blank_to_nil(v)
         v.nil? || v.to_s.strip.empty? ? nil : v.to_s
+      end
+
+      # One rule at every site that reads a list of entries (round 6, three
+      # seats concordant): an element this adapter cannot read is normalised to
+      # an empty entry and KEPT, never dropped. Every such list feeds a signed
+      # denominator — `inputs_total`, `outputs_total`, `software_total`,
+      # `scripts_total` — or decides whether a stage declared an environment of
+      # its own, so dropping an element let a producer who wrote a bare string
+      # or a `null` grade above one who wrote an honest object. This is the
+      # argument `ordered_steps` already makes for a non-object step, applied
+      # to every other list in the same record. A bare string is not read as a
+      # locator: the standard's entries are objects, and guessing would be the
+      # producer's string choosing the route.
+      def readable(entry)
+        entry.is_a?(Hash) ? entry : {}
       end
 
       def unset?(v)

@@ -373,6 +373,46 @@ class PredicateTest < Minitest::Test
     assert_equal 'floating', P.software_grade('name' => 'bc', 'locator' => nil, 'version' => nil, 'checksum' => nil).first
   end
 
+  # Round 6 (opus5): the checksum and version branches ran before the
+  # names-nothing branch, so a digest with nothing to fetch — and a version
+  # naming no tool — bought a grade above an honest weak declaration.
+  def test_a_checksum_or_a_version_alone_does_not_outrank_naming_nothing
+    assert_equal 'absent', P.input_grade('locator' => nil, 'checksum' => { 'sha1' => 'a' * 40 }).first
+    assert_equal 'absent', P.input_grade('locator' => '  ', 'checksum' => { 'sha256' => 'a' * 64 }).first
+    assert_equal 'immutable', P.input_grade('locator' => 'x.fa', 'checksum' => { 'sha1' => 'a' * 40 }).first
+    assert_equal 'absent',
+                 P.software_grade('name' => nil, 'locator' => nil, 'version' => nil, 'checksum' => { 'sha1' => 'a' * 40 }).first
+    assert_equal 'absent',
+                 P.software_grade('name' => nil, 'locator' => nil, 'version' => '1.0', 'checksum' => nil).first
+  end
+
+  # Round 6 (codex, reproduced): the wildcard was tested only on the candidate
+  # being accepted, so the order of two candidates chose the signed grade.
+  def test_a_wildcard_in_any_candidate_is_ranged_whatever_its_position
+    assert_equal 'ranged', P.version_grade('tool', '1.x 1.0').first
+    assert_equal 'ranged', P.version_grade('tool', '1.0 1.x').first
+    assert_equal 'versioned', P.version_grade('tool', 'GATK 4.5.0.0').first
+  end
+
+  # Round 6 (codex, reproduced): PinStrength reads a digest SUBSTRING as a pin,
+  # so a scheme plus a digest-shaped tail reached immutable on a reference that
+  # is not an image digest reference.
+  def test_a_digest_shaped_tail_is_not_an_image_digest
+    d = "@sha256:#{'a' * 64}"
+    assert_equal 'floating', P.container_grade("docker://tool:latest#" + d).first
+    assert_equal 'immutable', P.container_grade("docker://tool#{d}").first
+    assert_equal 'immutable', P.container_grade("ghcr.io/o/i:1.0#{d}").first
+    assert_equal 'versioned', P.container_grade('quay.io/biocontainers/bc:1.07.1').first
+  end
+
+  # §4 promises the two script counters; until round 6 they never reached the
+  # record.
+  def test_the_script_counters_are_in_the_counts
+    c = P.grade(np)['counts']
+    assert c.key?('scripts_total') && c.key?('scripts_with_checksum'),
+           'the transparency number behind the all-or-nothing script rule must reach the record'
+  end
+
   # The seed is found by parameter NAME — a guess — so it is reported beside
   # the grades and is not among the signed counts.
   def test_seed_is_reported_beside_the_grades

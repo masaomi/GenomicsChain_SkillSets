@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.4'
+    PREDICATE_VERSION = 'prov-predicate-0.3.5'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -160,7 +160,7 @@ module GenomicsChainProv
     #   counts, not items)
     def grade(np)
       sw = np.software.map { |s| item('software', s['name'], s['locator'], *software_grade(s), s['stage']) }
-      ct = np.containers.map { |c| item('container', c['name'], c['ref'], *PS.container(c['ref']), c['stage']) }
+      ct = np.containers.map { |c| item('container', c['name'], c['ref'], *container_grade(c['ref']), c['stage']) }
       stages = stage_environments(np, sw, ct)
       external = np.inputs_external
       inp = external.map { |i| item('inputs', i['name'], i['locator'], *input_grade(i)) }
@@ -207,13 +207,18 @@ module GenomicsChainProv
     # container route, never here — otherwise naming the `:latest` image that
     # actually ran would lower the grade below not naming it (review round 1).
     def software_grade(s)
-      return ['immutable', 'carries a checksum'] if s['checksum']
-      return version_grade(s['name'], s['version']) if s['version']
       # The adapter keeps an entry it cannot read rather than dropping it
       # (round 5): an entry that names nothing is the weakest declaration
       # there is, not a missing one — dropping it let the stage inherit the
       # workflow-level items and grade ABOVE an honest declaration.
+      #
+      # This branch precedes the checksum and version branches (round 6): a
+      # checksum grades `immutable` only on an entry that also names what it
+      # digests, and a version alone identifies no tool. A digest with nothing
+      # to fetch permits a stranger nothing, which is what the grade measures.
       return ['absent', 'the entry names nothing the bundle can resolve'] if s['name'].nil? && s['locator'].nil?
+      return ['immutable', 'carries a checksum'] if s['checksum']
+      return version_grade(s['name'], s['version']) if s['version']
 
       ['floating', 'a bare name — no version, no checksum']
     end
@@ -236,10 +241,14 @@ module GenomicsChainProv
       # 5.2.21" stays versioned)
       return ranged if words.any? { |w| w =~ /[<>!*]|\A[~^]/ }
       return ranged if candidates.any? { |v| v =~ RANGE_MARK }
+      # the wildcard piece is scanned across EVERY candidate before any one of
+      # them is accepted (round 6, codex, reproduced: "1.x 1.0" graded ranged
+      # and "1.0 1.x" versioned — one declaration, reordered)
+      if candidates.any? { |v| v.split(/[-+._~]+/).any? { |t| t =~ /\A[xX]\z/ } }
+        return ['ranged', "version #{raw.inspect} admits more than one release (.x)"]
+      end
 
       candidates.each do |v|
-        pieces = v.split(/[-+._~]+/)
-        return ['ranged', "version #{raw.inspect} admits more than one release (.x)"] if pieces.any? { |t| t =~ /\A[xX]\z/ }
         return ['versioned', "#{name} #{v} — a release name; stable by convention only"] if v =~ RELEASE_LIKE
       end
       floating
@@ -260,10 +269,14 @@ module GenomicsChainProv
     # `inputs_with_checksum 0`; round 3: a `10.1234/` directory lifted it to
     # versioned).
     def input_grade(i)
-      return ['immutable', 'carries a checksum'] if i['checksum']
-
+      # Before the checksum branch (round 6): a checksum on an entry that names
+      # no location digests something the bundle does not identify, and nothing
+      # a stranger can fetch. The empty-locator case is the weakest, not the
+      # strongest.
       v = i['locator'].to_s.strip
       return ['absent', 'empty locator'] if v.empty?
+      return ['immutable', 'carries a checksum'] if i['checksum']
+
       return ['versioned', 'DOI — persistent, but nothing here verifies the bytes behind it'] if v =~ DOI_WHOLE
       return ['floating', 'URL — retrievable, but its content can change without notice'] if v =~ PS::URL
 
@@ -295,6 +308,21 @@ module GenomicsChainProv
       symbolic = w['ref_kind'] == 'symbolic'
       { 'kind' => w['ref_kind'], 'tag_like' => symbolic ? (w['commit'].to_s =~ RELEASE_LIKE ? true : false) : nil,
         'detection' => 'heuristic' }
+    end
+
+    # PinStrength.container reads a digest SUBSTRING as a pin — right for a
+    # repo config, wrong for a signed grade: `docker://tool:latest#@sha256:<64
+    # hex>` reached `immutable` on a string the producer chose (round 6, codex,
+    # reproduced). prov anchors the shape here exactly as `runtime_grade`
+    # already does: the digest route grades `immutable` only when the whole
+    # reference IS an image digest reference. Anything else that carried a
+    # digest-shaped suffix is capped at `floating` — the suffix is a name.
+    def container_grade(ref)
+      grade, reason = PS.container(ref)
+      return [grade, reason] unless grade == 'immutable'
+      return [grade, reason] if ref.to_s =~ OCI_IMAGE_DIGEST
+
+      ['floating', 'a digest-shaped suffix on a reference that is not an image digest reference']
     end
 
     def runtime_grade(r)
@@ -354,6 +382,12 @@ module GenomicsChainProv
       LEVELS.each { |l| c["software_#{l}"] = sw.count { |i| i['grade'] == l } }
       c['containers_total'] = ct.length
       LEVELS.each { |l| c["containers_#{l}"] = ct.count { |i| i['grade'] == l } }
+      # §4 promises these beside the all-or-nothing script rule, and until
+      # round 6 they lived in the adapter's workflow hash where nothing read
+      # them — a transparency number that never reached the record. Both are
+      # re-derivable from the bundle's bytes, so they belong in the counts.
+      c['scripts_total'] = np.workflow['scripts_total'].to_i
+      c['scripts_with_checksum'] = np.workflow['scripts_with_checksum'].to_i
       c['inputs_total'] = inp.length
       c['inputs_with_checksum'] = np.inputs_external.count { |i| i['checksum'] }
       c['inputs_internal'] = np.inputs_internal.length
