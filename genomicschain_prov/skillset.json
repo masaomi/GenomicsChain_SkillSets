@@ -1,0 +1,18 @@
+{
+  "name": "genomicschain_prov",
+  "version": "0.1.0",
+  "description": "GenomicsChain service (2.5) provenance anchoring, the customer/verifier half: reads a provenance bundle (BioCompute Object IEEE 2791-2020; Workflow Run RO-Crate in v0.2) into the seven recorded conditions, grades rebuild sufficiency with the Tier-2 six pin levels, and checks a bundle against its anchor proof. Reads only; the bundle stays with the customer.",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [
+    {"name": "genomicschain_core", "version": ">= 0.5.0"},
+    {"name": "genomicschain_tier2", "version": ">= 0.4.0"}
+  ],
+  "provides": ["provenance_bundle_adapter", "rebuild_sufficiency_grade"],
+  "tool_classes": [],
+  "config_files": [],
+  "knowledge_dirs": [],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

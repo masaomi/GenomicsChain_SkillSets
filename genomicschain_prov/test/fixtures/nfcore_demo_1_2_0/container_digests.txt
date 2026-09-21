@@ -1,0 +1,6 @@
+# docker images --digests, 2026-09-20, after the nf-core/demo 1.2.0 test run (Docker Desktop 20.10.23, aarch64 host)
+# repository:tag  repo-digest  size
+community.wave.seqera.io/library/multiqc:1.34--db7c73dae76bc9e6  sha256:22eb821173e8b85e1632263d98447a13cf3eef1803e895aa712b984630e2d793  1.49GB
+community.wave.seqera.io/library/cowpy:1.1.5--3db457ae1977a273  sha256:1ebc0043e8cafa61203bf42d29fd05bd14e7b4298e5e8cf986504c15f5aa4160  347MB
+quay.io/biocontainers/seqtk:1.4--he4a0461_1  sha256:24a4a7ebb63af178822c166befb4fcafc77d1b6754fe52fb085f0835cc274496  15.2MB
+quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0  sha256:e194048df39c3145d9b4e0a14f4da20b59d59250465b6f2a9cb698445fd45900  614MB

@@ -1,0 +1,275 @@
+# frozen_string_literal: true
+
+# Predicate — six hand-made normalised provenances, one per level, the rules
+# review round 1 changed (per-stage environment, two routes per tool, release-
+# shaped versions, symbolic refs floating), and the real U0 bundle whose grades
+# are pinned here as numbers. Design v0.1 §5 and §9 U2.
+require 'minitest/autorun'
+require 'json'
+
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+require 'genomicschain_prov'
+
+class PredicateTest < Minitest::Test
+  NP = GenomicsChainProv::NormalizedProvenance
+  P = GenomicsChainProv::Predicate
+  FIXTURE = File.expand_path('fixtures/nfcore_demo_1_2_0/bco.json', __dir__)
+
+  DIGEST_IMAGE = "quay.io/x/bc:1.07.1@sha256:#{'b' * 64}"
+
+  # Everything pinned as hard as a bundle can pin it, declared for the whole
+  # workflow (stage nil). Each case below loosens exactly one thing.
+  def np(**over)
+    base = {
+      format: 'bco', format_version: 'x', producer: nil,
+      workflow: { 'name' => 'toy', 'version' => '1', 'repository' => 'https://example.org/toy.git',
+                  'commit' => 'a' * 40, 'ref_kind' => 'commit', 'path' => 'run.sh', 'script' => nil },
+      runtime: { 'engine' => 'shell', 'version' => '5.2', 'locator' => 'https://gnu.org/bash', 'checksum' => { 'sha256' => 'f' * 64 } },
+      software: [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => DIGEST_IMAGE, 'checksum' => { 'sha256' => 'e' * 64 },
+                   'stage' => nil }],
+      containers: [{ 'ref' => DIGEST_IMAGE, 'name' => 'bc', 'stage' => nil }],
+      stages: [{ 'id' => 1, 'name' => 'add', 'description' => nil, 'inputs' => 2, 'outputs' => 1,
+                 'software' => [], 'container' => nil }],
+      inputs: [{ 'name' => 'a.txt', 'locator' => 'https://example.org/a.txt', 'checksum' => { 'sha256' => 'c' * 64 },
+                 'internal' => false, 'reference_hint' => false }],
+      outputs: [{ 'name' => 'out.txt', 'locator' => 'file:///r/out.txt', 'checksum' => { 'sha256' => 'd' * 64 },
+                  'mediatype' => 'text/plain' }],
+      params_total: 3, params_count: 3, seed_recorded: true, notes: []
+    }
+    NP.new(**base.merge(over))
+  end
+
+  def stage(id)
+    { 'id' => id, 'name' => "s#{id}", 'description' => nil, 'inputs' => 0, 'outputs' => 0, 'software' => [], 'container' => nil }
+  end
+
+  # --- six levels -----------------------------------------------------------------
+
+  def test_immutable_when_every_category_names_bytes
+    g = P.grade(np)
+    assert_equal 'immutable', g['grade_overall']
+    assert_equal %w[immutable immutable immutable immutable immutable immutable], g['grades'].values_at(*P::REPORTED)
+    assert_equal 1, g['counts']['stages_with_environment']
+  end
+
+  def test_versioned_when_the_runtime_is_a_release_not_bytes
+    g = P.grade(np(runtime: { 'engine' => 'nextflow', 'version' => '26.04.6', 'locator' => nil, 'checksum' => nil }))
+    assert_equal 'versioned', g['grade_overall']
+    assert_equal 'versioned', g['grades']['runtime']
+    assert_match(/release name/, g['items'].find { |i| i['category'] == 'runtime' }['reason'])
+  end
+
+  def test_versioned_when_the_only_container_is_tag_pinned
+    tagged = 'quay.io/x/bc:1.07.1'
+    g = P.grade(np(software: [], containers: [{ 'ref' => tagged, 'name' => 'bc', 'stage' => nil }]))
+    assert_equal 'versioned', g['grade_overall']
+    assert_equal 'versioned', g['grades']['container']
+    assert_equal 'versioned', g['grades']['environment']
+  end
+
+  def test_ranged_when_a_tool_admits_more_than_one_release
+    g = P.grade(np(software: [{ 'name' => 'python', 'version' => '>=3.10,<3.12', 'locator' => nil, 'checksum' => nil, 'stage' => nil }],
+                   containers: []))
+    assert_equal 'ranged', g['grade_overall']
+    assert_equal 'ranged', g['grades']['software']
+    assert_equal 'absent', g['grades']['container']
+    assert_equal 'ranged', g['grades']['environment'], 'no container, so the package list is the only route'
+  end
+
+  def test_floating_when_the_only_route_is_a_latest_container
+    g = P.grade(np(software: [], containers: [{ 'ref' => 'docker://x/bc:latest', 'name' => 'bc', 'stage' => nil }]))
+    assert_equal 'floating', g['grade_overall']
+    assert_equal 'floating', g['grades']['container']
+    assert_equal 'floating', g['grades']['environment']
+  end
+
+  def test_local_path_when_an_input_is_a_path_with_no_way_to_obtain_it
+    g = P.grade(np(inputs: [{ 'name' => 'x.fa', 'locator' => '/data/x.fa', 'checksum' => nil,
+                              'internal' => false, 'reference_hint' => true }]))
+    assert_equal 'local_path', g['grade_overall']
+    assert_equal 'local_path', g['grades']['inputs']
+  end
+
+  def test_absent_when_no_runtime_is_named
+    g = P.grade(np(runtime: nil))
+    assert_equal 'absent', g['grade_overall']
+    assert_equal 'absent', g['grades']['runtime']
+  end
+
+  # --- rules with consequences ------------------------------------------------------
+
+  # The environment has two routes, a container image or a package list, and
+  # one suffices (decided 2026-09-20, design §10-8). So a run without
+  # containers is graded by what it says about its packages; a run that says
+  # nothing on either route is `absent` — declaring nothing never outgrades
+  # declaring a floating URL.
+  def test_environment_is_the_stronger_of_its_two_routes
+    checksummed = [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => 'https://example.org/bc-1.07.1.tar.gz',
+                     'checksum' => { 'sha256' => 'e' * 64 }, 'stage' => nil }]
+    no_container = P.grade(np(software: checksummed, containers: []))
+    assert_equal 'absent', no_container['grades']['container']
+    assert_equal 'immutable', no_container['grades']['software']
+    assert_equal 'immutable', no_container['grades']['environment']
+    assert_equal 'immutable', no_container['grade_overall']
+    assert_equal 0, no_container['counts']['containers_total']
+
+    latest_but_pinned_packages = P.grade(np(software: checksummed,
+                                            containers: [{ 'ref' => 'docker://x/bc:latest', 'name' => 'bc', 'stage' => nil }]))
+    assert_equal 'floating', latest_but_pinned_packages['grades']['container']
+    assert_equal 'immutable', latest_but_pinned_packages['grades']['environment']
+
+    neither = P.grade(np(software: [], containers: []))
+    assert_equal 'absent', neither['grades']['environment']
+    assert_equal 'absent', neither['grade_overall']
+  end
+
+  # Review round 1 (three seats): one digest-pinned image must not make the
+  # whole environment immutable while other stages name nothing. Environment
+  # is graded per stage — own items plus inherited workflow-level items — and
+  # the category takes the weakest stage; the claim carries the coverage.
+  def test_environment_is_graded_per_stage_and_takes_the_weakest_stage
+    two_stages = [stage(1), stage(2)]
+    pinned_on_one = P.grade(np(stages: two_stages, software: [],
+                               containers: [{ 'ref' => DIGEST_IMAGE, 'name' => 'bc', 'stage' => 1 }]))
+    assert_equal 'immutable', pinned_on_one['grades']['container'], 'the category still reports its items'
+    assert_equal 'absent', pinned_on_one['grades']['environment'], 'stage 2 names nothing'
+    assert_equal 'absent', pinned_on_one['grade_overall']
+    assert_equal 1, pinned_on_one['counts']['stages_with_environment']
+    assert_equal 2, pinned_on_one['counts']['stages_total']
+    assert_equal [%w[1 immutable], %w[2 absent]], pinned_on_one['stages'].map { |s| [s['id'].to_s, s['grade']] }
+
+    each_stage_pinned = P.grade(np(stages: two_stages, software: [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => nil, 'checksum' => nil, 'stage' => 2 }],
+                                   containers: [{ 'ref' => DIGEST_IMAGE, 'name' => 'bc', 'stage' => 1 }]))
+    assert_equal 'versioned', each_stage_pinned['grades']['environment'], 'stage 1 immutable, stage 2 versioned → weakest'
+    assert_equal 2, each_stage_pinned['counts']['stages_with_environment']
+    assert_equal 2, each_stage_pinned['counts']['stages_with_own_environment']
+  end
+
+  # A BCO's software_prerequisites apply to every step: workflow-level items
+  # cover every stage, and the coverage count says so.
+  def test_workflow_level_declarations_cover_every_stage
+    g = P.grade(np(stages: [stage(1), stage(2), stage(3)]))
+    assert_equal 'immutable', g['grades']['environment']
+    assert_equal 3, g['counts']['stages_with_environment']
+    assert_equal 0, g['counts']['stages_with_own_environment']
+    assert_equal 3, g['counts']['stages_total']
+  end
+
+  # A tool naming both a version and an image is two routes, not one: the
+  # version grades the package route, the image grades the container route.
+  # Naming the `:latest` image that actually ran must not lower the grade
+  # below not naming it (review round 1, customer skeptic).
+  def test_a_version_and_an_image_are_two_routes
+    latest = 'quay.io/biocontainers/fastqc:latest'
+    g = P.grade(np(software: [{ 'name' => 'fastqc', 'version' => '0.12.1', 'locator' => latest, 'checksum' => nil, 'stage' => nil }],
+                   containers: [{ 'ref' => latest, 'name' => 'fastqc', 'stage' => nil }]))
+    assert_equal 'versioned', g['grades']['software']
+    assert_equal 'floating', g['grades']['container']
+    assert_equal 'versioned', g['grades']['environment']
+    without_image = P.grade(np(software: [{ 'name' => 'fastqc', 'version' => '0.12.1', 'locator' => nil, 'checksum' => nil, 'stage' => nil }],
+                               containers: []))
+    assert_equal g['grades']['environment'], without_image['grades']['environment'], 'disclosing the image changes nothing'
+  end
+
+  # A BCO version is free text. Only a release-shaped string names a release.
+  def test_version_strings_grade_by_shape
+    expect = { '0.12.1' => 'versioned', '1.4-r122' => 'versioned', '2024.06' => 'versioned', 'v1.2.0' => 'versioned',
+               '5.2.21' => 'versioned', 'latest' => 'floating', 'unknown' => 'floating', 'HEAD' => 'floating',
+               'master' => 'floating', '>=1.0' => 'ranged', '1.*' => 'ranged', '1.x' => 'ranged', '3.10,<3.12' => 'ranged' }
+    expect.each do |version, level|
+      assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
+    end
+    assert_equal 'floating', P.runtime_grade('engine' => 'nextflow', 'version' => 'latest', 'locator' => nil, 'checksum' => nil).first
+  end
+
+  # The reference genome is found by file name — a guess. It is reported
+  # beside the grade; as an input it is still graded as one, so the signed
+  # grade never depends on the guess being right.
+  def test_reference_genome_is_reported_beside_the_grade_not_inside_it
+    inputs = [
+      { 'name' => 'a.txt', 'locator' => 'https://example.org/a.txt', 'checksum' => { 'sha256' => 'c' * 64 },
+        'internal' => false, 'reference_hint' => false },
+      { 'name' => 'genome.fa', 'locator' => 'https://example.org/genome.fa', 'checksum' => nil,
+        'internal' => false, 'reference_hint' => true }
+    ]
+    g = P.grade(np(inputs: inputs))
+    assert_equal({ 'grade' => 'floating', 'detection' => 'heuristic', 'count' => 1 }, g['reference'])
+    assert_equal 'floating', g['grades']['inputs']
+    assert_equal 2, g['counts']['inputs_total']
+    assert_equal 1, g['counts']['inputs_with_checksum']
+    assert_nil P.grade(np)['reference']['grade']
+  end
+
+  def test_internal_inputs_are_counted_but_not_graded
+    inputs = np.inputs + [{ 'name' => 'sum.txt', 'locator' => 'work/12/34/sum.txt', 'checksum' => nil,
+                            'internal' => true, 'reference_hint' => false }]
+    g = P.grade(np(inputs: inputs))
+    assert_equal 'immutable', g['grades']['inputs']
+    assert_equal 1, g['counts']['inputs_total']
+    assert_equal 1, g['counts']['inputs_internal']
+  end
+
+  # A symbolic ref is floating in the signed grade whatever its shape; the
+  # tag-likeness is a heuristic and is reported beside it (review round 1).
+  def test_symbolic_refs_are_floating_and_tag_likeness_stays_beside_the_grade
+    tag = P.grade(np(workflow: { 'name' => 'toy', 'version' => '1', 'repository' => 'r', 'commit' => 'v1.2.0',
+                                 'ref_kind' => 'symbolic', 'path' => nil, 'script' => nil }))
+    assert_equal 'floating', tag['grades']['workflow']
+    assert_equal({ 'kind' => 'symbolic', 'tag_like' => true, 'detection' => 'heuristic' }, tag['workflow_ref'])
+    branch = P.grade(np(workflow: { 'name' => 'toy', 'version' => '1', 'repository' => 'r', 'commit' => 'main',
+                                    'ref_kind' => 'symbolic', 'path' => nil, 'script' => nil }))
+    assert_equal 'floating', branch['grades']['workflow']
+    assert_equal false, branch['workflow_ref']['tag_like']
+    assert_equal({ 'kind' => 'commit', 'tag_like' => nil, 'detection' => 'heuristic' }, P.grade(np)['workflow_ref'])
+    assert_equal 'floating', P.workflow_grade('repository' => 'r', 'commit' => nil, 'ref_kind' => nil).first
+    assert_equal 'absent', P.workflow_grade('repository' => nil, 'commit' => nil, 'ref_kind' => nil, 'script' => nil).first
+  end
+
+  def test_outputs_digest_binds_the_checksum_column_in_any_order
+    a = [{ 'name' => 'x', 'checksum' => { 'sha256' => '1' * 64 } }, { 'name' => 'y', 'checksum' => { 'sha1' => '2' * 40 } }]
+    assert_equal P.outputs_digest(a), P.outputs_digest(a.reverse)
+    assert_match(/\A[0-9a-f]{64}\z/, P.outputs_digest(a))
+    changed = [{ 'name' => 'x', 'checksum' => { 'sha256' => '3' * 64 } }, a[1]]
+    refute_equal P.outputs_digest(a), P.outputs_digest(changed)
+    assert_nil P.outputs_digest([{ 'name' => 'x', 'checksum' => nil }])
+    assert_nil P.outputs_digest([])
+  end
+
+  def test_same_input_same_grade_and_json_native
+    a = P.grade(np)
+    b = P.grade(np)
+    assert_equal a, b
+    assert_equal a, JSON.parse(JSON.generate(a))
+    assert_equal P::PREDICATE_VERSION, a['predicate_version']
+    assert_equal GenomicsChainTier2::VERSION, a['pin_strength_version']
+    assert_match(/\A\d+\.\d+\.\d+\z/, a['pin_strength_version'])
+  end
+
+  # --- the real bundle, pinned ----------------------------------------------------
+
+  def test_fixture_grades_are_pinned
+    g = P.grade(GenomicsChainProv::Adapters::Bco.parse(File.read(FIXTURE)))
+    assert_equal 'absent', g['grade_overall']
+    assert_equal({ 'software' => 'absent', 'container' => 'absent', 'environment' => 'absent', 'inputs' => 'local_path',
+                   'workflow' => 'immutable', 'runtime' => 'versioned' }, g['grades'])
+    c = g['counts']
+    assert_equal 8, c['stages_total']
+    assert_equal 0, c['stages_with_environment'], 'nf-prov names no tool and no image for any step'
+    assert_equal 0, c['software_total']
+    assert_equal 0, c['containers_total']
+    assert_equal 8, c['inputs_total'], 'nothing in the bundle shows the run producing any of its 8 inputs'
+    assert_equal 0, c['inputs_internal']
+    assert_equal 0, c['inputs_with_checksum']
+    assert_equal 16, c['outputs_total']
+    assert_equal 0, c['outputs_with_checksum']
+    assert_nil c['outputs_digest']
+    assert_equal 376, c['params_total']
+    assert_equal 367, c['params_count']
+    assert_equal false, c['seed_recorded']
+    assert_equal({ 'grade' => nil, 'detection' => 'heuristic', 'count' => 0 }, g['reference'])
+    assert_equal({ 'kind' => 'commit', 'tag_like' => nil, 'detection' => 'heuristic' }, g['workflow_ref'])
+    inputs = g['items'].select { |i| i['category'] == 'inputs' }
+    assert_equal({ 'local_path' => 3, 'floating' => 5 }, inputs.map { |i| i['grade'] }.tally)
+    assert_equal 8, g['stages'].length
+  end
+end

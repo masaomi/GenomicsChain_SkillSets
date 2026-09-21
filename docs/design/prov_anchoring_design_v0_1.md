@@ -1,0 +1,475 @@
+# (2.5) 来歴の固定（provenance anchoring）— 設計 v0.1
+
+**日付:** 2026-09-20
+**著者:** masaomi（起草は Claude Fable 5.1、このセッション）
+**状態:** 草案 v0.1.2（2026-09-20 夜: multi-LLM review round 1 の (a)/(b) を 5 件の直しに束ねて反映——§5 段ごとの環境と版の形、§13.4-3 出力の証拠による内部入力、§6 記録の契約、§6/§8 proof の寿命と検証者の言い方、§7 配置。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は未実施）
+**前提の文書:** KairosChain L2 `genomicschain_business_model_direction_20260919`（事業上の位置づけ、§3 が主張の境界の正本）、
+GenomicsChain L2 `service_2_5_dev_plan_notes_20260920`（コードの現状）、`docs/demos/service_2_5_principle_20260920/demo.html`（原理）、
+記憶 `warranty-scope`（言葉づかいの規則）、`genomicschain_core` design v0.4.1（package は v0.5.0。SubmitCore の経路。文書は KairosChain 側、コードは `submit_core.rb` の注釈が写し）
+
+---
+
+## 0. 一行で
+
+顧客の pipeline が出した**来歴の束**（BioCompute Object か Workflow Run RO-Crate）を、顧客自身の鍵で署名して anchor に固定し、
+束の digest・固定度の等級（束の locator が第三者に何を許すか）・署名者・時刻だけを記録する。束と値は顧客の手元に残る。
+固定が主張するのは「この束はこの時刻にこの digest だった」と「等級は N」の 2 つで、「再構築できる」とは言わない。
+
+## 1. この設計が新しく作るもの、作らないもの
+
+```
+作る                                          作らない（既にある / 範囲外）
+─────────────────────────────────────────    ─────────────────────────────────────────
+入力アダプタ  束 → 正規化した来歴 (§4)        SubmitCore の経路（digest 再計算・署名検証・
+固定度の述語  正規化 → 等級 (§5)                bearer 束縛・重複回復）— genomicschain_core v0.5.0。
+verdict_spec/prov.rb  署名される同一性 (§6)     ただし core に 3 か所だけ手を入れる（§7: 登録の汎用化、
+prov_attestation.schema.json  記録の形 (§6)     idempotency の fallback、束の深さ gate）
+gc_prov_submit  anchor 側の tool (§7)         6 等級の目盛り — genomicschain_tier2/pin_strength.rb
+gc_prov_check   顧客側の tool (§7)            anchor の proof 保管 — Synoptis（TTL は §6 で明示する）
+gc_prov_verify  検証者側の tool (§7)          第二の機関目撃者 — v0.2 (§10)
+gc_prov_write   書き出し器・補完器 (§4.1)      束の形式そのもの — IEEE 2791-2020 / WRROC を使う
+client の --tier prov (§7)                    再構築と実行 — (iii)、別会社。価格 — 事業側
+```
+
+## 2. 用語
+
+| 語 | 意味 |
+|---|---|
+| 束（bundle） | pipeline の来歴を書いた 1 ファイル。`bco.json`（BioCompute Object, IEEE 2791-2020）または `ro-crate-metadata.json`（Workflow Run RO-Crate。規格の最新は 0.6 だが、nf-prov 1.7.0 が書くのは profile 0.1 — §13）。Nextflow の `nf-prov` plugin がどちらも出す（Nextflow 25.10 以上） |
+| digest | 束の canonical JSON の SHA-256。正準化の規則は名前で記録に載せる（`bundle_digest_canonicalization: kairos-sorted-json-0.1`）: 鍵を byte 順に再帰的に並べ替え、空白なし、文字列は JSON の最小 escape（非 ASCII はそのまま UTF-8）、整数はそのまま、小数は Ruby の `Float#to_s`。`KairosMcp::Manifest.canonical_json_sha256` がその実装。RFC 8785（JCS）への移行は v0.2 の候補（§10-12）。検証者は file の sha256 ではなく、この規則で digest を取り直す |
+| 等級（grade） | 束に書かれた環境が第三者に何を許すかの目盛り。`immutable / versioned / ranged / floating / local_path / absent` の 6 段。Tier-2 と同じ |
+| 固定（anchor） | digest・等級・署名者・時刻を Synoptis proof として anchor に記録すること |
+| 提出者（submitter） | 束に署名した鍵の持ち主。**顧客**。proof の `submitter_pubkey` |
+| 目撃者（attester） | proof を発行した anchor（MMP id）。GenomicsChain。proof の `attester_id` |
+| 検証者（verifier） | 束と proof id を受け取り、digest と等級を計算し直して proof と突き合わせる第三者。サービス (2.5) の役務 |
+
+## 3. 全体像
+
+```
+顧客の環境                         anchor (meeting.genomicschain.io)            検証者
+────────────────────              ─────────────────────────────────           ──────────────────
+Nextflow + nf-prov
+   │ bco.json / ro-crate-metadata.json
+   ▼
+gc_prov_check（網なし）
+   digest, 等級, signed_params
+   │
+   ▼
+gc_submit_client --tier prov
+   顧客の ed25519 鍵で
+   {mcp_tool_name, params, nonce,
+    chain_tip_hash} に署名
+   │  HTTPS, 顧客の pubkey に束縛した Bearer
+   ▼                              gc_prov_submit
+                                    束を verbatim 受領 → digest 再計算
+                                    → 等級を再導出 → 署名と一致を確認
+                                    → Synoptis proof 発行
+   ◀── proof_id, claim ──────────   束は保存しない（記録は同一性と数だけ）
+   │
+   │ 束 + proof_id を渡す（顧客の判断）
+   └────────────────────────────────────────────────────────────────────▶ gc_prov_verify
+                                                                            digest・等級を再計算
+                                    ◀── attestation_verify(proof_id) ───     proof と照合
+                                                                            「確かめられたこと／
+                                                                              確かめていないこと」を出力
+```
+
+原理デモとの対応: デモの節 2 = `gc_prov_check`、節 3 = `gc_submit_client` + `gc_prov_submit`、節 4 = `gc_prov_verify`、節 5 = (iii)（この設計の外）。
+
+## 4. 入力アダプタ — 束を正規化する
+
+**目的:** BCO と WRROC は形が違うが、等級を出すのに要る情報は同じ 7 種類。アダプタは束を読んで、この 7 種類だけを持つ
+正規化した来歴（`NormalizedProvenance`）に落とす。**digest は正規化前の束から取る**（束は verbatim が主語。正規化は等級のためだけ）。
+
+固定して記録する条件は記憶 `warranty-scope` の 7 つ。各条件が束のどこから来るか:
+
+| 条件 | BCO (IEEE 2791-2020) の出所 | WRROC の出所（規格 0.6。nf-prov は profile 0.1 を書く、§13） | 等級の出し方（§5） |
+|---|---|---|---|
+| 入力データ | `io_domain.input_subdomain[].uri` / `.sha1_checksum` | `CreateAction.object` の `File.sha256` / `contentUrl` | checksum あり→immutable、URL/DOI→`data_locator` |
+| コード（workflow 本体） | `execution_domain.script[]`、`extension_domain` SCM (repo, commit) | `ComputationalWorkflow` の `url` / `version` / `codeRepository` | commit hash（40/64 hex）→immutable。それ以外の名前→floating（tag か branch かは束に無い。tag らしさは等級の外の欄 `workflow_ref` に） |
+| ライブラリ・ツール | `execution_domain.software_prerequisites[]`（workflow 全体）と `pipeline_steps[].prerequisite[]`（段ごと） (name, version, uri, sha1_checksum) | `SoftwareApplication.softwareVersion`、`ContainerImage.sha256` / `tag` | 二経路。版は package の経路: checksum→immutable、release の形の版→versioned、範囲→ranged、それ以外→floating。image は container の経路: digest→immutable、tag→versioned、なし/latest→floating |
+| 参照ゲノム | `external_data_endpoints[]` または input のうち参照とわかるもの | `File` のうち `FormalParameter` 名が参照を指すもの | データと同じ。**参照かどうかは名前の推測**→ `reference_detection: heuristic` と記録 |
+| パラメータ | `parametric_domain[]` (param, value, step) | `PropertyValue` (name, value) | 存在の有無のみ。等級には入れず `params_count / params_total` を数える |
+| 乱数シード | パラメータのうち `seed` を含む名前で値を持つもの | 同左 | 存在の有無のみ。`seed_recorded: true/false`（false は「seed 無し」ではなく「記録に無い」） |
+| 実行環境の版 | `execution_domain.script_driver` と、同名の `software_prerequisites` 項目（版・uri・checksum） | `SoftwareApplication`(Nextflow) の `softwareVersion`、`agent` | checksum か image digest→immutable、release の形の版→versioned、範囲→ranged、それ以外の版→floating、なし→absent |
+
+### 4.1 束を出す側（producer）は差し替え可能にする — Nextflow に縛らない（09-20 追記）
+
+利用者の指摘: nf-prov を唯一の入口にすると「全部の計算を Nextflow で書く」という第三者依存が生じる。
+アダプタが読むのは **形式（BCO / WRROC）**であって nf-prov ではないので、束を出す側は複数持てる。
+
+| producer | 対象 | 自動度 | 到達できる固定度 | 状態 |
+|---|---|---|---|---|
+| Nextflow + nf-prov（既定） | Nextflow で回す pipeline | 全自動（config に 1 block。fixture の `prov.config` は 13 行） | **そのままでは `absent`**（U0 実測 §13: container もツールの版も checksum も束に無い）。`gc_prov_write --from-nextflow-run` で補うと、tag だけなら versioned、digest と checksum まで取れば immutable | v0.1。U0 済（2026-09-20、fixture あり） |
+| `gc_prov_write`（汎用の最小書き出し器。§13 以降は nf-prov 束の補完器も兼ねる） | shell・R・Python・SUSHI/ezRun など、実行系を問わない。Nextflow の実行 dir を渡せば nf-prov の束を補う | 半自動: 段の一覧（コマンド）を顧客が書き、ツールの版・container digest・入出力の checksum・パラメータ・seed・実行系の版は script が集める | 記録した分だけ。checksum を取れば immutable、取らなければ floating 止まり — 等級がそのまま見せる | **v0.1 に入れる**。Tier-3 の実行系（local / thoa）が自分の実行を束にするのにも使う |
+| SUSHI/ezRun の書き出し器 | FGCZ の SUSHI で回した解析 | 全自動（SUSHI 側に Ruby で足す） | SUSHI が持つ版情報の範囲 | v0.2 候補。SUSHI は自前なので足せる |
+| 他の実行系が自分で出す WRROC | Galaxy、CWL（cwlprov → WRROC）、WfExS | 実行系まかせ | 実行系の記録の範囲 | WRROC アダプタ（U6）で読む。Snakemake・WDL は出す物があるか未確認 |
+
+原則: **束は公開標準（BCO / WRROC）で、顧客はそれを持って GenomicsChain から離れられる。** 逆向きの縛りも作らない。
+`gc_prov_write` が出す最小の BCO は必須 domain だけを埋め、値は入れず checksum を入れる（§4 の表と同じ 7 種類）。
+
+**v0.1 は BCO だけ実装し、WRROC は v0.2。** 理由: BCO の `execution_domain` は上の表の 3 行に平らに対応し、WRROC は JSON-LD の
+`@graph` を辿る必要がある。どちらも同じ `NormalizedProvenance` に落ちるので、後から足しても §5 以降は変わらない。
+**U0 で確認済（2026-09-20、§13）:** nf-prov 1.7.0 の `bco.json` は SCM extension（repo・commit・path）を書き、`sha1_checksum` は
+入力 0/8・出力 0/16 で書かない。ツールの版と container は欄ごと無い。U0 は「nf-core/demo の test profile を 1 本走らせて
+bco.json を取る」で、fixture は `genomicschain_prov/test/fixtures/nfcore_demo_1_2_0/`。
+
+```ruby
+# genomicschain_prov/lib/genomicschain_prov/normalized.rb — U1 で実装した形（2026-09-20）。
+# software / containers を最上位に置くのは、BCO がツールを workflow 単位（software_prerequisites）で持つため。
+# inputs[]['internal'] は §13.4-3 の内部入力の規則。notes はアダプタが「無い」と見た事実（値は作らない）。
+NormalizedProvenance = Struct.new(
+  :format,          # 'bco' | 'wrroc'
+  :format_version,  # BCO の spec_version URL / WRROC の conformsTo profile
+  :producer,        # {'name','version'} か nil（束が名乗らなければ nil。nf-prov は名乗らない）
+  :workflow,        # {'name','version','repository','commit','ref_kind','path','script'}
+  :runtime,         # {'engine','version','locator','checksum'} か nil
+  :software,        # [{'name','version','locator','checksum','stage'}] runtime を除く全ツール
+  :containers,      # [{'ref','name','stage'}] software のうち locator が OCI image 参照のもの
+  :stages,          # [{'id','name','description','inputs','outputs','software','container'}]
+  :inputs,          # [{'name','locator','checksum','internal','reference_hint'}]
+  :outputs,         # [{'name','locator','checksum','mediatype'}]
+  :params_total, :params_count, :seed_recorded,
+  :notes,           # [String]
+  keyword_init: true
+)
+```
+
+## 5. 固定度の述語 — 正規化した来歴から等級を出す（「再構築十分性」とは呼ばない: 等級は locator が第三者に何を許すかであって、再構築できることではない）
+
+**規則は決定的である。** 同じ束から同じ等級が出る。顧客が自分で走らせて同じ答えを得られること（Tier-2 と同じ理由: 争えるが、水掛け論にならない）。
+
+```
+各項目 → 6 等級（image と locator は pin_strength.rb の container / data_locator。版は release の形か
+        │        どうか（§4 の表）。checksum があれば immutable）
+        ▼
+段ごとの環境 = その段に宣言された項目 ＋ workflow 全体に宣言された項目（BCO の software_prerequisites は
+   全段に効く）について、package の経路と container の経路の**強い方**（§10-8: 経路は二つ、一方で足りる）
+        │
+        ▼
+分類の等級（immutable > versioned > ranged > floating > local_path > absent）
+   environment = 段の**最弱**（round 1: 1 段だけの digest 固定で全体を上げない）
+   inputs / workflow / runtime = 項目の最弱。software / container も分類として最弱を記録する（直す場所が分かるように）
+        │
+        ▼
+全体の等級 (grade_overall) = environment・inputs・workflow・runtime の 4 つの最弱
+        │
+        ▼
+数（分母つき）: stages_with_environment / stages_total, software_total / software_immutable / ...,
+               containers_total / ..., inputs_total / inputs_with_checksum / inputs_internal,
+               outputs_total / outputs_with_checksum, params_count / params_total
+```
+
+- **最弱で決める理由:** 「再構築できるか」は一番弱い環に決まる。平均や多数決は、弱い環を隠す。最弱の規則は**必須の環**に当てる。
+  環境だけは container か package 一覧のどちらか一方で作り直せる（代替経路がある）ので、**段ごとに**二つの強い方を取り、
+  段の最弱を環境の等級とする（09-20 決定、round 1 で段ごとに改訂）。同じ tool が版と image の両方を名乗るなら、版は package の
+  経路、image は container の経路で別々に等級づけする——実際に動いた `:latest` の image を正直に書くと等級が下がる、という
+  逆の誘因を作らないため。
+- **分類が空なら absent。** 何も申告しない producer が floating を申告した producer より上に来ないため。段の網羅は数で見せ、
+  claim にも載せる（`stages_with_environment/stages_total`）。workflow 全体に 1 本だけ宣言した tool が全段を覆うという申告は
+  可能で、その真偽は `bundle_truthfulness` の外（v0.2 の検証者が `.command.run` と突き合わせる、§10-13）。
+- **署名される等級に名前の推測は入れない。** 参照ゲノム（`reference`）も、symbolic な ref の tag らしさ（`workflow_ref`）も、
+  等級の横の欄に `detection: heuristic` として出す。
+- **分類ごとの等級も記録する理由:** 全体が `floating` でも「入力は全部 checksum つき、container だけ `:latest`」と分かれば、顧客は直せる。全体だけでは直す場所が分からない。
+- **参照ゲノムの検出は推測**なので、その分類は `grade_overall` に入れず、別欄 `reference`（`grade`・`detection: heuristic`・`count`）として出す。推測を署名される同一性に混ぜない。参照らしい入力も入力としては inputs の等級に入る（推測が外れても署名される等級は変わらない）。
+- **等級が言わないこと:** 実際に再構築できるか。`immutable` でも取得先が消えていれば再構築できない。等級は「束に書かれた locator が第三者に何を許すか」であって、locator の先が生きているかではない。束に書かれた checksum は書かれたまま数え、取り直さない。記録の `not_checked` 欄に `locator_reachability` と `checksum_values_as_written` を書く。
+
+## 6. 記録 — 署名される同一性と proof の中身
+
+Tier-2 と同じ構造。**束が主語、同一性は束から導出、server が導出し直して署名と突き合わせる。** 顧客の言い分は一つも取らない。
+
+```
+Tier-1  digest subject = report.json        identity = report の欄
+Tier-2  digest subject = adjudication       identity = adjudication から導出
+Tier-3  digest subject = jobspec_json       identity = verdict_result
+prov    digest subject = 束 (verbatim)      identity = 束から導出（アダプタ + 述語）
+```
+
+**署名される欄（`SIGNED_IDENTITY_FIELDS`）:**
+
+```
+subject_ref                 "prov:sha256:<bundle_digest>"  — 束が自分を名指す。顧客の文字列を claim に入れない
+bundle_format               bco | wrroc
+bundle_format_version       spec_version / conformsTo（束の自己申告。規格 schema への適合は検査しない → not_checked）
+bundle_digest               canonical JSON sha256（server が再計算。規則は §2 の kairos-sorted-json-0.1）
+producer_name, producer_version   束の GenomicsChain extension が名乗る producer（無ければ null。nf-prov は名乗らない）
+adapter_version, predicate_version, pin_strength_version
+                            等級を出した手順の版: アダプタ、述語、PinStrength（= genomicschain_tier2 の版）。
+                            検証者は三つが手元と一致するときだけ再導出する
+grade_overall               6 等級
+grade_software, grade_container, grade_environment, grade_inputs, grade_workflow, grade_runtime
+stages_total, stages_with_environment, stages_with_own_environment
+software_total, software_immutable, software_versioned, software_ranged, software_floating, software_local_path, software_absent
+containers_total, containers_immutable, containers_versioned, containers_ranged, containers_floating, containers_local_path, containers_absent
+inputs_total, inputs_with_checksum, inputs_internal
+outputs_total, outputs_with_checksum, outputs_digest   — 出力の checksum 列の sha256（値ではなく列の digest。checksum は書かれたまま）
+params_count, params_total, seed_recorded
+workflow_repository_sha256, workflow_commit  — repository は URL の sha256（私設 repo の名前を台帳に出さない）。commit は SCM extension の
+                            scm_commit そのまま（hash か名前）。無ければ null。tag らしさの推測 `workflow_ref` は署名の外（§5）
+```
+
+**server が決める欄（署名の外）:** `trust_tier = 'self_reported'`（提出者＝顧客自身の申告。Tier-2 と同じ語）、`toolchain`
+（anchor の Ruby と platform。Tier-2 では digest subject の中にあったので署名できたが、束は grader の interpreter を持たないので
+署名しない——round 1）、`bundle_digest_canonicalization`、`not_checked`（builder が固定した列: `locator_reachability`,
+`bundle_truthfulness`, `bundle_schema_conformance`, `checksum_values_as_written`, `reference_genome_identification`。schema は
+enum で固定し、client が送ってきた値は捨てる）。
+**記録に入れないもの:** 束の本文、入力・出力の locator の列、パラメータの値、repository の URL。すべて digest で束縛し、顧客の手元に残す。
+Synoptis の evidence 上限は 64 KB（`Config.max_evidence_size`）だが、記録は同一性と数だけ（試算 2.3 KB: §6 の欄を fixture の値で組み、
+署名つき operator を含めて canonical JSON にした大きさ。U3 で実測に置き換える）なので余裕がある。
+
+**束を残さない（不変条件、round 1 で明文化）:** anchor は束を 1 回の導出の間だけ memory に持ち、disk にも log にも書かない。
+HTTP の access log は request body を記録しない設定にし、例外の trace は `params` を伏せる。束には絶対 path と全 param の値が
+入る（§10-11 ii）ので、これが「束は顧客の手元に残る」という約束の実体。
+
+**束の入口の上限（Gate A、round 1）:** 束は raw bytes で 2 MB まで、JSON の深さは 32 まで、`restricted_subset!`（NaN・U+2028 等の
+拒否）を通す。Tier-2 の `dos_gate!`（64 KB）は束には**当てない**——nf-core/demo の束は `JSON.generate` で 57.6 KB（実測）、補完後は
+試算 63.8 KB（round 1 の persona の計算。file は未作成）で、rnaseq 級は入口で弾かれてしまう。深さだけを見る gate を core に足す（§7）。
+
+**proof の寿命（round 1）:** Synoptis の既定 TTL は 86400 秒（24 時間）で、`SynoptisAttestor#issue` は TTL を渡していない。
+prov の proof は attestor が明示の TTL を渡す（3153600000 秒 = 100 年。KairosChain の `external_commitment_created` の記録に
+前例）。検証者は `expired` を「TTL を過ぎた」という鮮度の印として印刷し、「記録が無効」とは書かない（Synoptis の Verifier 自体は
+expired を `valid: false` で返すので、`gc_prov_verify` はその error を鮮度として読み替える）。
+
+**claim 文字列:** `prov:<predicate_version>:<grade_overall>:<stages_with_environment>/<stages_total>:<bundle_digest>:<submission_key>`
+例: `prov:prov-predicate-0.2.0:absent:0/8:9bd92601…:<key>`。台帳を眺める人が、どの規則の版で出た等級か、段の何割を環境が
+覆っているかを claim だけで読めるように（round 1: 1 段だけ固定した束が `immutable:30` と見えないため）。Tier-2 の
+`tier2:<lock_state>:<proposed_demotions>:...` と同じ発想。
+
+**submission_key** は SubmitCore が `{digest_subject_hash, signed_identity, operator_pubkey}` から作る（既存）。同じ束を同じ鍵で再提出すると
+既存 proof の回復になる（既存の recovery branch）。別の鍵で同じ束を出せば別の proof になる — これは仕様。誰が固定したかは鍵で決まる。
+
+**schema:** `genomicschain_prov/schemas/prov_attestation.schema.json`（置き場所は §7）。`record_type: prov_attestation`、
+`record_version: 0.1`、`mcp_tool_name: gc_prov_submit`、`additionalProperties: false`。title は「pin strength」で、「再構築十分性」とは
+書かない（等級は locator が第三者に何を許すかであって、再構築できることではない）。`not_checked` は必須で、builder が固定した
+5 項目の列（上）を enum で持つ。
+
+## 7. 道具と置き場所
+
+| tool / script | 置き場所 | 動く場所 | 網 | 何をするか |
+|---|---|---|---|---|
+| `gc_prov_check` | `genomicschain_prov/tools/` | 顧客の workstation（off-anchor） | 使わない | 束を読み、digest・等級・数・`signed_params` を出す。`--json` で機械可読 |
+| `gc_submit_client.rb --tier prov` | `scripts/`（既存に 1 tier 足す） | 顧客の workstation | anchor へ HTTPS | `signed_params` に署名して `gc_prov_submit` を呼ぶ。`--dry-run` / `--print-only` は既存のまま |
+| `gc_prov_submit` | `genomicschain_prov/tools/`（prov の `skillset.json` の `anchor_profile_tool_classes`。core の登録を汎用化して読む） | anchor のみ | — | Tier-2 submit と同じ骨。ただし束の gate は §6 の Gate A。`dry_run` で `signed_params` を返す |
+| `gc_prov_verify` | `genomicschain_prov/tools/` | 検証者（GenomicsChain または第三者） | anchor の `attestation_verify` を読む | 束 + proof_id → digest・等級を再計算 → proof の manifest と照合 → 「確かめたこと／確かめていないこと」 |
+
+**package の依存:**
+
+```
+genomicschain_prov  ──requires──▶  genomicschain_core（SubmitCore, Manifest）
+                    ──requires──▶  genomicschain_tier2（PinStrength と、その版）  ← v0.1 はこれで行く。
+                                                                              PinStrength を core へ移すのは候補、v0.1 では動かさない
+```
+
+core → prov の向きの依存は作らない（round 1: `Skillset#load!` は `tools/*.rb` を anchor_profile に関係なく eager に require するので、
+core に prov を require する file を置くと、prov の無い node——team workstation の core + tier1——で core ごと落ちる）。
+`verdict_spec/prov.rb`・`prov_submit.rb`・`gc_prov_submit`・schema は **genomicschain_prov に置く**。core に入れる変更は 3 か所だけ:
+(1) `AnchorProfileRegistration` が自分の `skillset.json` だけでなく、どの skillset の `anchor_profile_tool_classes` も読む、
+(2) `SubmitCore.build_response` の `idempotency_key` の fallback に `bundle_digest` と `grade_overall` を足す（今のままだと prov は
+鍵だけの定数になる）、(3) 深さだけを見る gate（`Manifest.depth_gate!`）。
+
+配備の表（`genomicschain_core/plugin/SKILL.md` の表の anchor の行を直し、顧客 workstation と検証者の 2 行を足す）:
+
+| Node | Packages | anchor_profile | 使う tool |
+|---|---|---|---|
+| anchor | core + tier1 + tier2 + tier3 + **prov** | true | `gc_prov_submit` |
+| 顧客 workstation | core + tier2 + **prov** | false | `gc_prov_check`, client |
+| 検証者 | core + tier2 + **prov** | false | `gc_prov_verify` |
+
+**顧客の鍵と Bearer:** 既存のとおり、顧客が `--keygen` で ed25519 鍵を作り、GenomicsChain が `gc_issue_bound_token.rb` で
+その pubkey に束縛した Bearer を発行する（発行後に anchor の再起動が要る — 既知の運用制約）。
+署名鍵は顧客の手元にだけある。GenomicsChain は失効も回転もできない。これが「鍵の所有」の堀の実体。
+
+## 8. 検証者が言えること・言えないこと（`gc_prov_verify` の出力の形）
+
+```
+確かめたこと（束と proof の manifest から、この tool 自身が）
+  - 束の digest = proof の bundle_digest（§2 の規則で取り直す。file の sha256 ではない）
+  - 等級 = proof の grade_overall と各分類（proof の adapter_version / predicate_version / pin_strength_version が
+    手元の版と一致するときだけ再導出する。違えば「版が違うので再導出していない」と書き、不一致とは書かない）
+  - 提出者の署名（manifest.operator の ed25519 署名を、提出者の公開鍵だけで検証。anchor の鍵は要らない）
+  - 段 N 本のうち環境あり k、software M 本のうち immutable a / versioned b / ...、入力 K 本のうち checksum つき k'
+anchor が言っていること（この tool は確かめていない。--anchor-pubkey が渡されたときだけ検証に移す）
+  - 時刻 T に目撃した（attester_id、timestamp、anchor の署名）。鍵が無い間は chain_tip_hash が時刻の下限
+  - proof の鮮度（expired は「TTL を過ぎた」であって「記録が無効」ではない。timestamp と ttl を印刷する）
+確かめていないこと（not_checked をそのまま写す）
+  - locator の先が今も取得できるか
+  - 束が実行を正しく写しているか（producer と補完器の出力を信じている）
+  - 束が規格の schema に適合しているか／束に書かれた checksum が正しいか（書かれたまま数えている）
+  - 参照ゲノムが何だったか（記録に無い）
+  - 出力が正しいか、再構築して同じ出力が出るか  ← (iii) の仕事
+```
+
+言葉づかいは記憶 `warranty-scope` の規則に従う: 「固定した」「観測した」と書き、「保証」は記録と手順にだけ、「再現できる」は書かない。
+
+**前提の穴（この設計の外だが、`gc_prov_verify` が第三者に効くために要る）:** anchor の公開鍵が配られていないので、
+第三者は proof の署名を自分で検証できない（記憶 `warranty-scope` の GxP 前 2 件の ①）。v0.1 の `gc_prov_verify` は
+anchor の `attestation_verify` を信じる形で書き、公開鍵の配布は別件として起票する。
+
+## 9. 実装の順番（完了できる単位、Principle 1）
+
+| 単位 | 中身 | 完了の印 |
+|---|---|---|
+| U0 | nf-core の test profile（例 `nf-core/rnaseq -profile test`）を nf-prov つきで 1 本走らせ、`bco.json` と `ro-crate-metadata.json` を fixture として `genomicschain_prov/test/fixtures/` に置く | 2 ファイルがある。各欄がどこまで埋まっているかを 1 表にして L2 に記録 |
+| U1 | BCO アダプタ `adapters/bco.rb` → `NormalizedProvenance` | `adapter_bco_test.rb`: fixture から 7 種類が取れる。空欄は nil |
+| U1b | 汎用の最小書き出し器 `tools/gc_prov_write.rb`（§4.1）: 段の一覧を受け取り、版・digest・checksum・パラメータ・seed・実行系の版を集めて BCO を書く。Tier-3 executor から呼べる形 | `prov_write_test.rb`: 2 段の shell 計算（デモの 223, 553, 2）から BCO が出て、U1 のアダプタで読める。checksum を省くと等級が floating になる |
+| U2 | 述語 `predicate.rb`（PinStrength を呼ぶ） | `predicate_test.rb`: 手書きの小さな正規化来歴 6 つで 6 等級が出る。fixture の等級が固定される（数値を test に書く） |
+| U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`。core の 3 か所（§7） | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 24 時間でない 1 本、`idempotency_key` が束ごとに違う 1 本を足す |
+| U4 | `gc_prov_check` と client の `--tier prov` | `submit_client_test.rb` に prov の 1 本。使い捨て local anchor で dry_run → 実提出 → 回復まで（09-09 の Tier-2 と同じ手順） |
+| U5 | `gc_prov_verify` | fixture + local anchor の proof で「確かめたこと／いないこと」が出る。改竄した束で不一致が出る |
+| U6 | WRROC アダプタ（v0.2） | 同じ fixture の `ro-crate-metadata.json` から U1 と同じ 7 種類 |
+| U7 | 第二の機関目撃者（v0.2）— proof_id と時刻に別鍵で countersign する protocol | 設計から |
+
+U0〜U5 が v0.1。U0 を先にするのは、アダプタの欄名を実物で決めるため（§4 の未確認）。
+
+## 10. 決めていないこと・検証が要ること
+
+1. ~~nf-prov の `bco.json` が `sha1_checksum` と SCM extension を埋めるか（U0 で見る）~~ **U0 で判明（2026-09-20、§13）**: SCM は埋める（remote 起動時）、checksum は入力にも出力にも無い、ツールの版と container は欄ごと無い。顧客側の補完手順は `gc_prov_write --from-nextflow-run`。**決定（09-20、unknowns pass）**: 補完で足す sha256・producer を載せる GenomicsChain の `extension_domain` の schema URL は `https://genomicschain.ch/schemas/bco_extension_genomicschain_v0_1.json`。schema file は v0.1 の実装と同時に repo（`genomicschain_core/schemas/`）に作り、公開は anchor の公開鍵と同じ時期（売る前）
+2. `subject_ref` を `prov:sha256:<digest>` にするか、顧客が付ける run 名を許すか。v0.1 は前者（claim に顧客の文字列を入れない）
+3. anchor 公開鍵の配布方法（§8 の穴）。この設計の外だが、(2.5) を第三者に売る前に閉じる
+4. 第二の目撃者の protocol（U7）
+5. PinStrength を core へ移すか（prov が tier2 に依存する形を続けるか）
+6. 価格（事業側。stage 3 の実測後）
+7. 有料化の時期は事業側の判断（09-20 確定）。この設計の実装はその前に進める
+8. ~~container を使わない実行の扱い~~ **決定（2026-09-20）: 環境 = container と software の強い方**（§5 に反映）。U2 で顕在化した
+   問題: 「分類が空なら `absent`」の規則をそのまま 5 分類に当てると、container 無しの実行——SUSHI/ezRun、R script、conda だけの
+   環境——が全体 `absent` 止まりになる。環境を作り直す経路は二つあり一方で足りるので、最弱の規則は必須の環にだけ当てる。
+   両経路の等級は記録に残るので、「container は :latest だが package は hash 固定」も読める
+9. **runtime の上限**（同上）: 「版あり → versioned」なので、runtime に checksum か digest が無い限り全体は `versioned` を超えない。
+   アダプタは runtime の `locator` と `checksum` を読むようにしてあり、補完器が Nextflow の framework jar の sha256 か実行 image の
+   digest を書けば immutable に届く。**決定（09-20、unknowns pass）: 書く。** 補完器は実際に動いた Nextflow の framework jar の sha256 を runtime の
+   checksum に入れる。jar の置き場は導入法で違う: launcher 導入なら `~/.nextflow/framework/<版>/`、conda 導入なら
+   `<env>/share/nextflow/dist/<版>/nextflow-<版>-one.jar`（U0 の machine はこちら）。補完器は `NXF_HOME` と
+   `nextflow` 実行ファイルの場所から探し、見つからなければ checksum を nil のまま残す（versioned 止まり）
+10. **補完の真偽**（09-20、unknowns pass で決定）: 補完器が顧客の machine で書く値（ツールの版・image の digest・file の checksum）は
+    anchor では確かめない。v0.1 の判は顧客の自己申告（`trust_tier = self_reported`）で、記録の `not_checked` に `bundle_truthfulness`
+    を残す。補完の再導出は v0.2 の検証者の判（`prov_verified`、§12）の仕事
+11. **宣言した未決（Open Unknowns、09-20 の unknowns pass）**: (i) ~~内部入力の規則は Nextflow の慣習に依っている~~ round 1 で解消:
+    規則は「同じ束の中で出力（その locator か filename）として現れる locator」だけを内部とし、path の慣習には依らない（§13.4-3）。(ii) 束には絶対 path と全
+    param の値が入る。記録には入らないが、検証者に束を渡すかどうかは顧客の判断で、v0.1 は伏字の仕組みを持たない。(iii) 補完した
+    束は補完器を再実行しても同じ bytes にならない（`object_id`・時刻）。v0.1 は要求しない——digest はこの file を指す
+12. **正準化の規則**（round 1）: v0.1 は `kairos-sorted-json-0.1`（§2）を記録に名前で載せる。RFC 8785（JCS）への移行は v0.2 の候補
+    ——この記録型には古い署名が無いので移れる
+13. **等級の網羅は数で見せる**（round 1）: workflow 全体に 1 本だけ宣言した tool が全段を覆うと申告する束は `immutable k/N` と読めるが、
+    その真偽は `bundle_truthfulness` の外。v0.2 の検証者の判が `.command.run` と突き合わせる。補完器は段ごとの `prerequisite[]` を
+    書くので、補完した束では段の網羅が数に出る
+
+## 11. デモ → 設計の対応表
+
+| デモ（`demo.html`） | 設計 |
+|---|---|
+| 束の JSON（コミットつき） | BCO / WRROC。コミットは使わない（束は checksum を持つ。伏せたい値は束に入れない、が実運用の形） |
+| 環境の固定を 4 つから選ぶ | §5 の述語が束から自動で出す。選ばない |
+| 正準 JSON → SHA-256 | `Manifest.canonical_json_sha256`（規則は §2） |
+| 顧客の鍵で署名 → 台帳 | client + `gc_prov_submit` → Synoptis proof |
+| 第二の目撃者ボタン | U7（v0.2） |
+| 検証者の「分かること／分からないこと」 | `gc_prov_verify` の出力（§8） |
+| 再構築して実行 | (iii)。この設計の外 |
+
+## 12. 判の積み重ね — 誰が、何を言えるか（v0.2 候補、2026-09-20 追記）
+
+利用者の指摘（09-20）: §8 の「台帳が言うこと／言わないこと」は**顧客の判 1 枚**の話である。検証した人、再計算した人、
+規制検査者がそれぞれ自分の鍵で判を押すと、言えることが一段ずつ増える。各段の主張は、その人が実際にやったことの範囲を出ない。
+主語は全部同じ束の digest なので、台帳の上では「同じ指紋を指す判の列」になる。
+
+| 判 | claim 種別 | 署名する鍵 | 言えるようになること | まだ言えないこと | 置き場所 |
+|---|---|---|---|---|---|
+| 顧客の判 | `prov` | 顧客 | この束が時刻 T にこの digest だった。等級 N。鍵 X が固定した（§6） | 一致・再構築・適合・正しさ | v0.1 |
+| 検証した人の判 | `prov_verified` | 検証者（GenomicsChain か、顧客が指名した第三者） | 束から digest を取り直したら台帳と一致した。段の数・ツール・版・等級を読んだ。locator の到達性を検査したなら、その結果（日付つき） | 再構築・適合・正しさ | v0.2。`gc_prov_verify` の出力（§8）をそのまま proof にする |
+| 再計算した人の判 | `prov_reproduced` | 再計算者（(iii)、別会社） | **観測**: 日付・条件（実行系の版、許容 ε、回数）・記録だけから作り直せたか（不足 n 件）・出力が一致したか。不一致も失敗もそのまま記録（記憶 `warranty-scope`） | 適合・正しさ | (iii) 側。形は Tier-3 の二軸判定と同じ |
+| 規制検査者の判 | `prov_reg_check` | 検査者（監査人・notified body・当局の検査官） | 規則の名前・版・要件・検査した範囲・日付と、満たす／満たさない。**検査者の名前で** | 正しさ | GenomicsChain は書式と検証を提供し、運ぶだけ。自分では「適合」を書かない |
+| 誰の判でも | — | — | — | 結果が科学的に正しい | — |
+
+設計上の含意（v0.2 で決めること）:
+
+- **proof を「同じ subject_ref の列」として引ける**必要がある。いまの `ProofLookup` は submission_key で 1 本を引く。subject_ref（束の digest）で列を返す読み口を足す。`gc_prov_verify` はこの列を読んで §8 の出力を組む。
+- **claim 種別ごとに verdict_spec を分ける**（Tier-1/2/3 と同じ形）。各 spec の「言えること」を schema の `claims` と `not_checked` に機械可読で書く。
+- **鍵**: 検証者・再計算者・検査者にも、それぞれ pubkey に束縛した Bearer を発行する（既存の `gc_issue_bound_token.rb`）。誰の判かは proof の `submitter_pubkey`。anchor の `attester_id` は全 proof に共通で、目撃者の役。
+- **規則の版**: `prov_reg_check` は規則の識別子と版を持つ。`genomicschain_regwatch` の watchlist id と baseline digest をそのまま使えば、変更追跡が「この判が依拠した条文が動いた」と署名つきで言える。ここが並行製品との接点。
+- **未決**: (iii) の判を同じ anchor に載せるか（別会社の proof を GenomicsChain が目撃する形になる）。検査者が自分の鍵を anchor に登録する手順。判の取り消し（既存の revoke）が「列」の中で何を意味するか。
+
+**判の種別の入場規則（09-20 追記）:** 台帳に載せる判は「第三者が同じ手順で導き直せる主張」に限る。
+指紋・等級・照合結果・条件つきの再実行の観測・規則の版と範囲つきの点検は導き直せる。「結果が科学的に正しい」は
+導き直す手順がないので載せない（peer review 的な判は作らない）。判そのものへの異議（著者が同じ論文と同じ規則で
+再検査を求める）は導き直せるので範囲の内側。外部の review の表明は、将来必要なら DOI つきの参照として同じ指紋に
+結びつけるだけにし、GenomicsChain は作らない。
+
+原理デモ v2 の場面 7・9・10・11 がこの節に対応する。
+
+## 13. U0 の実測 — nf-prov の束は何を書き、何を書かないか（2026-09-20 追記）
+
+U0（§9）を回した。nf-core/demo 1.2.0（commit `555d145b9e701c012f53996a2f17efb2daff5fe7`）を nf-prov 1.7.0・Nextflow 26.04.6・Docker で 1 本、
+8 工程すべて完走（failed 0）。束 2 本は `genomicschain_prov/test/fixtures/nfcore_demo_1_2_0/` に verbatim で置いた（由来は同 dir の README）。
+記録は GenomicsChain L2 `u0_nfprov_bundle_fields_20260920`。走らせる前に nf-prov の source（`renderers/BcoRenderer.groovy`、
+`renderers/WrrocRenderer.groovy`）を読み、実物が source どおりであることを欄ごとに確かめた。
+
+### 13.1 欄の埋まり方（§4 の 7 条件）
+
+| 条件 | BCO（nf-prov 1.7.0） | WRROC（同） |
+|---|---|---|
+| 入力データ | 8 本、URI のみ。`sha1_checksum` 0/8（https 5、`work/tmp/` 相対 2、outdir 内の `file://` 1） | `File` 10 本、`sha256` 0/10 |
+| コード | SCM extension に repo・commit・path（remote 起動のとき） | `codeRepository`、`version` = commit |
+| ライブラリ・ツール | **Nextflow の 1 行だけ**。工程のツールは無い | `SoftwareApplication` 8 本、**版は 0/8** |
+| container | **欄が無い** | `ContainerImage` 0 本。`CreateAction` 25 本に container の欄なし |
+| 参照ゲノム | demo には無い（`parametric_domain` に iGenomes の既定値が 300 本以上並ぶだけ） | 同左 |
+| パラメータ | 376 本。値あり 367、文字列 `"null"` 9（未設定を nf-prov が文字列化したもの）。大半が既定値 | `PropertyValue` 23 本（null は落とす） |
+| 乱数シード | 無し | 無し |
+| 実行環境の版 | Nextflow 26.04.6 | `runtimePlatform` "Nextflow 26.04.6" |
+
+このほか: `object_id` は render ごとの乱数 UUID なので、同じ実行でも render し直せば別の束になる。`created`・`modified` は
+workflow の開始時刻（render 時刻ではない）。
+`etag` は nf-prov 独自の非正準 hash。WRROC の `conformsTo` は `wfrun/{process,workflow,provenance}/0.1`——規格の最新 0.6 ではない。
+
+### 13.2 §5 の述語をそのまま当てると
+
+| 分類 | 等級 | 理由 |
+|---|---|---|
+| workflow | immutable | scm_commit 40 hex |
+| runtime | versioned | Nextflow 26.04.6 |
+| software | **absent** | Nextflow 以外のツールが 0 本 |
+| container | **absent** | 欄が無い |
+| environment | **absent** | 8 段とも環境の宣言なし（`stages_with_environment` 0/8） |
+| inputs | local_path | 8 本すべて外部（束の中に、この run が作ったという出力の証拠が無い）。https 5 本は floating、`work/tmp/` 2 本と outdir 内の 1 本は local_path。補完器が hash を足せば immutable |
+| **全体** | **absent** | environment（= 段の最弱 = absent）・inputs・workflow・runtime の 4 つの最弱 |
+
+つまり既定の producer の束は、そのままでは `absent` になる（実測は 1 本。renderer の source がツール・container・checksum を
+書かないので、nf-prov 1.7.0 の BCO ならどの run でも同じ）。正直だが、見出しとしては役に立たない。
+§4.1 の旧文「container digest・checksum が出れば immutable」は nf-prov 単体では起きない。
+
+### 13.3 足りない情報は同じ実行 dir にある
+
+| 足りないもの | 在処 | 取れる等級 |
+|---|---|---|
+| ツールの版 | `results/pipeline_info/*_software_mqc_versions.yml`（cowpy 1.1.5、fastqc 0.12.1、seqtk 1.4-r122、nf-core/demo v1.2.0-g555d145、Nextflow 26.04.6） | versioned |
+| container の名前 | `work/<hash>/.command.run` の `docker run` 行（4 種、すべて tag つき。例 `quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0`）。module の `container` directive は 4 本中 3 本が同じ文字列で、seqtk だけ registry 無し（`biocontainers/seqtk:…`。`quay.io/` は config の `registry` が補う）——実際に動いた名前は `.command.run` で取る | versioned |
+| container の digest | `docker images --digests`（4 image すべて sha256 あり。例 fastqc `sha256:e194048d…`） | immutable |
+| file の checksum | 実 file を hash する（staging された remote 入力、`work/`、`results/`） | immutable |
+
+trace の既定 14 列に container 列は無い（`trace.fields` で足せる）。WRROC が crate dir に落とす解決済み `nextflow.config`（40 KB）には
+`registry = 'quay.io'` しか無く、container directive は module 側にある。
+
+### 13.4 設計への帰結（提案。operator が受け入れれば v0.1 の一部）
+
+1. **`gc_prov_write` は nf-prov 束の補完器も兼ねる。** `gc_prov_write --from-nextflow-run <launch_dir>` が `bco.json`・`*_versions.yml`・
+   各工程の `.command.run`（か container 列つき trace）・`docker image inspect`・file の hash を読み、補完した BCO を書く:
+   各段の `prerequisite[]` にその段のツール {name, version, uri: `image@sha256:…`}（段ごとの環境の網羅が数に出るように。workflow
+   全体の `software_prerequisites[]` にも同じ列）、runtime（Nextflow）の項目に framework jar の sha256（§10-9）、io の各項目に
+   `sha1_checksum`（規格の欄は SHA-1）、同じ file の sha256 は GenomicsChain の `extension_domain` 項目に。等級は集めた分だけ上がる
+   （tag のみ → versioned、digest と checksum → immutable）。述語は最弱のままで、何も隠さない。
+2. **WRROC アダプタ（v0.2）は profile 0.1 と 0.6 の両方を受ける。**
+3. **内部入力の規則（round 1 で改訂）**: 同じ束の中で出力として現れる locator（`pipeline_steps[].output_list` か
+   `io_domain.output_subdomain`）を持つ入力だけを内部（`inputs_internal`）として `inputs_total` から外す。work dir や outdir の path
+   prefix は使わない——prefix は producer が選ぶ値で、`outdir=/data` とすれば弱い入力が等級から消える（round 1 で 3 席が指摘、
+   実際に再現された）。nf-prov の workflow 入力は元々「task が作らなかった入力」なので、その束ではこの規則は何も内部にせず、
+   run が作った一時 file は書かれたとおり checksum 無しの local path として数える（補完器が hash を足せば immutable）。
+4. **パラメータ**: `params_total` は `parametric_domain` の長さ（ここでは 376）。既定値で膨らむが「存在の有無のみ」の方針は変えない。
+   `seed_recorded` は名前に seed を含み**値を持つ** param の有無（値が `"null"` なら false）。
+5. `object_id` の乱数と時刻は設計に影響しない。digest はこの file を指す。同じ file の再提出は同じ proof の回復、render し直した file は
+   別の proof——それで正しい。
+6. `extension_domain` の `extension_schema` URL は **決定（09-20）**: `https://genomicschain.ch/schemas/bco_extension_genomicschain_v0_1.json`
+   （§10-1。schema file は repo に、公開は売る前）。
+
+### 13.5 顧客の手順への影響
+
+Nextflow の顧客は run のあとに 1 手順増える: `gc_prov_write --from-nextflow-run` → `gc_prov_check` → client。
+これは「補完しなければ等級 absent」と正直に見せた上での選択肢であって、補完を強制はしない。上流（nf-prov）に
+container・ツールの版・checksum を BCO に書く提案を出す道もある。出せば補完器の仕事は減るが、受理と配布は先方の時間で決まる。
