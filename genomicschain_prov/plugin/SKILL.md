@@ -5,8 +5,8 @@ description: Read a pipeline's provenance bundle (BioCompute Object; Workflow Ru
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.0 —
-design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
+Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.1
+(adapter 0.3.0, predicate 0.3.0) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
 
 ```
 customer's pipeline ──▶ bundle (bco.json / ro-crate-metadata.json)
@@ -49,32 +49,47 @@ Fixture: `test/fixtures/nfcore_demo_1_2_0/` (verbatim bundles + the run artifact
 
 - **Runtime** = the engine `execution_domain.script_driver` names; its version is the
   `software_prerequisites` entry of the same name. That entry is not counted as a tool.
+- **Stage** = position after sorting the steps on `step_number` (step numbers 10/20/30 are stages
+  1/2/3); every per-stage item carries that position. A duplicated or non-integer `step_number` is a
+  `FormatError` (review round 2).
 - **Software** = workflow-level `software_prerequisites` + every step's `prerequisite`, de-duplicated
-  on (name, version, locator). **Containers** = the software entries whose locator is an OCI image
-  reference (`docker://…`, `…@sha256:…`, or `registry/repo:tag`).
-- **Internal inputs** (design §13.4-3, revised after review round 1): an input is internal only when
-  the same locator appears as a step output or a published output in the bundle. Path prefixes are
-  not evidence — they are the producer's choice. Counted separately (`inputs_internal`).
+  on (name, version, locator, **stage**): a tool two steps declare is two items. **Containers** = the
+  software entries whose locator is an OCI image reference (`docker://…`, `…@sha256:…`, or
+  `registry/repo:tag`).
+- **Internal inputs** (design §13.4-3, revised after review round 2): an input is internal only when
+  some step's `output_list` names its `uri` at an earlier position than every step's `input_list`
+  that names it. `filename` labels are not matched; a published output carries no step and is not
+  ordering evidence; an input no step reads, and an in-place overwrite (one step reads and writes the
+  same locator), stay external and graded. Path prefixes are not evidence — they are the producer's
+  choice. Counted separately (`inputs_internal`).
 - **Reference genome** is a guess by file name and is reported as `reference_hint`, never mixed into
   the signed grade.
 - **Producer** is nil unless the bundle states it (nf-prov does not).
 
 ## The predicate (U2) — `Predicate.grade(normalized)`
 
-Images and locators are graded by `GenomicsChainTier2::PinStrength`; a version string grades by
-shape (release-shaped → `versioned`, a constraint or wildcard → `ranged`, `latest`/`unknown` →
-`floating`); a checksum is `immutable`. The environment can be rebuilt by either of two routes — a
-container image or a package list — so **per stage** (own items plus inherited workflow-level items)
-`environment` is the stronger of the two routes, and the category is the **weakest stage** (review
-round 1, 2026-09-20: one digest-pinned image must not lift a pipeline whose other stages name
-nothing). A tool naming both a version and an image is graded on both routes separately. The overall
-grade is the weakest of environment / inputs / workflow / runtime. An empty category is `absent`, not
-skipped. Symbolic refs are `floating`; tag-likeness and the reference-genome guess are reported
-beside the grades (`workflow_ref`, `reference`), never inside them. `pin_strength_version` (= the
-tier2 package version) is part of the signed procedure. One consequence stays open in design §10-9:
-a runtime known only by version holds the overall grade at `versioned`. `counts` carries the numbers the record signs (stages, per-level
-software and container counts, inputs with checksum / internal, outputs with checksum, `outputs_digest`
-over the checksum column, params, seed). `items` carries each item's grade and reason for people.
+Images are graded by `GenomicsChainTier2::PinStrength.container`; a version string grades by the rule
+in words at the top of `predicate.rb` (drop a leading tool-name token, read the first token, drop an
+epoch; release-shaped → `versioned`, a constraint / wildcard / literal `x` token → `ranged`, a
+`latest`/`unknown`/`SNAPSHOT`-class token anywhere → `floating`); a checksum field is `immutable`. An
+input's locator alone never grades above `versioned` (DOI) / `floating` (URL) / `local_path` — a
+hash-like substring in a locator is not a checksum (round 2). The environment can be rebuilt by
+either of two routes — a container image or a package list — so **per stage** `environment` is the
+stronger of the two routes over the items the stage declares **itself**; a stage that declares
+nothing falls back to the workflow-level items, and the fallback is never added to a stage's own
+declaration (round 2). The category is the **weakest stage** (round 1: one digest-pinned image must
+not lift a pipeline whose other stages name nothing), and `absent` when there are no stages. A tool
+naming both a version and an image is graded on both routes separately. The overall grade is the
+weakest of environment / inputs / workflow / runtime. An empty category is `absent`, not skipped.
+Symbolic refs are `floating`; tag-likeness, the reference-genome guess and the seed's presence are
+reported beside the grades (`workflow_ref`, `reference`, `seed`), never inside them.
+`pin_strength_version` is `PinStrength::RULE_VERSION` (the rule's own version, not the tier2 package's)
+and is part of the signed procedure; `outputs_digest_rule` names how `outputs_digest` is derived. One
+consequence stays open in design §10-9: a runtime known only by version holds the overall grade at
+`versioned`. `counts` carries the numbers the record signs (stages total / with environment / with own
+environment, per-level software and container counts, inputs with checksum / internal, outputs with
+checksum, `outputs_digest` over the checksum column, params); `coverage` is the `own/total` the claim
+carries. `items` carries each item's grade and reason for people.
 
 ## Tests
 

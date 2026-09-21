@@ -115,9 +115,12 @@ class AdapterBcoTest < Minitest::Test
 
   # --- a bundle carrying what nf-prov omits ----------------------------------------
 
-  # A tool with a version and a digest-pinned image, a per-step prerequisite,
-  # SHA-1 on an input, SHA-256 in the GenomicsChain extension, a seed, a
-  # reference genome named as such, and both kinds of internal input.
+  # A tool with a version and a digest-pinned image, per-step prerequisites
+  # (the same tool in two steps), SHA-1 on an input, SHA-256 in the
+  # GenomicsChain extension, a seed, a reference genome named as such, one
+  # internal input (made by step 1, read by step 2), one in-place overwrite
+  # (step 3 reads and writes the same locator) and one published output that
+  # is also a workflow input.
   def enriched_bco
     {
       'spec_version' => 'https://w3id.org/ieee/ieee-2791-schema/2791object.json',
@@ -127,8 +130,13 @@ class AdapterBcoTest < Minitest::Test
           { 'step_number' => 2, 'name' => 'divide', 'description' => 'step 2',
             'prerequisite' => [{ 'name' => 'bc', 'version' => '1.07.1',
                                  'uri' => { 'uri' => 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0' } }],
-            'input_list' => [{ 'uri' => 'work/ab/cdef/sum.txt' }],
+            'input_list' => [{ 'uri' => 'work/12/34/sum.txt' }],
             'output_list' => [{ 'uri' => 'work/ab/cdef/out.txt' }] },
+          { 'step_number' => 3, 'name' => 'polish', 'description' => 'step 3',
+            'prerequisite' => [{ 'name' => 'bc', 'version' => '1.07.1',
+                                 'uri' => { 'uri' => 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0' } }],
+            'input_list' => [{ 'uri' => 'work/ov/inplace.txt' }],
+            'output_list' => [{ 'uri' => 'work/ov/inplace.txt' }] },
           { 'step_number' => 1, 'name' => 'add', 'description' => 'step 1',
             'input_list' => [{ 'uri' => 'a.txt' }, { 'uri' => 'b.txt' }],
             'output_list' => [{ 'uri' => 'work/12/34/sum.txt' }] }
@@ -155,7 +163,8 @@ class AdapterBcoTest < Minitest::Test
           { 'uri' => { 'uri' => 'file:///home/x/toy/results/previous.txt' } },
           { 'uri' => { 'uri' => 'work/tmp/zz/scratch.txt' } },
           { 'uri' => { 'uri' => 'work/12/34/sum.txt' } },
-          { 'uri' => { 'uri' => 'file:///home/x/toy/results/out.txt' } }
+          { 'uri' => { 'uri' => 'file:///home/x/toy/results/out.txt' } },
+          { 'uri' => { 'uri' => 'work/ov/inplace.txt' } }
         ],
         'output_subdomain' => [
           { 'mediatype' => 'text/plain',
@@ -184,13 +193,15 @@ class AdapterBcoTest < Minitest::Test
     assert_equal({ 'name' => 'gc_prov_write', 'version' => '0.1.0' }, n.producer)
     assert_equal({ 'engine' => 'shell', 'version' => 'bash 5.2.21', 'locator' => 'https://www.gnu.org/software/bash/',
                    'checksum' => nil }, n.runtime)
-    assert_equal %w[coreutils unpinned-tool bc], n.software.map { |s| s['name'] }
-    assert_equal [nil, nil, 2], n.software.map { |s| s['stage'] }
+    assert_equal %w[coreutils unpinned-tool bc bc], n.software.map { |s| s['name'] }, 'bc is kept once per step'
+    assert_equal [nil, nil, 2, 3], n.software.map { |s| s['stage'] }
     assert_nil n.software[1]['version']
-    assert_equal ["docker://library/debian@sha256:#{'c' * 64}", 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0'],
+    assert_equal ["docker://library/debian@sha256:#{'c' * 64}", 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0',
+                  'quay.io/biocontainers/bc:1.07.1--h7b6447c_0'],
                  n.containers.map { |c| c['ref'] }
     assert_equal 'symbolic', n.workflow['ref_kind'], '"v0.1" is not a hash; a tag and a branch look alike here'
-    assert_equal [1, 2], n.stages.map { |s| s['id'] }
+    assert_equal [1, 2, 3], n.stages.map { |s| s['id'] }
+    assert_equal [1, 2, 3], n.stages.map { |s| s['step_number'] }
     assert_nil n.stages[0]['container']
     assert_equal 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0', n.stages[1]['container']
     refute_includes n.notes, 'bundle names no producer'
@@ -206,11 +217,15 @@ class AdapterBcoTest < Minitest::Test
     assert_nil genome['checksum']
     assert_equal true, genome['reference_hint']
 
-    # Internal only on output evidence: sum.txt is step 1's output_list entry,
-    # out.txt is a published output. previous.txt (under outdir) and
-    # scratch.txt (under work/) are NOT — a prefix is a producer's choice.
-    assert_equal %w[sum.txt out.txt], n.inputs_internal.map { |i| i['name'] }
-    assert_equal %w[a.txt genome.fa.gz previous.txt scratch.txt], n.inputs_external.map { |i| i['name'] }
+    # Internal only when produced by an earlier step than every consumer:
+    # sum.txt is step 1's output and step 2's input. out.txt is a published
+    # output with no step — publication is not ordering evidence. inplace.txt
+    # is read and written by the same step — the bytes read existed before
+    # the run wrote them. previous.txt (under outdir) and scratch.txt (under
+    # work/) never appear as outputs — a prefix is a producer's choice.
+    assert_equal %w[sum.txt], n.inputs_internal.map { |i| i['name'] }
+    assert_equal %w[a.txt genome.fa.gz previous.txt scratch.txt out.txt inplace.txt],
+                 n.inputs_external.map { |i| i['name'] }
 
     assert_equal 'out.txt', n.outputs.first['name']
     assert_equal({ 'sha1' => 'b' * 40, 'sha256' => 'e' * 64 }, n.outputs.first['checksum'])
@@ -239,6 +254,84 @@ class AdapterBcoTest < Minitest::Test
     assert Bco.oci_ref?('registry.example:5000/img:2.1')
     refute Bco.oci_ref?('https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6')
     refute Bco.oci_ref?('s3://bucket/key:1')
+  end
+
+  # --- stage identity and the internal-input rule (review round 2) -----------------
+
+  # A stage is its position after sorting on step_number, and every per-stage
+  # item carries that position. Step numbers 10 / 30 / 20 are stages 1 / 2 / 3.
+  def test_stage_is_position_after_sort
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'].each { |st| st['step_number'] *= 10 }
+    b['description_domain']['pipeline_steps'].rotate!(1)
+    n = Bco.parse(b)
+    assert_equal [1, 2, 3], n.stages.map { |s| s['id'] }
+    assert_equal [10, 20, 30], n.stages.map { |s| s['step_number'] }
+    assert_equal %w[add divide polish], n.stages.map { |s| s['name'] }
+    assert_equal [2, 3], n.software.select { |x| x['name'] == 'bc' }.map { |x| x['stage'] }
+    assert_equal %w[sum.txt], n.inputs_internal.map { |i| i['name'] }, 'ordering follows step_number, not list order'
+  end
+
+  # Two steps sharing a number would share a stage and pool their
+  # declarations; a step without an integer number has no position.
+  def test_duplicate_or_missing_step_number_is_a_format_error
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][1]['step_number'] = 2
+    err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+    assert_match(/duplicate step_number \[2\]/, err.message)
+
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][0].delete('step_number')
+    err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+    assert_match(/without an integer step_number/, err.message)
+
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][0]['step_number'] = '20'
+    b['description_domain']['pipeline_steps'][1]['step_number'] = '30'
+    n = Bco.parse(b)
+    assert_equal [1, 2, 3], n.stages.map { |s| s['id'] }, 'a numeric string is an integer'
+    assert_equal [1, 20, 30], n.stages.map { |s| s['step_number'] }
+  end
+
+  # The same tool declared by two steps is two items with two stages; the
+  # same tool declared at the workflow level AND by a step is two items too.
+  # Only an entry repeated within one level collapses.
+  def test_a_tool_declared_in_two_steps_is_kept_per_step
+    b = enriched_bco
+    b['execution_domain']['software_prerequisites'] << { 'name' => 'bc', 'version' => '1.07.1',
+                                                         'uri' => { 'uri' => 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0' } }
+    b['execution_domain']['software_prerequisites'] << { 'name' => 'bc', 'version' => '1.07.1',
+                                                         'uri' => { 'uri' => 'quay.io/biocontainers/bc:1.07.1--h7b6447c_0' } }
+    n = Bco.parse(b)
+    assert_equal [nil, 2, 3], n.software.select { |x| x['name'] == 'bc' }.map { |x| x['stage'] }
+    g = GenomicsChainProv::Predicate.grade(n)
+    assert_equal 2, g['counts']['stages_with_own_environment'], 'steps 2 and 3 declare bc themselves'
+    assert_equal 3, g['counts']['stages_with_environment'], 'step 1 falls back to the workflow level'
+    assert_equal '2/3', g['coverage']
+  end
+
+  # A `filename` is a caption, not a location: an output whose filename equals
+  # an input's uri does not make that input internal.
+  def test_filename_label_is_not_production_evidence
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][1]['output_list'] = [
+      { 'uri' => { 'uri' => 'work/ab/cdef/other.txt', 'filename' => 'work/tmp/zz/scratch.txt' } }
+    ]
+    b['description_domain']['pipeline_steps'][2]['input_list'] = [{ 'uri' => 'work/tmp/zz/scratch.txt' }]
+    n = Bco.parse(b)
+    assert_equal false, n.inputs.find { |i| i['name'] == 'scratch.txt' }['internal']
+  end
+
+  # An input produced by a LATER step than the one that reads it is not made
+  # by this run before it was read; it stays external and graded.
+  def test_input_produced_after_it_is_read_stays_external
+    b = enriched_bco
+    steps = b['description_domain']['pipeline_steps']
+    steps.find { |st| st['step_number'] == 1 }['output_list'] = []
+    steps.find { |st| st['step_number'] == 3 }['output_list'] << { 'uri' => 'work/12/34/sum.txt' }
+    n = Bco.parse(b)
+    assert_empty n.inputs_internal
+    assert_equal 7, n.inputs_external.length
   end
 
   # --- refusals -------------------------------------------------------------------

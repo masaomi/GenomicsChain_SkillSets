@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 # Predicate — six hand-made normalised provenances, one per level, the rules
-# review round 1 changed (per-stage environment, two routes per tool, release-
-# shaped versions, symbolic refs floating), and the real U0 bundle whose grades
-# are pinned here as numbers. Design v0.1 §5 and §9 U2.
+# review rounds 1 and 2 changed (per-stage environment with fallback-only
+# inheritance, two routes per tool, the version rule in words, locators never
+# immutable on their own, zero stages absent, seed beside the grades), and the
+# real U0 bundle whose grades are pinned here as numbers. Design v0.1 §5, §9 U2.
 require 'minitest/autorun'
 require 'json'
 
@@ -171,11 +172,23 @@ class PredicateTest < Minitest::Test
     assert_equal g['grades']['environment'], without_image['grades']['environment'], 'disclosing the image changes nothing'
   end
 
-  # A BCO version is free text. Only a release-shaped string names a release.
+  # A BCO version is free text. Only a release-shaped string names a release —
+  # by the rule in words (predicate.rb, design §5): a leading tool-name token
+  # is dropped, the first token after it is read, an epoch is dropped; a
+  # constraint or wildcard is ranged, a literal x token is ranged, a
+  # NOT_A_RELEASE token anywhere is floating. The customer-skeptic seat of
+  # review round 2 measured the first regex misgrading `GATK 4.5.0.0` and
+  # `bash 5.2.21` as floating and admitting `0-unknown` and `1.x.2`.
   def test_version_strings_grade_by_shape
     expect = { '0.12.1' => 'versioned', '1.4-r122' => 'versioned', '2024.06' => 'versioned', 'v1.2.0' => 'versioned',
-               '5.2.21' => 'versioned', 'latest' => 'floating', 'unknown' => 'floating', 'HEAD' => 'floating',
-               'master' => 'floating', '>=1.0' => 'ranged', '1.*' => 'ranged', '1.x' => 'ranged', '3.10,<3.12' => 'ranged' }
+               'V1.2.0' => 'versioned', '5.2.21' => 'versioned', 'GATK 4.5.0.0' => 'versioned',
+               'bash 5.2.21' => 'versioned', '5.2.21 (x86_64)' => 'versioned', '1:2.3.4' => 'versioned',
+               '2.3~rc1' => 'versioned', '0.12.1--hdfd78af_0' => 'versioned', '2.0-alpha' => 'versioned',
+               'latest' => 'floating', 'unknown' => 'floating', 'HEAD' => 'floating', 'master' => 'floating',
+               '0-unknown' => 'floating', '1.0-SNAPSHOT' => 'floating', '2.0.dev3' => 'floating', 'r122' => 'floating',
+               '' => 'floating',
+               '>=1.0' => 'ranged', '1.*' => 'ranged', '*' => 'ranged', '1.x' => 'ranged', '1.x.2' => 'ranged',
+               '~1.2' => 'ranged', '^1.2' => 'ranged', '3.10,<3.12' => 'ranged', 'GATK >=4' => 'ranged' }
     expect.each do |version, level|
       assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
     end
@@ -241,8 +254,75 @@ class PredicateTest < Minitest::Test
     assert_equal a, b
     assert_equal a, JSON.parse(JSON.generate(a))
     assert_equal P::PREDICATE_VERSION, a['predicate_version']
-    assert_equal GenomicsChainTier2::VERSION, a['pin_strength_version']
-    assert_match(/\A\d+\.\d+\.\d+\z/, a['pin_strength_version'])
+    assert_equal GenomicsChainTier2::PinStrength::RULE_VERSION, a['pin_strength_version'], 'the rule, not the package'
+    assert_match(/\Apin-strength-\d+\.\d+\.\d+\z/, a['pin_strength_version'])
+    refute_equal GenomicsChainTier2::VERSION, a['pin_strength_version']
+    assert_equal 'gc-outputs-rows-0.1', a['outputs_digest_rule']
+  end
+
+  # --- rules review round 2 changed -------------------------------------------------
+
+  # Inheritance is a fallback, not an addition: a stage that declares its own
+  # `:latest` image is graded on that, even when the workflow level names a
+  # checksummed package; only a stage that declares nothing takes the
+  # workflow-level items. The coverage in the claim counts own declarations.
+  def test_inherited_items_are_fallback_only
+    g = P.grade(np(stages: [stage(1), stage(2)],
+                   software: [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => nil,
+                                'checksum' => { 'sha256' => 'e' * 64 }, 'stage' => nil }],
+                   containers: [{ 'ref' => 'docker://x/bc:latest', 'name' => 'bc', 'stage' => 1 }]))
+    assert_equal [%w[1 floating own], %w[2 immutable inherited]],
+                 g['stages'].map { |s| [s['id'].to_s, s['grade'], s['source']] }
+    assert_equal 'floating', g['grades']['environment']
+    assert_equal 2, g['counts']['stages_with_environment']
+    assert_equal 1, g['counts']['stages_with_own_environment']
+    assert_equal '1/2', g['coverage']
+    assert_equal '0/3', P.grade(np(stages: [stage(1), stage(2), stage(3)]))['coverage'], 'workflow-level only'
+  end
+
+  # A bundle with no steps has no stage to grade: environment is absent and
+  # the counts read 0/0, never an implicit stage graded immutable.
+  def test_zero_stages_grade_environment_absent
+    g = P.grade(np(stages: []))
+    assert_equal 'absent', g['grades']['environment']
+    assert_equal 'absent', g['grade_overall']
+    assert_equal 'immutable', g['grades']['software'], 'the items are still reported by category'
+    assert_empty g['stages']
+    assert_equal [0, 0, 0], g['counts'].values_at('stages_total', 'stages_with_environment', 'stages_with_own_environment')
+    assert_equal '0/0', g['coverage']
+  end
+
+  # A hash-like substring in a locator is a producer-chosen string, not a
+  # checksum field: it never raises an input to immutable, and
+  # inputs_with_checksum stays 0. Only a checksum field does that.
+  def test_a_hash_in_a_locator_is_not_a_checksum
+    path = { 'name' => 'x.fa', 'locator' => "/data/x.fa#sha256:#{'a' * 64}", 'checksum' => nil,
+             'internal' => false, 'reference_hint' => false }
+    url = path.merge('locator' => "https://example.org/x.fa?sha256=#{'a' * 64}")
+    doi = path.merge('locator' => "https://doi.org/10.5281/zenodo.1234#md5=#{'a' * 32}")
+    assert_equal 'immutable', P::PS.data_locator(path['locator']).first, 'tier2 reads it as a hash; prov must not'
+    assert_equal 'local_path', P.input_grade(path).first
+    assert_equal 'floating', P.input_grade(url).first
+    assert_equal 'versioned', P.input_grade(doi).first
+    g = P.grade(np(inputs: [path]))
+    assert_equal 'local_path', g['grades']['inputs']
+    assert_equal 0, g['counts']['inputs_with_checksum']
+    assert_equal 'immutable', P.input_grade(path.merge('checksum' => { 'sha256' => 'a' * 64 })).first
+  end
+
+  # The seed is found by parameter NAME — a guess — so it is reported beside
+  # the grades and is not among the signed counts.
+  def test_seed_is_reported_beside_the_grades
+    assert_equal({ 'recorded' => true, 'detection' => 'heuristic' }, P.grade(np)['seed'])
+    assert_equal({ 'recorded' => false, 'detection' => 'heuristic' }, P.grade(np(seed_recorded: false))['seed'])
+    refute P.grade(np)['counts'].key?('seed_recorded')
+  end
+
+  def test_outputs_digest_tolerates_a_nil_name
+    rows = [{ 'name' => nil, 'checksum' => { 'sha256' => '1' * 64 } }, { 'name' => 'y', 'checksum' => { 'sha1' => '2' * 40 } }]
+    assert_match(/\A[0-9a-f]{64}\z/, P.outputs_digest(rows))
+    assert_equal P.outputs_digest(rows), P.outputs_digest(rows.reverse)
+    assert_equal P.outputs_digest(rows), P.outputs_digest([rows[0].merge('name' => ''), rows[1]]), 'nil sorts as ""'
   end
 
   # --- the real bundle, pinned ----------------------------------------------------
@@ -265,11 +345,13 @@ class PredicateTest < Minitest::Test
     assert_nil c['outputs_digest']
     assert_equal 376, c['params_total']
     assert_equal 367, c['params_count']
-    assert_equal false, c['seed_recorded']
+    assert_equal({ 'recorded' => false, 'detection' => 'heuristic' }, g['seed'])
+    assert_equal '0/8', g['coverage']
     assert_equal({ 'grade' => nil, 'detection' => 'heuristic', 'count' => 0 }, g['reference'])
     assert_equal({ 'kind' => 'commit', 'tag_like' => nil, 'detection' => 'heuristic' }, g['workflow_ref'])
     inputs = g['items'].select { |i| i['category'] == 'inputs' }
     assert_equal({ 'local_path' => 3, 'floating' => 5 }, inputs.map { |i| i['grade'] }.tally)
     assert_equal 8, g['stages'].length
+    assert(g['stages'].all? { |s| s['source'] == 'none' })
   end
 end

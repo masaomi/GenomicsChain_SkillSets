@@ -39,6 +39,6 @@ nextflow run nf-core/demo -profile test,docker --outdir /tmp/gc_u0_demo/results 
 - BCO `parametric_domain`: 376 params with values, mostly defaults and iGenomes entries; no seed-like param.
 - WRROC: 129 nodes; 8 `SoftwareApplication` **without versions**; 10 `File` **without `sha256`**; 0 `ContainerImage`.
 
-Design v0.1 §5 grades for `bco.json` as-is (predicate 0.2.0): workflow `immutable`, runtime `versioned`, software `absent`,
-container `absent`, environment `absent` (0/8 stages name anything), inputs `local_path` (8 inputs, none shown as produced
-by the run; 3 local paths, 5 https) → overall **`absent`**. The enrichment path is in design §13.
+Design v0.1 §5 grades for `bco.json` as-is (predicate 0.3.0): workflow `immutable`, runtime `versioned`, software `absent`,
+container `absent`, environment `absent` (0/8 stages name anything; coverage `0/8`), inputs `local_path` (8 inputs, none shown as
+produced by the run before being read; 3 local paths, 5 https) → overall **`absent`**. The enrichment path is in design §13.

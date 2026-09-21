@@ -25,7 +25,14 @@ module GenomicsChainProv
     #   producer:  {name, version}
     #   checksums: [{uri, sha256}]   joined to inputs/outputs by exact locator
     # because the standard's own checksum field is SHA-1 and the record wants
-    # SHA-256 beside it. The extension_schema URL is an open item (§10).
+    # SHA-256 beside it. The extension_schema URL is fixed (design §10-1).
+    #
+    # Stage identity (review round 2): a stage is its POSITION after sorting
+    # the steps on `step_number`, and every per-stage item carries that
+    # position. Step numbers 10, 20, 30 are stages 1, 2, 3. A duplicated or
+    # non-integer `step_number` is a FormatError — two steps sharing a number
+    # would share a stage and pool their declarations, and a grade must not
+    # rest on that.
     module Bco
       class FormatError < StandardError; end
 
@@ -54,7 +61,7 @@ module GenomicsChainProv
         bco = load(bundle)
         notes = []
         ed = bco['execution_domain']
-        steps = Array(bco.dig('description_domain', 'pipeline_steps')).select { |s| s.is_a?(Hash) }
+        steps = ordered_steps(bco)
         params = Array(bco['parametric_domain']).select { |p| p.is_a?(Hash) }
         extension = genomicschain_extension(bco)
         sha256_by_locator = checksums_from(extension)
@@ -63,7 +70,7 @@ module GenomicsChainProv
         software = software_of(ed, steps, runtime)
         containers = software.select { |s| oci_ref?(s['locator']) }
                              .map { |s| { 'ref' => s['locator'], 'name' => s['name'], 'stage' => s['stage'] } }
-        inputs = inputs_of(bco['io_domain'], produced_locators(bco, steps), sha256_by_locator)
+        inputs = inputs_of(bco['io_domain'], internal_locators(steps), sha256_by_locator)
         outputs = outputs_of(bco['io_domain'], sha256_by_locator)
         recorded = params.reject { |p| unset?(p['value']) }
         producer = producer_of(extension)
@@ -107,6 +114,20 @@ module GenomicsChainProv
         raise FormatError, "bundle is not valid JSON: #{e.message}"
       end
 
+      # [[position, step], ...] sorted on step_number. Position is the stage id.
+      def ordered_steps(bco)
+        raw = Array(bco.dig('description_domain', 'pipeline_steps')).select { |st| st.is_a?(Hash) }
+        bad = raw.reject { |st| st['step_number'].to_s =~ /\A-?\d+\z/ }
+        unless bad.empty?
+          raise FormatError, "#{bad.length} pipeline step(s) without an integer step_number"
+        end
+
+        dup = raw.map { |st| st['step_number'].to_i }.tally.select { |_, n| n > 1 }.keys.sort
+        raise FormatError, "duplicate step_number #{dup.inspect}" unless dup.empty?
+
+        raw.sort_by { |st| st['step_number'].to_i }.each_with_index.map { |st, i| [i + 1, st] }
+      end
+
       # --- the seven conditions -------------------------------------------------
 
       def workflow_of(bco, ed)
@@ -144,15 +165,20 @@ module GenomicsChainProv
       end
 
       # Workflow-level prerequisites (runtime excluded) plus every step's
-      # prerequisites, de-duplicated on (name, version, locator) so a tool named
-      # at both levels is counted once.
+      # prerequisites. De-duplicated on (name, version, locator, stage): the
+      # same entry repeated within one level is counted once, but a tool a
+      # step declares is kept for that step even when the workflow level names
+      # it too, and a tool two steps declare is two items — the per-stage
+      # coverage the claim carries is counted from these (review round 2: a
+      # key without the stage collapsed every per-step entry into the
+      # workflow-level one, and the enriched fixture graded `absent` 4/8).
       def software_of(ed, steps, runtime)
         top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil) }
         top = top.reject { |s| runtime && s['name'].casecmp?(runtime['engine']) }
-        per_step = steps.flat_map do |st|
-          Array(st['prerequisite']).filter_map { |s| software_entry(s, st['step_number']) }
+        per_step = steps.flat_map do |pos, st|
+          Array(st['prerequisite']).filter_map { |s| software_entry(s, pos) }
         end
-        (top + per_step).uniq { |s| [s['name'], s['version'], s['locator']] }
+        (top + per_step).uniq { |s| [s['name'], s['version'], s['locator'], s['stage']] }
       end
 
       def software_entry(entry, stage)
@@ -168,10 +194,11 @@ module GenomicsChainProv
       end
 
       def stages_of(steps)
-        steps.sort_by { |s| s['step_number'].to_i }.map do |s|
-          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, s['step_number']) }
+        steps.map do |pos, s|
+          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, pos) }
           {
-            'id' => s['step_number'].to_i,
+            'id' => pos,
+            'step_number' => s['step_number'].to_i,
             'name' => blank_to_nil(s['name']),
             'description' => blank_to_nil(s['description']),
             'inputs' => Array(s['input_list']).length,
@@ -182,7 +209,7 @@ module GenomicsChainProv
         end
       end
 
-      def inputs_of(io, produced, sha256_by_locator)
+      def inputs_of(io, internal, sha256_by_locator)
         Array(io['input_subdomain']).filter_map do |i|
           next nil unless i.is_a?(Hash)
 
@@ -193,7 +220,7 @@ module GenomicsChainProv
           name = basename(blank_to_nil(uri['filename']) || locator)
           { 'name' => name, 'locator' => locator,
             'checksum' => checksum_of(uri, locator, sha256_by_locator),
-            'internal' => produced.include?(locator),
+            'internal' => internal.include?(locator),
             'reference_hint' => name =~ REFERENCE_HINT ? true : false }
         end
       end
@@ -214,33 +241,38 @@ module GenomicsChainProv
 
       # --- rules ------------------------------------------------------------------
 
-      # Design §13.4-3, revised after review round 1 (2026-09-20). An input is
-      # internal only when the bundle itself shows this run producing it: the
-      # same locator appears as a step output (`pipeline_steps[].output_list`)
-      # or a published output (`io_domain.output_subdomain`). A path prefix —
-      # the engine's work dir, the run's outdir — is not evidence: both are
-      # values the producer chooses, and a prefix rule let a producer move a
-      # weak input out of the grade by pointing outdir at it (verified by the
-      # customer-skeptic review). nf-prov's workflow inputs are already "task
-      # inputs no task produced", so on its bundles this marks nothing
-      # internal and the run's temp files grade as what they are: local paths
-      # without a checksum, until the enricher hashes them.
-      def produced_locators(bco, steps)
-        out = steps.flat_map do |s|
-          Array(s['output_list']).filter_map do |o|
-            next nil unless o.is_a?(Hash)
-
-            uri = o['uri'].is_a?(Hash) ? o['uri'] : { 'uri' => o['uri'] }
-            [blank_to_nil(uri['uri']), blank_to_nil(uri['filename'])]
-          end
+      # Design §13.4-3, revised after review round 2 (2026-09-20). An input is
+      # internal only when the bundle shows this run producing it BEFORE
+      # reading it: the locator appears in some step's output_list at an
+      # earlier position than in every step's input_list that names it. Only
+      # `uri` is matched — a `filename` is a producer's caption for the entry,
+      # not a location, and matching it let a label remove an input from the
+      # grade (round 2). A published output (io_domain.output_subdomain) has no
+      # step and so is not ordering evidence. Two cases stay external and are
+      # graded: an input no step lists as read (the bundle gives no point at
+      # which it was consumed), and an in-place overwrite, where one step
+      # reads and writes the same locator — the bytes it read existed before
+      # the run wrote them. A path prefix is never evidence: the work dir and
+      # the outdir are values the producer chooses (round 1).
+      # nf-prov's workflow inputs are "task inputs no task produced", so on
+      # its bundles this marks nothing internal.
+      def internal_locators(steps)
+        produced = {}
+        consumed = {}
+        steps.each do |pos, st|
+          uris_of(st['output_list']).each { |l| produced[l] = [produced[l], pos].compact.min }
+          uris_of(st['input_list']).each { |l| consumed[l] = [consumed[l], pos].compact.min }
         end
-        Array(bco.dig('io_domain', 'output_subdomain')).each do |o|
-          next unless o.is_a?(Hash)
+        produced.keys.select { |l| consumed[l] && produced[l] < consumed[l] }
+      end
+
+      def uris_of(list)
+        Array(list).filter_map do |o|
+          next nil unless o.is_a?(Hash)
 
           uri = o['uri'].is_a?(Hash) ? o['uri'] : { 'uri' => o['uri'] }
-          out << [blank_to_nil(uri['uri']), blank_to_nil(uri['filename'])]
-        end
-        out.flatten.compact.uniq
+          blank_to_nil(uri['uri'])
+        end.uniq
       end
 
       def oci_ref?(locator)

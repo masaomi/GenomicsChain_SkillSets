@@ -17,8 +17,9 @@ module GenomicsChainProv
   #     lists alone would be empty for every nf-prov bundle;
   #   inputs[]['internal'] — nf-prov lists the run's own temp files and its own
   #     versions.yml as workflow inputs; the rule that separates them from
-  #     supplied inputs is in Adapters::Bco.internal? and is re-derivable from
-  #     the bundle alone.
+  #     supplied inputs is Adapters::Bco.internal_locators (produced by an
+  #     earlier step than every consumer) and is re-derivable from the bundle
+  #     alone.
   NormalizedProvenance = Struct.new(
     :format,          # 'bco' | 'wrroc'
     :format_version,  # BCO spec_version URL / WRROC conformsTo profile
@@ -27,7 +28,7 @@ module GenomicsChainProv
     :runtime,         # {'engine','version','locator','checksum'} or nil — checksum / digest let it grade immutable
     :software,        # [{'name','version','locator','checksum','stage'}] every tool named, runtime excluded
     :containers,      # [{'ref','name','stage'}] the software entries whose locator is an OCI image reference
-    :stages,          # [{'id','name','description','inputs','outputs','software','container'}]
+    :stages,          # [{'id','step_number','name','description','inputs','outputs','software','container'}] — id is the position after sorting on step_number
     :inputs,          # [{'name','locator','checksum','internal','reference_hint'}]
     :outputs,         # [{'name','locator','checksum','mediatype'}]
     :params_total,    # entries in the parameter list

@@ -23,6 +23,13 @@ module GenomicsChainTier2
   # these findings. That comparison needs the Tier-1 report as its other half
   # and is a separate layer. This file only reads what the code ships.
   module PinStrength
+    # The version of THIS rule, signed by records that grade with it (the
+    # prov attestation's `pin_strength_version`, design v0.1 §6). It is
+    # separate from the package version on purpose: a tier2 release that
+    # leaves the six-level reduction untouched must not turn every earlier
+    # proof into "not re-derived by this verifier". Bump it when the reduction
+    # below changes what any input grades to.
+    RULE_VERSION = 'pin-strength-0.1.0'
     LEVELS = %w[immutable versioned ranged floating local_path absent].freeze
 
     DOI       = %r{\b(?:doi\.org/|doi:)?(10\.\d{4,9}/[^\s"'<>)\]]+)}i

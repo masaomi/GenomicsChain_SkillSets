@@ -18,7 +18,7 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 |---|---|---|
 | `genomicschain_core` | 0.5.0 | Submit path: digest, admission gates, signing, Synoptis recording |
 | `genomicschain_tier1` | 0.2.1 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
-| `genomicschain_tier2` | 0.4.0 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
+| `genomicschain_tier2` | 0.4.1 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
 | `genomicschain_tier3` | 0.5.0 | Tier-3 execution — backends, comparator, cost estimation |
 | `genomicschain_regwatch` | 0.1.1 | Regulatory watch — `gc_regwatch_scan`, `gc_regwatch_report`, a 30-source watchlist |
 
