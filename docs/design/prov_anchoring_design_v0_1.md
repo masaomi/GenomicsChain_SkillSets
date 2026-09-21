@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** 草案 v0.1.3（2026-09-21: multi-LLM review round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`、round 3 は未実施。改訂履歴は §14）
+**状態:** 草案 v0.1.4（2026-09-21 朝: round 3（REVISE）の (a)/(b) を 5 件 G1–G5 に束ねて反映——G1 §5 版の規則・DOI・runtime、G2 §6 null 欄と正準化規則の署名、G3 §7/§10-14 読み口を place route に、G4 §8 検証者の言えること、G5 §6/§13.4-1 誤り文と拡張 checksum の結合。code は adapter 0.3.1 / predicate 0.3.1、test 47 本緑。round 3 の記録は L2 `review_r3_prov_anchoring_v0_1_3_20260921`。round 4 は未実施。v0.1.3 まで: round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`。改訂履歴は §14）
 **前提の文書:** KairosChain L2 `genomicschain_business_model_direction_20260919`（事業上の位置づけ、§3 が主張の境界の正本）、
 GenomicsChain L2 `service_2_5_dev_plan_notes_20260920`（コードの現状）、`docs/demos/service_2_5_principle_20260920/demo.html`（原理）、
 記憶 `warranty-scope`（言葉づかいの規則）、`genomicschain_core` design v0.4.1（package は v0.5.0。SubmitCore の経路。文書は KairosChain 側、コードは `submit_core.rb` の注釈が写し）
@@ -25,7 +25,7 @@ GenomicsChain L2 `service_2_5_dev_plan_notes_20260920`（コードの現状）�
 verdict_spec/prov.rb  署名される同一性 (§6)     ただし core に 4 か所だけ手を入れる（§7: 登録の汎用化、
 prov_attestation.schema.json  記録の形 (§6)     idempotency の fallback、attestor の ttl、store_proof! の proof_ttl）
 gc_prov_submit  anchor 側の tool (§7)         6 等級の目盛り — genomicschain_tier2/pin_strength.rb
-gc_prov_proof   anchor の読み口 (§7, §8)      anchor の proof 保管 — Synoptis（TTL は §6 で明示する）
+gc_prov_proof   anchor の公開読み口 (§7, §8)   anchor の proof 保管 — Synoptis（TTL は §6 で明示する）
 gc_prov_check   顧客側の tool (§7)            第二の機関目撃者 — v0.2 (§10)
 gc_prov_verify  検証者側の tool (§7)          束の形式そのもの — IEEE 2791-2020 / WRROC を使う
 gc_prov_write   書き出し器・補完器 (§4.1)      再構築と実行 — (iii)、別会社。価格 — 事業側
@@ -88,11 +88,11 @@ gc_submit_client --tier prov
 |---|---|---|---|
 | 入力データ | `io_domain.input_subdomain[].uri` / `.sha1_checksum`（規格の欄は SHA-1）。SHA-256 は `extension_domain` の `genomicschain_extension.checksums[]` を locator で結合（§13.4-1、補完器が書く） | `CreateAction.object` の `File.sha256` / `contentUrl` | checksum の欄あり→immutable。無ければ locator だけで: DOI→versioned、URL→floating、path→local_path。**locator の文字列だけで immutable にはならない**（§5） |
 | コード（workflow 本体） | `execution_domain.script[]`、`extension_domain` SCM (repo, commit) | `ComputationalWorkflow` の `url` / `version` / `codeRepository` | commit hash（40/64 hex）→immutable。それ以外の名前→floating（tag か branch かは束に無い。tag らしさは等級の外の欄 `workflow_ref` に）。hash の形で判定するのは名前の推測ではない: hash はその木を自らの hash で名指すので、形が内容を決める |
-| ライブラリ・ツール | `execution_domain.software_prerequisites[]`（workflow 全体）と `pipeline_steps[].prerequisite[]`（段ごと） (name, version, uri, sha1_checksum) | `SoftwareApplication.softwareVersion`、`ContainerImage.sha256` / `tag` | 二経路。版は package の経路: checksum→immutable、release の形の版→versioned（規則は §5 に言葉で）、範囲→ranged、それ以外→floating。image は container の経路: digest→immutable、tag→versioned、なし/latest→floating |
+| ライブラリ・ツール | `execution_domain.software_prerequisites[]`（workflow 全体）と `pipeline_steps[].prerequisite[]`（段ごと） (name, version, uri, sha1_checksum)。SHA-256 は入力と同じく `genomicschain_extension.checksums[]` を uri で結合（round 3） | `SoftwareApplication.softwareVersion`、`ContainerImage.sha256` / `tag` | 二経路。版は package の経路: checksum→immutable、release の形の版→versioned（規則は §5 に言葉で）、範囲→ranged、それ以外→floating。image は container の経路: digest→immutable、tag→versioned、なし/latest→floating |
 | 参照ゲノム | `external_data_endpoints[]` または input のうち参照とわかるもの | `File` のうち `FormalParameter` 名が参照を指すもの | データと同じ。**参照かどうかは名前の推測**→ `reference_detection: heuristic` と記録 |
 | パラメータ | `parametric_domain[]` (param, value, step) | `PropertyValue` (name, value) | 存在の有無のみ。等級には入れず `params_count / params_total` を数える |
 | 乱数シード | パラメータのうち `seed` を含む名前で値を持つもの | 同左 | 存在の有無のみ。`seed_recorded: true/false`（false は「seed 無し」ではなく「記録に無い」）。名前の推測なので等級の横の `seed` 欄に出し、署名しない（§5、round 2） |
-| 実行環境の版 | `execution_domain.script_driver` と、同名の `software_prerequisites` 項目（版・uri・checksum） | `SoftwareApplication`(Nextflow) の `softwareVersion`、`agent` | checksum か image digest→immutable、release の形の版→versioned、範囲→ranged、それ以外の版→floating、なし→absent |
+| 実行環境の版 | `execution_domain.script_driver` と、同名の `software_prerequisites` 項目（版・uri・checksum。SHA-256 は extension の `checksums[]` を uri で結合） | `SoftwareApplication`(Nextflow) の `softwareVersion`、`agent` | checksum の欄あり→immutable。locator が **OCI image 参照そのもの**（`docker://…@sha256:…` の形）で digest つき→immutable。URL や path の末尾に `@sha256:` を足しても上がらない（round 3 で実測）。release の形の版→versioned、範囲→ranged、それ以外の版→floating、なし→absent |
 
 ### 4.1 束を出す側（producer）は差し替え可能にする — Nextflow に縛らない（09-20 追記）
 
@@ -146,16 +146,22 @@ end
 
 ```
 各項目 → 6 等級（image は pin_strength.rb の container。版は下の「版の規則」。checksum の欄があれば immutable。
-        │        入力の locator は文字列だけでは immutable にならない——DOI→versioned、URL→floating、path→local_path）
+        │        入力の locator は文字列だけでは immutable にならない——locator 全体が DOI→versioned、URL→floating、
+        │        path→local_path。部分文字列は名前であって識別子ではない（round 2: `#sha256:`、round 3: `10.1234/` の dir））
         ▼
-段 = pipeline_steps を step_number で並べ替えた後の**位置**（1 始まり）。step_number が重複・欠落・非整数なら FormatError
-   （round 2: 番号そのものを id にすると、重複した段が宣言を共有してしまう）
+段 = pipeline_steps を step_number で並べ替えた後の**位置**（1 始まり）。step_number が重複・欠落・非整数（JSON の整数か
+   数字だけの文字列以外。`2.0` は非整数）なら FormatError。object でない要素が並んでいても FormatError（落とすと stages_total が
+   縮んで最弱の段が消えうる、round 3）（round 2: 番号そのものを id にすると、重複した段が宣言を共有してしまう）
         │
         ▼
 段ごとの環境 = **その段が自分で宣言した項目**について、package の経路と container の経路の**強い方**
    （§10-8: 経路は二つ、一方で足りる）。自分で何も宣言しない段だけが workflow 全体の項目（BCO の
    software_prerequisites）を**代わりに**使う——継承は代替であって加算ではない（round 2: 加算にすると
-   workflow 全体の 1 本が N/N と読め、何も言わない段を持ち上げた）。段が 0 本なら環境は absent（暗黙の段は作らない）
+   workflow 全体の 1 本が N/N と読め、何も言わない段を持ち上げた）。段が一部でも自分で宣言すると、その段では workflow
+   全体の宣言は両経路とも使われない——段ごとの bare name 1 本の申告が、継承していた等級より下げうる（round 3 で実測:
+   workflow 全体に digest 固定の image、段 3 だけ版なしの awk → 段 3 は floating）。補完器は段ごとにだけ書くので
+   この混在は起きない。経路ごとの代替（container は container を、package は package を継承）に変えるかは §10-15。
+   段が 0 本なら環境は absent（暗黙の段は作らない）
         │
         ▼
 分類の等級（immutable > versioned > ranged > floating > local_path > absent）
@@ -172,15 +178,20 @@ end
                params_count / params_total
 ```
 
-**版の規則（言葉で。predicate 0.3.0 の `version_grade`）。** BCO の `version` は自由文なので、次の順で読む。
-(1) 先頭の空白区切りの語に数字が無ければ tool 名とみなして落とす（`GATK 4.5.0.0`、`bash 5.2.21`）。(2) 残りの最初の語を取る
-（`5.2.21 (x86_64)` → `5.2.21`）。(3) Debian 型の epoch `N:` を落とす。その前に: `< > ! ,` か `*`、先頭の `~`/`^` があれば
-**ranged**（範囲）。取った語を `- + . _ ~` で切った要素に `x` だけの要素があれば **ranged**（`1.x`、`1.x.2`）。要素のどれかが
-`latest / unknown / head / master / main / dev / devel / nightly / snapshot / stable / current / trunk / none / null / unversioned`
-（末尾に数字がついてもよい: `dev3`）なら **floating**（`0-unknown`、`1.0-SNAPSHOT`）。残った語が「任意の v/V、数字を `.` で繋いだ列、
-任意個の `- + . _ ~` 区切りの接尾」の形なら **versioned**（`1.4-r122`、`0.12.1--hdfd78af_0`、`2.3~rc1`、`V1.2.0`）。
-どれでもなければ floating（数字を含まない `HEAD` も、`r122` のように数字から始まらない語も）。round 2 の customer-skeptic 席が
-最初の正規表現で `GATK 4.5.0.0` と `bash 5.2.21` が floating に落ち、`0-unknown` と `1.x.2` が versioned に通ることを実測した。
+**版の規則（言葉で。predicate 0.3.1 の `version_grade`）。** BCO の `version` は自由文なので、空白で語に切って次の順で読む。
+(1) **拒否**: `latest / unknown / head / master / main / dev / devel / nightly / snapshot / stable / current / trunk / none / null /
+unversioned`（末尾に数字がついてもよい: `dev3`）が語として丸ごとあれば、文字列全体が **floating**（`1.0 latest` も `latest 1.0` も）。
+候補の語を `- + . _ ~` で切った要素にこれらがあっても同じ（`0-unknown`、`1.0-SNAPSHOT`、`2.0.dev3`）。
+(2) **候補**: 数字を含む語だけ、並び順に。各候補から Debian 型の epoch `N:` を落とす。数字の無い語は tool 名なので飛ばす
+（`GATK 4.5.0.0`、`GNU bash, version 5.2.21` → 候補は `5.2.21` だけ。語の中の `,` は範囲の印ではない）。
+(3) 候補を左から順に: `< > ! ,` か `*`、先頭の `~`/`^` があれば **ranged**（`GATK >=4`、`GATK ~1.2`）。要素に `x` だけの要素が
+あれば **ranged**（`1.x`、`1.x.2`）。「任意の v/V、数字を `.` で繋いだ列、任意個の `- + . _ ~` 区切りの接尾」の形なら
+**versioned**（`1.4-r122`、`0.12.1--hdfd78af_0`、`2.3~rc1`、`V1.2.0`）。どれでもなければ**次の候補へ**（`python3 3.11.4`:
+`python3` は release の形ではなく、`3.11.4` がそう——tool 名を添えた申告が bare の版より下がることはない、round 3）。
+(4) 候補が尽きれば floating（`HEAD`、`r122`、`5.2.21(1)-release`）。候補が無く `*` だけなら ranged。
+round 2 の customer-skeptic 席が最初の正規表現で `GATK 4.5.0.0` と `bash 5.2.21` が floating に落ち、`0-unknown` と `1.x.2` が
+versioned に通ることを、round 3 の opus5 席が `python3 3.11.4` が floating に落ちることを、skeptic 席が `GNU bash, version 5.2.21`
+が ranged に流れることを実測した。
 
 - **最弱で決める理由:** 「再構築できるか」は一番弱い環に決まる。平均や多数決は、弱い環を隠す。最弱の規則は**必須の環**に当てる。
   環境だけは container か package 一覧のどちらか一方で作り直せる（代替経路がある）ので、**段ごとに**二つの強い方を取り、
@@ -194,8 +205,11 @@ end
   突き合わせる、§10-13）。
 - **producer が選ぶ文字列は等級を上げない。** 入力が immutable になるのは checksum の欄だけ。locator に `#sha256:…` のような
   hash らしい部分文字列があっても、それは名前であって検査ではない（round 2 で実測: `inputs_with_checksum 0` のまま immutable に
-  なっていた）。tier2 の `data_locator` は repo 内の設定値を読む道具なので hash 部分文字列を content hash と読むが、prov は
-  その結果を versioned / floating / local_path に頭打ちにする。
+  なっていた）。DOI も同じ: locator **全体**が DOI（`10.NNNN/…`、`doi:`、`doi.org/` の URL）のときだけ versioned で、
+  `/data/10.1234/x.fa` の `10.1234/` は dir の名前（round 3 で実測: dir 名で local_path が versioned に上がっていた）。
+  tier2 の `data_locator` は repo 内の設定値を読む道具なので部分文字列を hash や DOI と読むが、prov は使わない——
+  入力の locator は prov 自身の規則（DOI 全体 / URL / path）で読む。runtime も同じ: locator が OCI image 参照そのものの
+  ときだけ digest を見る（URL の末尾の `@sha256:` は名前）。
 - **署名される等級に名前の推測は入れない。** 参照ゲノム（`reference`）も、symbolic な ref の tag らしさ（`workflow_ref`）も、
   乱数シードの有無（`seed`。名前に seed を含む param の存在で見る推測）も、等級の横の欄に `detection: heuristic` として出す。
   seed は round 2 まで署名される数に入っていた（`seed_recorded`）。記録の `not_checked` に `seed_identification` を足す（§6）。
@@ -220,13 +234,17 @@ prov    digest subject = 束 (verbatim)      identity = 束から導出（アダ
 subject_ref                 "prov:sha256:<bundle_digest>"  — 束が自分を名指す。顧客の文字列を claim に入れない
 bundle_format               bco | wrroc
 bundle_format_version       spec_version / conformsTo（束の自己申告。規格 schema への適合は検査しない → not_checked）
-bundle_digest               canonical JSON sha256（server が再計算。規則は §2 の kairos-sorted-json-0.1）
+bundle_digest               canonical JSON sha256（server が再計算）
+bundle_digest_canonicalization, outputs_digest_rule
+                            digest を出した規則の名前（`kairos-sorted-json-0.1`、`gc-outputs-rows-0.1`）。署名する（round 3: 署名の外だと、
+                            v0.2 で JCS に移ったあと検証者が v0.1 の束を「不一致」と印刷する）。等級と digest を決める手順の版は
+                            **すべて署名し、それ以外は署名しない**
 producer_name, producer_version   束の GenomicsChain extension が名乗る producer（無ければ null。nf-prov は名乗らない）
 adapter_version, predicate_version, pin_strength_version
-                            等級を出した手順の版: アダプタ（prov-adapter-bco-0.3.0）、述語（prov-predicate-0.3.0）、
+                            等級を出した手順の版: アダプタ（prov-adapter-bco-0.3.1）、述語（prov-predicate-0.3.1）、
                             PinStrength の**規則の版**（`PinStrength::RULE_VERSION`、pin-strength-0.1.0。tier2 の package 版
                             ではない——package を上げても規則が変わらなければ古い proof が「再導出不可」にならないように、round 2）。
-                            検証者は三つが手元と一致するときだけ再導出する。等級を決める手順の版は**すべて署名し、それ以外は署名しない**
+                            検証者は三つが手元と一致するときだけ再導出する
 grade_overall               6 等級
 grade_software, grade_container, grade_environment, grade_inputs, grade_workflow, grade_runtime
 stages_total, stages_with_environment, stages_with_own_environment
@@ -244,12 +262,15 @@ workflow_repository_sha256, workflow_commit  — repository は URL の sha256�
                             `workflow_ref` は署名の外（§5）
 ```
 
-**null になりうる欄:** `producer_name` / `producer_version`（束が名乗らない。nf-prov）、`outputs_digest`（checksum つきの出力が
-0 本）、`workflow_commit`（SCM extension が無い）。schema は三つを `["string","null"]` にする。それ以外の署名欄は必須。
+**null になりうる欄（5 つ）:** `producer_name` / `producer_version`（束が名乗らない。nf-prov）、`outputs_digest`（checksum つきの出力が
+0 本）、`workflow_commit` と `workflow_repository_sha256`（SCM extension が無い——`gc_prov_write` が shell / R / Python の計算から
+書く束は SCM を持たない。round 3: 必須のままだと §4.1 の最初の非 Nextflow producer が anchor に届かない）。schema は五つを
+`["string","null"]` にし、null は「無い」の意味で署名に入る。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
+固定する**: 検証者は manifest の `record_version` の集合で `params` を組み立て、知らない `record_version` は版違いの見出しへ（§8）。
 
 **server が決める欄（署名の外）:** `trust_tier = 'self_reported'`（提出者＝顧客自身の申告。Tier-2 と同じ語）、`toolchain`
 （anchor の Ruby と platform。Tier-2 では digest subject の中にあったので署名できたが、束は grader の interpreter を持たないので
-署名しない——round 1）、`bundle_digest_canonicalization`、`outputs_digest_rule`（`gc-outputs-rows-0.1`）、`seed`
+署名しない——round 1）、`seed`
 （`{recorded, detection: heuristic}`。名前の推測なので署名の外——round 2）、`not_checked`（builder が固定した列 6 項目:
 `locator_reachability`, `bundle_truthfulness`, `bundle_schema_conformance`, `checksum_values_as_written`,
 `reference_genome_identification`, `seed_identification`。schema は enum で固定し、client が送ってきた値は捨てる）。
@@ -259,7 +280,9 @@ Synoptis の evidence 上限は 64 KB（`Config.max_evidence_size`）だが、�
 署名つき operator を含めて canonical JSON にした大きさ。U3 で実測に置き換える）なので余裕がある。
 
 **束を残さない（不変条件、round 1 で明文化）:** anchor は束を 1 回の導出の間だけ memory に持ち、disk にも log にも書かない。
-HTTP の access log は request body を記録しない設定にし、例外の trace は `params` を伏せる。束には絶対 path と全 param の値が
+HTTP の access log は request body を記録しない設定にし、例外の trace は `params` を伏せる。**アダプタと述語が投げる例外の
+message に束の値を入れない**（round 3: `FormatError` が JSON parser の断片や `spec_version` の値を写していた。message は欄の名前・
+数・位置だけ。顧客側の `gc_prov_check` は顧客の machine で動くので詳しく出してよい）。束には絶対 path と全 param の値が
 入る（§10-11 ii）ので、これが「束は顧客の手元に残る」という約束の実体。
 
 **束の入口の上限（Gate A、round 1）:** 束は raw bytes で 2 MB まで、JSON の深さは 32 まで、`restricted_subset!`（NaN・U+2028 等の
@@ -277,7 +300,7 @@ Tier-1/2/3 の spec は `proof_ttl` を持たないので nil が渡り、engine
 扱いは §8 の表。
 
 **claim 文字列:** `prov:<predicate_version>:<grade_overall>:<stages_with_own_environment>/<stages_total>:<bundle_digest>:<submission_key>`
-例: `prov:prov-predicate-0.3.0:absent:0/8:9bd92601…:<key>`。台帳を眺める人が、どの規則の版で出た等級か、段の何割が**自分の**環境を
+例: `prov:prov-predicate-0.3.1:absent:0/8:9bd92601…:<key>`。台帳を眺める人が、どの規則の版で出た等級か、段の何割が**自分の**環境を
 宣言しているかを claim だけで読めるように（round 1: 1 段だけ固定した束が `immutable:30` と見えないため。round 2: workflow 全体の
 1 本が `8/8` と見えないため）。述語の出力の `coverage` がこの `own/total`。Tier-2 の `tier2:<lock_state>:<proposed_demotions>:...`
 と同じ発想。
@@ -286,6 +309,10 @@ Tier-1/2/3 の spec は `proof_ttl` を持たないので nil が渡り、engine
 既存 proof の回復になる（既存の recovery branch）。別の鍵で同じ束を出せば別の proof になる — これは仕様。誰が固定したかは鍵で決まる。
 **回復は手順の版が同じときだけ**起きる: adapter / predicate / pin_strength のどれかが上がっていれば `signed_identity` が変わり
 submission_key も変わるので、同じ束・同じ鍵でも新しい proof になる。これも仕様——古い版の等級は古い proof に残る。
+
+**idempotency_key（round 3）:** `sha256(bundle_digest | grade_overall | predicate_version | pubkey)`。`predicate_version` を入れるのは、
+版が上がって等級が変わらない再提出が新しい proof（submission_key が違う）なのに同じ key になり、client 側の重複除去が第二の
+proof を落とすため。
 
 **submit 側の版のずれ（round 2）:** anchor の手順の版が顧客の `gc_prov_check` より新しい（または古い）と、顧客が署名した
 `signed_params` の三つの版と anchor の再導出が一致せず IdentityMismatch になる。`gc_prov_submit` はこの拒否に anchor 側の三つの版を
@@ -301,11 +328,11 @@ submission_key も変わるので、同じ束・同じ鍵でも新しい proof �
 
 | tool / script | 置き場所 | 動く場所 | 網 | 何をするか |
 |---|---|---|---|---|
-| `gc_prov_check` | `genomicschain_prov/tools/` | 顧客の workstation（off-anchor） | 使わない | 束を読み、digest・等級・数・`signed_params` を出す。`--json` で機械可読 |
+| `gc_prov_check` | `genomicschain_prov/bin/`（`tools/` には置かない: `Skillset#load!` が `tools/*.rb` をどの node でも eager に require するので、CLI の option parse が anchor の起動時に走る——round 3） | 顧客の workstation（off-anchor） | 使わない | 束を読み、digest・等級・数・`signed_params` を出す。`--json` で機械可読 |
 | `gc_submit_client.rb --tier prov` | `scripts/`（既存に 1 tier 足す） | 顧客の workstation | anchor へ HTTPS | `signed_params` に署名して `gc_prov_submit` を呼ぶ。`--dry-run` / `--print-only` は既存のまま |
 | `gc_prov_submit` | `genomicschain_prov/tools/`（prov の `skillset.json` の `anchor_profile_tool_classes`。core の登録を汎用化して読む） | anchor のみ | — | Tier-2 submit と同じ骨。ただし束の gate は §6 の Gate A。`dry_run` で `signed_params` を返す |
-| `gc_prov_proof` | `genomicschain_prov/tools/`（anchor_profile。読み口） | anchor のみ | — | `proof_id` → Synoptis の `ProofEnvelope#to_h`（proof_id・attester_id・subject_ref・claim・**evidence**・signature・timestamp・ttl・submitter_pubkey ほか）に、`evidence`（canonical JSON の文字列 `{manifest, manifest_body_sha256}`）を parse した `manifest` と、registry の `revoked?` を足して返す。既存の `attestation_verify` は `valid / errors / content_hash / checked_at / proof_id` を返すだけで evidence を返さず、`attestation_list` は要約（proof_id・attester_id・subject_ref・claim・timestamp・expired・revoked）だけなので、第三者は manifest を読めない（round 2 の P0）。この tool が §8 の第一段の材料。**Bearer 無し・読み取り専用**（§10-14 で決定） |
-| `gc_prov_verify` | `genomicschain_prov/tools/` | 検証者（GenomicsChain または第三者） | anchor の `gc_prov_proof` を読む | 束 + proof_id → envelope を取る → digest・等級を再計算 → manifest と照合 → 提出者の署名（と、鍵があれば anchor の署名）を**手元で**検証 → 「確かめたこと／確かめていないこと」（§8） |
+| `gc_prov_proof` | `genomicschain_prov/lib/genomicschain_prov/place_extension.rb`——MCP tool ではなく **Meeting Place の公開 route**。prov の `skillset.json` の `place_extensions[]` に `{class, require, public_routes: ["/place/web/prov/"]}` を書き、Hestia の `PlaceRouter#register_extension(public_routes:)` が `/place/web/prov/proof/<proof_id>` を **認証なし・GET のみ・公開 rate limiter つき**で Bearer の前に dispatch する（round 3 で実物を読んだ: MCP の `tools/call` は body を読む前に Bearer を検査し、anchor では service_grant の AccessGate も重ねてかかるので、tool として登録しても 1 本だけ認証の外には出せない） | anchor のみ（Meeting Place が動いている node） | — | `proof_id` → registry の envelope。**返すのは次の欄だけ**: `proof_id, version, attester_id, subject_ref, claim, evidence`（canonical JSON の文字列 `{manifest, manifest_body_sha256}` そのまま）`, merkle_root, timestamp, ttl, submitter_pubkey, signature` に、`evidence` を parse した `manifest` と registry の `revoked` を足す。`actor_user_id`（Bearer の `--user` 名）・`actor_role`・`metadata` は**返さない**（署名の外の欄で、検証に要らず、顧客の token 名を漏らす——round 3、3 席）。`manifest.record_type` が `prov_attestation` でなければ not found と同じ返事（registry は全 tier で 1 本の `proofs.jsonl`。Tier-2 の manifest は repo の URL を hash せずに持つ——round 3、codex と verifier）。既存の `attestation_verify` は `valid / errors / content_hash / checked_at / proof_id` を返すだけで evidence を返さず、`attestation_list` は要約だけなので、第三者は manifest を読めない（round 2 の P0）。この route が §8 の第一段の材料 |
+| `gc_prov_verify` | `genomicschain_prov/bin/`（同上） | 検証者（GenomicsChain または第三者） | anchor の `gc_prov_proof` route を GET | 束 + proof_id → envelope を取る → digest・等級を再計算 → manifest と照合 → 提出者の署名（と、鍵があれば anchor の署名）を**手元で**検証 → 「確かめたこと／確かめていないこと」（§8） |
 
 **package の依存:**
 
@@ -317,7 +344,7 @@ genomicschain_prov  ──requires──▶  genomicschain_core（SubmitCore, Ma
 
 core → prov の向きの依存は作らない（round 1: `Skillset#load!` は `tools/*.rb` を anchor_profile に関係なく eager に require するので、
 core に prov を require する file を置くと、prov の無い node——team workstation の core + tier1——で core ごと落ちる）。
-`verdict_spec/prov.rb`・`prov_submit.rb`・`gc_prov_submit`・`gc_prov_proof`・schema は **genomicschain_prov に置く**。core に入れる変更は
+`verdict_spec/prov.rb`・`prov_submit.rb`・`gc_prov_submit`・`place_extension.rb`（`gc_prov_proof`）・schema は **genomicschain_prov に置く**。core に入れる変更は
 4 か所（round 2 で実物を読んで数え直した。深さ gate は core に足さない——`DoSGate.compute_depth` が public なので prov 側で呼ぶ）:
 (1) `AnchorProfileRegistration.install!` が差し替える `KairosMcp::Skillset#tool_class_names` が `name == 'genomicschain_core'` のときだけ
 `anchor_profile_tool_classes` を読んでいるのを、どの skillset の `skillset.json` でも読むようにする（prov の `gc_prov_submit` / `gc_prov_proof` を anchor だけに出す）、
@@ -325,7 +352,10 @@ core に prov を require する file を置くと、prov の無い node——te
 `result_hash || headline.static_readiness || codescan_evidence_digest`）に `bundle_digest` と `grade_overall` を足す（今のままだと
 prov は鍵だけの定数になる）、(3) `SynoptisAttestor#issue(subject_ref:, claim:, evidence:, actor_role:)` に `ttl: nil` を足して
 engine の `create_attestation(ttl:)` へ渡す、(4) `SubmitCore.store_proof!` が `spec.respond_to?(:proof_ttl) ? spec.proof_ttl : nil` を
-attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Tier-1/2/3 の proof は変わらない。core の版は 0.5.0 → 0.6.0。
+attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Tier-1/2/3 の proof は変わらない。core の版は 0.5.0 → 0.6.0、
+**同じ commit で prov の `depends_on` を `genomicschain_core >= 0.6.0` に上げる**（round 3: 0.5.0 の core の横に prov を入れると
+`gc_prov_submit` は登録されず、手で登録しても TTL が渡らず 24 時間の proof が黙って出る）。`gc_prov_submit` は引き続き
+`anchor_profile_tool_classes` の MCP tool（Bearer 有り。提出は認証の内側）。
 
 配備の表（`genomicschain_core/plugin/SKILL.md` の表の anchor の行を直し、顧客 workstation と検証者の 2 行を足す）:
 
@@ -333,7 +363,7 @@ attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Ti
 |---|---|---|---|
 | anchor | core + tier1 + tier2 + tier3 + **prov** | true | `gc_prov_submit` |
 | 顧客 workstation | core + tier2 + **prov** | false | `gc_prov_check`, client |
-| 検証者 | core + tier2 + **prov** | false | `gc_prov_verify` |
+| 検証者 | core + tier2 + **prov**（core の depends_on 経由で synoptis + mmp も入る——anchor の署名検証は `Synoptis::Verifier` と `MMP::Crypto` が要る） | false | `gc_prov_verify` |
 
 **顧客の鍵と Bearer:** 既存のとおり、顧客が `--keygen` で ed25519 鍵を作り、GenomicsChain が `gc_issue_bound_token.rb` で
 その pubkey に束縛した Bearer を発行する（発行後に anchor の再起動が要る — 既知の運用制約）。
@@ -342,27 +372,43 @@ attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Ti
 ## 8. 検証者が言えること・言えないこと（`gc_prov_verify` の出力の形）
 
 原則（round 2）: **検証者は、自分が手元に持つ bytes から自分で計算したことだけを「確かめた」と印刷する。** anchor の返事を
-写すときは「anchor が言っている」と書く。第一段の材料は `gc_prov_proof(proof_id)` が返す envelope（`evidence` から取り出した manifest・attester_id・
-timestamp・ttl・anchor の署名・submitter_pubkey・revoked）。`attestation_verify` は evidence を返さず、`public_key` を渡さない呼び出しは
+写すときは「anchor が言っている」と書く。第一段の材料は `gc_prov_proof` route が返す envelope（§7 の欄: `evidence` から取り出した
+manifest・attester_id・timestamp・ttl・anchor の署名・submitter_pubkey・revoked）。
+
+**二つの署名（round 3）。** 提出者の署名は ed25519、`Manifest.canonical_json({mcp_tool_name, params, nonce, chain_tip_hash})` の
+bytes に対して、base64url。`params` は manifest の `record_version` が定める署名欄の集合（§6）から組み立てる。anchor の署名は
+**RSA-2048 / SHA-256（PKCS#1 v1.5）、Base64、公開鍵は PEM**（MMP の `Crypto`。ed25519 ではない）で、bytes は Synoptis の
+`ProofEnvelope#canonical_json`（proof_id・version・attester_id・subject_ref・claim・evidence・merkle_root・timestamp・ttl・
+submitter_pubkey の順。json gem 2.9.1 では `sort_keys:` が効かず挿入順——実測）。検証者は自分で直列化し直さず、verifier node の
+`Synoptis::Verifier#verify(envelope, public_key:)` に PEM を渡す。`attestation_verify` は evidence を返さず、`public_key` を渡さない呼び出しは
 署名つき envelope に対して常に `valid: false`（`no_public_key_for_verification`）を返すので、v0.1 の検証者は `attestation_verify` を
 **使わない**。
 
 ```
-確かめたこと（束と envelope の manifest から、この tool 自身が）
-  - 束の digest = manifest の bundle_digest（§2 の規則で取り直す。file の sha256 ではない）
+確かめたこと（束と envelope から、この tool 自身が）
+  - 束の digest = manifest の bundle_digest（manifest の bundle_digest_canonicalization が名指す規則で取り直す。file の sha256 ではない。
+    規則の名前を知らなければ照合しない——下の表）
+  - envelope.subject_ref = "prov:sha256:" + その digest、envelope.claim = §6 の形で組み直した文字列（anchor が署名した層が
+    evidence の中身と一致すること。attestation_list が印刷するのは claim なので、台帳を読む人が引用するのはこちら）
+  - evidence.manifest_body_sha256 = sha256(canonical_json(manifest))、envelope.submitter_pubkey = manifest.operator.pubkey、
+    manifest.submission_key = {digest_subject_hash, signed_identity, operator_pubkey} から組み直した値（= claim の末尾）
   - 等級 = manifest の grade_overall と各分類、数（adapter_version / predicate_version / pin_strength_version の三つが
-    手元の版と一致するときだけ再導出する）
+    手元の版と一致するときだけ再導出する。outputs_digest は outputs_digest_rule が手元と一致するときだけ）
   - 提出者の署名（manifest.operator の ed25519 署名。--submitter-pubkey で渡された鍵で検証。渡されなければ
     manifest 内の pubkey で検証し「manifest 内の鍵と自己整合」と書く——それは提出者の同一性の証明ではない）
   - 段 N 本のうち自分で環境を宣言した k、software M 本のうち immutable a / versioned b / ...、入力 K 本のうち checksum つき k'
 版が違うとき（見出しを別にする）
   - 「adapter / predicate / pin_strength の版が手元（x, y, z）と proof（x', y', z'）で違うので等級は再導出していない」
-    ——不一致とは書かない。digest の照合と署名の検証は版に依らないので、そちらは行う
-anchor が言っていること（この tool は確かめていない。--anchor-pubkey が渡されたときだけ「確かめたこと」に移す）
-  - 時刻 T に目撃した（attester_id、timestamp、anchor の署名）。鍵が無い間は「anchor-reported」。chain_tip_hash は
-    「この block より後」という順序の下限であって時刻ではない——block の時刻は chain から別に引く
+    ——不一致とは書かない。manifest の record_version を知らないときも同じ見出し（署名欄の集合が分からないので提出者の署名も
+    検証しない）。digest の照合は正準化規則の名前に、署名の検証は record_version に依る——手順の版には依らない
+anchor が言っていること（この tool は確かめていない）
+  - 時刻 T に目撃した（attester_id、timestamp、anchor の署名）。--anchor-pubkey が渡されたときだけ、署名と、署名の中にある
+    timestamp・ttl・subject_ref・claim・evidence を「確かめたこと」に移す。鍵が無い間は「anchor-reported」
+  - chain_tip_hash: 顧客が署名した時点で見た proofs 台帳の末尾記録の hash（core の TipSource。block ではない）。受理時に
+    anchor が鮮度（≤ 100 件か ≤ 6 時間）を確かめたという anchor の言い分で、この tool は検証しない
   - proof の鮮度（timestamp と ttl を印刷し、expired は「TTL を過ぎた」と書く。「記録が無効」とは書かない）
-  - 失効（revoked。anchor が取り消したという anchor の言い分。理由は envelope に無い）
+  - 失効（revoked）——**鍵があっても anchor-reported のまま**。revoked は registry の別 file から足した欄で、署名の外にある。
+    書き換えても envelope の署名は通るので、「確かめた」には移せない（round 3、codex）
 確かめていないこと（manifest の not_checked をそのまま写す）
   - locator の先が今も取得できるか
   - 束が実行を正しく写しているか（producer と補完器の出力を信じている）
@@ -377,11 +423,12 @@ Synoptis の engine と Verifier の語彙をそのまま使い、検証者が�
 | anchor の返事 | 検証者が印刷すること | 束の照合 |
 |---|---|---|
 | `status: error, message: Proof not found` | 「anchor はこの proof_id を知らない」 | できない（manifest が無い） |
-| `status: revoked` | 「anchor はこの proof を取り消したと言っている」＋ envelope があれば通常どおり照合（取り消しは anchor の判断で、束の同一性は変わらない） | する |
+| `revoked: true` | 「anchor はこの proof を取り消したと言っている」＋通常どおり照合（取り消しは anchor の判断で、束の同一性は変わらない。route は envelope を返す） | する |
 | envelope あり、`ttl` を過ぎている | 「鮮度: TTL を過ぎた（timestamp, ttl）」 | する |
-| envelope の anchor 署名が `--anchor-pubkey` で検証できない（Verifier の `invalid_signature` / `missing_signature` 相当） | 「anchor の署名が渡された鍵で検証できない——proof は anchor のものではないか、鍵が違う」 | する（提出者の署名は別に検証する） |
-| `identity_outside_signature`（署名の外に同一性の欄がある） | 「manifest の形が壊れている: 署名の外に同一性がある」 | しない（どの欄が署名されたか決められない） |
-| `missing_attester_id` / `missing_subject_ref` / `missing_claim` | 「envelope に必須の欄が無い」 | しない |
+| envelope の anchor 署名が `--anchor-pubkey` で検証できない（Verifier の `invalid_signature` / `missing_signature` 相当） | 「anchor の署名が渡された鍵で検証できない——proof は anchor のものではないか、鍵が違うか、直列化が違う（json gem の版、Ruby 以外の実装）」 | する（提出者の署名は別に検証する） |
+| `identity_outside_signature`（envelope version 1.0.0 に submitter_pubkey がある） | 「envelope の submitter_pubkey は署名の外にある——無視し、manifest.operator.pubkey を使う。anchor の署名の行は invalid」 | **する**（evidence はどの version でも署名の中。round 3: 計算できることは計算する） |
+| `missing_attester_id` / `missing_subject_ref` / `missing_claim` | 「envelope の必須欄が無い——anchor の記録として不完全」 | **する**（manifest は evidence の中に残っている） |
+| evidence が parse できない／manifest が prov の形でない／`bundle_digest_canonicalization` か `outputs_digest_rule` の名前を知らない／envelope の version を知らない | 「この proof は prov の記録として読めない（理由）。束の digest だけ印刷する」 | 束の digest は計算する（照合先が無い） |
 | 読み口に届かない（網が無い、anchor が止まっている） | 「anchor の読み口に届かない——proof_id と束の digest だけを印刷する」 | 束の digest は計算する（照合先が無い） |
 
 言葉づかいは記憶 `warranty-scope` の規則に従う: 「固定した」「観測した」と書き、「保証」は記録と手順にだけ、「再現できる」は書かない。
@@ -399,7 +446,7 @@ Synoptis の engine と Verifier の語彙をそのまま使い、検証者が�
 | U1 | BCO アダプタ `adapters/bco.rb` → `NormalizedProvenance` | `adapter_bco_test.rb`: fixture から 7 種類が取れる。空欄は nil |
 | U1b | 汎用の最小書き出し器 `tools/gc_prov_write.rb`（§4.1）: 段の一覧を受け取り、版・digest・checksum・パラメータ・seed・実行系の版を集めて BCO を書く。Tier-3 executor から呼べる形 | `prov_write_test.rb`: 2 段の shell 計算（デモの 223, 553, 2）から BCO が出て、U1 のアダプタで読める。checksum を省くと等級が floating になる |
 | U2 | 述語 `predicate.rb`（PinStrength を呼ぶ） | `predicate_test.rb`: 手書きの小さな正規化来歴 6 つで 6 等級が出る。fixture の等級が固定される（数値を test に書く） |
-| U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`、`tools/gc_prov_proof.rb`。core の 4 か所（§7） | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 100 年で Tier-2 の proof は 24 時間のままの 1 本、`idempotency_key` が束ごとに違う 1 本、版ずれの拒否が三つの版を返す 1 本、`gc_prov_proof` が envelope を返し未知の id に not found を返す 1 本を足す |
+| U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`、`lib/genomicschain_prov/place_extension.rb`（`gc_prov_proof` route）。core の 4 か所（§7）と prov の core pin | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本のうち prov に対応のある 11 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復。toolchain_ruby・tier1 content hash・applied stage の 3 本は prov に無い）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 100 年で Tier-2 の proof は 24 時間のままの 1 本、`idempotency_key` が束ごとに違う 1 本、版ずれの拒否が三つの版を返す 1 本、`gc_prov_proof` route が prov の envelope を §7 の欄だけで返し、未知の id と Tier-2 の id に not found を返し、`actor_user_id` を含まない 1 本、SCM 無しの束が null の repo hash で記録される 1 本を足す |
 | U4 | `gc_prov_check` と client の `--tier prov` | `submit_client_test.rb` に prov の 1 本。使い捨て local anchor で dry_run → 実提出 → 回復まで（09-09 の Tier-2 と同じ手順） |
 | U5 | `gc_prov_verify` | fixture + local anchor の proof で「確かめたこと／いないこと」が出る。改竄した束で不一致が出る。§8 の表の各行が 1 本ずつ（not found・revoked・expired・鍵違い・版違い）。`--submitter-pubkey` 無しで「自己整合」の文言、`--anchor-pubkey` 有りで anchor の行が「確かめたこと」へ移る |
 | U6 | WRROC アダプタ（v0.2） | 同じ fixture の `ro-crate-metadata.json` から U1 と同じ 7 種類 |
@@ -445,10 +492,21 @@ U0〜U5 が v0.1。U0 を先にするのは、アダプタの欄名を実物で�
     許した者だけが確かめられる」に変わるので、それは採らない。既存の `attestation_verify` / `attestation_list` は Bearer 有りのまま
     （prov の検証者は使わない）。退けた案: (B) 第三者にも pubkey 束縛の Bearer を発行する（`gc_issue_bound_token.rb`。誰が読んだかは
     残るが、監査人ごとに鍵の手続きと anchor の再起動が要る）、(C) 公開鍵の配布（§10-3）まで Bearer 有りのまま。
-    **実装の穴（U3 で決める）**: KairosChain の HTTP transport は session 単位で Bearer を要求する。1 tool だけを認証の外に出す
-    仕組みは prov 側の tool 登録だけでは作れないかもしれない。候補は transport の allowlist か、Synoptis SkillSet にある
-    `anchoring/public_read.rb` / `public_verifier.rb` の公開読み口（実物は未確認——U3 で読む）。どちらでも `gc_prov_verify` の
-    §8 は変わらない
+    **仕組み（round 3 で実物を読んで決めた）**: MCP の `tools/call` は request ごとに body を読む前に Bearer を検査し（tool 名で
+    分岐できない）、anchor では service_grant の AccessGate が `pubkey_hash` の無い呼び出しを重ねて拒むので、MCP tool を 1 本だけ
+    認証の外に出す口は無い。v0.1.3 で候補に挙げた transport の allowlist と Synoptis の `public_read.rb` は、前者は存在せず、
+    後者は anchoring Log の entry を digest で引く口で proof_id では引けない。**実在するのは Meeting Place の place extension の
+    `public_routes`**（Hestia `PlaceRouter`: `/place/web/` 配下の prefix を認証なし・GET のみ・公開 rate limiter つきで Bearer の前に
+    dispatch する。skillset_exchange が同じ口で catalog を公開している）。`gc_prov_proof` はこれで `/place/web/prov/proof/<proof_id>`
+    に出す（§7）。前提: anchor で Meeting Place が動いていること（meeting.genomicschain.io では動いている）。
+    **読める欄**は §7 の列挙どおりで、それ以外は返さない。proof_id は engine の `SecureRandom.uuid`（UUID v4、122 bit）なので
+    束の digest からも submission_key からも導けない——proof_id を知る者だけが読める。§12 の「同じ subject_ref の列」を引く口
+    （v0.2）は digest を索引にするので、公開にするかは v0.2 で別に決める
+15. **継承の代替は経路ごとか、段ごとか**（round 3、operator の決定待ち。既定は現状維持）: いまは「段が一部でも自分で宣言すると、
+    その段は workflow 全体の宣言を両経路とも使わない」（§5）。実測: workflow 全体に digest 固定の image、段 3 だけ版なしの awk を
+    正直に足すと段 3 が immutable → floating に落ちる。代案は経路ごとの代替（container は container を、package は package を
+    継承）——この逆転は消えるが、round 2 で固定した「段の `:latest` image と workflow 全体の checksum つき package → floating」が
+    immutable に戻る。補完器は段ごとにだけ書くのでどちらでも補完した束は変わらない。決まるまで §5 は現状の言葉のまま
 
 ## 11. デモ → 設計の対応表
 
@@ -550,8 +608,10 @@ trace の既定 14 列に container 列は無い（`trace.fields` で足せる�
    各工程の `.command.run`（か container 列つき trace）・`docker image inspect`・file の hash を読み、補完した BCO を書く:
    各段の `prerequisite[]` にその段のツール {name, version, uri: `image@sha256:…`}——**段ごとにだけ**書き、workflow 全体の
    `software_prerequisites[]` には写さない（round 2: 写すと代替の経路が全段を覆い、段ごとの網羅が数に出なくなる。
-   `software_prerequisites[]` は nf-prov が書いた runtime の 1 行のまま）、runtime（Nextflow）の項目に framework jar の sha256
-   （§10-9）、io の各項目に `sha1_checksum`（規格の欄は SHA-1）、同じ file の sha256 は GenomicsChain の `extension_domain` 項目に。
+   `software_prerequisites[]` は nf-prov が書いた runtime の 1 行のまま）、runtime（Nextflow）の framework jar の sha256（§10-9）と
+   各ツールの file hash は GenomicsChain の `extension_domain` の `checksums[]` に **その項目の uri を鍵にして**書く（アダプタは
+   入力・出力と同じ結合で tool と runtime の checksum を読む——round 3: それまで書く場所はあっても読む欄が無かった）、io の各項目に
+   `sha1_checksum`（規格の欄は SHA-1）、同じ file の sha256 は同じ `checksums[]` に。
    等級は集めた分だけ上がる（tag のみ → versioned、digest と checksum → immutable）。述語は最弱のままで、何も隠さない。
    補完器が段の `input_list` / `output_list` に task の入出力の uri を書けば、§13.4-3 の順序規則で run の中間 file が内部入力として
    数から外れる。
@@ -586,4 +646,5 @@ container・ツールの版・checksum を BCO に書く提案を出す道もあ
 | v0.1 | 2026-09-20 | 起草。§0–§12 |
 | v0.1.1 | 2026-09-20 | U0 の実測（§13）、unknowns pass（§10-1/9/10/11） |
 | v0.1.2 | 2026-09-20 | review round 1（REVISE）の 5 件: §5 段ごとの環境と版の形、§13.4-3 出力の証拠による内部入力、§6 記録の契約、§6/§8 proof の寿命と検証者の言い方、§7 配置 |
+| v0.1.4 | 2026-09-21 | review round 3（REVISE）の 5 件: G1 §5/§4（版の規則: 拒否は語全体、候補は数字を含む語を左から、DOI は locator 全体、runtime の digest は OCI 参照だけ、段の一部宣言の逆転を明記、object でない段は拒否）、G2 §6（null 5 欄、正準化規則と outputs 規則を署名、record_version が署名欄を固定、idempotency に predicate_version、prov の core pin）、G3 §7/§10-14（`gc_prov_proof` は place extension の公開 route、返す欄の列挙、record_type の絞り、proof_id は UUID v4）、G4 §8（二つの署名の算法と bytes、確かめること 4 行追加、revoked は常に anchor-reported、5〜6 行目は照合する、prov でない記録の行、chain_tip_hash は台帳末尾の hash）、G5 §6/§13.4-1（誤り文に束の値を入れない、拡張 checksum を tool と runtime に結合、重複除去の鍵に checksum）。§10-15 を operator の決定待ちで追加。code: adapter 0.3.1 / predicate 0.3.1 |
 | v0.1.3 | 2026-09-21 | falsifier（126 件中 5 件を反駁、修正済）と operator の決定 §10-14 (A) を含む。review round 2（REVISE）の 5 件: F1 §5/§13.4-1（段 = 位置、重複除去に段、継承は代替のみ、段ゼロは absent、版の規則を言葉で、locator は immutable にならない、claim は own/total）、F2 §13.4-3（uri のみ、前の段が作ったものだけ内部、上書きは外部）、F3 §6/§7（core 4 か所と TTL の経路、`pin_strength_version` = 規則の版、`outputs_digest` の規則名、seed を署名の外へ、null になりうる欄、版ずれの語彙、回復は同版のみ）、F4 §7/§8（`gc_prov_proof`、手元での署名検証、誤り符号の表、版違いの見出し、読み口の認証 §10-14）、F5 言い回し（§2 正準化の限界、§4 checksum の出所と accessor、§6 repo hash の推測余地、§8 chain_tip_hash は順序、Gate A と HTTP の上限）。code: adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 |

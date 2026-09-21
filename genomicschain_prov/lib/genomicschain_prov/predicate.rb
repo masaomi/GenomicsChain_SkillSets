@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.0'
+    PREDICATE_VERSION = 'prov-predicate-0.3.1'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -78,26 +78,42 @@ module GenomicsChainProv
     CATEGORIES = %w[environment inputs workflow runtime].freeze
     REPORTED = %w[software container environment inputs workflow runtime].freeze
 
-    # --- the version-string rule, in words (design §5, review round 2) ------
-    # A BCO `version` is free text. It names a release when, after
-    #   1. dropping a leading tool-name token ("GATK 4.5.0.0", "bash 5.2.21"),
-    #   2. taking the first whitespace-separated token that remains,
-    #   3. dropping a Debian-style epoch ("1:2.3"),
-    # the token is digits joined by dots, with an optional leading v/V and any
-    # number of suffixes joined by - + . _ ~ (1.4-r122, 0.12.1--hdfd78af_0,
-    # 2.3~rc1). Before that test:
-    #   - a constraint operator (< > ! ,), a wildcard (*) or a leading ~ / ^
-    #     admits more than one release → ranged;
-    #   - a token that is literally x (1.x, 1.x.2) → ranged;
-    #   - a token from NOT_A_RELEASE, alone or with trailing digits, anywhere
-    #     (latest, 0-unknown, 1.0-SNAPSHOT, 2.0.dev3) → floating;
-    #   - a string with no digit at all (unknown, HEAD, master) → floating.
+    # --- the version-string rule, in words (design §5, review rounds 2–3) ----
+    # A BCO `version` is free text. Split it on whitespace into words.
+    #   veto:   a word that is, whole, a NOT_A_RELEASE word (optionally with
+    #           trailing digits: latest, dev3), or a candidate whose - + . _ ~
+    #           pieces contain one (0-unknown, 1.0-SNAPSHOT, 2.0.dev3) → the
+    #           whole string is floating. "1.0 latest" and "latest 1.0" alike.
+    #   candidates: the words that contain a digit, in order, each with a
+    #           Debian epoch "N:" dropped. A word without a digit is a tool
+    #           name and is skipped ("GATK 4.5.0.0", "GNU bash, version 5.2.21").
+    #   each candidate, left to right:
+    #     - a constraint operator (< > ! ,), a wildcard (*) or a leading ~ / ^
+    #       → ranged ("GATK >=4", "~1.2");
+    #     - a piece that is literally x → ranged (1.x, 1.x.2);
+    #     - digits joined by dots, optional leading v/V, any number of pieces
+    #       joined by - + . _ ~ → versioned (1.4-r122, 0.12.1--hdfd78af_0,
+    #       2.3~rc1, V1.2.0);
+    #     - otherwise the next candidate ("python3 3.11.4": python3 is not a
+    #       release, 3.11.4 is — naming the tool never grades below the bare
+    #       version, review round 3).
+    #   no candidate decided → floating (unknown, HEAD, r122); "*" alone → ranged.
     RELEASE_LIKE  = /\A[vV]?\d+(?:\.\d+)*(?:[-+._~]+[A-Za-z0-9]+)*\z/
     RANGE_MARK    = /[<>!,*]|\A[~^]/
     NOT_A_RELEASE = %w[latest unknown head master main dev devel nightly snapshot stable current trunk none null
                        unversioned].freeze
     NOT_A_RELEASE_TOKEN = /\A(?:#{NOT_A_RELEASE.join('|')})\d*\z/i
-    IMAGE_DIGEST  = /@sha256:[0-9a-f]{64}/i
+    # A DOI is a DOI only when the whole locator is one (optionally as a
+    # doi.org URL or a doi: URI). A `10.1234/` directory inside a path is a
+    # name (review round 3, reproduced: a directory rename lifted an input two
+    # levels).
+    DOI_WHOLE     = %r{\A(?:https?://(?:dx\.)?doi\.org/|doi:)?10\.\d{4,9}/\S+\z}i
+    # The runtime is digest-pinned only when its locator IS an OCI image
+    # reference carrying a digest: optional docker:// oci:// shub://, a
+    # registry/repository path, an optional tag, then @sha256:<64 hex>, and
+    # nothing else. "https://…/v26.04.6@sha256:…" is a URL with a suffix the
+    # producer chose (review round 3, reproduced on the fixture).
+    OCI_IMAGE_DIGEST = %r{\A(?:(?:docker|oci|shub)://)?[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)*(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}\z}i
 
     module_function
 
@@ -166,45 +182,46 @@ module GenomicsChainProv
 
     def version_grade(name, version)
       raw = version.to_s.strip
-      return ['ranged', "version #{raw.inspect} admits more than one release"] if raw =~ RANGE_MARK
+      words = raw.split(/\s+/)
+      floating = ['floating', "version #{raw.inspect} names no release"]
+      return floating if words.any? { |w| w =~ NOT_A_RELEASE_TOKEN }
 
-      v = release_token(raw)
-      return ['floating', "version #{raw.inspect} names no release"] if v.nil?
+      candidates = release_candidates(raw)
+      return ['ranged', "version #{raw.inspect} admits more than one release"] if candidates.empty? && raw =~ RANGE_MARK
 
-      tokens = v.split(/[-+._~]+/)
-      return ['ranged', "version #{raw.inspect} admits more than one release (.x)"] if tokens.any? { |t| t =~ /\A[xX]\z/ }
-      if tokens.any? { |t| t =~ NOT_A_RELEASE_TOKEN }
-        return ['floating', "version #{raw.inspect} names no release"]
+      candidates.each do |v|
+        pieces = v.split(/[-+._~]+/)
+        return floating if pieces.any? { |t| t =~ NOT_A_RELEASE_TOKEN }
+        return ['ranged', "version #{raw.inspect} admits more than one release"] if v =~ RANGE_MARK
+        return ['ranged', "version #{raw.inspect} admits more than one release (.x)"] if pieces.any? { |t| t =~ /\A[xX]\z/ }
+        return ['versioned', "#{name} #{v} — a release name; stable by convention only"] if v =~ RELEASE_LIKE
       end
-      return ['versioned', "#{name} #{v} — a release name; stable by convention only"] if v =~ RELEASE_LIKE
-
-      ['floating', "version #{raw.inspect} names no release"]
+      floating
     end
 
-    # Steps 1–3 of the rule above. nil when no token carries a digit.
-    def release_token(raw)
-      t = raw.split(/\s+/).drop_while { |x| x !~ /\d/ }.first
-      t&.sub(/\A\d+:/, '')
+    # The words of a free-text version that carry a digit, in order, each
+    # with a Debian epoch dropped. Empty when no word does.
+    def release_candidates(raw)
+      raw.split(/\s+/).select { |w| w =~ /\d/ }.map { |w| w.sub(/\A\d+:/, '') }
     end
 
-    # An input is `immutable` only through a checksum field. PinStrength's
-    # data_locator reads a hash-like substring in a locator as a content hash
-    # — right for a config value inside a repository, wrong here: the locator
-    # is a string the producer chooses, and `inputs_with_checksum` would still
-    # say 0 (review round 2, reproduced). The locator alone tops out at
-    # versioned (a DOI), floating (a URL) or local_path.
+    # An input is `immutable` only through a checksum field. The locator
+    # alone tops out at versioned (the whole locator is a DOI), floating (a
+    # URL) or local_path. PinStrength.data_locator is not used here: it reads
+    # a hash-like or DOI-like SUBSTRING as a content hash or a DOI — right for
+    # a config value inside a repository, wrong for a string the producer
+    # chooses (review round 2: `#sha256:` lifted a path to immutable with
+    # `inputs_with_checksum 0`; round 3: a `10.1234/` directory lifted it to
+    # versioned).
     def input_grade(i)
       return ['immutable', 'carries a checksum'] if i['checksum']
 
-      level, reason = PS.data_locator(i['locator'])
-      return [level, reason] unless level == 'immutable'
+      v = i['locator'].to_s.strip
+      return ['absent', 'empty locator'] if v.empty?
+      return ['versioned', 'DOI — persistent, but nothing here verifies the bytes behind it'] if v =~ DOI_WHOLE
+      return ['floating', 'URL — retrievable, but its content can change without notice'] if v =~ PS::URL
 
-      note = 'a hash inside the locator string is not a checksum field'
-      v = i['locator'].to_s
-      return ['versioned', "DOI — #{note}"] if v =~ PS::DOI
-      return ['floating', "URL — #{note}"] if v =~ PS::URL
-
-      ['local_path', "a filesystem path — #{note}"]
+      ['local_path', 'a filesystem path; nothing in the bundle says how to obtain it']
     end
 
     # A commit hash names the tree by its own hash. Anything symbolic is
@@ -232,7 +249,7 @@ module GenomicsChainProv
     def runtime_grade(r)
       return ['absent', 'no runtime named'] if r.nil?
       return ['immutable', 'runtime carries a checksum'] if r['checksum']
-      return ['immutable', 'runtime image is digest-pinned'] if r['locator'].to_s =~ IMAGE_DIGEST
+      return ['immutable', 'runtime image is digest-pinned'] if r['locator'].to_s =~ OCI_IMAGE_DIGEST
       return version_grade(r['engine'], r['version']) if r['version']
 
       ['absent', "#{r['engine']} without a version"]

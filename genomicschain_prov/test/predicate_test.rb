@@ -188,7 +188,11 @@ class PredicateTest < Minitest::Test
                '0-unknown' => 'floating', '1.0-SNAPSHOT' => 'floating', '2.0.dev3' => 'floating', 'r122' => 'floating',
                '' => 'floating',
                '>=1.0' => 'ranged', '1.*' => 'ranged', '*' => 'ranged', '1.x' => 'ranged', '1.x.2' => 'ranged',
-               '~1.2' => 'ranged', '^1.2' => 'ranged', '3.10,<3.12' => 'ranged', 'GATK >=4' => 'ranged' }
+               '~1.2' => 'ranged', '^1.2' => 'ranged', '3.10,<3.12' => 'ranged', 'GATK >=4' => 'ranged',
+               # review round 3: a tool name carrying a digit, a comma in a dropped word, the veto anywhere
+               'python3 3.11.4' => 'versioned', 'openjdk11 11.0.22' => 'versioned', 'gcc-13 13.2.0' => 'versioned',
+               'GNU bash, version 5.2.21' => 'versioned', 'GATK ~1.2' => 'ranged', 'main.py 1.2' => 'versioned',
+               '1.0 latest' => 'floating', 'latest 1.0' => 'floating', '5.2.21(1)-release' => 'floating' }
     expect.each do |version, level|
       assert_equal level, P.version_grade('tool', version).first, "version #{version.inspect}"
     end
@@ -308,6 +312,39 @@ class PredicateTest < Minitest::Test
     assert_equal 'local_path', g['grades']['inputs']
     assert_equal 0, g['counts']['inputs_with_checksum']
     assert_equal 'immutable', P.input_grade(path.merge('checksum' => { 'sha256' => 'a' * 64 })).first
+  end
+
+  # Review round 3 (customer skeptic, reproduced): a `10.1234/` directory
+  # inside a path lifted an input two levels. A DOI is a DOI only when the
+  # whole locator is one.
+  def test_a_doi_shaped_substring_is_not_a_doi
+    grade = ->(l) { P.input_grade('name' => 'x', 'locator' => l, 'checksum' => nil, 'internal' => false, 'reference_hint' => false).first }
+    assert_equal 'local_path', grade.call('/data/x.fa')
+    assert_equal 'local_path', grade.call('/data/10.1234/x.fa')
+    assert_equal 'local_path', grade.call('work/10.1000/tmp.txt')
+    assert_equal 'local_path', grade.call('/data/x.fa?ref=10.1234/abc')
+    assert_equal 'floating', grade.call('https://example.org/x.fa')
+    assert_equal 'floating', grade.call('https://example.org/10.1234/x.fa')
+    assert_equal 'versioned', grade.call('10.5281/zenodo.1234')
+    assert_equal 'versioned', grade.call('doi:10.5281/zenodo.1234')
+    assert_equal 'versioned', grade.call('https://doi.org/10.5281/zenodo.1234')
+    assert_equal 'versioned', grade.call('https://dx.doi.org/10.5281/zenodo.1234')
+    assert_equal 'absent', grade.call('')
+  end
+
+  # Review round 3 (customer skeptic, reproduced on the fixture): `@sha256:`
+  # appended to the runtime's release URL graded it immutable. The runtime is
+  # digest-pinned only when its locator IS an OCI image reference.
+  def test_runtime_is_immutable_only_via_checksum_or_an_oci_digest
+    rt = ->(l, c = nil) { P.runtime_grade('engine' => 'nextflow', 'version' => '26.04.6', 'locator' => l, 'checksum' => c).first }
+    assert_equal 'versioned', rt.call('https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6')
+    assert_equal 'versioned', rt.call("https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6@sha256:#{'a' * 64}")
+    assert_equal 'versioned', rt.call("/opt/nextflow.jar@sha256:#{'a' * 64}")
+    assert_equal 'versioned', rt.call("nextflow@sha256:#{'a' * 64} extra")
+    assert_equal 'immutable', rt.call("docker://nextflow/nextflow:26.04.6@sha256:#{'a' * 64}")
+    assert_equal 'immutable', rt.call("quay.io/nextflow/nextflow:26.04.6@sha256:#{'a' * 64}")
+    assert_equal 'immutable', rt.call("registry.example:5000/nf@sha256:#{'a' * 64}")
+    assert_equal 'immutable', rt.call('https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6', { 'sha256' => 'a' * 64 })
   end
 
   # The seed is found by parameter NAME — a guess — so it is reported beside

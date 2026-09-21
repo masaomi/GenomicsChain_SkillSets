@@ -18,10 +18,11 @@ require_relative 'genomicschain_prov/adapters/bco'
 require_relative 'genomicschain_prov/predicate'
 
 module GenomicsChainProv
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
 
   # Part of the signed identity (`adapter_version`, design §6): the same bundle
   # under a different adapter version may normalise differently, so the record
-  # names the adapter that produced the grade.
-  ADAPTER_BCO_VERSION = 'prov-adapter-bco-0.3.0'
+  # names the adapter that produced the grade. The constant lives with the
+  # adapter; this is its public name.
+  ADAPTER_BCO_VERSION = Adapters::Bco::VERSION
 end

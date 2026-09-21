@@ -278,7 +278,8 @@ class AdapterBcoTest < Minitest::Test
     b = enriched_bco
     b['description_domain']['pipeline_steps'][1]['step_number'] = 2
     err = assert_raises(Bco::FormatError) { Bco.parse(b) }
-    assert_match(/duplicate step_number \[2\]/, err.message)
+    assert_match(/1 step_number value\(s\) duplicated/, err.message)
+    refute_match(/2/, err.message.sub('1 step_number', ''), 'the duplicated value itself is not in the message')
 
     b = enriched_bco
     b['description_domain']['pipeline_steps'][0].delete('step_number')
@@ -334,11 +335,66 @@ class AdapterBcoTest < Minitest::Test
     assert_equal 7, n.inputs_external.length
   end
 
+  # --- review round 3 ---------------------------------------------------------------
+
+  # The extension's checksums join tools and the runtime by locator, the same
+  # way inputs and outputs join: the enricher writes the framework jar's sha256
+  # keyed by the runtime's uri, and a tool's file hash keyed by its uri.
+  def test_extension_checksums_reach_software_and_runtime
+    b = enriched_bco
+    b['extension_domain'][1]['genomicschain_extension']['checksums'] += [
+      { 'uri' => 'https://www.gnu.org/software/bash/', 'sha256' => 'F' * 64 },
+      { 'uri' => 'https://example.org/tool', 'sha256' => '9' * 64 }
+    ]
+    n = Bco.parse(b)
+    assert_equal({ 'sha256' => 'f' * 64 }, n.runtime['checksum'])
+    assert_equal({ 'sha256' => '9' * 64 }, n.software.find { |x| x['name'] == 'unpinned-tool' }['checksum'])
+    g = GenomicsChainProv::Predicate.grade(n)
+    assert_equal 'immutable', g['grades']['runtime']
+    assert_equal 'immutable', g['items'].find { |i| i['name'] == 'unpinned-tool' }['grade']
+  end
+
+  # Two declarations alike but for their checksum are two items; the weaker
+  # survives whichever comes first.
+  def test_dedup_keeps_entries_that_differ_only_in_checksum
+    b = enriched_bco
+    b['execution_domain']['software_prerequisites'] << { 'name' => 'coreutils', 'version' => '9.4',
+                                                         'uri' => { 'uri' => "docker://library/debian@sha256:#{'c' * 64}",
+                                                                    'sha1_checksum' => 'A' * 40 } }
+    n = Bco.parse(b)
+    assert_equal 2, n.software.count { |x| x['name'] == 'coreutils' }
+    assert_equal [nil, { 'sha1' => 'a' * 40 }], n.software.select { |x| x['name'] == 'coreutils' }.map { |x| x['checksum'] }
+  end
+
+  # A step that is not an object is refused, not dropped: dropping it would
+  # shrink stages_total and could remove the weakest stage from the grade.
+  def test_non_object_step_is_a_format_error
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'] << 'step four'
+    err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+    assert_match(/1 pipeline step\(s\) are not objects/, err.message)
+  end
+
+  # No bundle value reaches an error message: the anchor may log it, and §6
+  # promises its logs carry no bundle content.
+  def test_error_messages_carry_no_bundle_values
+    err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-PATH-/data/patient42"') }
+    refute_match(/patient42|SECRET/, err.message)
+    assert_equal 'bundle is not valid JSON', err.message
+    err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-PATH-/data/patient42"}') }
+    refute_match(/patient42|SECRET/, err.message)
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][0]['step_number'] = '/data/patient42'
+    err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+    refute_match(/patient42/, err.message)
+  end
+
   # --- refusals -------------------------------------------------------------------
 
   def test_rejects_what_is_not_a_bco
     err = assert_raises(Bco::FormatError) { Bco.parse('{"@context": "https://w3id.org/ro/crate/1.1/context"}') }
     assert_match(/spec_version/, err.message)
+    assert_equal GenomicsChainProv::ADAPTER_BCO_VERSION, Bco::VERSION
     assert_raises(Bco::FormatError) { Bco.parse('not json') }
     assert_raises(Bco::FormatError) { Bco.parse('[1,2]') }
     err = assert_raises(Bco::FormatError) { Bco.parse(enriched_bco.reject { |k, _| k == 'io_domain' }) }

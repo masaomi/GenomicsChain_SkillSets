@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'set'
 require_relative '../normalized'
 
 module GenomicsChainProv
@@ -30,11 +31,20 @@ module GenomicsChainProv
     # Stage identity (review round 2): a stage is its POSITION after sorting
     # the steps on `step_number`, and every per-stage item carries that
     # position. Step numbers 10, 20, 30 are stages 1, 2, 3. A duplicated or
-    # non-integer `step_number` is a FormatError — two steps sharing a number
-    # would share a stage and pool their declarations, and a grade must not
-    # rest on that.
+    # non-integer `step_number`, or a step that is not an object, is a
+    # FormatError — two steps sharing a number would share a stage and pool
+    # their declarations, and a dropped step would shrink `stages_total`.
+    #
+    # FormatError messages carry structural facts only — a field name, a
+    # count, a position — never a value copied from the bundle: the anchor
+    # may log an exception message, and §6 promises that no bundle content
+    # reaches its disk or logs (review round 3).
     module Bco
       class FormatError < StandardError; end
+
+      # Part of the signed identity (`adapter_version`, design §6): the same
+      # bundle under a different adapter version may normalise differently.
+      VERSION = 'prov-adapter-bco-0.3.1'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -66,11 +76,11 @@ module GenomicsChainProv
         extension = genomicschain_extension(bco)
         sha256_by_locator = checksums_from(extension)
 
-        runtime = runtime_of(ed, notes)
-        software = software_of(ed, steps, runtime)
+        runtime = runtime_of(ed, notes, sha256_by_locator)
+        software = software_of(ed, steps, runtime, sha256_by_locator)
         containers = software.select { |s| oci_ref?(s['locator']) }
                              .map { |s| { 'ref' => s['locator'], 'name' => s['name'], 'stage' => s['stage'] } }
-        inputs = inputs_of(bco['io_domain'], internal_locators(steps), sha256_by_locator)
+        inputs = inputs_of(bco['io_domain'], internal_locators(steps).to_set, sha256_by_locator)
         outputs = outputs_of(bco['io_domain'], sha256_by_locator)
         recorded = params.reject { |p| unset?(p['value']) }
         producer = producer_of(extension)
@@ -89,7 +99,7 @@ module GenomicsChainProv
           runtime: runtime,
           software: software,
           containers: containers,
-          stages: stages_of(steps),
+          stages: stages_of(steps, sha256_by_locator),
           inputs: inputs,
           outputs: outputs,
           params_total: params.length,
@@ -104,26 +114,31 @@ module GenomicsChainProv
         raise FormatError, 'bundle is not a JSON object' unless bco.is_a?(Hash)
 
         spec = bco['spec_version'].to_s
-        raise FormatError, "spec_version #{spec.inspect} does not name an IEEE 2791 BCO" unless spec =~ SPEC_MARK
+        raise FormatError, 'spec_version does not name an IEEE 2791 BCO' unless spec =~ SPEC_MARK
 
         %w[description_domain execution_domain io_domain].each do |k|
           raise FormatError, "BCO missing required domain #{k}" unless bco[k].is_a?(Hash)
         end
         bco
-      rescue JSON::ParserError => e
-        raise FormatError, "bundle is not valid JSON: #{e.message}"
+      rescue JSON::ParserError
+        raise FormatError, 'bundle is not valid JSON'
       end
 
       # [[position, step], ...] sorted on step_number. Position is the stage id.
       def ordered_steps(bco)
-        raw = Array(bco.dig('description_domain', 'pipeline_steps')).select { |st| st.is_a?(Hash) }
+        listed = Array(bco.dig('description_domain', 'pipeline_steps'))
+        raw = listed.select { |st| st.is_a?(Hash) }
+        unless raw.length == listed.length
+          raise FormatError, "#{listed.length - raw.length} pipeline step(s) are not objects"
+        end
+
         bad = raw.reject { |st| st['step_number'].to_s =~ /\A-?\d+\z/ }
         unless bad.empty?
           raise FormatError, "#{bad.length} pipeline step(s) without an integer step_number"
         end
 
-        dup = raw.map { |st| st['step_number'].to_i }.tally.select { |_, n| n > 1 }.keys.sort
-        raise FormatError, "duplicate step_number #{dup.inspect}" unless dup.empty?
+        dup = raw.map { |st| st['step_number'].to_i }.tally.count { |_, n| n > 1 }
+        raise FormatError, "#{dup} step_number value(s) duplicated" if dup.positive?
 
         raw.sort_by { |st| st['step_number'].to_i }.each_with_index.map { |st, i| [i + 1, st] }
       end
@@ -150,38 +165,48 @@ module GenomicsChainProv
 
       # The runtime is the engine `script_driver` names; its version is the
       # software_prerequisites entry of the same name, when there is one.
-      def runtime_of(ed, notes)
+      def runtime_of(ed, notes, sha256_by_locator = {})
         engine = blank_to_nil(ed['script_driver'])
         return nil if engine.nil?
 
         entry = Array(ed['software_prerequisites']).find { |s| s.is_a?(Hash) && s['name'].to_s.casecmp?(engine) }
-        notes << "runtime #{engine} has no version entry in software_prerequisites" if entry.nil?
-        se = entry && software_entry(entry, nil)
+        notes << 'runtime has no version entry in software_prerequisites' if entry.nil?
+        se = entry && software_entry(entry, nil, sha256_by_locator)
         # locator and checksum are what would let the runtime grade above
         # `versioned` (a digest-pinned engine image, a checksummed launcher);
-        # nf-prov writes a release-tag URL and no checksum.
+        # nf-prov writes a release-tag URL and no checksum. The enricher writes
+        # the framework jar's sha256 into the GenomicsChain extension keyed by
+        # this entry's locator (§13.4-1), which the join below picks up.
         { 'engine' => engine, 'version' => se && se['version'],
           'locator' => se && se['locator'], 'checksum' => se && se['checksum'] }
       end
 
       # Workflow-level prerequisites (runtime excluded) plus every step's
-      # prerequisites. De-duplicated on (name, version, locator, stage): the
-      # same entry repeated within one level is counted once, but a tool a
-      # step declares is kept for that step even when the workflow level names
-      # it too, and a tool two steps declare is two items — the per-stage
-      # coverage the claim carries is counted from these (review round 2: a
-      # key without the stage collapsed every per-step entry into the
-      # workflow-level one, and the enriched fixture graded `absent` 4/8).
-      def software_of(ed, steps, runtime)
-        top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil) }
+      # prerequisites. De-duplicated on (name, version, locator, checksum,
+      # stage): the same entry repeated within one level is counted once, but
+      # a tool a step declares is kept for that step even when the workflow
+      # level names it too, and a tool two steps declare is two items — the
+      # per-stage coverage the claim carries is counted from these (review
+      # round 2: a key without the stage collapsed every per-step entry into
+      # the workflow-level one, and the enriched fixture graded `absent` 4/8).
+      # The checksum is in the key because it decides the grade: two entries
+      # alike but for their checksum are two declarations, and the weaker one
+      # must survive (round 3).
+      def software_of(ed, steps, runtime, sha256_by_locator = {})
+        top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil, sha256_by_locator) }
         top = top.reject { |s| runtime && s['name'].casecmp?(runtime['engine']) }
         per_step = steps.flat_map do |pos, st|
-          Array(st['prerequisite']).filter_map { |s| software_entry(s, pos) }
+          Array(st['prerequisite']).filter_map { |s| software_entry(s, pos, sha256_by_locator) }
         end
-        (top + per_step).uniq { |s| [s['name'], s['version'], s['locator'], s['stage']] }
+        (top + per_step).uniq { |s| [s['name'], s['version'], s['locator'], s['checksum'], s['stage']] }
       end
 
-      def software_entry(entry, stage)
+      # A tool's checksum comes from the standard's `sha1_checksum` on its uri
+      # and from the GenomicsChain extension's `checksums[]` joined by exact
+      # locator — the same join inputs and outputs use (round 3: the enricher
+      # had nowhere to put a SHA-256 for a tool or the runtime that anything
+      # read).
+      def software_entry(entry, stage, sha256_by_locator = {})
         return nil unless entry.is_a?(Hash)
 
         uri = entry['uri'].is_a?(Hash) ? entry['uri'] : { 'uri' => entry['uri'] }
@@ -190,12 +215,12 @@ module GenomicsChainProv
         return nil if name.nil? && locator.nil?
 
         { 'name' => name || locator, 'version' => blank_to_nil(entry['version']), 'locator' => locator,
-          'checksum' => checksum_of(uri, nil, {}), 'stage' => stage.nil? ? nil : stage.to_i }
+          'checksum' => checksum_of(uri, locator, sha256_by_locator), 'stage' => stage.nil? ? nil : stage.to_i }
       end
 
-      def stages_of(steps)
+      def stages_of(steps, sha256_by_locator = {})
         steps.map do |pos, s|
-          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, pos) }
+          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, pos, sha256_by_locator) }
           {
             'id' => pos,
             'step_number' => s['step_number'].to_i,

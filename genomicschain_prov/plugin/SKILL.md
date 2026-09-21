@@ -5,8 +5,8 @@ description: Read a pipeline's provenance bundle (BioCompute Object; Workflow Ru
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.1
-(adapter 0.3.0, predicate 0.3.0) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
+Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.2
+(adapter 0.3.1, predicate 0.3.1) — design `docs/design/prov_anchoring_design_v0_1.md`, implementation units §9.
 
 ```
 customer's pipeline ──▶ bundle (bco.json / ro-crate-metadata.json)
@@ -53,7 +53,9 @@ Fixture: `test/fixtures/nfcore_demo_1_2_0/` (verbatim bundles + the run artifact
   1/2/3); every per-stage item carries that position. A duplicated or non-integer `step_number` is a
   `FormatError` (review round 2).
 - **Software** = workflow-level `software_prerequisites` + every step's `prerequisite`, de-duplicated
-  on (name, version, locator, **stage**): a tool two steps declare is two items. **Containers** = the
+  on (name, version, locator, checksum, **stage**): a tool two steps declare is two items. A tool's or the
+  runtime's SHA-256 comes from the GenomicsChain extension's `checksums[]` joined by locator, like inputs
+  (round 3). A step that is not an object is a `FormatError`; error messages carry no bundle values. **Containers** = the
   software entries whose locator is an OCI image reference (`docker://…`, `…@sha256:…`, or
   `registry/repo:tag`).
 - **Internal inputs** (design §13.4-3, revised after review round 2): an input is internal only when
@@ -69,11 +71,13 @@ Fixture: `test/fixtures/nfcore_demo_1_2_0/` (verbatim bundles + the run artifact
 ## The predicate (U2) — `Predicate.grade(normalized)`
 
 Images are graded by `GenomicsChainTier2::PinStrength.container`; a version string grades by the rule
-in words at the top of `predicate.rb` (drop a leading tool-name token, read the first token, drop an
-epoch; release-shaped → `versioned`, a constraint / wildcard / literal `x` token → `ranged`, a
-`latest`/`unknown`/`SNAPSHOT`-class token anywhere → `floating`); a checksum field is `immutable`. An
-input's locator alone never grades above `versioned` (DOI) / `floating` (URL) / `local_path` — a
-hash-like substring in a locator is not a checksum (round 2). The environment can be rebuilt by
+in words at the top of `predicate.rb` (a `latest`/`unknown`/`SNAPSHOT`-class word anywhere vetoes →
+`floating`; the words carrying a digit are candidates, left to right: a constraint / wildcard / literal
+`x` piece → `ranged`, release-shaped → `versioned`, else the next candidate — so `python3 3.11.4` is
+versioned); a checksum field is `immutable`. An input's locator alone never grades above `versioned`
+(the whole locator is a DOI) / `floating` (URL) / `local_path` — a hash-like or DOI-like substring is a
+name, not a checksum (rounds 2–3). The runtime is digest-pinned only when its locator is an OCI image
+reference carrying `@sha256:`, never a URL with that suffix. The environment can be rebuilt by
 either of two routes — a container image or a package list — so **per stage** `environment` is the
 stronger of the two routes over the items the stage declares **itself**; a stage that declares
 nothing falls back to the workflow-level items, and the fallback is never added to a stage's own
