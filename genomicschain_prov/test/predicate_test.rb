@@ -355,6 +355,22 @@ class PredicateTest < Minitest::Test
     assert_equal 'immutable', rt.call("quay.io/nextflow/nextflow:26.04.6@sha256:#{'a' * 64}")
     assert_equal 'immutable', rt.call("registry.example:5000/nf@sha256:#{'a' * 64}")
     assert_equal 'immutable', rt.call('https://github.com/nextflow-io/nextflow/releases/tag/v26.04.6', { 'sha256' => 'a' * 64 })
+    # Round 5 (opus5): round 3 closed the absolute path, but a repo-relative
+    # one with a digest suffix still read as an image and graded the strongest
+    # level the design has. Unschemed, a slashed name must carry a registry
+    # host; otherwise say docker://.
+    assert_equal 'versioned', rt.call("tools/nextflow@sha256:#{'a' * 64}")
+    assert_equal 'versioned', rt.call("nextflow/nextflow@sha256:#{'a' * 64}")
+    assert_equal 'immutable', rt.call("docker://nextflow/nextflow@sha256:#{'a' * 64}")
+    assert_equal 'immutable', rt.call("nextflow@sha256:#{'a' * 64}")
+  end
+
+  # An entry the adapter could not read is kept and graded weakest, so that
+  # omitting a field never outgrades declaring one (round 5, opus5).
+  def test_a_software_entry_that_names_nothing_grades_absent
+    assert_equal 'absent',
+                 P.software_grade('name' => nil, 'locator' => nil, 'version' => nil, 'checksum' => nil).first
+    assert_equal 'floating', P.software_grade('name' => 'bc', 'locator' => nil, 'version' => nil, 'checksum' => nil).first
   end
 
   # The seed is found by parameter NAME — a guess — so it is reported beside

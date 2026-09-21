@@ -3,6 +3,12 @@
 require 'json'
 require 'set'
 require_relative '../normalized'
+# The adapter reduces duplicate declarations with the predicate's own rule,
+# and reads image references with the predicate's own shape. Requiring it
+# here rather than testing `defined?` makes the grade depend on the bundle's
+# bytes instead of on which entry point happened to load first (round 5,
+# opus5). No cycle: the predicate requires `normalized` and tier2 only.
+require_relative '../predicate'
 
 module GenomicsChainProv
   module Adapters
@@ -44,7 +50,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.3'
+      VERSION = 'prov-adapter-bco-0.3.4'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -53,11 +59,12 @@ module GenomicsChainProv
       COMMIT_HASH = /\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z/i
       URL_SCHEME  = %r{\A(?:https?|ftp|s3|gs|file)://}i
       OCI_SCHEME  = %r{\A(?:docker|oci|shub)://}i
-      # An image reference carrying a digest: optional scheme, registry/repo
-      # path, optional tag, @sha256:<64 hex>, nothing else — the same shape the
-      # predicate uses for the runtime. "/opt/tools/awk@sha256:…" is a path
-      # (round 4: the unanchored form let a path grade the container route).
-      OCI_DIGEST  = %r{\A(?:(?:docker|oci|shub)://)?[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)*(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}\z}i
+      # An image reference carrying a digest. THE predicate's constant, not a
+      # copy of it: the two shapes decide the same grade on two sides of the
+      # same record, and a copy drifts silently (round 4 anchored the absolute
+      # path; round 5, opus5, closed the repo-relative one — see
+      # Predicate::OCI_IMAGE_DIGEST for the rule and its reasoning).
+      OCI_DIGEST  = GenomicsChainProv::Predicate::OCI_IMAGE_DIGEST
       SHA1_HEX    = /\A[0-9a-f]{40}\z/i
       SHA256_HEX  = /\A[0-9a-f]{64}\z/i
       # registry[:port]/repo[/repo]:tag. An untagged, unschemed name ("biocontainers/fastqc")
@@ -158,8 +165,18 @@ module GenomicsChainProv
 
       def workflow_of(bco, ed, sha256_by_locator = {})
         pd = bco['provenance_domain'].is_a?(Hash) ? bco['provenance_domain'] : {}
-        scm = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
-                                            .find { |s| s.is_a?(Hash) }
+        scms = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
+                                            .select { |s| s.is_a?(Hash) }
+        # Two SCM declarations are two declarations and the weaker one decides,
+        # the rule script[] and the runtime already follow (round 5): reading
+        # the first let the order of two extension entries choose the signed
+        # grade — a commit hash first and a branch name second graded
+        # `immutable`, and swapping them graded `floating`.
+        rank = lambda do |s|
+          c = blank_to_nil(s['scm_commit'])
+          c.nil? ? 0 : (c =~ COMMIT_HASH ? 2 : 1)
+        end
+        scm = scms.min_by { |s| rank.call(s) }
         commit = scm && blank_to_nil(scm['scm_commit'])
         # Every script[] entry counts (round 5, three seats): the workflow is
         # checksum-pinned only when ALL of them join a digest — reading the
@@ -222,7 +239,7 @@ module GenomicsChainProv
       # must survive (round 3).
       def software_of(ed, steps, runtime, sha256_by_locator = {})
         top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil, sha256_by_locator) }
-        top = top.reject { |s| runtime && s['name'].casecmp?(runtime['engine']) }
+        top = top.reject { |s| runtime && s['name'].to_s.casecmp?(runtime['engine'].to_s) }
         per_step = steps.flat_map do |pos, st|
           Array(st['prerequisite']).filter_map { |s| software_entry(s, pos, sha256_by_locator) }
         end
@@ -234,13 +251,18 @@ module GenomicsChainProv
       # locator — the same join inputs and outputs use (round 3: the enricher
       # had nowhere to put a SHA-256 for a tool or the runtime that anything
       # read).
+      # An entry that names nothing the bundle can resolve is KEPT and graded
+      # `absent` by the predicate, not dropped (round 5, opus5): dropping it
+      # let a stage whose only prerequisite was unreadable fall back to the
+      # workflow-level items and grade above a stage that declared its weak
+      # tool honestly. The same argument `ordered_steps` already makes for a
+      # non-object step — a dropped entry shrinks a signed denominator.
       def software_entry(entry, stage, sha256_by_locator = {})
         return nil unless entry.is_a?(Hash)
 
         uri = entry['uri'].is_a?(Hash) ? entry['uri'] : { 'uri' => entry['uri'] }
         name = blank_to_nil(entry['name'])
         locator = blank_to_nil(uri['uri'])
-        return nil if name.nil? && locator.nil?
 
         { 'name' => name || locator, 'version' => blank_to_nil(entry['version']), 'locator' => locator,
           'checksum' => checksum_of(uri, locator, sha256_by_locator), 'stage' => stage.nil? ? nil : stage.to_i }
@@ -262,19 +284,26 @@ module GenomicsChainProv
         end
       end
 
+      # An entry with no readable locator is KEPT with `locator: nil` and
+      # graded `absent` by the predicate (round 5, opus5). `inputs_total` and
+      # `outputs_total` are signed counts: dropping the entry shortened the
+      # denominator, so a bundle listing one checksummed input and one
+      # locator-less input signed `inputs_with_checksum 1/1` and graded
+      # `immutable`, while the same producer declaring that second input with
+      # a path signed 1/2 and `local_path`. Omitting a field must never grade
+      # above declaring it.
       def inputs_of(io, internal, sha256_by_locator)
         Array(io['input_subdomain']).filter_map do |i|
           next nil unless i.is_a?(Hash)
 
           uri = i['uri'].is_a?(Hash) ? i['uri'] : { 'uri' => i['uri'] }
           locator = blank_to_nil(uri['uri'])
-          next nil if locator.nil?
-
-          name = basename(blank_to_nil(uri['filename']) || locator)
+          name = blank_to_nil(uri['filename']) || locator
+          name = basename(name) unless name.nil?
           { 'name' => name, 'locator' => locator,
             'checksum' => checksum_of(uri, locator, sha256_by_locator),
-            'internal' => internal.include?(locator),
-            'reference_hint' => name =~ REFERENCE_HINT ? true : false }
+            'internal' => locator ? internal.include?(locator) : false,
+            'reference_hint' => name.to_s =~ REFERENCE_HINT ? true : false }
         end
       end
 
@@ -284,9 +313,9 @@ module GenomicsChainProv
 
           uri = o['uri'].is_a?(Hash) ? o['uri'] : { 'uri' => o['uri'] }
           locator = blank_to_nil(uri['uri'])
-          next nil if locator.nil?
 
-          { 'name' => basename(blank_to_nil(uri['filename']) || locator), 'locator' => locator,
+          name = blank_to_nil(uri['filename']) || locator
+          { 'name' => name.nil? ? nil : basename(name), 'locator' => locator,
             'checksum' => checksum_of(uri, locator, sha256_by_locator),
             'mediatype' => blank_to_nil(o['mediatype']) }
         end
@@ -349,24 +378,20 @@ module GenomicsChainProv
       end
 
       # Of several software_prerequisites entries naming the engine, the one
-      # that grades weakest under Predicate.runtime_grade. The predicate is
-      # not loaded here, so the order is the predicate's: checksum > OCI
-      # digest > a version string > nothing, with the version string left to
-      # the predicate by keeping the entry as declared.
+      # that grades weakest — under Predicate.runtime_grade itself, not under a
+      # second copy of it. Round 5 (opus5): the adapter's own copy of the rule
+      # was reached or skipped depending on whether the predicate happened to
+      # be loaded, so two declarations reduced to different entries and the
+      # signed grade depended on the entry point rather than on the bundle.
+      # The levels come from the same constant for the same reason.
       def weakest_runtime_entry(entries, sha256_by_locator)
+        pred = GenomicsChainProv::Predicate
         ses = entries.filter_map { |e| software_entry(e, nil, sha256_by_locator) }
-        levels = %w[immutable versioned ranged floating local_path absent]
         grade = lambda do |x|
-          next 'immutable' if x['checksum'] || x['locator'].to_s =~ OCI_DIGEST
-          next 'absent' unless x['version']
-          # the version string is graded by the predicate's rule when it is
-          # loaded (it always is through genomicschain_prov.rb); the adapter
-          # itself never grades a string
-          next 'versioned' unless defined?(GenomicsChainProv::Predicate)
-
-          GenomicsChainProv::Predicate.version_grade(x['name'], x['version']).first
+          pred.runtime_grade('engine' => x['name'], 'version' => x['version'],
+                             'locator' => x['locator'], 'checksum' => x['checksum']).first
         end
-        ses.max_by { |x| levels.index(grade.call(x)) }
+        ses.max_by { |x| pred::LEVELS.index(grade.call(x)) }
       end
 
       # checksums[] entries whose sha256 is not 64 hex are ignored — a checksum

@@ -451,14 +451,82 @@ class AdapterBcoTest < Minitest::Test
   # A path with a digest suffix is not an image reference (the same shape the
   # runtime rule refuses); a checksum field holds a hex digest or nothing.
   def test_digest_shapes_and_checksum_fields_are_checked
-    refute Bco.oci_ref?("/opt/tools/awk@sha256:#{'a' * 64}")
-    assert Bco.oci_ref?("quay.io/x/awk:1@sha256:#{'a' * 64}")
+    d = "@sha256:#{'a' * 64}"
+    refute Bco.oci_ref?("/opt/tools/awk#{d}")
+    assert Bco.oci_ref?("quay.io/x/awk:1#{d}")
+    # Round 5 (opus5): unschemed, a name with a slash whose first component is
+    # no registry host is a repo-relative path — and the digest route is the
+    # one that reaches `immutable`. Write docker:// for a Hub namespace.
+    refute Bco.oci_ref?("tools/awk#{d}")
+    refute Bco.oci_ref?("biocontainers/fastqc#{d}")
+    assert Bco.oci_ref?("docker://tools/awk#{d}")
+    assert Bco.oci_ref?("ghcr.io/org/img#{d}")
+    assert Bco.oci_ref?("localhost:5000/img#{d}")
+    assert Bco.oci_ref?("registry.example.com:5000/a/b:v1#{d}")
+    assert Bco.oci_ref?("ubuntu#{d}")
     b = enriched_bco
     b['io_domain']['input_subdomain'][0]['uri']['sha1_checksum'] = '?'
     b['extension_domain'][1]['genomicschain_extension']['checksums'][0]['sha256'] = 'x'
     n = Bco.parse(b)
     assert_nil n.inputs.find { |i| i['name'] == 'a.txt' }['checksum']
     assert_includes n.notes, 'a checksum field that is not a hex digest was ignored'
+  end
+
+  # Round 5 (opus5, reproduced): the adapter used to drop an entry it could not
+  # read. `inputs_total` is a signed count, so the drop shortened the
+  # denominator and a bundle that omitted a field graded ABOVE the same bundle
+  # declaring that field honestly.
+  def test_an_input_that_names_no_locator_is_kept_and_graded
+    b = enriched_bco
+    b['io_domain']['input_subdomain'] = [
+      { 'uri' => { 'uri' => 'https://example.org/data/a.txt', 'sha1_checksum' => 'A' * 40 } },
+      { 'uri' => { 'filename' => 'secret.bam' } }
+    ]
+    n = Bco.parse(b)
+    kept = n.inputs.last
+    assert_equal 'secret.bam', kept['name']
+    assert_nil kept['locator']
+    g = GenomicsChainProv::Predicate.grade(n)
+    assert_equal 2, g['counts']['inputs_total']
+    assert_equal 1, g['counts']['inputs_with_checksum']
+    assert_equal 'absent', g['grades']['inputs'], 'omitting the locator must not outgrade declaring one'
+    # the same entry declared with a path grades local_path — weaker than the
+    # checksummed input, stronger than saying nothing
+    b['io_domain']['input_subdomain'][1]['uri']['uri'] = 'data/secret.bam'
+    assert_equal 'local_path', GenomicsChainProv::Predicate.grade(Bco.parse(b))['grades']['inputs']
+  end
+
+  def test_an_output_that_names_no_locator_stays_in_the_signed_count
+    b = enriched_bco
+    before = GenomicsChainProv::Predicate.grade(Bco.parse(b))['counts']['outputs_total']
+    b['io_domain']['output_subdomain'] << { 'uri' => { 'filename' => 'unlisted.bam' } }
+    assert_equal before + 1, GenomicsChainProv::Predicate.grade(Bco.parse(b))['counts']['outputs_total']
+  end
+
+  # A stage whose only prerequisite is unreadable used to fall back to the
+  # workflow-level items, which could lift it above a stage that declared a
+  # weak tool of its own (round 5, opus5).
+  def test_a_prerequisite_that_names_nothing_is_the_stage_own_declaration
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'].find { |s| s['step_number'] == 1 }['prerequisite'] =
+      [{ 'uri' => { 'sha1_checksum' => '' } }]
+    st = GenomicsChainProv::Predicate.grade(Bco.parse(b))['stages'].find { |s| s['id'] == 1 }
+    assert_equal 'own', st['source'], 'an unreadable entry is a declaration, not a silence'
+    assert_equal 'absent', st['grade']
+  end
+
+  # Round 5 (opus5): with two SCM extensions the array order chose the signed
+  # workflow grade — the same defect script[] and the runtime had already had.
+  def test_two_scm_declarations_take_the_weakest_in_any_order
+    at = ->(c) { { 'scm_extension' => { 'scm_repository' => 'https://git/x', 'scm_commit' => c, 'scm_path' => 'main.nf' } } }
+    [[at['a' * 40], at['main']], [at['main'], at['a' * 40]]].each do |order|
+      b = enriched_bco
+      b['extension_domain'] = order + [b['extension_domain'][1]]
+      n = Bco.parse(b)
+      assert_equal 'main', n.workflow['commit'], "order #{order.map { |e| e['scm_extension']['scm_commit'] }.inspect}"
+      assert_equal 'symbolic', n.workflow['ref_kind']
+      assert_equal 'floating', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+    end
   end
 
   def test_format_error_drops_the_parser_cause

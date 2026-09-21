@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.3'
+    PREDICATE_VERSION = 'prov-predicate-0.3.4'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -123,11 +123,30 @@ module GenomicsChainProv
     # levels).
     DOI_WHOLE     = %r{\A(?:https?://(?:dx\.)?doi\.org/|doi:)?10\.\d{4,9}/\S+\z}i
     # The runtime is digest-pinned only when its locator IS an OCI image
-    # reference carrying a digest: optional docker:// oci:// shub://, a
-    # registry/repository path, an optional tag, then @sha256:<64 hex>, and
-    # nothing else. "https://…/v26.04.6@sha256:…" is a URL with a suffix the
-    # producer chose (review round 3, reproduced on the fixture).
-    OCI_IMAGE_DIGEST = %r{\A(?:(?:docker|oci|shub)://)?[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)*(?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}\z}i
+    # reference carrying a digest: a scheme or a registry-shaped name, an
+    # optional tag, then @sha256:<64 hex>, and nothing else.
+    # "https://…/v26.04.6@sha256:…" is a URL with a suffix the producer chose
+    # (review round 3, reproduced on the fixture).
+    #
+    # Unschemed, the reference must LOOK like a registry reference — a first
+    # component carrying a dot or a port, or a single component (an official
+    # image). "tools/awk@sha256:<64 hex>" is equally a repo-relative path, and
+    # this is the one route that reaches `immutable`: round 5 (opus5)
+    # reproduced a producer-chosen path grading the container route immutable
+    # while the same adapter already refuses the analogous guess for the
+    # weaker tag form. Write docker:// for a Docker Hub namespace.
+    OCI_IMAGE_DIGEST = %r{
+      \A
+      (?:
+        (?:docker|oci|shub)://[a-z0-9][a-z0-9._-]*(?::[0-9]+)?(?:/[a-z0-9._-]+)*
+        |
+        [a-z0-9][a-z0-9-]*(?:(?:\.[a-z0-9-]+)+(?::[0-9]+)?|:[0-9]+)(?:/[a-z0-9._-]+)+
+        |
+        [a-z0-9][a-z0-9._-]*
+      )
+      (?::[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}
+      \z
+    }ix
 
     module_function
 
@@ -190,6 +209,11 @@ module GenomicsChainProv
     def software_grade(s)
       return ['immutable', 'carries a checksum'] if s['checksum']
       return version_grade(s['name'], s['version']) if s['version']
+      # The adapter keeps an entry it cannot read rather than dropping it
+      # (round 5): an entry that names nothing is the weakest declaration
+      # there is, not a missing one — dropping it let the stage inherit the
+      # workflow-level items and grade ABOVE an honest declaration.
+      return ['absent', 'the entry names nothing the bundle can resolve'] if s['name'].nil? && s['locator'].nil?
 
       ['floating', 'a bare name — no version, no checksum']
     end
