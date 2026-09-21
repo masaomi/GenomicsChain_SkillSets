@@ -50,7 +50,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.5'
+      VERSION = 'prov-adapter-bco-0.3.6'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -94,7 +94,13 @@ module GenomicsChainProv
 
         runtime = runtime_of(ed, notes, sha256_by_locator)
         software = software_of(ed, steps, runtime, sha256_by_locator)
-        containers = software.select { |s| oci_ref?(s['locator']) }
+        # An unreadable entry might have been an image, so it weakens the
+        # container route as well as the package route (round 7, codex,
+        # reproduced): with it in the package route only, replacing an honestly
+        # declared `docker://b:latest` with an unreadable element left the
+        # container route holding the strong image alone and LIFTED the stage,
+        # because the stage takes the stronger of the two routes (§5, §10-8).
+        containers = software.select { |s| oci_ref?(s['locator']) || (s['name'].nil? && s['locator'].nil?) }
                              .map { |s| { 'ref' => s['locator'], 'name' => s['name'], 'stage' => s['stage'] } }
         inputs = inputs_of(bco['io_domain'], internal_locators(steps).to_set, sha256_by_locator)
         outputs = outputs_of(bco['io_domain'], sha256_by_locator)
@@ -111,7 +117,7 @@ module GenomicsChainProv
           format: 'bco',
           format_version: bco['spec_version'].to_s,
           producer: producer,
-          workflow: workflow_of(bco, ed, sha256_by_locator),
+          workflow: workflow_of(bco, ed, sha256_by_locator, notes),
           runtime: runtime,
           software: software,
           containers: containers,
@@ -135,11 +141,61 @@ module GenomicsChainProv
         %w[description_domain execution_domain io_domain].each do |k|
           raise FormatError, "BCO missing required domain #{k}" unless bco[k].is_a?(Hash)
         end
-        bco
+        normalise_lists(bco)
       rescue JSON::ParserError
         # cause: nil — the parser's message quotes the offending bytes, and a
         # full exception rendering would print the cause (round 4, codex).
         raise FormatError, 'bundle is not valid JSON', cause: nil
+      end
+
+      # Rounds 5–7 found one defect class four times — a producer who wrote an
+      # element this adapter could not read outgraded one who wrote an honest
+      # entry — and twice the fix was applied site by site, leaving the sites
+      # nobody had enumerated (round 6: the lists; round 7: the SCM blocks, the
+      # parameters, the runtime's own scan of the same array). The rule is
+      # therefore applied ONCE, here, where the bundle enters: after this, no
+      # list in the bundle holds an element that is not an object, so no site
+      # downstream can forget. `load` works on a private re-parse, and the
+      # digest subject is the ORIGINAL bytes (§4), so nothing signed is touched.
+      #
+      # `script[]` is the one list whose bare STRING is a legitimate producer
+      # shape — nf-prov 1.7.0 writes exactly that (U0, the fixture) — so a
+      # string is lifted into the object form the rest of the list uses, and
+      # only a non-string non-object becomes empty. That distinction is stated
+      # in §5; round 7 found the design text claiming the opposite.
+      def normalise_lists(bco)
+        ed = bco['execution_domain']
+        ed['script'] = as_list(ed['script'], 'script').map { |e| e.is_a?(String) ? { 'uri' => { 'uri' => e } } : readable(e) } if ed['script']
+        if ed['software_prerequisites']
+          ed['software_prerequisites'] = as_list(ed['software_prerequisites'], 'software_prerequisites').map { |e| readable(e) }
+        end
+        as_list(bco.dig('description_domain', 'pipeline_steps') || [], 'pipeline_steps').each do |st|
+          st['prerequisite'] = as_list(st['prerequisite'], 'prerequisite').map { |e| readable(e) } if st.is_a?(Hash) && st['prerequisite']
+        end
+        io = bco['io_domain']
+        %w[input_subdomain output_subdomain].each do |k|
+          io[k] = as_list(io[k], k).map { |e| readable(e) } if io[k]
+        end
+        bco['parametric_domain'] = as_list(bco['parametric_domain'], 'parametric_domain').map { |e| readable(e) } if bco['parametric_domain']
+        if bco['extension_domain']
+          bco['extension_domain'] = as_list(bco['extension_domain'], 'extension_domain').map do |e|
+            x = readable(e)
+            x['scm_extension'] = readable(x['scm_extension']) if x.key?('scm_extension')
+            x
+          end
+        end
+        bco
+      end
+
+      # A field the standard defines as an array, written as an object or a
+      # scalar, is a structural error and not something to guess at: `Array()`
+      # turns a Hash into pair-arrays, which would then be counted as entries
+      # and inflate a signed denominator with nonsense (round 7, opus5). The
+      # message carries the field name and nothing from the bundle (§6).
+      def as_list(value, field)
+        return value if value.is_a?(Array)
+
+        raise FormatError, "BCO field #{field} is not an array"
       end
 
       # [[position, step], ...] sorted on step_number. Position is the stage id.
@@ -163,7 +219,7 @@ module GenomicsChainProv
 
       # --- the seven conditions -------------------------------------------------
 
-      def workflow_of(bco, ed, sha256_by_locator = {})
+      def workflow_of(bco, ed, sha256_by_locator = {}, notes = [])
         pd = bco['provenance_domain'].is_a?(Hash) ? bco['provenance_domain'] : {}
         scms = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
                                             .select { |s| s.is_a?(Hash) }
@@ -176,7 +232,16 @@ module GenomicsChainProv
           c = blank_to_nil(s['scm_commit'])
           c.nil? ? 0 : (c =~ COMMIT_HASH ? 2 : 1)
         end
-        scm = scms.min_by { |s| rank.call(s) }
+        weakest = scms.group_by { |s| rank.call(s) }.min_by { |r, _| r }&.last || []
+        scm = weakest.first
+        # Two declarations of the SAME rank that disagree are a bundle saying
+        # two things, and which one is recorded must not be the array's order
+        # (round 7, opus5) — the rule `genomicschain_extension` already follows
+        # for a producer and `checksums_from` for a digest: record neither.
+        if weakest.uniq { |s| s.values_at('scm_repository', 'scm_commit', 'scm_path').map { |v| blank_to_nil(v) } }.length > 1
+          notes << 'the bundle gives more than one SCM declaration of equal strength and they disagree; none is recorded'
+          scm = nil
+        end
         commit = scm && blank_to_nil(scm['scm_commit'])
         # Every script[] entry counts (round 5, three seats): the workflow is
         # checksum-pinned only when ALL of them join a digest — reading the
@@ -414,15 +479,23 @@ module GenomicsChainProv
       # that says two things about one file; it has pinned nothing, and which
       # digest won must not depend on the array order (round 6). The locator is
       # dropped and the disagreement noted.
+      # A `sha256` field that is present but not 64 hex is a FAILED declaration,
+      # not a missing one (round 7, opus5): skipping it before the disagreement
+      # test meant a good digest plus an unreadable one kept the pin while two
+      # readable disagreeing digests lost it — writing nonsense outranked
+      # writing something checkable. A locator with no `sha256` field at all
+      # says nothing about the digest and is ignored.
       def checksums_from(extension, notes = [])
         by_locator = Array(extension['checksums']).each_with_object({}) do |c, acc|
-          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && c['sha256'].to_s =~ SHA256_HEX
+          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && blank_to_nil(c['sha256'])
 
-          (acc[c['uri'].to_s] ||= []) << c['sha256'].to_s.downcase
+          (acc[c['uri'].to_s] ||= []) << (c['sha256'].to_s =~ SHA256_HEX ? c['sha256'].to_s.downcase : nil)
         end
-        conflicting = by_locator.count { |_, v| v.uniq.length > 1 }
-        notes << 'the extension gives one locator more than one checksum; that locator is not pinned' if conflicting.positive?
-        by_locator.filter_map { |k, v| [k, v.first] if v.uniq.length == 1 }.to_h
+        pinned = by_locator.filter_map { |k, v| [k, v.first] if v.uniq.length == 1 && v.first }.to_h
+        if pinned.length < by_locator.length
+          notes << 'the extension gives one locator more than one checksum, or an unreadable one; that locator is not pinned'
+        end
+        pinned
       end
 
       def malformed_checksum?(bco, extension)

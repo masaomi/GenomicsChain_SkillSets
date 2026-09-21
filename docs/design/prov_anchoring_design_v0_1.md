@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** 草案 v0.1.8（2026-09-21: round 6（3 席回答、全員 REVISE）の (b) を反映——「読めない項目を落とさない」を **object でない要素**まで広げ、項目を読むすべての場所に一つの規則として当てる。checksum と版の枝より「何も名指さない」の判定を前に置く。container の経路も digest の形で固定。`.x` は全候補を走査。拡張 block は全部を統合。`scripts_total / scripts_with_checksum` を記録の欄に。code は adapter 0.3.5 / predicate 0.3.5、test 67 本緑。v0.1.7: round 5 の subprocess 席で唯一返答した opus5 の (b) 5 件を反映——読めない項目を落とさず absent として数える、scheme 無しの digest は registry の形のときだけ image、SCM extension の複数は最弱、runtime の重複削減は predicate の規則そのもの。code は adapter 0.3.4 / predicate 0.3.4、test 58 本緑。v0.1.6: round 5 の persona 3 席の (b) を反映——script[] は全項目の checksum で pin、v/V 始まりの候補も拒否語を見る、範囲の印はどの語にあっても ranged、§8 json の言い方と submission_key の組成。code は adapter 0.3.3 / predicate 0.3.3、test 53 本緑。round 5 の記録は L2 `review_r5_prov_anchoring_v0_1_5_20260921`。v0.1.5: round 4（REVISE、5 席全員回答）の残り H1–H4 を反映——H1 code（範囲の印の語、拒否語の位置、runtime の重複、image 参照の形、checksum の形、例外の cause）、H2 §6/§7 idempotency は submission_key から、H3 script の checksum で workflow が immutable に届く、H4 §7/§8/§9/§10-14 の文言。round 4 の記録は L2 `review_r4_prov_anchoring_v0_1_4_20260921`。v0.1.4: round 3（REVISE）の (a)/(b) を 5 件 G1–G5 に束ねて反映——G1 §5 版の規則・DOI・runtime、G2 §6 null 欄と正準化規則の署名、G3 §7/§10-14 読み口を place route に、G4 §8 検証者の言えること、G5 §6/§13.4-1 誤り文と拡張 checksum の結合。round 3 の記録は L2 `review_r3_prov_anchoring_v0_1_3_20260921`。v0.1.3 まで: round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`。改訂履歴は §14）
+**状態:** 草案 v0.1.9（2026-09-21: round 7（4 席全員回答、全員 REVISE）の (b) を反映——正規化を経路ごとの列挙から**束が入る境界の一箇所**に移した。`script[]` の裸の文字列は実物の nf-prov が書く読める申告なので例外として明記（v0.1.8 の文が実装と食い違っていた）。checksum の経路には locator が要る（道具・runtime も入力に揃える）。読めない項目は container と package の両方の経路を弱める。同強の SCM 宣言が食い違えば記録しない。読めない digest も食い違い扱い。`record_version` を 0.2 に。code は adapter 0.3.6 / predicate 0.3.6、test 72 本緑。v0.1.8: round 6（3 席回答、全員 REVISE）の (b) を反映——「読めない項目を落とさない」を **object でない要素**まで広げ、項目を読むすべての場所に一つの規則として当てる。checksum と版の枝より「何も名指さない」の判定を前に置く。container の経路も digest の形で固定。`.x` は全候補を走査。拡張 block は全部を統合。`scripts_total / scripts_with_checksum` を記録の欄に。code は adapter 0.3.5 / predicate 0.3.5、test 67 本緑。v0.1.7: round 5 の subprocess 席で唯一返答した opus5 の (b) 5 件を反映——読めない項目を落とさず absent として数える、scheme 無しの digest は registry の形のときだけ image、SCM extension の複数は最弱、runtime の重複削減は predicate の規則そのもの。code は adapter 0.3.4 / predicate 0.3.4、test 58 本緑。v0.1.6: round 5 の persona 3 席の (b) を反映——script[] は全項目の checksum で pin、v/V 始まりの候補も拒否語を見る、範囲の印はどの語にあっても ranged、§8 json の言い方と submission_key の組成。code は adapter 0.3.3 / predicate 0.3.3、test 53 本緑。round 5 の記録は L2 `review_r5_prov_anchoring_v0_1_5_20260921`。v0.1.5: round 4（REVISE、5 席全員回答）の残り H1–H4 を反映——H1 code（範囲の印の語、拒否語の位置、runtime の重複、image 参照の形、checksum の形、例外の cause）、H2 §6/§7 idempotency は submission_key から、H3 script の checksum で workflow が immutable に届く、H4 §7/§8/§9/§10-14 の文言。round 4 の記録は L2 `review_r4_prov_anchoring_v0_1_4_20260921`。v0.1.4: round 3（REVISE）の (a)/(b) を 5 件 G1–G5 に束ねて反映——G1 §5 版の規則・DOI・runtime、G2 §6 null 欄と正準化規則の署名、G3 §7/§10-14 読み口を place route に、G4 §8 検証者の言えること、G5 §6/§13.4-1 誤り文と拡張 checksum の結合。round 3 の記録は L2 `review_r3_prov_anchoring_v0_1_3_20260921`。v0.1.3 まで: round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`。改訂履歴は §14）
 **前提の文書:** KairosChain L2 `genomicschain_business_model_direction_20260919`（事業上の位置づけ、§3 が主張の境界の正本）、
 GenomicsChain L2 `service_2_5_dev_plan_notes_20260920`（コードの現状）、`docs/demos/service_2_5_principle_20260920/demo.html`（原理）、
 記憶 `warranty-scope`（言葉づかいの規則）、`genomicschain_core` design v0.4.1（package は v0.5.0。SubmitCore の経路。文書は KairosChain 側、コードは `submit_core.rb` の注釈が写し）
@@ -98,7 +98,15 @@ gc_submit_client --tier prov
 checksum の集合が配列の順に依存する（補完器が producer の block と別に自分の block を書く運用で起きる）。全 block を統合して読み、
 `checksums[]` は連結する。producer を名乗る block が複数あって食い違うときは、どちらも記録しない——順序に選ばせない。
 同じ locator に異なる digest が二つ与えられていたら、その locator は **pin されていない**ものとして扱い、notes に残す。
-束が一つの file について二つのことを言っているとき、どちらが勝つかを配列の順が決めてはならない。
+束が一つの file について二つのことを言っているとき、どちらが勝つかを配列の順が決めてはならない。**読めない digest も同じ**
+（round 7）: `sha256` の欄があって 64 桁 hex でないものは**失敗した申告**であって、無いのとは違う。良い digest と読めない digest が
+並んだときも pin しない——これを無視すると、でたらめを書いた束が、確かめられる食い違いを書いた束より上に来る。`sha256` の欄が
+そもそも無い項目は digest について何も言っていないので無視する。なお、ここで pin しないのは**拡張が与える SHA-256** であって、
+項目自身の `sha1_checksum` 欄は別の申告なので生き残る（round 7、codex: notes の文言が広すぎた）。
+
+SCM の宣言も同じ規則に従う（round 7）。**同じ強さの宣言が複数あって食い違うとき**——二つの異なる 40 桁 commit、二つの異なる
+repository——は、どちらも記録しない。最弱を採る規則だけでは同率のときに配列の順が決め手になってしまい、それは上と同じ形の
+逆転である。
 
 ### 4.1 束を出す側（producer）は差し替え可能にする — Nextflow に縛らない（09-20 追記）
 
@@ -233,15 +241,30 @@ versioned に通ることを、round 3 の opus5 席が `python3 3.11.4` が flo
   （継承すると floating の段が immutable に上がっていた）。object でない段を `FormatError` にする §5 の理由——「落とすと
   stages_total が縮んで最弱の段が消えうる」——と同じ理屈を、同じ記録の他の分母にも適用する。
 
-  **この規則は「項目を読むすべての場所」に一つの形で適用する**（round 6、3 席が独立に同じ場所を挙げた）。v0.1.7 は読めない
-  **object** だけを保持しており、**そもそも object でない要素**（裸の文字列、`null`）は依然として捨てていた。対象は
-  `input_subdomain[]`、`output_subdomain[]`、`prerequisite[]`、`software_prerequisites[]`、`script[]` の全部。object でない要素は
-  空の項目として保持し、最弱（`absent`）として数える。裸の文字列を locator として読むことはしない——規格の項目は object であり、
-  推測すれば producer の文字列が経路を選ぶことになる。`script[]` も同じで、読めない要素を先に落としてから「全項目に checksum が
-  あるか」を判定すると、判定対象の配列自体が縮む（uri を書かなければ `immutable`、正直に書けば `floating` だった）。
+  **この規則は、束が入ってくる境界で一度だけ適用する**（round 7）。round 5 は見つかった経路ごとに、round 6 は列挙した 5 配列に
+  当てた。どちらも「当て忘れた場所」を残した——round 6 は `parametric_domain[]`、SCM の block、runtime が同じ配列を自分で走査する
+  箇所を落としていた。そこで正規化は `load` の直後に一箇所だけ置き、**そこを通った後の束には object でない要素がどの配列にも無い**
+  状態にする。以後どの場所も当て忘れようがない。対象は `script[]`、`software_prerequisites[]`、各段の `prerequisite[]`、
+  `input_subdomain[]`、`output_subdomain[]`、`parametric_domain[]`、`extension_domain[]`（その中の `scm_extension` も）。
+  正規化は再 parse した私用の複製に対して行い、digest の主語は**元の bytes**（§4）なので署名される対象は触らない。
+
+  **例外は `script[]` の裸の文字列** 一つだけで、これは読める申告である。実物の nf-prov 1.7.0 の束が `script` を文字列の配列で
+  書いている（U0 の fixture がそれ）。よって文字列は object の形に持ち上げて locator として読み、**文字列でない非 object**
+  （整数、真偽値、配列）だけを空の項目にする。v0.1.8 はここを「裸の文字列は locator として読まない」と 5 配列すべてについて書いて
+  いたが、実装は `script[]` でそうしておらず、**文が実装と食い違っていた**（round 7、3 席が指摘）。正しい規則は上のとおりで、
+  食い違っていたのは文の側である。規格が配列と定める欄が object や scalar で書かれていたら `FormatError`——`Array()` は Hash を
+  対の配列に変えてしまい、それが項目として署名される分母に入る（round 7）。
 - **checksum も版も、何を digest したかを名指していなければ等級を上げない。** 「何も名指さない項目は absent」の判定は、checksum の枝と
   版の枝より**前**に置く（round 6）。取得先の無い digest は第三者に何も許さず、等級が測っているのはまさにそれである。同様に、
   name も uri も無く version だけがある項目は、道具を名指していないので `versioned` ではなく `absent`。
+  **checksum の経路には locator が要る**（round 7）: 入力は round 6 で既にそうなっていたが、道具と runtime は locator が無くても
+  checksum で `immutable` に届いていた。同じ形について二つの関数が違うことを言っていたので、道具と runtime も揃える——名前だけの
+  道具に checksum が付いていても `floating` 止まり。**数え方も等級に合わせる**: `inputs_with_checksum` は locator のある項目だけを
+  数える（等級は absent なのに coverage には入る、という食い違いがあった）。
+- **読めない項目は、二つの経路の両方を弱める。** 段の環境は container と package の**強い方**で決まる（§10-8）。読めない
+  `prerequisite` を package の経路にだけ置くと、正直に書いた `docker://b:latest` を読めない要素に差し替えたとき container の経路に
+  強い image だけが残り、**段の等級が上がる**（round 7、codex が再現）。読めない項目はどちらの経路だったか分からないので、両方に
+  空の項目として入れる。結果、省略した束は正直な束より下（`absent` < `floating`）になる。
 - **container の経路も digest の形で固定する。** tier2 の `PinStrength.container` は digest の**部分文字列**を pin と読む——repo の
   設定値を読む道具としては正しいが、署名される等級には使えない。`docker://tool:latest#@sha256:<64 桁>` が immutable に届いていた
   （round 6、codex が再現）。runtime と同じく、参照**全体**が image の digest 参照のときだけ immutable とし、digest らしい末尾を
@@ -249,6 +272,12 @@ versioned に通ることを、round 3 の opus5 席が `python3 3.11.4` が flo
 - **`.x` のような全体印は、どの候補にあっても全体に効く。** 候補を左から見て最初に release の形に合ったものを採ると、`1.x 1.0` は
   ranged、`1.0 1.x` は versioned になっていた（round 6、codex が再現）。同じ申告の並べ替えで等級が変わるので、`.x` は候補を採る前に
   全候補を走査する。範囲の印（`< > ! *`）が既にそうなっているのと同じ扱い。
+- **拒否語が道具の名前と衝突する場合も、緩みとして明記する**（round 7、opus5）。拒否語（`latest`、`head`、`main`、`stable` など）は
+  語全体として現れれば文字列全体を floating にする。そのため `head (GNU coreutils) 8.32` は floating、より不完全な `8.32` は
+  versioned になる——「tool 名を添えた申告が bare の版より下がることはない」という §5 自身の原則と衝突している。承知のうえで
+  こちらを採る: 拒否語を数字を含む語だけに限ると `latest 1.0` が versioned に通ってしまい、**producer が選んだ「latest」が署名
+  される等級を上げる**。下振れ（正直な banner が過小評価される）と上振れ（曖昧な申告が過大評価される）なら、この設計は下振れを
+  選ぶ。緩みの向きを明記しておく。
 - **digest の形で残した緩みは、緩みとして明記する。** `/` を含まない一成分（`ubuntu@sha256:…`）は image として通す。これは Docker
   Hub の official image の形であり、意図した残余である。`tag` の形（`OCI_TAGGED`）には registry の形の検査を掛けていない——`tag` の
   経路は最大でも versioned までしか届かず、`biocontainers/fastqc:0.11.9` のような正直な申告を落とす損の方が大きいため。用心を
@@ -313,6 +342,9 @@ workflow_repository_sha256, workflow_commit  — repository は URL の sha256�
 書く束は SCM を持たない。round 3: 必須のままだと §4.1 の最初の非 Nextflow producer が anchor に届かない）。schema は五つを
 `["string","null"]` にし、null は「無い」の意味で署名に入る。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
 固定する**: 検証者は manifest の `record_version` の集合で `params` を組み立て、知らない `record_version` は版違いの見出しへ（§8）。
+v0.1.8 で `scripts_total` / `scripts_with_checksum` を署名欄に足したので、**`record_version` は 0.2 に上げる**（round 7、opus5:
+欄の集合を変えながら 0.1 のままなら、不変条件が自分の文面で破れている）。0.1 の proof はまだ存在しない——U3 が未着手なので、
+この改版で失効するものは無い。以後、署名欄の増減は必ず `record_version` を上げる。
 
 **server が決める欄（署名の外）:** `trust_tier = 'self_reported'`（提出者＝顧客自身の申告。Tier-2 と同じ語）、`toolchain`
 （anchor の Ruby と platform。Tier-2 では digest subject の中にあったので署名できたが、束は grader の interpreter を持たないので
@@ -366,7 +398,7 @@ submission_key も変わるので、同じ束・同じ鍵でも新しい proof �
 版のずれに語彙が無いと、顧客には「一致しない」としか見えない。
 
 **schema:** `genomicschain_prov/schemas/prov_attestation.schema.json`（置き場所は §7）。`record_type: prov_attestation`、
-`record_version: 0.1`、`mcp_tool_name: gc_prov_submit`、`additionalProperties: false`。title は「pin strength」で、「再構築十分性」とは
+`record_version: 0.2`（§6。v0.1.8 で署名欄が増えたため 0.1 から上げた）、`mcp_tool_name: gc_prov_submit`、`additionalProperties: false`。title は「pin strength」で、「再構築十分性」とは
 書かない（等級は locator が第三者に何を許すかであって、再構築できることではない）。`not_checked` は必須で、builder が固定した
 6 項目の列（上）を enum で持つ。
 
@@ -697,6 +729,7 @@ container・ツールの版・checksum を BCO に書く提案を出す道もあ
 | v0.1 | 2026-09-20 | 起草。§0–§12 |
 | v0.1.1 | 2026-09-20 | U0 の実測（§13）、unknowns pass（§10-1/9/10/11） |
 | v0.1.2 | 2026-09-20 | review round 1（REVISE）の 5 件: §5 段ごとの環境と版の形、§13.4-3 出力の証拠による内部入力、§6 記録の契約、§6/§8 proof の寿命と検証者の言い方、§7 配置 |
+| v0.1.9 | 2026-09-21 | review round 7（4 席全員回答、全員 REVISE。4 席が揃ったのは round 4 以来）の (b): 正規化を**束が入る境界の一箇所**に移動（round 5 は経路ごと、round 6 は列挙した 5 配列に当て、どちらも当て忘れを残した——`parametric_domain[]`、SCM の block、runtime の走査。以後は `load` 直後を通った束に非 object 要素が無い）、§5 `script[]` の裸の文字列は実物の nf-prov 1.7.0 が書く読める申告なので例外と明記（v0.1.8 の文が実装と食い違っており、**文の側が誤り**だった。3 席が指摘）、規格が配列と定める欄が object なら `FormatError`、§5 checksum の経路には locator が要る（道具・runtime を入力に揃え、`inputs_with_checksum` も locator のある項目だけ数える）、§5/§10-8 読めない項目は container と package の両経路を弱める（正直な `docker://b:latest` を読めない要素に差し替えると段が上がっていた）、§4 同強の SCM 宣言が食い違えば記録しない、§4 読めない digest も食い違い扱い・ただし pin しないのは拡張の SHA-256 であって項目自身の `sha1_checksum` ではない、§5 拒否語と道具名の衝突（`head (GNU coreutils) 8.32`）を下振れを選ぶ緩みとして明記、§6 `record_version` を 0.2 に。code: adapter 0.3.6 / predicate 0.3.6、test 72 本 / 472 assertions 緑（新規 6 本は修正前の tree で落ちることを別 checkout で確認。既存 1 本は道具立てに locator を足して更新——新しい規則が触れる形だったため、test の趣旨は継承の可否で等級ではない） |
 | v0.1.8 | 2026-09-21 | review round 6（4 席中 3 席回答——opus4.6 は 600 秒で timeout——全員 REVISE、指摘は高度に一致）の (b): §4/§5 **object でない配列要素**も落とさず `absent` として数える（`input_subdomain` / `output_subdomain` / `prerequisite` / `software_prerequisites` / `script[]` の全部。round 5 の修正は読めない object だけを保持しており、裸の文字列や `null` は依然落ちていた）、§5 「何も名指さない」の判定を checksum と版の枝より前へ（取得先の無い digest が immutable を買っていた）、§5/§4 container の経路も参照全体が image digest のときだけ immutable（`docker://tool:latest#@sha256:…` が再現）、§5 `.x` は候補を採る前に全候補を走査（`1.x 1.0` と `1.0 1.x` が分かれた）、§4 `genomicschain_extension` は全 block を統合し同一 locator の digest 食い違いは pin 無し、§6 `scripts_total / scripts_with_checksum` を署名される欄に、§5 tag の形に registry 検査を掛けていない理由を明記（v0.1.7 の記述は実装と食い違っていた）、§7 core 変更 (1) から `gc_prov_proof` を削除（v0.1.3 の名残）、§6/§10-14 `toolchain` の二つの「署名」を書き分け、§6 の版の例を 0.3.5 に。反証 1 件: 入力の URL 判定が tier2 の規則を使い `file://` が floating に上がるという指摘は再現せず（`local_path` のまま、§13.2 の実測どおり）。code: adapter 0.3.5 / predicate 0.3.5、test 67 本 / 446 assertions 緑（新規 9 本は修正前の tree で落ちることを別 checkout で確認） |
 | v0.1.7 | 2026-09-21 | review round 5 の subprocess 席（4 席中 opus5 の 1 席のみ回答。worker が SIGTERM で落ち、opus4.6 は中断、codex は空、cursor は認証切れ——L2 `review_r5_…`）の (b) 5 件: §4/§5 読めない項目を落とさず `absent` として数える（`inputs_total`・`outputs_total` は署名される分母、段の `prerequisite[]` は継承させない）、§4/§5 scheme 無しの digest つき名前は registry の形のときだけ image（`tools/awk@sha256:…` は path）、§4 SCM extension が複数なら最弱、runtime の重複削減は predicate の `runtime_grade` 自身を呼ぶ（adapter の写しを廃し `defined?` 分岐を削除）、`input_grade` の `empty locator` 分岐が生きる。code: adapter 0.3.4 / predicate 0.3.4、test 58 本 / 417 assertions 緑（新規 7 本は修正前の code で落ちることを別 checkout で確認） |
 | v0.1.6 | 2026-09-21 | review round 5 の persona 3 席の (b) 3 件（script[] は全項目、v/V 始まりの拒否、印はどの語でも）と (c) の文言（§8 json の実測、submission_key の組成、§9 U3 の test 環境、OCI_TAGGED の先頭文字）。subprocess 4 席の結果は L2 `review_r5_…` に。code: adapter 0.3.3 / predicate 0.3.3 |

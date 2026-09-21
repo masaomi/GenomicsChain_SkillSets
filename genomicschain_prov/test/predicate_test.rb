@@ -282,7 +282,10 @@ class PredicateTest < Minitest::Test
   # workflow-level items. The coverage in the claim counts own declarations.
   def test_inherited_items_are_fallback_only
     g = P.grade(np(stages: [stage(1), stage(2)],
-                   software: [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => nil,
+                   # the locator is what makes this entry immutable (round 7:
+                   # a checksum with nothing to fetch no longer does). What
+                   # this test is about is the fallback, not that grade.
+                   software: [{ 'name' => 'bc', 'version' => '1.07.1', 'locator' => 'https://example.org/bc',
                                 'checksum' => { 'sha256' => 'e' * 64 }, 'stage' => nil }],
                    containers: [{ 'ref' => 'docker://x/bc:latest', 'name' => 'bc', 'stage' => 1 }]))
     assert_equal [%w[1 floating own], %w[2 immutable inherited]],
@@ -403,6 +406,27 @@ class PredicateTest < Minitest::Test
     assert_equal 'immutable', P.container_grade("docker://tool#{d}").first
     assert_equal 'immutable', P.container_grade("ghcr.io/o/i:1.0#{d}").first
     assert_equal 'versioned', P.container_grade('quay.io/biocontainers/bc:1.07.1').first
+  end
+
+  # Round 7 (cursor): `input_grade` refused a digest of something the bundle
+  # does not locate, and `software_grade` did not — the two functions said
+  # different things about the same shape.
+  def test_the_checksum_route_needs_a_locator_everywhere
+    ck = { 'sha1' => 'a' * 40 }
+    assert_equal 'floating', P.software_grade('name' => 'bc', 'locator' => nil, 'version' => nil, 'checksum' => ck).first
+    assert_equal 'immutable', P.software_grade('name' => 'bc', 'locator' => 'x', 'version' => nil, 'checksum' => ck).first
+    assert_equal 'absent', P.runtime_grade('engine' => 'nf', 'version' => nil, 'locator' => nil, 'checksum' => ck).first
+    assert_equal 'immutable', P.runtime_grade('engine' => 'nf', 'version' => nil, 'locator' => 'x', 'checksum' => ck).first
+    assert_equal 'absent', P.container_grade(nil).first
+  end
+
+  # The count and the grade were reading the same entry two different ways.
+  def test_a_locator_less_checksum_is_not_counted_as_coverage
+    g = P.grade(np(inputs: [{ 'name' => 'a', 'locator' => nil, 'checksum' => { 'sha1' => 'a' * 40 }, 'internal' => false },
+                            { 'name' => 'b', 'locator' => 'b.fa', 'checksum' => nil, 'internal' => false }]))
+    assert_equal 2, g['counts']['inputs_total']
+    assert_equal 0, g['counts']['inputs_with_checksum']
+    assert_equal 'absent', g['grades']['inputs']
   end
 
   # §4 promises the two script counters; until round 6 they never reached the

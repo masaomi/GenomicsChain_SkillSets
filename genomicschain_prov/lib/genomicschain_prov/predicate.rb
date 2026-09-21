@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.5'
+    PREDICATE_VERSION = 'prov-predicate-0.3.6'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -217,8 +217,12 @@ module GenomicsChainProv
       # digests, and a version alone identifies no tool. A digest with nothing
       # to fetch permits a stranger nothing, which is what the grade measures.
       return ['absent', 'the entry names nothing the bundle can resolve'] if s['name'].nil? && s['locator'].nil?
-      return ['immutable', 'carries a checksum'] if s['checksum']
+      # the checksum route needs a locator (round 7, cursor): `input_grade`
+      # already refused a digest of something the bundle does not locate, and
+      # the two functions must say the same thing about the same shape
+      return ['immutable', 'carries a checksum'] if s['checksum'] && s['locator']
       return version_grade(s['name'], s['version']) if s['version']
+      return ['floating', 'a checksum with nothing the bundle locates to fetch'] if s['checksum']
 
       ['floating', 'a bare name — no version, no checksum']
     end
@@ -318,6 +322,11 @@ module GenomicsChainProv
     # reference IS an image digest reference. Anything else that carried a
     # digest-shaped suffix is capped at `floating` — the suffix is a name.
     def container_grade(ref)
+      # An entry the adapter could not read reaches this route too (round 7,
+      # codex): it might have been an image, so the route it might have
+      # weakened is not left complete.
+      return ['absent', 'the entry names no image'] if ref.to_s.strip.empty?
+
       grade, reason = PS.container(ref)
       return [grade, reason] unless grade == 'immutable'
       return [grade, reason] if ref.to_s =~ OCI_IMAGE_DIGEST
@@ -327,7 +336,7 @@ module GenomicsChainProv
 
     def runtime_grade(r)
       return ['absent', 'no runtime named'] if r.nil?
-      return ['immutable', 'runtime carries a checksum'] if r['checksum']
+      return ['immutable', 'runtime carries a checksum'] if r['checksum'] && r['locator']
       return ['immutable', 'runtime image is digest-pinned'] if r['locator'].to_s =~ OCI_IMAGE_DIGEST
       return version_grade(r['engine'], r['version']) if r['version']
 
@@ -389,7 +398,10 @@ module GenomicsChainProv
       c['scripts_total'] = np.workflow['scripts_total'].to_i
       c['scripts_with_checksum'] = np.workflow['scripts_with_checksum'].to_i
       c['inputs_total'] = inp.length
-      c['inputs_with_checksum'] = np.inputs_external.count { |i| i['checksum'] }
+      # a checksum on an entry with no locator grades `absent` (round 6), so it
+      # must not be counted as coverage either (round 7, opus5: the count and
+      # the grade were reading the same entry two different ways)
+      c['inputs_with_checksum'] = np.inputs_external.count { |i| i['checksum'] && !i['locator'].to_s.strip.empty? }
       c['inputs_internal'] = np.inputs_internal.length
       c['outputs_total'] = np.outputs.length
       c['outputs_with_checksum'] = np.outputs.count { |o| o['checksum'] }

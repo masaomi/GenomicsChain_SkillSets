@@ -597,7 +597,73 @@ class AdapterBcoTest < Minitest::Test
     b['execution_domain']['script'] = [a]
     n = Bco.parse(b)
     assert_equal [1, 0], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
-    assert_includes n.notes, 'the extension gives one locator more than one checksum; that locator is not pinned'
+    assert_includes n.notes, 'the extension gives one locator more than one checksum, or an unreadable one; that locator is not pinned'
+    # Round 7 (opus5): a `sha256` that is present but unreadable is a FAILED
+    # declaration. Skipping it left a good digest plus nonsense pinned while
+    # two readable disagreeing digests were not — nonsense outranked checkable.
+    b2 = enriched_bco
+    b2['extension_domain'] = [{ 'genomicschain_extension' => { 'checksums' => [
+      { 'uri' => a, 'sha256' => 'C' * 64 }, { 'uri' => a, 'sha256' => 'nope' }
+    ] } }]
+    b2['execution_domain']['script'] = [a]
+    assert_equal [1, 0], Bco.parse(b2).workflow.values_at('scripts_total', 'scripts_with_checksum')
+  end
+
+  # Round 7 (opus5): two SCM declarations of the same rank were resolved by
+  # array position, the rule the extension and the checksums already refuse.
+  def test_two_equal_rank_scm_declarations_that_disagree_record_neither
+    at = ->(r, c) { { 'scm_extension' => { 'scm_repository' => r, 'scm_commit' => c, 'scm_path' => 'main.nf' } } }
+    one = at['https://git/x', 'a' * 40]
+    two = at['https://git/y', 'b' * 40]
+    [[one, two], [two, one]].each do |order|
+      b = enriched_bco
+      b['extension_domain'] = order + [b['extension_domain'][1]]
+      n = Bco.parse(b)
+      assert_nil n.workflow['commit'], 'the array order must not choose between two equal declarations'
+      assert_nil n.workflow['repository']
+      assert_includes n.notes, 'the bundle gives more than one SCM declaration of equal strength and they disagree; none is recorded'
+    end
+  end
+
+  # Round 7 (codex, reproduced): an unreadable prerequisite weakened only the
+  # package route, so replacing an honestly declared weak image with it left
+  # the container route holding the strong image alone and lifted the stage.
+  def test_an_unreadable_prerequisite_weakens_the_container_route_too
+    d = "@sha256:#{'a' * 64}"
+    pinned = { 'name' => 'a', 'uri' => { 'uri' => "ghcr.io/o/a#{d}" } }
+    honest = { 'name' => 'b', 'uri' => { 'uri' => 'docker://b:latest' } }
+    b = enriched_bco
+    step = b['description_domain']['pipeline_steps'].find { |s| s['step_number'] == 1 }
+    step['prerequisite'] = [pinned, honest]
+    honest_grade = GenomicsChainProv::Predicate.grade(Bco.parse(b))['stages'].find { |s| s['id'] == 1 }['grade']
+    step['prerequisite'] = [pinned, nil]
+    omitted_grade = GenomicsChainProv::Predicate.grade(Bco.parse(b))['stages'].find { |s| s['id'] == 1 }['grade']
+    assert_equal 'floating', honest_grade
+    assert_equal 'absent', omitted_grade, 'omitting the weak image must not outgrade declaring it'
+  end
+
+  # Round 7, four seats: the rule is applied once, where the bundle enters, so
+  # no site downstream can forget it. `script[]` is the one list whose bare
+  # string is a producer shape the real bundle uses (nf-prov 1.7.0).
+  def test_the_bundle_is_normalised_at_the_boundary
+    b = enriched_bco
+    b['parametric_domain'] << nil << 'unreadable'
+    params_total = GenomicsChainProv::Predicate.grade(Bco.parse(b))['counts']['params_total']
+    assert_equal 5, params_total, 'params_total is the length of the array as the bundle wrote it'
+    b2 = enriched_bco
+    b2['execution_domain']['script'] = [42]
+    n = Bco.parse(b2)
+    assert_nil n.workflow['script'], 'a bare integer is not a script locator'
+    assert_equal [1, 0], n.workflow.values_at('scripts_total', 'scripts_with_checksum')
+    b3 = enriched_bco
+    b3['extension_domain'] = ['not an object', { 'scm_extension' => 'not an object' }]
+    assert_nil Bco.parse(b3).workflow['commit']
+    # a field the standard defines as an array, written as an object, is a
+    # structural error: Array() would turn it into pair-arrays and count them
+    b4 = enriched_bco
+    b4['io_domain']['input_subdomain'] = { 'uri' => { 'uri' => 'a.txt' } }
+    err = assert_raises(Bco::FormatError) { Bco.parse(b4) }
+    assert_match(/input_subdomain is not an array/, err.message)
   end
 
   def test_format_error_drops_the_parser_cause
