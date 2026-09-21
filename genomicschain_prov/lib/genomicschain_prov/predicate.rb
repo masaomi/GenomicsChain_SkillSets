@@ -61,7 +61,7 @@ module GenomicsChainProv
   # bundle tells the truth about the run, or whether the checksums it carries
   # were recomputed — all `not_checked` on the record.
   module Predicate
-    PREDICATE_VERSION = 'prov-predicate-0.3.6'
+    PREDICATE_VERSION = 'prov-predicate-0.3.7'
     # The rule that grades images and locators is tier2's PinStrength. What
     # the record signs is that RULE's version, not the tier2 package's: a
     # package release that leaves the reduction alone must not turn every
@@ -116,7 +116,6 @@ module GenomicsChainProv
     NOT_A_RELEASE = %w[latest unknown head master main dev devel nightly snapshot stable current trunk none null
                        unversioned].freeze
     NOT_A_RELEASE_TOKEN = /\A\d*(?:#{NOT_A_RELEASE.join('|')})\d*\z/i
-    RANGE_ONLY_WORD = /\A[<>!~^*]+=*\z/
     # A DOI is a DOI only when the whole locator is one (optionally as a
     # doi.org URL or a doi: URI). A `10.1234/` directory inside a path is a
     # name (review round 3, reproduced: a directory rename lifted an input two
@@ -404,7 +403,10 @@ module GenomicsChainProv
       c['inputs_with_checksum'] = np.inputs_external.count { |i| i['checksum'] && !i['locator'].to_s.strip.empty? }
       c['inputs_internal'] = np.inputs_internal.length
       c['outputs_total'] = np.outputs.length
-      c['outputs_with_checksum'] = np.outputs.count { |o| o['checksum'] }
+      # the same shape as inputs, counted the same way (round 8, opus5): a
+      # checksum on an entry the bundle does not locate is not coverage, even
+      # where no grade reads the count
+      c['outputs_with_checksum'] = np.outputs.count { |o| o['checksum'] && !o['locator'].to_s.strip.empty? }
       c['outputs_digest'] = outputs_digest(np.outputs)
       c['params_total'] = np.params_total
       c['params_count'] = np.params_count

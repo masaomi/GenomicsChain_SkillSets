@@ -427,6 +427,11 @@ class PredicateTest < Minitest::Test
     assert_equal 2, g['counts']['inputs_total']
     assert_equal 0, g['counts']['inputs_with_checksum']
     assert_equal 'absent', g['grades']['inputs']
+    # outputs carry no grade, but the same shape is counted the same way
+    # (round 8, opus5)
+    o = P.grade(np(outputs: [{ 'name' => 'a', 'locator' => nil, 'checksum' => { 'sha1' => 'a' * 40 } }]))['counts']
+    assert_equal 1, o['outputs_total']
+    assert_equal 0, o['outputs_with_checksum']
   end
 
   # §4 promises the two script counters; until round 6 they never reached the

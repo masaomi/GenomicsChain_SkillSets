@@ -50,7 +50,7 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.6'
+      VERSION = 'prov-adapter-bco-0.3.7'
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -164,27 +164,51 @@ module GenomicsChainProv
       # only a non-string non-object becomes empty. That distinction is stated
       # in §5; round 7 found the design text claiming the opposite.
       def normalise_lists(bco)
+        # PRESENCE, not truthiness (round 8, opus5 + codex): a JSON `false`
+        # slipped past `if bco[k]` and reached the readers as the string
+        # "false", so `"script": false` — naming no script at all — signed
+        # `scripts_total: 1` and graded the workflow one level above a bundle
+        # that declared nothing.
         ed = bco['execution_domain']
-        ed['script'] = as_list(ed['script'], 'script').map { |e| e.is_a?(String) ? { 'uri' => { 'uri' => e } } : readable(e) } if ed['script']
-        if ed['software_prerequisites']
-          ed['software_prerequisites'] = as_list(ed['software_prerequisites'], 'software_prerequisites').map { |e| readable(e) }
+        normalise!(ed, 'script') { |e| e.is_a?(String) ? { 'uri' => { 'uri' => e } } : readable(e) }
+        normalise!(ed, 'software_prerequisites')
+        dd = bco['description_domain']
+        (dd.key?('pipeline_steps') ? as_list(dd['pipeline_steps'], 'pipeline_steps') : []).each do |st|
+          next unless st.is_a?(Hash)
+
+          # `input_list` / `output_list` are the evidence §13.4-3 reads to
+          # decide which inputs a step produced before reading them; written as
+          # an object, `Array()` turned them into pair-arrays and the site
+          # dropped them, which HID a weak input and raised the grade (round 8,
+          # codex, reproduced).
+          %w[prerequisite input_list output_list].each { |k| normalise!(st, k) }
         end
-        as_list(bco.dig('description_domain', 'pipeline_steps') || [], 'pipeline_steps').each do |st|
-          st['prerequisite'] = as_list(st['prerequisite'], 'prerequisite').map { |e| readable(e) } if st.is_a?(Hash) && st['prerequisite']
-        end
-        io = bco['io_domain']
-        %w[input_subdomain output_subdomain].each do |k|
-          io[k] = as_list(io[k], k).map { |e| readable(e) } if io[k]
-        end
-        bco['parametric_domain'] = as_list(bco['parametric_domain'], 'parametric_domain').map { |e| readable(e) } if bco['parametric_domain']
-        if bco['extension_domain']
-          bco['extension_domain'] = as_list(bco['extension_domain'], 'extension_domain').map do |e|
-            x = readable(e)
-            x['scm_extension'] = readable(x['scm_extension']) if x.key?('scm_extension')
-            x
-          end
+        %w[input_subdomain output_subdomain].each { |k| normalise!(bco['io_domain'], k) }
+        normalise!(bco, 'parametric_domain')
+        normalise!(bco, 'extension_domain') do |e|
+          x = readable(e)
+          # An `scm_extension` that is not an object is NOT a declaration, so
+          # it is removed rather than emptied (round 8, cursor): emptied, it
+          # entered `workflow_of`'s weakest-declaration scan as a rank-0 SCM
+          # and beat a valid commit hash in another block. The boundary rule
+          # keeps an unreadable element where it feeds a denominator or a
+          # stage's own declaration; an absent SCM block feeds neither.
+          x.delete('scm_extension') if x.key?('scm_extension') && !x['scm_extension'].is_a?(Hash)
+          x['genomicschain_extension'] = normalise_extension(x['genomicschain_extension']) if x['genomicschain_extension'].is_a?(Hash)
+          x
         end
         bco
+      end
+
+      def normalise!(holder, key, &block)
+        return unless holder.is_a?(Hash) && holder.key?(key)
+
+        holder[key] = as_list(holder[key], key).map { |e| block ? block.call(e) : readable(e) }
+      end
+
+      def normalise_extension(ext)
+        normalise!(ext, 'checksums')
+        ext
       end
 
       # A field the standard defines as an array, written as an object or a
@@ -221,8 +245,13 @@ module GenomicsChainProv
 
       def workflow_of(bco, ed, sha256_by_locator = {}, notes = [])
         pd = bco['provenance_domain'].is_a?(Hash) ? bco['provenance_domain'] : {}
+        # A block that names nothing is not a declaration and does not enter
+        # the weakest-declaration scan (round 8, cursor): as an empty object it
+        # ranked 0 and beat a valid commit hash in another block, so adding an
+        # empty enrichment block LOWERED an honest workflow grade.
         scms = Array(bco['extension_domain']).filter_map { |e| e.is_a?(Hash) ? e['scm_extension'] : nil }
-                                            .select { |s| s.is_a?(Hash) }
+                                             .select { |s| s.is_a?(Hash) }
+                                             .reject { |s| %w[scm_repository scm_commit scm_path].all? { |k| blank_to_nil(s[k]).nil? } }
         # Two SCM declarations are two declarations and the weaker one decides,
         # the rule script[] and the runtime already follow (round 5): reading
         # the first let the order of two extension entries choose the signed
@@ -487,9 +516,13 @@ module GenomicsChainProv
       # says nothing about the digest and is ignored.
       def checksums_from(extension, notes = [])
         by_locator = Array(extension['checksums']).each_with_object({}) do |c, acc|
-          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && blank_to_nil(c['sha256'])
+          # PRESENCE of the field, not a usable value (round 8, codex): a
+          # `sha256` written as null, "" or whitespace was skipped before the
+          # disagreement test, so a good digest beside a blank one kept the pin
+          # while a good digest beside "?" lost it.
+          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && c.key?('sha256')
 
-          (acc[c['uri'].to_s] ||= []) << (c['sha256'].to_s =~ SHA256_HEX ? c['sha256'].to_s.downcase : nil)
+          (acc[c['uri'].to_s] ||= []) << (blank_to_nil(c['sha256']).to_s =~ SHA256_HEX ? c['sha256'].to_s.downcase : nil)
         end
         pinned = by_locator.filter_map { |k, v| [k, v.first] if v.uniq.length == 1 && v.first }.to_h
         if pinned.length < by_locator.length
@@ -523,8 +556,17 @@ module GenomicsChainProv
         s.split('/').reject(&:empty?).last || s
       end
 
+      # Only a string or a number is a value here (round 8, opus5). `to_s` on
+      # anything else put Ruby's own rendering into the signed identity and the
+      # signed grade — and `Hash#inspect` changed format in Ruby 3.4, so the
+      # same bundle bytes graded `floating` on one interpreter and `ranged` on
+      # another, and `workflow_commit` signed as two different strings. The
+      # identity has to come from the bundle and the named procedure versions,
+      # nothing else (§6).
       def blank_to_nil(v)
-        v.nil? || v.to_s.strip.empty? ? nil : v.to_s
+        return nil unless v.is_a?(String) || v.is_a?(Numeric)
+
+        v.to_s.strip.empty? ? nil : v.to_s
       end
 
       # One rule at every site that reads a list of entries (round 6, three
@@ -536,8 +578,10 @@ module GenomicsChainProv
       # or a `null` grade above one who wrote an honest object. This is the
       # argument `ordered_steps` already makes for a non-object step, applied
       # to every other list in the same record. A bare string is not read as a
-      # locator: the standard's entries are objects, and guessing would be the
-      # producer's string choosing the route.
+      # locator here — the standard's entries are objects, and guessing would
+      # be the producer's string choosing the route. `script[]` is the one
+      # exception, handled in `normalise_lists`: the real nf-prov bundle writes
+      # that list as bare strings, so there a string is a readable declaration.
       def readable(entry)
         entry.is_a?(Hash) ? entry : {}
       end

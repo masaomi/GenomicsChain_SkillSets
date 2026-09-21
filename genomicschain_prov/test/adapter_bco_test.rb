@@ -666,6 +666,79 @@ class AdapterBcoTest < Minitest::Test
     assert_match(/input_subdomain is not an array/, err.message)
   end
 
+  # Round 8 (opus5 + codex): the boundary guarded each list with Ruby
+  # truthiness, so a JSON `false` bypassed both the array check and the
+  # element normalisation and arrived downstream as the string "false".
+  def test_a_falsy_value_where_an_array_belongs_is_still_refused
+    %w[script software_prerequisites].each do |k|
+      b = enriched_bco
+      b['execution_domain'][k] = false
+      err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+      assert_match(/#{k} is not an array/, err.message)
+    end
+    b = enriched_bco
+    b['io_domain']['input_subdomain'] = false
+    assert_raises(Bco::FormatError) { Bco.parse(b) }
+  end
+
+  # Round 8 (opus5): `to_s` on a non-scalar put Ruby's own rendering into the
+  # signed identity, and `Hash#inspect` changed format in Ruby 3.4 — the same
+  # bundle bytes would grade differently on two interpreters.
+  def test_a_structure_where_a_string_belongs_is_not_rendered_into_the_identity
+    b = enriched_bco
+    b['extension_domain'][0]['scm_extension']['scm_commit'] = { 'a' => 1 }
+    b['execution_domain']['software_prerequisites'][0]['version'] = { 'a' => 1 }
+    n = Bco.parse(b)
+    assert_nil n.workflow['commit']
+    assert_nil n.runtime['version']
+  end
+
+  # Round 8 (codex, reproduced): `input_list` / `output_list` are the evidence
+  # §13.4-3 reads. Written as an object they became pair-arrays, the site
+  # dropped them, and a weak input disappeared from the grade.
+  def test_the_step_io_lists_are_at_the_boundary_too
+    b = enriched_bco
+    b['description_domain']['pipeline_steps'][0]['input_list'] = { 'uri' => 'work/12/34/sum.txt' }
+    err = assert_raises(Bco::FormatError) { Bco.parse(b) }
+    assert_match(/input_list is not an array/, err.message)
+    b2 = enriched_bco
+    # step_number 2 is stage 2; a bare string and a null are both kept
+    b2['description_domain']['pipeline_steps'][0]['input_list'] = ['work/12/34/sum.txt', nil]
+    assert_equal 2, Bco.parse(b2).stages.find { |s| s['id'] == 2 }['inputs'],
+                 'a non-object element is kept, not dropped'
+  end
+
+  # Round 8 (codex): a `sha256` written as null or "" was skipped before the
+  # disagreement test, so a blank beside a good digest kept the pin while "?"
+  # beside it lost it.
+  def test_a_blank_checksum_beside_a_good_one_is_a_disagreement
+    a = 'file:///x/helper.sh'
+    [nil, '', '   '].each do |blank|
+      b = enriched_bco
+      b['extension_domain'] = [{ 'genomicschain_extension' => { 'checksums' => [
+        { 'uri' => a, 'sha256' => 'C' * 64 }, { 'uri' => a, 'sha256' => blank }
+      ] } }]
+      b['execution_domain']['script'] = [a]
+      assert_equal [1, 0], Bco.parse(b).workflow.values_at('scripts_total', 'scripts_with_checksum'),
+                   "blank #{blank.inspect} must not leave the locator pinned"
+    end
+  end
+
+  # Round 8 (cursor): the round-7 boundary rule itself introduced this. An
+  # `scm_extension` that is not an object became `{}`, entered the weakest-
+  # declaration scan as a rank-0 declaration, and beat a valid commit hash in
+  # another block — so adding an empty enrichment block LOWERED the grade.
+  def test_an_empty_scm_block_is_not_a_declaration
+    b = enriched_bco
+    b['extension_domain'][0]['scm_extension']['scm_commit'] = 'a' * 40
+    with_empty = [b['extension_domain'][0], { 'scm_extension' => nil }, b['extension_domain'][1]]
+    b['extension_domain'] = with_empty
+    n = Bco.parse(b)
+    assert_equal 'a' * 40, n.workflow['commit'], 'an absent SCM block must not outrank a commit hash'
+    assert_equal 'commit', n.workflow['ref_kind']
+    assert_equal 'immutable', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
+  end
+
   def test_format_error_drops_the_parser_cause
     err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-patient42"') }
     assert_nil err.cause
