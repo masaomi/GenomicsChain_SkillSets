@@ -2,7 +2,12 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** 草案 v0.1.10（2026-09-21: round 8（3 席回答、全員 REVISE）の (b) を反映——境界の欄の有無を key で見る（JSON の `false` が素通りしていた）、文字列の欄に object が来たら「無い」扱い（Ruby の描画が署名に入り interpreter で等級が変わっていた）、段の `input_list`/`output_list` と拡張の `checksums[]` も境界へ、`sha256` は欄の有無で見る、`scm_extension` が object でなければ空にせず取り除く（**round 7 の境界規則が自分で作った欠陥**）、述語の返り値を anchor が log に出さない規則を §6 に明記。code は adapter 0.3.7 / predicate 0.3.7、test 77 本緑。v0.1.9: round 7（4 席全員回答、全員 REVISE）の (b) を反映——正規化を経路ごとの列挙から**束が入る境界の一箇所**に移した。`script[]` の裸の文字列は実物の nf-prov が書く読める申告なので例外として明記（v0.1.8 の文が実装と食い違っていた）。checksum の経路には locator が要る（道具・runtime も入力に揃える）。読めない項目は container と package の両方の経路を弱める。同強の SCM 宣言が食い違えば記録しない。読めない digest も食い違い扱い。`record_version` を 0.2 に。code は adapter 0.3.6 / predicate 0.3.6、test 72 本緑。v0.1.8: round 6（3 席回答、全員 REVISE）の (b) を反映——「読めない項目を落とさない」を **object でない要素**まで広げ、項目を読むすべての場所に一つの規則として当てる。checksum と版の枝より「何も名指さない」の判定を前に置く。container の経路も digest の形で固定。`.x` は全候補を走査。拡張 block は全部を統合。`scripts_total / scripts_with_checksum` を記録の欄に。code は adapter 0.3.5 / predicate 0.3.5、test 67 本緑。v0.1.7: round 5 の subprocess 席で唯一返答した opus5 の (b) 5 件を反映——読めない項目を落とさず absent として数える、scheme 無しの digest は registry の形のときだけ image、SCM extension の複数は最弱、runtime の重複削減は predicate の規則そのもの。code は adapter 0.3.4 / predicate 0.3.4、test 58 本緑。v0.1.6: round 5 の persona 3 席の (b) を反映——script[] は全項目の checksum で pin、v/V 始まりの候補も拒否語を見る、範囲の印はどの語にあっても ranged、§8 json の言い方と submission_key の組成。code は adapter 0.3.3 / predicate 0.3.3、test 53 本緑。round 5 の記録は L2 `review_r5_prov_anchoring_v0_1_5_20260921`。v0.1.5: round 4（REVISE、5 席全員回答）の残り H1–H4 を反映——H1 code（範囲の印の語、拒否語の位置、runtime の重複、image 参照の形、checksum の形、例外の cause）、H2 §6/§7 idempotency は submission_key から、H3 script の checksum で workflow が immutable に届く、H4 §7/§8/§9/§10-14 の文言。round 4 の記録は L2 `review_r4_prov_anchoring_v0_1_4_20260921`。v0.1.4: round 3（REVISE）の (a)/(b) を 5 件 G1–G5 に束ねて反映——G1 §5 版の規則・DOI・runtime、G2 §6 null 欄と正準化規則の署名、G3 §7/§10-14 読み口を place route に、G4 §8 検証者の言えること、G5 §6/§13.4-1 誤り文と拡張 checksum の結合。round 3 の記録は L2 `review_r3_prov_anchoring_v0_1_3_20260921`。v0.1.3 まで: round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`。改訂履歴は §14）
+**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
+round 5〜8 は名目上は設計 review だったが、産出物の 9 割近くが adapter の実装修正であり、設計の review に test が走っていること
+自体がその徴候だった。残る懸案は review の巡ではなく**実装の queue** に置く。設計に変更が要るときは、実装が突き当たった事実を
+持って個別に改訂する。以下は凍結時点の状態の記録（round 8
+
+（3 席回答、全員 REVISE）の (b) を反映——境界の欄の有無を key で見る（JSON の `false` が素通りしていた）、文字列の欄に object が来たら「無い」扱い（Ruby の描画が署名に入り interpreter で等級が変わっていた）、段の `input_list`/`output_list` と拡張の `checksums[]` も境界へ、`sha256` は欄の有無で見る、`scm_extension` が object でなければ空にせず取り除く（**round 7 の境界規則が自分で作った欠陥**）、述語の返り値を anchor が log に出さない規則を §6 に明記。code は adapter 0.3.7 / predicate 0.3.7、test 77 本緑。v0.1.9: round 7（4 席全員回答、全員 REVISE）の (b) を反映——正規化を経路ごとの列挙から**束が入る境界の一箇所**に移した。`script[]` の裸の文字列は実物の nf-prov が書く読める申告なので例外として明記（v0.1.8 の文が実装と食い違っていた）。checksum の経路には locator が要る（道具・runtime も入力に揃える）。読めない項目は container と package の両方の経路を弱める。同強の SCM 宣言が食い違えば記録しない。読めない digest も食い違い扱い。`record_version` を 0.2 に。code は adapter 0.3.6 / predicate 0.3.6、test 72 本緑。v0.1.8: round 6（3 席回答、全員 REVISE）の (b) を反映——「読めない項目を落とさない」を **object でない要素**まで広げ、項目を読むすべての場所に一つの規則として当てる。checksum と版の枝より「何も名指さない」の判定を前に置く。container の経路も digest の形で固定。`.x` は全候補を走査。拡張 block は全部を統合。`scripts_total / scripts_with_checksum` を記録の欄に。code は adapter 0.3.5 / predicate 0.3.5、test 67 本緑。v0.1.7: round 5 の subprocess 席で唯一返答した opus5 の (b) 5 件を反映——読めない項目を落とさず absent として数える、scheme 無しの digest は registry の形のときだけ image、SCM extension の複数は最弱、runtime の重複削減は predicate の規則そのもの。code は adapter 0.3.4 / predicate 0.3.4、test 58 本緑。v0.1.6: round 5 の persona 3 席の (b) を反映——script[] は全項目の checksum で pin、v/V 始まりの候補も拒否語を見る、範囲の印はどの語にあっても ranged、§8 json の言い方と submission_key の組成。code は adapter 0.3.3 / predicate 0.3.3、test 53 本緑。round 5 の記録は L2 `review_r5_prov_anchoring_v0_1_5_20260921`。v0.1.5: round 4（REVISE、5 席全員回答）の残り H1–H4 を反映——H1 code（範囲の印の語、拒否語の位置、runtime の重複、image 参照の形、checksum の形、例外の cause）、H2 §6/§7 idempotency は submission_key から、H3 script の checksum で workflow が immutable に届く、H4 §7/§8/§9/§10-14 の文言。round 4 の記録は L2 `review_r4_prov_anchoring_v0_1_4_20260921`。v0.1.4: round 3（REVISE）の (a)/(b) を 5 件 G1–G5 に束ねて反映——G1 §5 版の規則・DOI・runtime、G2 §6 null 欄と正準化規則の署名、G3 §7/§10-14 読み口を place route に、G4 §8 検証者の言えること、G5 §6/§13.4-1 誤り文と拡張 checksum の結合。round 3 の記録は L2 `review_r3_prov_anchoring_v0_1_3_20260921`。v0.1.3 まで: round 2 の (a)/(b) を 5 件の直しに束ねて反映——F1 §5/§13.4-1 帳簿の直し（段の同一性・重複除去・継承の数え方・版の規則・locator の上限）、F2 §13.4-3 内部入力の順序規則、F3 §6/§7 記録と core の変更 4 件、F4 §7/§8 検証者の読み口と誤り符号、F5 言い回し。code は adapter 0.3.0 / predicate 0.3.0 / tier2 0.4.1 で反映済、test 41 本緑。round 1 の記録は L2 `review_r1_prov_anchoring_v0_1_1_20260920`、round 2 は `review_r2_prov_anchoring_v0_1_2_20260920`。改訂履歴は §14）
 **前提の文書:** KairosChain L2 `genomicschain_business_model_direction_20260919`（事業上の位置づけ、§3 が主張の境界の正本）、
 GenomicsChain L2 `service_2_5_dev_plan_notes_20260920`（コードの現状）、`docs/demos/service_2_5_principle_20260920/demo.html`（原理）、
 記憶 `warranty-scope`（言葉づかいの規則）、`genomicschain_core` design v0.4.1（package は v0.5.0。SubmitCore の経路。文書は KairosChain 側、コードは `submit_core.rb` の注釈が写し）
@@ -743,6 +748,42 @@ Nextflow の顧客は run のあとに 1 手順増える: `gc_prov_write --from-
 container・ツールの版・checksum を BCO に書く提案を出す道もある。出せば補完器の仕事は減るが、受理と配布は先方の時間で決まる。
 
 ## 14. 改訂履歴
+
+### 凍結の記（2026-09-21、operator 決定）
+
+設計 review は round 8 で終了し、設計は **v0.1.10 で凍結**する。round 9 は回さない。
+
+**理由。** operator の指摘: 「adapter は設計よりも実装の問題ではないか。だとするなら設計レビューは終わりにしよう。
+設計なのに test が走っていること自体がおかしい」。これは正しく、数字が裏づけている。
+
+| | 設計 | code | test |
+|---|---|---|---|
+| round 4 適用時 | 657 行 | 758 行 | 862 行 |
+| round 8 適用時 | 759 行 | 1,029 行 | 1,259 行 |
+| **4 巡の増分** | **+102 行（13%）** | **+271 行（36%）** | **+397 行（51%）** |
+
+各巡の artifact で code は **付録（advisory only — findings against these never block; they go to the queue）** として
+渡していた。席はその規則を守っており、round 8 の codex は 3 件中 2 件に「Advisory under the appendix rule」と明記して
+返している。規則を破ったのは orchestrator 側で、付録への指摘を blocking として扱い毎巡 code を書き直していた。
+
+**それでも設計だった分**（+102 行）は残る: §5 の等級規則（読めない項目を最弱として数える、scheme 無しの digest は
+registry の形のときだけ image、checksum の経路には locator が要る、読めない項目は container と package の両経路を弱める）、
+§4 の SCM と拡張 block の規則、§6 の `record_version` 0.2 と「述語の返り値を anchor が log にも応答にも出さない」不変条件。
+これらは署名される等級と記録の契約を決めるので設計の中身である。付録の規則を守っていれば、同じ内容はもっと少ない巡で
+出ていた——**設計の主張として述べられた指摘だけを blocking にすればよかった**。
+
+**残る懸案の行き先。** 以下は設計の欠陥ではなく実装の課題として queue に置く。review の巡では追わない。
+
+- `software_of` の重複除去が読めない項目を二つ潰す（`software_total` が 1 つ少なく数える。等級は動かない）
+- `counts` が `np.workflow['scripts_total'].to_i` を読む（WRROC アダプタ U6 が欄を書かなければ黙って 0 を署名する）
+- `stages_with_own_environment` が空の宣言で N/N まで水増しできる（等級は動かない）
+- 拒否語の語全体一致が道具名と衝突する（`head (GNU coreutils) 8.32` が floating、`8.32` が versioned。§5 に宣言済みの緩み）
+- 一成分の digest（`ubuntu@sha256:…`）と `OCI_TAGGED` に registry 検査が無いこと（いずれも §5 に宣言済みの緩み）
+- §8 が `nonce` と `chain_tip_hash` の在処を書いていない（実装時に確定する）
+
+**設計を改訂する条件。** 実装が突き当たった事実があるときだけ、個別に改訂する。「review の巡を回す」形には戻さない。
+
+
 
 | 版 | 日付 | 何が変わったか |
 |---|---|---|
