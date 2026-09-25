@@ -39,3 +39,9 @@ __pycache__/
 docs/reports/
 docs/briefs/
 docs/demos/
+
+# The Tier-1 survey corpus: 247 unsigned per-paper reports filed by DOI, plus the
+# manifests that list those DOIs. Kept on the author's machine (decision 2026-09-25):
+# a named per-paper score needs the authors' sign-off and right of reply before it is
+# published, and none of these has had either.
+corpus/
