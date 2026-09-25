@@ -32,3 +32,10 @@ docs/research/
 # Python bytecode from the report generators under docs/reports.
 __pycache__/
 *.pyc
+
+# Reports, briefs and demo pages are working material, kept on the author's machine
+# (decision 2026-09-25). They name people, third-party papers and systems, and
+# unpublished records. Publish one deliberately with `git add -f` after screening it.
+docs/reports/
+docs/briefs/
+docs/demos/
