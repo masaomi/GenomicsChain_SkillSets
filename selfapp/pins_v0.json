@@ -1,0 +1,60 @@
+{
+  "kind": "resolved for V0",
+  "resolved_at": "2026-09-30T03:49:08Z",
+  "resolved_from": {
+    "lock_sha256": "f4ec866e8d9c0b0e05d8a783ac83d7a0a9c3327ab936dfc717d75dc8fa77e315",
+    "lock_input_hash": "8791bc85f243d129055ee112e702dbff10c8db994c38f8d114a1d7acdcf9527e",
+    "lock_platform": "linux-64",
+    "base_image_source": "https://hub.docker.com/v2/repositories/mambaorg/micromamba/tags/2.9.0-debian13",
+    "container_sources": {
+      "trim": "https://quay.io/api/v1/repository/biocontainers/fastp/tag/?specificTag=1.3.7&onlyActiveTags=true",
+      "salmon_index": "https://quay.io/api/v1/repository/biocontainers/salmon/tag/?specificTag=2.8.0--hfa8f182_0&onlyActiveTags=true",
+      "salmon_quant": "https://quay.io/api/v1/repository/biocontainers/salmon/tag/?specificTag=2.8.0--hfa8f182_0&onlyActiveTags=true",
+      "tximport": "https://quay.io/api/v1/repository/biocontainers/bioconductor-tximport/tag/?specificTag=1.38.2--r45hdfd78af_0&onlyActiveTags=true",
+      "deseq2": "https://quay.io/api/v1/repository/biocontainers/bioconductor-deseq2/tag/?specificTag=1.50.2--r45ha27e39d_0&onlyActiveTags=true",
+      "report": "https://quay.io/api/v1/repository/biocontainers/multiqc/tag/?specificTag=1.35--pyhdfd78af_2&onlyActiveTags=true"
+    },
+    "container_notes": {
+      "trim": "tag names no build; the lock's build h43da1c4_0 is not confirmed by it"
+    }
+  },
+  "tools": {
+    "fastp": {
+      "version": "1.3.7",
+      "build": "h43da1c4_0"
+    },
+    "salmon": {
+      "version": "2.8.0",
+      "build": "hfa8f182_0"
+    },
+    "r-base": {
+      "version": "4.5.3",
+      "build": "h502d0c9_3"
+    },
+    "bioconductor-tximport": {
+      "version": "1.38.2",
+      "build": "r45hdfd78af_0"
+    },
+    "bioconductor-deseq2": {
+      "version": "1.50.2",
+      "build": "r45ha27e39d_0"
+    },
+    "multiqc": {
+      "version": "1.35",
+      "build": "pyhdfd78af_2"
+    },
+    "snakemake-minimal": {
+      "version": "9.27.0",
+      "build": "pyhdfd78af_0"
+    }
+  },
+  "base_image": "docker.io/mambaorg/micromamba:2.9.0-debian13@sha256:ed1bc6280b1eadf303610c00befaf9ba52dbacbc988ae4d7d9765801465f129e",
+  "rule_containers": {
+    "trim": "docker://quay.io/biocontainers/fastp:1.3.7@sha256:d916c617fa2a5809a010cbb78f13639693ce9b675f6cf7f1ffb4b4cf91a15808",
+    "salmon_index": "docker://quay.io/biocontainers/salmon:2.8.0--hfa8f182_0@sha256:deee6c1353277c3fa9b579a79eff18f1588ad0a9f098c299d583c49d3613be9b",
+    "salmon_quant": "docker://quay.io/biocontainers/salmon:2.8.0--hfa8f182_0@sha256:deee6c1353277c3fa9b579a79eff18f1588ad0a9f098c299d583c49d3613be9b",
+    "tximport": "docker://quay.io/biocontainers/bioconductor-tximport:1.38.2--r45hdfd78af_0@sha256:b81a6536a594d5d730a43015a44e28ccdf5047d43e35ac4198bdfe2aa17207c6",
+    "deseq2": "docker://quay.io/biocontainers/bioconductor-deseq2:1.50.2--r45ha27e39d_0@sha256:de4543b77eba3d5b4b774a50bf2539b9adb0ba7451c9d909bf8def4a1b1dd56d",
+    "report": "docker://quay.io/biocontainers/multiqc:1.35--pyhdfd78af_2@sha256:ceace1ca5329886d92600c225d34a523020c163b1599403e44c8d895d2dfb2a2"
+  }
+}
