@@ -28,7 +28,7 @@
     "mcp_tool_version": { "type": "string" },
     "subject_ref": {
       "type": "string",
-      "pattern": "^doi:.+$",
+      "pattern": "^(doi|text_sha256):.+$",
       "description": "The paper, e.g. doi:10.1101/2024.06.17.598857. The code is identified by the evidence digest and, when stated, by repository."
     },
     "canonical_id_value": { "type": "string" },

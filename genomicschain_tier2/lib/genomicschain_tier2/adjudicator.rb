@@ -429,7 +429,12 @@ module GenomicsChainTier2
     end
 
     def subject
-      { 'canonical_id' => @t1.dig('canonical_id', 'value'),
+      s = { 'canonical_id' => @t1.dig('canonical_id', 'value') }
+      # The kind travels only for a paper with no DOI, so the record can name
+      # it "text_sha256:" rather than "doi:" (self-application design O-3).
+      # Adjudications of DOI papers keep the exact bytes they had before.
+      s['canonical_id_kind'] = 'text_sha256' if @t1.dig('canonical_id', 'kind') == 'text_sha256'
+      s.merge(
         'tier1_rubric_version' => @t1['rubric_version'],
         'tier1_report_content_hash' => @t1['report_content_hash'],
         'codescan_evidence_digest' => @scan.dig('target', 'evidence_digest'),
@@ -441,7 +446,8 @@ module GenomicsChainTier2
         # Two interpreters can be involved: the one that scanned and the one
         # adjudicating. Both are recorded (see Scanner#toolchain for why).
         'codescan_toolchain' => @scan.dig('target', 'toolchain'),
-        'adjudication_toolchain' => { 'ruby' => RUBY_VERSION, 'ruby_platform' => RUBY_PLATFORM } }
+        'adjudication_toolchain' => { 'ruby' => RUBY_VERSION, 'ruby_platform' => RUBY_PLATFORM }
+      )
     end
 
     # --- inputs ----------------------------------------------------------

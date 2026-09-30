@@ -159,7 +159,7 @@ module KairosMcp
           def render(result, report_json)
             report = JSON.parse(report_json)
             base = {
-              'subject_ref' => "doi:#{report.dig('canonical_id', 'value')}",
+              'subject_ref' => SubjectRef.for(report.dig('canonical_id', 'value'), report.dig('canonical_id', 'kind')),
               'report_content_hash' => report['report_content_hash'],
               'static_readiness' => report.dig('headline', 'static_readiness'),
               'claim' => result[:claim],

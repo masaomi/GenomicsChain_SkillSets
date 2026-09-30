@@ -2,6 +2,7 @@
 
 require 'digest'
 require 'json'
+require_relative '../subject_ref'
 
 module KairosMcp
   module SkillSets
@@ -167,7 +168,9 @@ module KairosMcp
               raise SubmitCore::SubmitError, 'adjudication.subject.canonical_id missing' if cid.nil? || cid.to_s.empty?
 
               {
-                'subject_ref' => "doi:#{cid}",
+                # canonical_id_kind is present only for a paper with no DOI
+                # (gc_tier2_adjudicate writes it for text_sha256 alone).
+                'subject_ref' => SubjectRef.for(cid, subj['canonical_id_kind']),
                 'tier1_report_content_hash' => subj['tier1_report_content_hash'],
                 'tier1_rubric_version' => subj['tier1_rubric_version'],
                 'codescan_evidence_digest' => subj['codescan_evidence_digest'],

@@ -348,6 +348,21 @@ class GateTest < Minitest::Test
     assert_refused('sources[0].kind',
                    'sources' => [{ 'kind' => 'tweet', 'ref' => 'r', 'content' => 'x' }])
   end
+
+  # Self-application design O-3: a paper with no DOI is named by the sha256 of
+  # its text, and the name must be the hash of a text actually supplied.
+  def test_text_sha256_names_the_supplied_paper_text
+    text_id = Digest::SHA256.hexdigest('Methods...')
+    out = A::Assessor.new(llm: llm_returning(llm_fields(steps: [step('C1')])))
+                     .run(base_args('canonical_id' => { 'value' => text_id, 'kind' => 'text_sha256' }))
+
+    assert_equal 'ok', out.dig('guards', 'schema')
+    assert_equal 'text_sha256', JSON.parse(out['report_json']).dig('canonical_id', 'kind')
+
+    assert_refused('64 lowercase hex', 'canonical_id' => { 'value' => 'not-a-hash', 'kind' => 'text_sha256' })
+    assert_refused('sha256 of a paper_text source',
+                   'canonical_id' => { 'value' => Digest::SHA256.hexdigest('other text'), 'kind' => 'text_sha256' })
+  end
 end
 
 class LiveRunRegressionTest < Minitest::Test

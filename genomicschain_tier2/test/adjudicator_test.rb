@@ -189,6 +189,18 @@ class AdjudicatorTest < Minitest::Test
       assert_match(/\A[0-9a-f]{64}\z/, a['subject']['codescan_evidence_digest'])
       assert_equal RUBY_VERSION, a['subject']['codescan_toolchain']['ruby']
       assert_equal RUBY_VERSION, a['subject']['adjudication_toolchain']['ruby']
+      refute a['subject'].key?('canonical_id_kind'), 'a DOI paper keeps the subject it had before O-3'
+    end
+  end
+
+  # Self-application design O-3: the kind travels only for a paper with no DOI.
+  def test_subject_carries_the_kind_only_for_a_text_sha256_paper
+    text_report = lambda do |names|
+      prose_report(names).merge('canonical_id' => { 'value' => 'c' * 64, 'kind' => 'text_sha256' })
+    end
+    with_ameta(report: text_report) do |a|
+      assert_equal 'c' * 64, a['subject']['canonical_id']
+      assert_equal 'text_sha256', a['subject']['canonical_id_kind']
     end
   end
 

@@ -3,6 +3,7 @@
 require 'json'
 require_relative '../b1_manifest_hash'
 require_relative '../report_content_hash'
+require_relative '../subject_ref'
 
 module KairosMcp
   module SkillSets
@@ -38,10 +39,10 @@ module KairosMcp
           attr_reader :report
 
           def subject_ref
-            doi = @report.dig('canonical_id', 'value')
-            raise SubmitCore::SubmitError, 'canonical_id.value missing' if doi.nil? || doi.empty?
+            value = @report.dig('canonical_id', 'value')
+            raise SubmitCore::SubmitError, 'canonical_id.value missing' if value.nil? || value.empty?
 
-            "doi:#{doi}"
+            SubjectRef.for(value, @report.dig('canonical_id', 'kind'))
           end
 
           def parse_digest_subject!

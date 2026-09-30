@@ -1,6 +1,6 @@
 {
   "name": "genomicschain_tier1",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "GenomicsChain Tier-1 readiness assessment: gc_tier1_assess, report schema v0.2.6, rubric knowledge",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",

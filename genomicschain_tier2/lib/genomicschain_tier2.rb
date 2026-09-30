@@ -14,6 +14,6 @@ require_relative 'genomicschain_tier2/scanner'
 require_relative 'genomicschain_tier2/adjudicator'
 
 module GenomicsChainTier2
-  VERSION = '0.4.1'
+  VERSION = '0.4.2'
   RUBRIC_VERSION = 'codescan-static-0.1.0'
 end

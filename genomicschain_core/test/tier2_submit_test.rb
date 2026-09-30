@@ -175,6 +175,24 @@ class Tier2SubmitCoreTest < Minitest::Test
     end
   end
 
+  # Self-application design O-3: a paper with no DOI is recorded under the
+  # sha256 of its text, never under "doi:".
+  def test_text_sha256_paper_is_recorded_under_its_own_prefix
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      adj['subject'] = adj['subject'].merge('canonical_id' => 'c' * 64, 'canonical_id_kind' => 'text_sha256')
+      identity = GCore2::Tier2Submit.signed_params_for(adj, repository)
+      op, pkhash, = signed_operator(tip_source, identity)
+
+      out = submit(registry, tip_source, adj, identity, op, pkhash, Tier2StubAttestor.new(registry: registry),
+                   repository: repository)
+
+      assert_equal 'recorded', out[:status]
+      manifest = GCore2::ProofLookup.parse_manifest_from_record(registry.read(:proofs).first)
+      assert_equal "text_sha256:#{'c' * 64}", manifest['subject_ref']
+    end
+  end
+
   # The interpreter is part of what is signed (author's decision 2026-09-09):
   # the same bytes under a different Ruby gave a different adjudication.
   def test_toolchain_ruby_is_in_the_signed_identity

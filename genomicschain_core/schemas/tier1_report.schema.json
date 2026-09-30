@@ -35,7 +35,7 @@
     },
     "subject_ref": {
       "type": "string",
-      "pattern": "^doi:.+$",
+      "pattern": "^(doi|text_sha256):.+$",
       "description": "Paper subject, e.g. doi:10.1101/2025.10.28.685023"
     },
     "report_content_hash": {

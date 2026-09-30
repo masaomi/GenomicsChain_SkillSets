@@ -54,7 +54,8 @@ module KairosMcp
               properties: {
                 canonical_id: {
                   type: 'object',
-                  description: 'Paper identity. kind precedence: doi > pmid > pdf_sha256 > repo_url. ' \
+                  description: 'Paper identity. kind precedence: doi > pmid > pdf_sha256 > repo_url > text_sha256. ' \
+                               'text_sha256 (a paper with no DOI) must be the sha256 of a paper_text source. ' \
                                '{value, kind, aliases}.'
                 },
                 sources: {

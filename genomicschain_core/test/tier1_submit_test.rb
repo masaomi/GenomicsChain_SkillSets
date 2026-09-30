@@ -173,6 +173,23 @@ class Tier1SubmitCoreTest < Minitest::Test
       assert_equal 'tier1_report', manifest['record_type']
       assert_equal report['report_content_hash'], manifest['report_content_hash']
       assert_equal 'self_reported', manifest['trust_tier']
+      assert_equal 'doi:10.1101/2025.01.29.635579', manifest['subject_ref']
+    end
+  end
+
+  # Self-application design O-3: a paper with no DOI is recorded under the
+  # sha256 of its text, never under "doi:".
+  def test_text_sha256_paper_is_recorded_under_its_own_prefix
+    text_id = 'c' * 64
+    with_proofs do |registry, tip_source|
+      report, op, pkhash, = signed_operator(
+        tip_source, base_report('canonical_id' => { 'value' => text_id, 'kind' => 'text_sha256' })
+      )
+      out = submit(registry, tip_source, JSON.generate(report), op, pkhash, StubAttestor.new(registry: registry))
+
+      assert_equal 'recorded', out[:status]
+      manifest = GCore::ProofLookup.parse_manifest_from_record(registry.read(:proofs).first)
+      assert_equal "text_sha256:#{text_id}", manifest['subject_ref']
     end
   end
 
