@@ -25,8 +25,8 @@ module KairosMcp
           CODE_SOURCE_KINDS = %w[repo_file repo_tree].freeze
           SOURCE_KINDS = (%w[paper_text paper_pdf_text landing_page] + CODE_SOURCE_KINDS).freeze
           # text_sha256 names a paper with no DOI by the sha256 of its text
-          # (self-application design O-3); it must be the hash of a paper_text
-          # source, so the name and the text read cannot come apart.
+          # (self-application design O-3); it must be the hash of supplied
+          # paper_text content, so the name and the text read cannot come apart.
           CANONICAL_ID_KINDS = %w[doi pmid pdf_sha256 repo_url text_sha256].freeze
 
           # Tool-derived keys. If the assessor emits any of them they are dropped and
@@ -133,19 +133,17 @@ module KairosMcp
             raise AssessError, 'prior_report_json is for a different canonical_id'
           end
 
-          # The hash of a paper_text source is the sha256 of its content when
-          # content is given, else the sha256 the caller declared for it.
+          # Only supplied content counts; a declared sha256 names no text read.
           def gate_text_sha256!(value, sources)
             unless value.match?(/\A[0-9a-f]{64}\z/)
               raise AssessError, 'canonical_id.value for kind text_sha256 must be 64 lowercase hex'
             end
 
-            texts = sources.select { |s| s['kind'].to_s == 'paper_text' }.map do |s|
-              s['content'].to_s.empty? ? s['sha256'].to_s : Digest::SHA256.hexdigest(s['content'].to_s)
-            end
+            texts = sources.select { |s| s['kind'].to_s == 'paper_text' && !s['content'].to_s.empty? }
+                           .map { |s| Digest::SHA256.hexdigest(s['content'].to_s) }
             return if texts.include?(value)
 
-            raise AssessError, 'canonical_id.value for kind text_sha256 must equal the sha256 of a paper_text source'
+            raise AssessError, 'canonical_id.value for kind text_sha256 must equal the sha256 of supplied paper_text content'
           end
 
           def prior_report(input)

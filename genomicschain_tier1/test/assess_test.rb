@@ -360,8 +360,11 @@ class GateTest < Minitest::Test
     assert_equal 'text_sha256', JSON.parse(out['report_json']).dig('canonical_id', 'kind')
 
     assert_refused('64 lowercase hex', 'canonical_id' => { 'value' => 'not-a-hash', 'kind' => 'text_sha256' })
-    assert_refused('sha256 of a paper_text source',
+    assert_refused('supplied paper_text content',
                    'canonical_id' => { 'value' => Digest::SHA256.hexdigest('other text'), 'kind' => 'text_sha256' })
+    assert_refused('supplied paper_text content',
+                   'canonical_id' => { 'value' => text_id, 'kind' => 'text_sha256' },
+                   'sources' => [{ 'kind' => 'paper_text', 'ref' => 'jats', 'sha256' => text_id }])
   end
 end
 

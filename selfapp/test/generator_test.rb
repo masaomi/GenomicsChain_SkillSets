@@ -13,6 +13,7 @@ require_relative '../generator/lib/synthetic_rnaseq'
 
 class GeneratorTest < Minitest::Test
   PINS = JSON.parse(File.read(File.expand_path('fixtures/pins_fixture.json', __dir__)))
+  LOCK = File.binread(File.expand_path('fixtures/rnaseq_fixture.lock', __dir__))
   SMALL = 1500
 
   HUMAN_FACING = %w[
@@ -27,8 +28,8 @@ class GeneratorTest < Minitest::Test
     synthetic_repo/scripts/deseq2.R
   ].freeze
 
-  def generate(dir, seed: 20_260_929)
-    SyntheticRnaseq::Generator.new(seed: seed, pins: PINS, out: dir, reads_per_sample: SMALL).run
+  def generate(dir, seed: 20_260_929, pins: PINS)
+    SyntheticRnaseq::Generator.new(seed: seed, pins: pins, lock: LOCK, out: dir, reads_per_sample: SMALL).run
   end
 
   def subject(dir) = File.join(dir, SyntheticRnaseq::SUBJECT_DIR)
@@ -135,7 +136,24 @@ class GeneratorTest < Minitest::Test
       assert(containers.all? { |c| c.match?(/@sha256:[0-9a-f]{64}"\s*\z/) })
       assert_match(/^FROM \S+@sha256:[0-9a-f]{64}$/, File.read(File.join(repo, 'Dockerfile')))
       refute_match(%r{https?://}, File.read(File.join(repo, 'config/config.yaml')))
+      lock = File.binread(File.join(repo, 'envs/rnaseq.lock'))
+      assert_equal LOCK, lock, 'the Dockerfile installs from envs/rnaseq.lock'
+      assert(lock.lines.grep(%r{\Ahttps?://}).all? { |l| l.include?('#') })
     end
+  end
+
+  def test_a_missing_rule_container_stops_generation
+    pins = PINS.merge('rule_containers' => PINS['rule_containers'].except('trim'))
+    Dir.mktmpdir('x') { |dir| assert_raises(KeyError) { generate(dir, pins: pins) } }
+  end
+
+  # A fresh Linux container runs with LANG=C, where Ruby reads files as US-ASCII.
+  def test_generates_under_a_c_locale
+    old = Encoding.default_external
+    Encoding.default_external = Encoding::US_ASCII
+    with_subject { |dir, _| assert File.file?(File.join(subject(dir), 'synthetic_repo/README.md')) }
+  ensure
+    Encoding.default_external = old
   end
 
   def test_refuses_to_overwrite_a_subject

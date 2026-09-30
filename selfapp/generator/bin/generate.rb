@@ -3,12 +3,12 @@
 
 # Generate the fictional RNA-seq subject (design §4, unit S1).
 #
-#   ruby selfapp/generator/bin/generate.rb --pins PINS.json --out selfapp [--seed 20260929]
+#   ruby selfapp/generator/bin/generate.rb --pins PINS.json --lock LOCK --out selfapp [--seed 20260929]
 #
 # Writes <out>/synthetic_rnaseq_v1/ (the subject, with generator_manifest.json)
 # and <out>/synthetic_truth_v1.json (the answer key, outside the subject).
 # The pins file supplies tool versions, the base image and the per-rule
-# containers; it is resolved in S2 together with the conda-lock file.
+# containers; the lock is the conda-lock output copied to envs/rnaseq.lock.
 
 require 'json'
 require 'optparse'
@@ -18,15 +18,16 @@ opts = { seed: 20_260_929 }
 OptionParser.new do |o|
   o.on('--seed N', Integer) { |v| opts[:seed] = v }
   o.on('--pins PATH') { |v| opts[:pins] = v }
+  o.on('--lock PATH') { |v| opts[:lock] = v }
   o.on('--out DIR') { |v| opts[:out] = v }
   o.on('--reads-per-sample N', Integer) { |v| opts[:reads_per_sample] = v }
 end.parse!
 
-abort 'usage: generate.rb --pins PINS.json --out DIR [--seed N] [--reads-per-sample N]' unless opts[:pins] && opts[:out]
+abort 'usage: generate.rb --pins PINS.json --lock LOCK --out DIR [--seed N] [--reads-per-sample N]' unless opts[:pins] && opts[:lock] && opts[:out]
 
-pins = JSON.parse(File.read(opts[:pins]))
+pins = JSON.parse(File.read(opts[:pins], encoding: 'UTF-8'))
 manifest = SyntheticRnaseq::Generator.new(
-  seed: opts[:seed], pins: pins, out: opts[:out], reads_per_sample: opts[:reads_per_sample]
+  seed: opts[:seed], pins: pins, lock: File.binread(opts[:lock]), out: opts[:out], reads_per_sample: opts[:reads_per_sample]
 ).run
 
 puts "subject #{File.join(opts[:out], SyntheticRnaseq::SUBJECT_DIR)}"

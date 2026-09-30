@@ -318,9 +318,10 @@ module SyntheticRnaseq
 
     attr_reader :cfg
 
-    def initialize(seed:, pins:, out:, **overrides)
+    def initialize(seed:, pins:, lock:, out:, **overrides)
       @seed = Integer(seed)
       @pins = pins
+      @lock = lock
       @out = out
       @cfg = DEFAULTS.merge(overrides.compact)
     end
@@ -341,6 +342,9 @@ module SyntheticRnaseq
                    sim.reads_for(s, counts[s.id], model.genes).join)
       end
       render_templates(subject, model)
+      # The conda-lock output the Dockerfile installs from (§4.3), copied as
+      # given so the manifest covers it.
+      write(File.join(repo, 'envs', 'rnaseq.lock'), @lock)
       truth = write_truth(model, counts)
       write_manifest(subject, truth)
     end
@@ -392,7 +396,7 @@ module SyntheticRnaseq
     def render_templates(subject, model)
       ctx = TemplateContext.new(NOTICE, @pins, model, @cfg, @seed)
       TEMPLATES.each do |tpl, rel|
-        erb = ERB.new(File.read(File.join(TEMPLATE_DIR, tpl)), trim_mode: '-')
+        erb = ERB.new(File.read(File.join(TEMPLATE_DIR, tpl), encoding: 'UTF-8'), trim_mode: '-')
         write(File.join(subject, rel), erb.result(ctx.binding_for_erb))
       end
     end
@@ -484,7 +488,7 @@ module SyntheticRnaseq
       [name, t.fetch('version'), t['build']].compact.join('=')
     end
 
-    def container(rule) = @pins.fetch('rule_containers', {})[rule]
+    def container(rule) = @pins.fetch('rule_containers').fetch(rule)
 
     def reference_release = REFERENCE_RELEASE
     def reference_stem = REFERENCE_STEM

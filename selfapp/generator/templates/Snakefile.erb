@@ -33,9 +33,7 @@ rule trim:
         html=".work/fastp/{sample}.html",
     log:
         ".work/logs/trim/{sample}.log",
-<% if container('trim') -%>
     container: "<%= container('trim') %>"
-<% end -%>
     threads: 1
     shell:
         "fastp --thread 1 --in1 {input} --out1 {output.fastq} "
@@ -50,9 +48,7 @@ rule salmon_index:
         directory(".work/salmon_index"),
     log:
         ".work/logs/salmon_index.log",
-<% if container('salmon_index') -%>
     container: "<%= container('salmon_index') %>"
-<% end -%>
     threads: 1
     shell:
         "salmon index --transcripts {input} --index {output} --kmerLen 31 --threads 1 > {log} 2>&1"
@@ -68,9 +64,7 @@ rule salmon_quant:
         outdir=".work/salmon/{sample}",
     log:
         ".work/logs/salmon_quant/{sample}.log",
-<% if container('salmon_quant') -%>
     container: "<%= container('salmon_quant') %>"
-<% end -%>
     threads: 1
     shell:
         "salmon quant --index {input.index} --libType A --unmatedReads {input.fastq} "
@@ -86,9 +80,7 @@ rule tximport:
         ".work/tximport/txi.rds",
     log:
         ".work/logs/tximport.log",
-<% if container('tximport') -%>
     container: "<%= container('tximport') %>"
-<% end -%>
     threads: 1
     shell:
         "Rscript scripts/tximport.R {input.samples} {input.tx2gene} .work/salmon {output} > {log} 2>&1"
@@ -106,9 +98,7 @@ rule deseq2:
         seed=config["permutation_seed"],
     log:
         ".work/logs/deseq2.log",
-<% if container('deseq2') -%>
     container: "<%= container('deseq2') %>"
-<% end -%>
     threads: 1
     shell:
         "Rscript scripts/deseq2.R {input.txi} {input.samples} {output} "
@@ -123,9 +113,7 @@ rule report:
         ".work/multiqc/multiqc_report.html",
     log:
         ".work/logs/multiqc.log",
-<% if container('report') -%>
     container: "<%= container('report') %>"
-<% end -%>
     threads: 1
     shell:
         "multiqc --force --outdir .work/multiqc .work/fastp .work/salmon > {log} 2>&1"
