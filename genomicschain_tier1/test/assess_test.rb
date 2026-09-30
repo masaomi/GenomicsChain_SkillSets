@@ -394,3 +394,36 @@ class LiveRunRegressionTest < Minitest::Test
     refute_includes out['report']['steps'].first['subflags'], 'stage1-ceiling-demoted'
   end
 end
+
+require_relative '../tools/gc_tier1_assess'
+require 'genomicschain_core/comparison_body'
+
+# Self-application design §6.4: a Tier-1 run recorded through the tool,
+# replayed with its response injected, gives the same comparison body and
+# sends the same request — the check that the prompt builder, not only the
+# derivation, agrees between two builds of the checker.
+class RecordAndReplayTest < Minitest::Test
+  include AssessHelpers
+
+  Registry = Struct.new(:fields) do
+    def call_tool(_name, _args, invocation_context:)
+      [{ text: JSON.generate('status' => 'ok', 'model' => 'm', 'provider' => 'p', 'fields' => fields) }]
+    end
+  end
+
+  def test_a_recorded_exchange_replays_to_the_same_body_and_request
+    tool = KairosMcp::SkillSets::GenomicschainTier1::Tools::GcTier1Assess
+           .new(nil, registry: Registry.new(llm_fields(steps: [step('C1')])))
+    recorded = JSON.parse(tool.call(base_args.merge('record_llm_exchange' => true)).first[:text])
+    exchange = recorded.fetch('llm_exchange')
+
+    sent = nil
+    replayed = A::Assessor.new(llm: ->(req) { sent = req; exchange['response'] }).run(base_args)
+
+    body = KairosMcp::SkillSets::GenomicschainCore::ComparisonBody
+    assert_equal body.digest('tier1_report', JSON.parse(recorded['report_json']))['sha256'],
+                 body.digest('tier1_report', JSON.parse(replayed['report_json']))['sha256']
+    assert_equal exchange['request'], JSON.parse(JSON.generate(sent.compact))
+    refute JSON.parse(tool.call(base_args).first[:text]).key?('llm_exchange')
+  end
+end

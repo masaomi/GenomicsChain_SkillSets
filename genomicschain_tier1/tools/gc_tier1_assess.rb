@@ -100,6 +100,11 @@ module KairosMcp
                 dry_run: {
                   type: 'boolean',
                   description: 'Run the gates and the b1 pre-commit only. No LLM call, no report.'
+                },
+                record_llm_exchange: {
+                  type: 'boolean',
+                  description: 'Also return the exact llm_call request and parsed response as llm_exchange, ' \
+                               'so the run can be replayed with the response injected. Default false.'
                 }
               },
               required: %w[canonical_id sources funnel_stage assessor_id operator_id]
@@ -108,8 +113,14 @@ module KairosMcp
 
           def call(arguments)
             args = arguments.transform_keys(&:to_s)
+            record = args.delete('record_llm_exchange') == true
+            @exchange = nil
             assessor = Assess::Assessor.new(llm: method(:call_llm))
-            text_content(JSON.pretty_generate(assessor.run(args)))
+            out = assessor.run(args)
+            # The self-application DDC replays a Tier-1 run with its recorded
+            # response (design §6.4); only this call can see what was sent.
+            out = out.merge('llm_exchange' => @exchange) if record && @exchange
+            text_content(JSON.pretty_generate(out))
           rescue Assess::Assessor::AssessError,
                  Assess::PreCommit::PreCommitError,
                  Assess::Derivation::DerivationError,
@@ -130,7 +141,9 @@ module KairosMcp
             raise Assess::Assessor::AssessError, 'gc_tier1_assess needs a ToolRegistry to reach llm_call' unless @registry
 
             result = invoke_tool('llm_call', payload.compact)
-            parse_llm_result(result)
+            parsed = parse_llm_result(result)
+            @exchange = { 'request' => payload.compact, 'response' => parsed }
+            parsed
           end
 
           def parse_llm_result(result)
