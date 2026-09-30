@@ -160,6 +160,13 @@ class Tier3ExecutorTest < Minitest::Test
     end
   end
 
+  def test_compare_frozen_refuses_one_directory_named_twice
+    Dir.mktmpdir do |a|
+      File.write(File.join(a, 'out.txt'), 'x')
+      assert_raises(ArgumentError) { GT2::Tier3Executor.compare_frozen(workdirs: [a, File.join(a, '.')]) }
+    end
+  end
+
   def test_two_agreeing_runs_report_all_identical
     Dir.mktmpdir do |a|
       Dir.mktmpdir do |b|

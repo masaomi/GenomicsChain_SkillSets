@@ -23,9 +23,13 @@ module DdcCommon
     Digest::SHA256.hexdigest(files.map { |rel, sha| "#{sha}  #{rel}\n" }.join)
   end
 
-  # The checker packages under root, paths relative to root.
+  # The checker packages under root, paths relative to root. A package missing
+  # from root stops here, so no tree hash is taken over fewer packages.
   def package_files(root)
-    PACKAGES.select { |p| File.directory?(File.join(root, p)) }.flat_map do |pkg|
+    missing = PACKAGES.reject { |p| File.directory?(File.join(root, p)) }
+    raise ArgumentError, "checker package(s) missing under #{root}: #{missing.join(', ')}" unless missing.empty?
+
+    PACKAGES.flat_map do |pkg|
       tree_files(File.join(root, pkg)).map { |rel, sha| ["#{pkg}/#{rel}", sha] }
     end.sort_by { |rel, _| rel.b }.to_h
   end

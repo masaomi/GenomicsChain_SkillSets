@@ -132,13 +132,11 @@ module KairosMcp
                                 variation: 'same_environment')
           dirs = Array(workdirs)
           raise ArgumentError, 'at least one workdir is required' if dirs.empty?
-          raise ArgumentError, 'workdirs must be distinct' if dirs.uniq.length != dirs.length
+          dirs.each { |wd| raise ArgumentError, "workdir does not exist: #{wd}" unless Dir.exist?(wd) }
+          # Two spellings of one directory would hash it twice and report agreement.
+          raise ArgumentError, 'workdirs must be distinct' if dirs.map { |d| File.realpath(d) }.uniq.length != dirs.length
 
-          files = dirs.map do |wd|
-            raise ArgumentError, "workdir does not exist: #{wd}" unless Dir.exist?(wd)
-
-            Execution::LocalBackend.output_files_of(wd)
-          end
+          files = dirs.map { |wd| Execution::LocalBackend.output_files_of(wd) }
           hashes = files.map { |f| KairosMcp::Manifest.tier3_result_hash(f) }
           cmp, self_consistency = compare_runs(hashes, files.first, expected_output || {}, comparator_id, variation)
           {

@@ -79,7 +79,9 @@ class DdcHarnessTest < Minitest::Test
   end
 
   def compare(a, t, report, source: REPO)
-    system(RbConfig.ruby, COMPARE, '--a', a, '--t', t, '--source-tree', source, '--out', report, out: File::NULL)
+    args = ['--a', a, '--t', t, '--out', report]
+    args += ['--source-tree', source] if source
+    system(RbConfig.ruby, COMPARE, *args, out: File::NULL)
     JSON.parse(File.read(report))
   end
 
@@ -98,6 +100,45 @@ class DdcHarnessTest < Minitest::Test
       assert r['inv_s9']['holds']
       refute_empty File.read("#{tmp}/A/loaded_files.txt").lines.grep(/rubric|schema/i), 'read-only files are listed'
       assert_includes JSON.parse(File.read("#{tmp}/A/environment.json"))['gems_loaded'].keys, 'json', '§6.4 needs the json version'
+    end
+  end
+
+  # The comparer's inventory is the bodies either side wrote, so an item that
+  # fails alike on both sides has no row and every remaining body can match.
+  # Such a pair must not be counted, and neither may one never checked for INV-S9.
+  def test_items_failing_alike_on_both_sides_keep_the_pair_out_of_the_count
+    Dir.mktmpdir do |tmp|
+      build_inputs("#{tmp}/in")
+      manifest = JSON.parse(File.read("#{tmp}/in/inputs_manifest.json"))
+      manifest['tier3'] << { 'variant' => 'V9', 'workdirs' => %w[tier3/V9/run1] }
+      File.write("#{tmp}/in/inputs_manifest.json", JSON.generate(manifest))
+      refute harness("#{tmp}/in", "#{tmp}/A")
+      refute harness("#{tmp}/in", "#{tmp}/T")
+      r = compare("#{tmp}/A", "#{tmp}/T", "#{tmp}/report.json")
+
+      assert_equal 5, r['bodies_total']
+      assert_equal r['bodies_total'], r['bodies_matching']
+      refute r['counted']
+      assert_equal ['1 item(s) failed on A', '1 item(s) failed on T'], r['not_counted_because']
+      assert_includes compare("#{tmp}/A", "#{tmp}/T", "#{tmp}/report2.json", source: nil)['not_counted_because'],
+                      'INV-S9 not checked (no --source-tree)'
+    end
+  end
+
+  def test_inv_s9_does_not_hold_over_a_package_t_never_loaded
+    Dir.mktmpdir do |tmp|
+      build_inputs("#{tmp}/in")
+      harness("#{tmp}/in", "#{tmp}/A")
+      harness("#{tmp}/in", "#{tmp}/T")
+      kept = File.readlines("#{tmp}/T/loaded_files.txt").grep_v(/  genomicschain_prov\//)
+      File.write("#{tmp}/T/loaded_files.txt", kept.join)
+      r = compare("#{tmp}/A", "#{tmp}/T", "#{tmp}/report.json")
+
+      assert_equal ['genomicschain_prov'], r['inv_s9']['T_packages_not_loaded']
+      refute r['inv_s9']['holds']
+      refute r['counted']
+      FileUtils.mkdir_p("#{tmp}/partial/genomicschain_core")
+      assert_raises(ArgumentError) { DdcCommon.package_files("#{tmp}/partial") }
     end
   end
 

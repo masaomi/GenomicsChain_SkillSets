@@ -40,8 +40,11 @@ INPUTS = File.realpath(opts[:inputs])
 abort 'inputs must not lie inside the checker root' if INPUTS.start_with?("#{ROOT}/")
 
 # The files the checker reads without requiring them (rubric, schemas) belong
-# to what was loaded as much as its Ruby files do. Every read path is noted;
-# only those under the checker root are kept.
+# to what was loaded as much as its Ruby files do. Paths passed to IO's class
+# methods read, binread, readlines, foreach and open (File inherits them) are
+# noted (Pathname#read goes through File.read). Other reads are not — for
+# example File.new, Kernel#open, IO.copy_stream, load, and reads inside C
+# extensions. Only paths under the checker root are kept.
 READS = []
 module ReadTracker
   %i[read binread readlines foreach open].each do |m|
