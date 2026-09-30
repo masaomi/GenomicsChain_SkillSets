@@ -89,8 +89,8 @@ replicates were requested; all other options were left at their defaults.
 
 Transcript-level estimates were summarised to genes with tximport <%= tool('bioconductor-tximport') %>
 in R <%= tool('r-base') %> (`type = "salmon"`, the <%= reference_release %> transcript-to-gene table,
-other arguments at their defaults), producing estimated counts, abundances and average
-transcript lengths per gene and sample.
+`dropInfReps = TRUE` as no bootstrap replicates were drawn, other arguments at their defaults),
+producing estimated counts, abundances and average transcript lengths per gene and sample.
 
 ### Differential expression
 

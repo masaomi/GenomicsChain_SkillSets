@@ -15,5 +15,5 @@ files <- file.path(args[3], samples$sample, "quant.sf")
 names(files) <- samples$sample
 stopifnot(all(file.exists(files)))
 
-txi <- tximport(files, type = "salmon", tx2gene = tx2gene)
+txi <- tximport(files, type = "salmon", tx2gene = tx2gene, dropInfReps = TRUE)
 saveRDS(txi, args[4])
