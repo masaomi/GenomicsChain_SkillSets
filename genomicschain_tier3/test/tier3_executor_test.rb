@@ -138,6 +138,28 @@ class Tier3ExecutorTest < Minitest::Test
 
   # --- run_count / self-consistency -------------------------------------
 
+  # Self-application design §6.4: the DDC compares frozen output directories
+  # without executing. It must give exactly the fields a run gave, and claim
+  # no execution (INV-S7).
+  def test_compare_frozen_reproduces_the_run_comparison_without_executing
+    Dir.mktmpdir do |a|
+      Dir.mktmpdir do |b|
+        eo = { 'target' => 'file:out.txt', 'sha256' => Digest::SHA256.hexdigest('hello'), 'source' => 'paper_declared' }
+        run = GT2::Tier3Executor.run(job_spec: job_spec(a, WRITE_RANDOM), expected_output: eo,
+                                     backend: GT2::Execution::LocalBackend.new, workdirs: [a, b])
+        frozen = GT2::Tier3Executor.compare_frozen(workdirs: [a, b], expected_output: eo)
+
+        assert_equal 'mismatch', frozen['comparison_verdict']
+        assert_equal false, frozen['self_consistency']['all_identical']
+        { 'result_hash' => run.result_hash, 'output_files' => run.output_files,
+          'comparison_verdict' => run.comparison_verdict, 'first_divergence' => run.first_divergence,
+          'self_consistency' => run.self_consistency, 'comparator_version' => run.comparator_version }
+          .each { |k, v| assert_equal v, frozen[k], k }
+        refute frozen.key?('execution_verdict')
+      end
+    end
+  end
+
   def test_two_agreeing_runs_report_all_identical
     Dir.mktmpdir do |a|
       Dir.mktmpdir do |b|

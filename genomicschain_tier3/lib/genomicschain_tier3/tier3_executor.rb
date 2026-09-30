@@ -2,6 +2,7 @@
 
 require_relative 'execution/backend'
 require_relative 'execution/comparator'
+require_relative 'execution/local_backend'
 
 module KairosMcp
   module SkillSets
@@ -104,19 +105,7 @@ module KairosMcp
           end
 
           first = receipts.first
-          cmp = if Execution::Comparator.target?(eo)
-                  Execution::Comparator.for(comparator_id)
-                                       .compare(result_hash: hashes.first,
-                                                output_files: first.output_files,
-                                                expected_output: eo)
-                else
-                  Execution::Comparator.no_target
-                end
-
-          self_consistency =
-            if hashes.length > 1
-              Execution::Comparator.agreement(run_result_hashes: hashes, variation: variation)
-            end
+          cmp, self_consistency = compare_runs(hashes, first.output_files, eo, comparator_id, variation)
 
           VerdictResult.new(
             **base,
@@ -132,6 +121,48 @@ module KairosMcp
             receipt: first,
             receipts: receipts
           )
+        end
+
+        # The comparison half of `run`, applied to directories a run already
+        # filled and that were then frozen (self-application design §6.4, Tier 3:
+        # the DDC compares these on both sides without executing anything). It
+        # returns the comparison fields only: no VerdictResult, no
+        # execution_verdict, because nothing was executed here (INV-S7).
+        def self.compare_frozen(workdirs:, expected_output: nil, comparator_id: 'exact_sha256',
+                                variation: 'same_environment')
+          dirs = Array(workdirs)
+          raise ArgumentError, 'at least one workdir is required' if dirs.empty?
+          raise ArgumentError, 'workdirs must be distinct' if dirs.uniq.length != dirs.length
+
+          files = dirs.map do |wd|
+            raise ArgumentError, "workdir does not exist: #{wd}" unless Dir.exist?(wd)
+
+            Execution::LocalBackend.output_files_of(wd)
+          end
+          hashes = files.map { |f| KairosMcp::Manifest.tier3_result_hash(f) }
+          cmp, self_consistency = compare_runs(hashes, files.first, expected_output || {}, comparator_id, variation)
+          {
+            'run_count' => dirs.length, 'result_hash' => hashes.first, 'output_files' => hashes_only(files.first),
+            'comparison_verdict' => cmp.comparison_verdict, 'comparator_id' => cmp.comparator_id,
+            'comparator_version' => cmp.comparator_version, 'first_divergence' => cmp.first_divergence,
+            'self_consistency' => self_consistency
+          }
+        end
+
+        def self.compare_runs(hashes, first_output_files, expected_output, comparator_id, variation)
+          cmp = if Execution::Comparator.target?(expected_output)
+                  Execution::Comparator.for(comparator_id)
+                                       .compare(result_hash: hashes.first,
+                                                output_files: first_output_files,
+                                                expected_output: expected_output)
+                else
+                  Execution::Comparator.no_target
+                end
+          self_consistency =
+            if hashes.length > 1
+              Execution::Comparator.agreement(run_result_hashes: hashes, variation: variation)
+            end
+          [cmp, self_consistency]
         end
 
         # A run that never completed has no comparison to report — that is

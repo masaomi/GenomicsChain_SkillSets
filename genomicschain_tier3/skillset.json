@@ -1,6 +1,6 @@
 {
   "name": "genomicschain_tier3",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "GenomicsChain Tier-3 execution layer (backends, comparator, executor, gc_tier3_execute, gc_tier3_estimate). Record 0.3: two verdict axes.",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",

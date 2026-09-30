@@ -59,11 +59,18 @@ module KairosMcp
             [job[:stdout], job[:stderr]].compact.reject(&:empty?).join("\n")
           end
 
-          def fetch(ref, _dst)
-            job = @jobs[ref] or raise BackendError, "unknown job ref: #{ref}"
-            output_files = KairosMcp::Manifest.walk_files(job[:workdir]).map do |f|
+          # The one enumeration of a workdir's outputs. Tier3Executor.compare_frozen
+          # reads a frozen directory through this too, so a comparison without a
+          # run counts exactly the files a run would have.
+          def self.output_files_of(workdir)
+            KairosMcp::Manifest.walk_files(workdir).map do |f|
               { 'sha256' => f[:sha256], 'relative_path' => f[:relative_path], 'size_bytes' => f[:size_bytes] }
             end
+          end
+
+          def fetch(ref, _dst)
+            job = @jobs[ref] or raise BackendError, "unknown job ref: #{ref}"
+            output_files = self.class.output_files_of(job[:workdir])
             local_hash = KairosMcp::Manifest.tier3_result_hash(output_files)
             Receipt.new(
               terminal_state: job[:exit_code].zero? ? :done : :failed,
