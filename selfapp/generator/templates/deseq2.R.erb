@@ -1,0 +1,49 @@
+# <%= notice %>
+#
+# Differential expression, treated vs control, and a label-permutation check on
+# the size-factor-normalised log fold change.
+# Usage: Rscript deseq2.R <txi.rds> <samples.tsv> <out.tsv> <alpha> <draws> <seed>
+
+suppressPackageStartupMessages(library(DESeq2))
+
+args <- commandArgs(trailingOnly = TRUE)
+stopifnot(length(args) == 6)
+alpha <- as.numeric(args[4])
+draws <- as.integer(args[5])
+seed <- as.integer(args[6])
+
+txi <- readRDS(args[1])
+samples <- read.delim(args[2], comment.char = "#", stringsAsFactors = FALSE)
+samples$condition <- factor(samples$condition, levels = c("control", "treated"))
+rownames(samples) <- samples$sample
+
+dds <- DESeqDataSetFromTximport(txi, colData = samples, design = ~ condition)
+dds <- DESeq(dds, quiet = TRUE)
+res <- results(dds, contrast = c("condition", "treated", "control"), alpha = alpha)
+
+# Permutation p-value: how often a random relabelling of the six samples gives a
+# mean log2 difference at least as large as the observed one.
+norm <- log2(counts(dds, normalized = TRUE) + 1)
+treated <- samples$condition == "treated"
+mean_diff <- function(labels) rowMeans(norm[, labels, drop = FALSE]) - rowMeans(norm[, !labels, drop = FALSE])
+observed <- mean_diff(treated)
+set.seed(seed)
+exceed <- rep(0L, nrow(norm))
+for (i in seq_len(draws)) {
+  exceed <- exceed + (abs(mean_diff(sample(treated))) >= abs(observed))
+}
+perm_p <- (exceed + 1) / (draws + 1)
+
+out <- data.frame(
+  gene_id = rownames(res),
+  baseMean = signif(res$baseMean, 6),
+  log2FoldChange = signif(res$log2FoldChange, 6),
+  lfcSE = signif(res$lfcSE, 6),
+  stat = signif(res$stat, 6),
+  pvalue = signif(res$pvalue, 6),
+  padj = signif(res$padj, 6),
+  perm_pvalue = signif(perm_p, 6),
+  stringsAsFactors = FALSE
+)
+out <- out[order(out$gene_id), ]
+write.table(out, args[3], sep = "\t", quote = FALSE, row.names = FALSE, na = "NA")

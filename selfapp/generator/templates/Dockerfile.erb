@@ -1,0 +1,10 @@
+# <%= notice %>
+#
+# The environment the manuscript's results were produced in: the base image by
+# digest, every package from the conda-lock file (URLs with checksums).
+FROM <%= pins.fetch('base_image') %>
+LABEL org.genomicschain.synthetic="<%= notice %>"
+COPY --chown=$MAMBA_USER:$MAMBA_USER envs/rnaseq.lock /tmp/rnaseq.lock
+RUN micromamba install --yes --name base --file /tmp/rnaseq.lock && micromamba clean --all --yes
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+WORKDIR /work

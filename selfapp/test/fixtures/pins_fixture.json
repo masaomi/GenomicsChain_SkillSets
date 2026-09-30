@@ -1,0 +1,21 @@
+{
+  "kind": "test-fixture — not resolved, never used to generate V0",
+  "tools": {
+    "fastp": { "version": "0.0.1", "build": "fixture_0" },
+    "salmon": { "version": "0.0.2", "build": "fixture_0" },
+    "r-base": { "version": "0.0.3", "build": "fixture_0" },
+    "bioconductor-tximport": { "version": "0.0.4", "build": "fixture_0" },
+    "bioconductor-deseq2": { "version": "0.0.5", "build": "fixture_0" },
+    "multiqc": { "version": "0.0.6", "build": "fixture_0" },
+    "snakemake-minimal": { "version": "0.0.7", "build": "fixture_0" }
+  },
+  "base_image": "docker.io/fixture/base:0.0.0@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "rule_containers": {
+    "trim": "docker://quay.io/fixture/fastp:0.0.1@sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "salmon_index": "docker://quay.io/fixture/salmon:0.0.2@sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "salmon_quant": "docker://quay.io/fixture/salmon:0.0.2@sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "tximport": "docker://quay.io/fixture/r:0.0.3@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "deseq2": "docker://quay.io/fixture/r:0.0.3@sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "report": "docker://quay.io/fixture/multiqc:0.0.6@sha256:6666666666666666666666666666666666666666666666666666666666666666"
+  }
+}

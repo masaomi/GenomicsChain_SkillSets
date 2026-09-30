@@ -1,0 +1,10 @@
+# <%= notice %>
+name: synthetic-rnaseq
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+<% pins.fetch('tools').each_key do |name| -%>
+  - <%= conda_spec(name) %>
+<% end -%>

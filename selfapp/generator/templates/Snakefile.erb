@@ -1,0 +1,131 @@
+# <%= notice %>
+#
+# Differential expression of a fictional compound on a fictional cell line:
+# trim -> salmon_index -> salmon_quant -> tximport -> deseq2, plus a QC report.
+# Intermediate files, tool reports and logs go under .work/; results/ holds only
+# the supplementary table the manuscript cites.
+
+configfile: "config/config.yaml"
+
+
+def read_samples(path):
+    with open(path) as fh:
+        rows = [line.rstrip("\n").split("\t") for line in fh if line.strip() and not line.startswith("#")]
+    header, body = rows[0], rows[1:]
+    return [dict(zip(header, row)) for row in body]
+
+
+SAMPLES = [row["sample"] for row in read_samples(config["samples"])]
+
+
+rule all:
+    input:
+        "results/synthetic_supplementary_table_S1.tsv",
+        ".work/multiqc/multiqc_report.html",
+
+
+rule trim:
+    input:
+        config["reads_dir"] + "/synthetic_{sample}.fastq.gz",
+    output:
+        fastq=".work/trimmed/{sample}.fastq.gz",
+        json=".work/fastp/{sample}.json",
+        html=".work/fastp/{sample}.html",
+    log:
+        ".work/logs/trim/{sample}.log",
+<% if container('trim') -%>
+    container: "<%= container('trim') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "fastp --thread 1 --in1 {input} --out1 {output.fastq} "
+        "--adapter_sequence {config[adapter]} --qualified_quality_phred 20 "
+        "--length_required 30 --json {output.json} --html {output.html} > {log} 2>&1"
+
+
+rule salmon_index:
+    input:
+        config["transcripts"],
+    output:
+        directory(".work/salmon_index"),
+    log:
+        ".work/logs/salmon_index.log",
+<% if container('salmon_index') -%>
+    container: "<%= container('salmon_index') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "salmon index --transcripts {input} --index {output} --kmerLen 31 --threads 1 > {log} 2>&1"
+
+
+rule salmon_quant:
+    input:
+        fastq=".work/trimmed/{sample}.fastq.gz",
+        index=".work/salmon_index",
+    output:
+        ".work/salmon/{sample}/quant.sf",
+    params:
+        outdir=".work/salmon/{sample}",
+    log:
+        ".work/logs/salmon_quant/{sample}.log",
+<% if container('salmon_quant') -%>
+    container: "<%= container('salmon_quant') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "salmon quant --index {input.index} --libType A --unmatedReads {input.fastq} "
+        "--validateMappings --threads 1 --output {params.outdir} > {log} 2>&1"
+
+
+rule tximport:
+    input:
+        quant=expand(".work/salmon/{sample}/quant.sf", sample=SAMPLES),
+        samples=config["samples"],
+        tx2gene=config["tx2gene"],
+    output:
+        ".work/tximport/txi.rds",
+    log:
+        ".work/logs/tximport.log",
+<% if container('tximport') -%>
+    container: "<%= container('tximport') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "Rscript scripts/tximport.R {input.samples} {input.tx2gene} .work/salmon {output} > {log} 2>&1"
+
+
+rule deseq2:
+    input:
+        txi=".work/tximport/txi.rds",
+        samples=config["samples"],
+    output:
+        "results/synthetic_supplementary_table_S1.tsv",
+    params:
+        alpha=config["padj_threshold"],
+        draws=config["permutation_draws"],
+        seed=config["permutation_seed"],
+    log:
+        ".work/logs/deseq2.log",
+<% if container('deseq2') -%>
+    container: "<%= container('deseq2') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "Rscript scripts/deseq2.R {input.txi} {input.samples} {output} "
+        "{params.alpha} {params.draws} {params.seed} > {log} 2>&1"
+
+
+rule report:
+    input:
+        expand(".work/fastp/{sample}.json", sample=SAMPLES),
+        expand(".work/salmon/{sample}/quant.sf", sample=SAMPLES),
+    output:
+        ".work/multiqc/multiqc_report.html",
+    log:
+        ".work/logs/multiqc.log",
+<% if container('report') -%>
+    container: "<%= container('report') %>"
+<% end -%>
+    threads: 1
+    shell:
+        "multiqc --force --outdir .work/multiqc .work/fastp .work/salmon > {log} 2>&1"

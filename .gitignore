@@ -21,6 +21,12 @@ command.log
 
 log/
 
+# The self-application subject and its answer key (design O-8): generated from
+# selfapp/generator and a seed, never committed. The generator and the hashes in
+# generator_manifest.json are what is kept; the bytes are re-derived from them.
+selfapp/synthetic_rnaseq_v1/
+selfapp/synthetic_truth_v1.json
+
 # Research data, held out of the repository by the author's decision (2026-09-01).
 # NOT because it is disposable -- the opposite. docs/research/prior_art_survey_20260901/
 # is the evidence behind the "61 systems" claim in the Prototype Fund application, and it

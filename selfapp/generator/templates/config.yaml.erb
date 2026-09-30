@@ -1,0 +1,10 @@
+# <%= notice %>
+samples: config/samples.tsv
+reads_dir: data/synthetic_reads
+transcripts: data/synthetic_reference/<%= reference_stem %>.transcripts.fa
+tx2gene: data/synthetic_reference/<%= reference_stem %>.tx2gene.tsv
+reference_release: "<%= reference_release %>"
+adapter: <%= adapter %>
+padj_threshold: 0.05
+permutation_draws: <%= cfg[:permutation_draws] %>
+permutation_seed: <%= seed %>

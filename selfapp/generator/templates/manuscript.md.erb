@@ -1,0 +1,194 @@
+**<%= notice %>**
+
+# [SYNTHETIC — FICTIONAL STUDY] Transcriptional response of a fictional cell line to a fictional compound
+
+**Author:** GenomicsChain Synthetic Subject Generator
+
+**Status of this document:** synthetic. The cell line, the compound, the reference, the
+genes and the sequencing reads described here do not exist outside this document and its
+supplement. The document was generated so that reproducibility checks can be run against a
+study whose correct answer is known in advance. It is not a paper and has not been, and will
+not be, submitted anywhere as one.
+
+## Abstract
+
+SYNX-7 is a fictional small molecule reported to modulate stress-response signalling in the
+fictional cell line SYNTH-CL1. To characterise its transcriptional footprint we profiled
+SYNTH-CL1 cells exposed to SYNX-7 or to vehicle, three biological replicates each, by
+single-end RNA sequencing. Reads were adapter- and quality-trimmed, quantified against the
+<%= reference_release %> transcriptome by selective alignment, aggregated to genes, and tested for
+differential expression with a negative-binomial generalised linear model. Of <%= gene_count %>
+annotated genes, {{S2:n_de}} were differentially expressed at an adjusted p-value below 0.05
+({{S2:n_up}} increased and {{S2:n_down}} decreased under SYNX-7). A label-permutation check on
+the normalised fold changes is reported alongside the model-based test. The complete workflow,
+environment specification and container recipe are provided, and every number in this report
+can be regenerated from them.
+
+## Introduction
+
+Compounds that act on stress-response pathways often leave a broad but shallow
+transcriptional signature, which makes the choice of quantification and testing procedure
+consequential: small differences in trimming, in how multi-mapping reads between isoforms are
+resolved, or in how dispersion is estimated can move genes across a significance threshold.
+For that reason the analysis below is described step by step, with the version of every tool
+and every parameter that departs from a tool's default, and the whole workflow is released as
+an executable pipeline with a pinned environment.
+
+SYNTH-CL1 is a fictional adherent line used here as a model system. SYNX-7 is a fictional
+compound. The reference, <%= reference_release %>, is a fictional transcriptome of
+<%= transcript_count %> transcripts from <%= gene_count %> genes; many genes carry more than one
+isoform, and isoforms of the same gene share most of their sequence, so transcript-level
+quantification has to apportion reads between them.
+
+The aim of the study is descriptive: to list genes whose expression changes under SYNX-7 and
+to estimate the size of those changes. We make no claim about mechanism.
+
+## Methods
+
+### Experimental design
+
+SYNTH-CL1 cells were exposed either to vehicle (control) or to SYNX-7 (treated), with three
+biological replicates per condition, giving six samples: SYNTH-S01, SYNTH-S02 and SYNTH-S03
+(control) and SYNTH-S04, SYNTH-S05 and SYNTH-S06 (treated). The sample sheet is
+`config/samples.tsv` in the code repository.
+
+### Sequencing data
+
+Each sample was sequenced single-end with 100 bp reads. The read files are
+`data/synthetic_reads/synthetic_SYNTH-S01.fastq.gz` to `synthetic_SYNTH-S06.fastq.gz` in the
+code repository. Base qualities are encoded as Phred+33. The reads are synthetic; how they can be
+regenerated is stated under Data and code availability.
+
+### Reference
+
+Reads were quantified against the <%= reference_release %> transcriptome
+(`data/synthetic_reference/<%= reference_stem %>.transcripts.fa`, <%= transcript_count %>
+transcripts). Transcripts were mapped to genes with the transcript-to-gene table distributed
+with the same release (`data/synthetic_reference/<%= reference_stem %>.tx2gene.tsv`,
+<%= gene_count %> genes). Transcript identifiers carry a version suffix (for example
+`SYNT0001.1`), which was kept throughout.
+
+### Read trimming
+
+Adapters and low-quality bases were removed with fastp <%= tool('fastp') %>, one thread per sample,
+with the adapter sequence given explicitly (`--adapter_sequence <%= adapter %>`), a
+per-base quality threshold of Phred 20 (`--qualified_quality_phred 20`) and a minimum read
+length after trimming of 30 bases (`--length_required 30`). All other options were left at
+their defaults. fastp's per-sample JSON reports were retained for quality control.
+
+### Transcript quantification
+
+A salmon <%= tool('salmon') %> index was built from the <%= reference_release %> transcript
+sequences with a k-mer length of 31 (`salmon index --kmerLen 31`), without decoy sequences.
+Trimmed reads were quantified per sample with `salmon quant` in selective-alignment mode
+(`--validateMappings`), with automatic library-type detection (`--libType A`), single-end
+input (`--unmatedReads`) and one thread (`--threads 1`). No bias correction and no bootstrap
+replicates were requested; all other options were left at their defaults.
+
+### Gene-level aggregation
+
+Transcript-level estimates were summarised to genes with tximport <%= tool('bioconductor-tximport') %>
+in R <%= tool('r-base') %> (`type = "salmon"`, the <%= reference_release %> transcript-to-gene table,
+other arguments at their defaults), producing estimated counts, abundances and average
+transcript lengths per gene and sample.
+
+### Differential expression
+
+Differential expression was tested with DESeq2 <%= tool('bioconductor-deseq2') %>. The count
+matrix and average transcript lengths from tximport were imported with
+`DESeqDataSetFromTximport`, with the design `~ condition` and control as the reference level.
+Size factors, dispersions and coefficients were estimated with `DESeq` at default settings. The
+treated-versus-control contrast was extracted with `results(..., alpha = 0.05)`, which applies
+independent filtering at that level; p-values were adjusted by the Benjamini-Hochberg
+procedure. A gene was called differentially expressed when its adjusted p-value was below 0.05.
+No fold-change shrinkage was applied; the reported log2 fold changes are the maximum-likelihood
+estimates.
+
+### Permutation check
+
+As a check that does not depend on the negative-binomial model, the treatment labels of the six
+samples were permuted <%= cfg[:permutation_draws] %> times at random, and for every gene the
+difference in mean log2(normalised count + 1) between the two groups was recomputed under each
+permutation. The permutation p-value is (1 + the number of permutations whose absolute
+difference is at least the observed one) / (<%= cfg[:permutation_draws] %> + 1). The random
+number generator was seeded with <%= seed %> (R's default generator) so that the permutation
+p-values are reproducible.
+
+### Quality control
+
+Trimming and quantification reports were collated with MultiQC <%= tool('multiqc') %>.
+
+### Workflow and environment
+
+All steps were run as a Snakemake <%= tool('snakemake-minimal') %> workflow (`Snakefile` in the code
+repository) with one core. The software environment is specified in `envs/rnaseq.yml` with
+exact versions and build strings, and locked for linux-64 with conda-lock
+(`envs/rnaseq.lock`, one package URL and checksum per line). The results reported here were
+produced inside the Docker image built from the repository's `Dockerfile`, whose base image is
+referenced by digest and whose packages are installed from the lock file. Parameters that are
+not command-line options (paths, adapter, thresholds, number of permutations and the permutation
+seed) are recorded in `config/config.yaml`.
+
+## Results
+
+### Read processing
+
+The six libraries contained {{S2:reads_per_sample_range}} reads each. After trimming,
+{{S2:reads_after_trim_range}} of reads were retained per sample. Salmon assigned
+{{S2:mapping_rate_range}} of trimmed reads to the <%= reference_release %> transcriptome, and the
+library type was detected as {{S2:library_type}} in every sample.
+
+### Differential expression
+
+Of the <%= gene_count %> genes, {{S2:n_tested}} passed independent filtering and were tested.
+{{S2:n_de}} genes were differentially expressed at an adjusted p-value below 0.05:
+{{S2:n_up}} with higher and {{S2:n_down}} with lower expression under SYNX-7. Their absolute
+log2 fold changes ranged from {{S2:abs_lfc_range}}. The ten genes with the smallest adjusted
+p-values are listed in Table 1; the full results for all genes are in Supplementary Table S1.
+
+**Table 1.** The ten genes with the smallest adjusted p-values (treated versus control).
+
+{{S2:top10_table}}
+
+### Permutation check
+
+Of the {{S2:n_de}} genes called differentially expressed, {{S2:n_de_perm_below_005}} also had a
+permutation p-value below 0.05. With six samples in two groups of three, the permutation test
+cannot reach very small p-values, so it is reported as a check on direction and rough strength
+rather than as a second significance call.
+
+## Discussion
+
+SYNX-7 changes the expression of the {{S2:n_de}} genes reported above in SYNTH-CL1, with the
+fold changes given in Table 1 and Supplementary Table S1. The modest number of replicates bounds
+what can be detected: genes with low expression or small changes will be missed, and the list in
+Supplementary Table S1 should be read as the changes this design could detect rather than as a
+complete account of the compound's effect.
+
+Two choices in the analysis deserve mention. Quantification with selective alignment and
+aggregation with tximport lets reads that are compatible with several isoforms of a gene count
+towards that gene without forcing an early assignment to one isoform. The permutation check
+reports a model-free view of the same contrast; agreement between it and the model-based test
+indicates that the calls are not an artefact of dispersion estimation, although with three
+replicates per group it cannot by itself establish significance.
+
+Every number in this report was produced by the workflow in the code repository, run once, in
+the container described above. The same workflow run again on the same inputs should reproduce
+Supplementary Table S1 byte for byte.
+
+## Data and code availability
+
+The code repository (`synthetic_repo`) contains the Snakemake workflow, the R scripts, the
+environment specification and lock file, the Dockerfile, the sample sheet, the configuration,
+the <%= reference_release %> reference and the reads.
+
+The reads and the reference are synthetic. They can be regenerated byte for byte from the
+GenomicsChain self-application generator with seed <%= seed %>.
+
+Supplementary Table S1 is the file `results/synthetic_supplementary_table_S1.tsv` written by
+the workflow, as produced by the run reported here. Its columns are gene_id, baseMean,
+log2FoldChange, lfcSE, stat, pvalue, padj and perm_pvalue.
+
+## References
+
+Omitted. This is a synthetic document; the tools used are named in Methods with their versions.
