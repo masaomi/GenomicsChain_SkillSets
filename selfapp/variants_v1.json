@@ -1,0 +1,184 @@
+{
+  "spec": "self-application planted-fault variants V1-V8 of the fictional RNA-seq subject (unit S3, part A)",
+  "spec_version": "v1",
+  "design": {
+    "path": "docs/design/self_application_design_v0_1.md",
+    "version": "v0.1.5",
+    "sha256": "270d4a82dccaba0161ffd7cc983c13a771b8111a8bdcd1779e48d827a4316129",
+    "sections": "§4.3 (V0 conditions), §5 (variant table)"
+  },
+  "base": {
+    "id": "V0",
+    "path": "selfapp/synthetic_rnaseq_v1",
+    "tree_sha256": "1bb7b8bb391220943a76c7542d232b11197e34a1f40162e9477fc78091863883",
+    "file_count": 20,
+    "note": "the placed subject (S2 placement 2026-09-30T14:39:17Z): generated tree with the filled manuscript and the author-run S1 table"
+  },
+  "output_root": "selfapp/synthetic_rnaseq_v1_variants",
+  "hashing_rule": "every regular file under the directory incl. dot files, symlinks not followed; lines \"<sha256>  <relpath>\\n\" sorted bytewise by relpath; tree_sha256 = sha256 of the concatenated lines (same rule as log/selfapp/s_minus_1/record.json)",
+  "edit_semantics": "Paths in base, output_root and execution_record are relative to the repository root; change paths are relative to the subject root. A variant is a full copy of the base with its changes applied; files not named in changes are copied byte for byte (generator_manifest.json included, so it keeps describing V0). Edits of one file apply in order. An edit counts the non-overlapping occurrences of \"before\" in the file as it stands after the previous edits, or, with \"within\", in the text strictly between the single occurrence of \"from\" and the single later occurrence of \"to\"; the count must equal \"occurrences\", and every counted occurrence is replaced by \"after\".",
+  "variants": [
+    {
+      "id": "V1",
+      "design_row": {
+        "line": 154,
+        "defect": "Methods から参照の release（`SynthRef release 3`）を消す"
+      },
+      "changes": [
+        {
+          "path": "synthetic_manuscript.md",
+          "edits": [
+            {
+              "within": {
+                "from": "\n## Methods\n",
+                "to": "\n## Results\n"
+              },
+              "before": "SynthRef release 3",
+              "after": "SynthRef",
+              "occurrences": 3
+            }
+          ]
+        }
+      ],
+      "choice": "Replacement text is \"SynthRef\" (the name without its release), applied only between the \"## Methods\" and \"## Results\" headings: the 3 occurrences in Reference, Transcript quantification and Gene-level aggregation. The 4 outside Methods (Abstract, Introduction, Results, Data and code availability) stay. The file names Methods cites (synthetic_SynthRef_r3.*) still carry \"r3\"; renaming them would be a second change, so they stay and the residue is reported, not hidden."
+    },
+    {
+      "id": "V2",
+      "design_row": {
+        "line": 155,
+        "defect": "`envs/rnaseq.yml` の依存 1 つから版を消す"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/envs/rnaseq.yml",
+          "edits": [
+            {
+              "before": "  - fastp=1.3.7=h43da1c4_0\n",
+              "after": "  - fastp\n",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "The first dependency in file order (fastp) loses version and build, leaving the bare name that Tier 2 grades floating. envs/rnaseq.lock is untouched, so the image the Dockerfile builds from the lock is unchanged."
+    },
+    {
+      "id": "V3",
+      "design_row": {
+        "line": 156,
+        "defect": "Snakefile の `container:` 1 つを digest から `:latest` に"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/Snakefile",
+          "edits": [
+            {
+              "before": "container: \"docker://quay.io/biocontainers/fastp:1.3.7@sha256:d916c617fa2a5809a010cbb78f13639693ce9b675f6cf7f1ffb4b4cf91a15808\"",
+              "after": "container: \"docker://quay.io/biocontainers/fastp:latest\"",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "The first container: in file order (rule trim, fastp); its value occurs once, so exactly one declaration changes. The tag :latest replaces both the version tag and the digest."
+    },
+    {
+      "id": "V4",
+      "design_row": {
+        "line": 157,
+        "defect": "補足表 S1 の値を 1 つ変える（論文と実行が食い違う）"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/results/synthetic_supplementary_table_S1.tsv",
+          "edits": [
+            {
+              "before": "SYN0001\t254.427\t-0.244159\t0.289499\t-0.843383\t0.399014\t0.929949\t0.462687\n",
+              "after": "SYN0001\t254.427\t-0.244195\t0.289499\t-0.843383\t0.399014\t0.929949\t0.462687\n",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "One cell of the declared table: first data row (SYN0001), column log2FoldChange, -0.244159 -> -0.244195 (last two digits transposed, a copying error). SYN0001 has padj 0.929949 and is not in Table 1, so no number in the manuscript text changes. Side effect of changing one cell: that row's stat no longer equals log2FoldChange / lfcSE. Shape stays 201 lines x 8 columns."
+    },
+    {
+      "id": "V5",
+      "design_row": {
+        "line": 158,
+        "defect": "V0 が種を固定して持つ乱数の段（DE の表に効く並べ替え検定の p 値）から、種の固定だけを外す（1 点の変更）"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/scripts/deseq2.R",
+          "edits": [
+            {
+              "before": "set.seed(seed)\n",
+              "after": "",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "Only the line set.seed(seed) is deleted; seed is still parsed from the arguments and the Snakefile still passes it, so nothing else about the run changes. Same edit as the S2 smoke script log/selfapp/deseq2_smoke/deseq2_v5.R."
+    },
+    {
+      "id": "V6",
+      "design_row": {
+        "line": 159,
+        "defect": "実行記録を `--no-checksums` で書く"
+      },
+      "changes": [],
+      "execution_record": {
+        "path": "log/selfapp/s2/synthetic_bco_v6.json",
+        "sha256": "532394497eccaa6b7245a55a7eaf4c7177af3976e8a8aeb9ba3dbd3b1ab05a5d"
+      },
+      "choice": "The subject is V0 byte for byte; the defect is the execution record written in S2 with --no-checksums, named here by path and sha256."
+    },
+    {
+      "id": "V7",
+      "design_row": {
+        "line": 160,
+        "defect": "規則が作業ディレクトリの中に時刻入りの log を書く"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/Snakefile",
+          "edits": [
+            {
+              "before": "\".work/logs/multiqc.log\",",
+              "after": "\"logs/multiqc.log\",",
+              "occurrences": 1
+            },
+            {
+              "before": "\"multiqc --force --outdir .work/multiqc .work/fastp .work/salmon > {log} 2>&1\"",
+              "after": "\"date -u +%Y-%m-%dT%H:%M:%S.%NZ > {log}; \"\n        \"multiqc --force --outdir .work/multiqc .work/fastp .work/salmon >> {log} 2>&1\"",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "Rule report (multiqc), a leaf whose output feeds only rule all, so the S1 table cannot move. One change, two edits in the same rule: its log moves from .work/logs/multiqc.log to logs/multiqc.log (non-dot, inside the working directory) and its shell first writes the UTC time with nanoseconds into it, so two runs differ even if started in the same second. The Snakefile header comment and README still say logs go under .work/; they stay."
+    },
+    {
+      "id": "V8",
+      "design_row": {
+        "line": 161,
+        "defect": "`scripts/deseq2.R` の中で、版を指定せずに package を導入する行（`BiocManager::install(\"…\")`）を置く"
+      },
+      "changes": [
+        {
+          "path": "synthetic_repo/scripts/deseq2.R",
+          "edits": [
+            {
+              "before": "suppressPackageStartupMessages(library(DESeq2))\n",
+              "after": "if (!requireNamespace(\"DESeq2\", quietly = TRUE)) BiocManager::install(\"DESeq2\")\nsuppressPackageStartupMessages(library(DESeq2))\n",
+              "occurrences": 1
+            }
+          ]
+        }
+      ],
+      "choice": "One line inserted directly above library(DESeq2): the package the script already loads, installed without a version, guarded by requireNamespace so it does nothing when DESeq2 is present (as it is in the image)."
+    }
+  ]
+}

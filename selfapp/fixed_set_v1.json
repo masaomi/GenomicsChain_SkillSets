@@ -1,0 +1,178 @@
+{
+  "fixed_set": "self-application fixed set v1 (design §5 INV-S2)",
+  "built_by": {
+    "path": "scripts/selfapp/fixed_set.rb",
+    "sha256": "e964f958897e797f6b9a92966c0e1f8ef7106375cf91e60c477ae1961306795d",
+    "bytes": 4906
+  },
+  "design": {
+    "path": "docs/design/self_application_design_v0_1.md",
+    "version": "0.1.5",
+    "sha256": "270d4a82dccaba0161ffd7cc983c13a771b8111a8bdcd1779e48d827a4316129"
+  },
+  "commit_c": {
+    "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+    "git_archive_sha256": "2875eec01fd16598aa2f8e0c673860f9ec8194a1e97fa0cf8f6af370a42ab302",
+    "git_archive_bytes": 1884160
+  },
+  "expectation_table": {
+    "path": "selfapp/expected_v1.json",
+    "sha256": "242528cd4c1bc7b5a1a55dedf959aa119f3d7d625757a0c8ab758cf206c8e0c7",
+    "bytes": 55553
+  },
+  "tier4_acceptance": {
+    "path": "selfapp/tier4_acceptance_v1.json",
+    "sha256": "b119162aaaa15ab32f3ee9e0acca53aed50b7fa3243d949a5b8bce00633a01c2",
+    "bytes": 13381
+  },
+  "comparison_body_definition": {
+    "path": "genomicschain_core/lib/genomicschain_core/comparison_body.rb",
+    "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+    "sha256": "0e672c6f315c45031f5a2bb0f09bd6a57f5e40ebfe99a3c2a157b4fca165dc9e",
+    "bytes": 5335
+  },
+  "ddc_counting_rule": [
+    {
+      "path": "scripts/selfapp/ddc_compare.rb",
+      "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+      "sha256": "1b98aff3561510dbb690b8989565983f4afb07630e4dd2ab0a171e68335f6bc4",
+      "bytes": 5812
+    },
+    {
+      "path": "scripts/selfapp/ddc_harness.rb",
+      "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+      "sha256": "a1b787c7e302480cd21d437c70271054dd036311a3ebb999b8e5125c863dfa5b",
+      "bytes": 8067
+    },
+    {
+      "path": "scripts/selfapp/ddc_common.rb",
+      "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+      "sha256": "b2157892390ed26e9b1758f179180e1703cc68adf34258c62824860d00395ed5",
+      "bytes": 1504
+    }
+  ],
+  "subject": {
+    "generator": {
+      "path": "selfapp/generator",
+      "tree_sha256": "daf3a8efe8ffca93a6ea90b95a44252d3f181b7f7679c9f2797b453c868e291d",
+      "files": 11
+    },
+    "seed": 20260929,
+    "pins": [
+      {
+        "path": "selfapp/pins_v0.json",
+        "sha256": "823f934284d27b61f14c03a86c8fafbfa425462215e8c107e7e95e1696aaa760",
+        "bytes": 3056
+      },
+      {
+        "path": "selfapp/pins_v0.lock",
+        "sha256": "1a138671d680d0207ab1b9680ac9e329e745cb0a2ae0c51c8a55c0ffe9bf7226",
+        "bytes": 30474
+      }
+    ],
+    "variant_spec": [
+      {
+        "path": "selfapp/variants_v1.json",
+        "sha256": "83da323ebb55bdbc1264bd309a2b54b563e911695ca5ce8e60e5af0e50a23be0",
+        "bytes": 8660
+      },
+      {
+        "path": "scripts/selfapp/make_variants.rb",
+        "sha256": "f97e1d5758fe8e3aa9c23866a1e11789b159399c996a2ade6f1f5caeb23aaf5a",
+        "bytes": 7581
+      }
+    ],
+    "frozen_subjects": {
+      "V0": {
+        "path": "selfapp/synthetic_rnaseq_v1",
+        "tree_sha256": "1bb7b8bb391220943a76c7542d232b11197e34a1f40162e9477fc78091863883",
+        "files": 20
+      },
+      "V1": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V1",
+        "tree_sha256": "e6d3475c9dab30e6c3e57279975ca09df77a0ea522bfd8b022ab62b03854da6c",
+        "files": 20
+      },
+      "V2": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V2",
+        "tree_sha256": "65b2b9c309524fe3f9c2799cfc612f22556987b0ddbcec5e7b6001d3fb9c1cb9",
+        "files": 20
+      },
+      "V3": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V3",
+        "tree_sha256": "9edde67723277f9dea07409f36162f5baffbc89629579c6c02bf253a30cc55df",
+        "files": 20
+      },
+      "V4": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V4",
+        "tree_sha256": "94540f6dca2279dd52a96c9eb3a989dea1973837210b73bdf07304bd35fbf0a3",
+        "files": 20
+      },
+      "V5": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V5",
+        "tree_sha256": "2387dfc7a09b80781db0f7f64f89c8b70af7e790784623d36feae48497ac6956",
+        "files": 20
+      },
+      "V6": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V6",
+        "tree_sha256": "1bb7b8bb391220943a76c7542d232b11197e34a1f40162e9477fc78091863883",
+        "files": 20
+      },
+      "V7": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V7",
+        "tree_sha256": "8eadae64dc9249e12bdacb9047fbca0fa1e9561e1e0d56288d499e75f721d1c5",
+        "files": 20
+      },
+      "V8": {
+        "path": "selfapp/synthetic_rnaseq_v1_variants/V8",
+        "tree_sha256": "bdfdfafed0cb73f660ea03c6a97357cb0999847ff9da33951bb69a9e22d68a16",
+        "files": 20
+      }
+    },
+    "answer_key": {
+      "path": "selfapp/synthetic_truth_v1.json",
+      "sha256": "6859b7747616b190582c0ed7b463f7d695d6c8cc128946ec60810860dc4cf313",
+      "bytes": 70737
+    }
+  },
+  "execution_records_s2": {
+    "V0": {
+      "path": "log/selfapp/s2/synthetic_bco_v0.json",
+      "sha256": "46e3a3512f06eb081c12e4997aa4348ea773f9d4aed8782f9f6d7d40051dff69",
+      "bytes": 16824
+    },
+    "V6": {
+      "path": "log/selfapp/s2/synthetic_bco_v6.json",
+      "sha256": "532394497eccaa6b7245a55a7eaf4c7177af3976e8a8aeb9ba3dbd3b1ab05a5d",
+      "bytes": 10252
+    },
+    "s2_record": {
+      "path": "log/selfapp/s2/s2_record.json",
+      "sha256": "44bb7df0fa91e81d0222c4a47fb8d469b604785a4714a85d3f3f0bc085632326",
+      "bytes": 4988
+    }
+  },
+  "calibration": [
+    {
+      "path": "log/selfapp/s3/calibration_record.json",
+      "sha256": "ace2c3789b9a8a8e2c15ff661b1cd346ccd3ba832b781dbebab68e5fc43554c5",
+      "bytes": 32563
+    },
+    {
+      "path": "scripts/selfapp/calibrate_v0.rb",
+      "sha256": "79feb54527816ac0c8850dae5fd2c6a00351c50cb6d30a93face9cceab5cf049",
+      "bytes": 11442
+    }
+  ],
+  "variants_record": {
+    "path": "log/selfapp/s3/variants_record.json",
+    "sha256": "e6ca9e109bdc51cd9a8cfef7c882d0af780e737beaa0c9f3aee0f213fce40fb8",
+    "bytes": 13682
+  },
+  "rules_located_in": {
+    "tier1_k_first_k_after_timestamp_and_replay": "expectation_table .rules",
+    "stage0_second_seed_rule": "tier4_acceptance .stage_0",
+    "ddc_counting_rule": "ddc_counting_rule (scripts at commit C) and expectation_table .rules"
+  },
+  "statement": "No checker was launched against selfapp/ before this set was written. This is the orchestrator statement, matching the calibration and variant records; it is not an independent check."
+}

@@ -25,6 +25,7 @@ log/
 # selfapp/generator and a seed, never committed. The generator and the hashes in
 # generator_manifest.json are what is kept; the bytes are re-derived from them.
 selfapp/synthetic_rnaseq_v1/
+selfapp/synthetic_rnaseq_v1_variants/
 selfapp/synthetic_truth_v1.json
 
 # Research data, held out of the repository by the author's decision (2026-09-01).
