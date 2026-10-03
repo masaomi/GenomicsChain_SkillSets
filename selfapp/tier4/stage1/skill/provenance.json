@@ -1,0 +1,85 @@
+{
+  "notice": "SYNTHETIC -- FICTIONAL STUDY. GenomicsChain self-application demonstration: the subject is a generated RNA-seq study with planted defects (variants V0-V8). Not real data, not a real study.",
+  "skill": {
+    "name": "selfapp_tier4_stage1_verdict_table",
+    "version": "0.1.0",
+    "kind": "Tier-4 distillation, stage 1: a computation that passed Tier 3, turned into a parameterised Skill",
+    "distilled_utc": "2026-10-03T12:35:00Z"
+  },
+  "distilled_by": {
+    "model": "Claude Opus 5.5",
+    "model_id": "claude-opus-5-5",
+    "role": "stage-1 distiller"
+  },
+  "source_tier3_run": {
+    "subject_ref": "selfapp://tier4/stage1/declared_computation",
+    "record": "log/selfapp/s8/launches/001_declared_computation/result.txt",
+    "args": "log/selfapp/s8/args/declared_computation.json",
+    "jobspec_digest": "5b6d000918f599602392ecd36546432336d72525ac49e4145f9fb77a83a1ac3a",
+    "result_hash": "dd97e807f8a7348139f077fd30a652ae3bcf420cb41cc1c3be527f9874af0b91",
+    "backend_id": "local",
+    "trust_tier": "self_reported",
+    "date": "2026-10-03",
+    "command_shape": "ruby scripts/selfapp/ddc_harness.rb --checker-root CHECKER_ROOT --inputs BUNDLE --out harness_out && mkdir -p results && ruby scripts/selfapp/verdict_table.rb harness_out results/verdict_table.tsv",
+    "environment_as_declared_in_args": {
+      "ruby": "3.4.10",
+      "checker_packages_tree_sha256": "604dc51a241bb3e07f7d2b8bb654f807f2721287bd9a8d331df43c9391436628",
+      "note": "host Ruby and gems as the operator installed them; the draft names Ruby 3.4.10 and the checker tree"
+    },
+    "distiller_observation": "Two hash rules give two values for the same installed checker (distiller's development runs, 2026-10-03, Ruby 3.4.10 arm64-darwin23). The value declared above equals the tree sha256 of the whole checker root directory (every regular file, the rule of vendor/ddc_common.rb tree_files + tree_sha256). The harness's own field of the same name covers only the five checker packages (vendor/ddc_common.rb package_files) and gave 6c6fbd44e5d69fcb329e87b2c5beabd7ad7f6976947dcae66e9f808a06afe0bd. The Skill checks neither value; skill_record.json records the five-package value."
+  },
+  "source_commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+  "source_commit_note": "ddc_harness.rb and ddc_common.rb were last changed in this commit. verdict_table.rb does not exist in it: it was added in 15d065623f90f4f072b98b12ee0b75a2d1713a34. All three copies were taken from the working tree at 9cafe13f0cd544bf01e3b7c11047aefe1844a579, where they had no uncommitted changes.",
+  "generator": {
+    "path_in_source_repository": "selfapp/generator",
+    "version": "0.1.0",
+    "tree_sha256": "daf3a8efe8ffca93a6ea90b95a44252d3f181b7f7679c9f2797b453c868e291d",
+    "tree_sha256_from": "selfapp/synthetic_rnaseq_v1/generator_manifest.json, field generator.tree_sha256",
+    "hashing_rule": "every regular file under the directory incl. dot files, symlinks not followed; lines \"<sha256>  <relpath>\\n\" sorted bytewise by relpath; sha256 of the concatenation (vendor/ddc_common.rb tree_files + tree_sha256)"
+  },
+  "parameter_values_at_distillation": {
+    "note": "Identity of the parameter values the distiller used. Informative; the Skill does not require these values.",
+    "variant_spec": {
+      "path_in_source_repository": "selfapp/variants_v1.json",
+      "sha256": "83da323ebb55bdbc1264bd309a2b54b563e911695ca5ce8e60e5af0e50a23be0"
+    },
+    "make_variants": {
+      "path_in_source_repository": "scripts/selfapp/make_variants.rb",
+      "sha256": "f97e1d5758fe8e3aa9c23866a1e11789b159399c996a2ade6f1f5caeb23aaf5a"
+    },
+    "input_bundle": {
+      "path_in_source_repository": "log/selfapp/ddc_inputs_v1",
+      "inputs_manifest_sha256": "1bbd266757adcced6a66ab7ea270df2a7ce893fa5d75eb948983a9a7dbe93d7a"
+    }
+  },
+  "copies": [
+    {
+      "package_path": "vendor/ddc_harness.rb",
+      "source_path": "scripts/selfapp/ddc_harness.rb",
+      "sha256": "a1b787c7e302480cd21d437c70271054dd036311a3ebb999b8e5125c863dfa5b",
+      "git_blob": "650ad3b2e52bad232cffcfeff1f4737db1ae25c2",
+      "last_changed_in_commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+      "copied_at_commit": "9cafe13f0cd544bf01e3b7c11047aefe1844a579",
+      "modified": false
+    },
+    {
+      "package_path": "vendor/ddc_common.rb",
+      "source_path": "scripts/selfapp/ddc_common.rb",
+      "sha256": "b2157892390ed26e9b1758f179180e1703cc68adf34258c62824860d00395ed5",
+      "git_blob": "281ad598859f279a054beae778fb1113780b4930",
+      "last_changed_in_commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+      "copied_at_commit": "9cafe13f0cd544bf01e3b7c11047aefe1844a579",
+      "modified": false
+    },
+    {
+      "package_path": "vendor/verdict_table.rb",
+      "source_path": "scripts/selfapp/verdict_table.rb",
+      "sha256": "f3e7e2a6466bd1fb2bd6b4b6bf137effc8e4e4ac8d989803bd7bf4ad4c8e81be",
+      "git_blob": "dab7656c2a9af0ff7b9eaaebf2eb0fafa9233dac",
+      "last_changed_in_commit": "15d065623f90f4f072b98b12ee0b75a2d1713a34",
+      "copied_at_commit": "9cafe13f0cd544bf01e3b7c11047aefe1844a579",
+      "modified": false
+    }
+  ],
+  "authored_for_this_package": ["SKILL.md", "bin/run.rb", "bin/plan_variants.rb", "params.schema.json", "params.example.json", "provenance.json"]
+}

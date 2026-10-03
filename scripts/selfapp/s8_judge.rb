@@ -60,7 +60,7 @@ def tier3_args(subject_ref, work, command)
   {
     'subject_ref' => subject_ref, 'backend' => 'local',
     'pipeline' => { 'command' => ['bash', '-c', command], 'workdir' => work, 'step_source' => 'prose-methods' },
-    'env' => { 'ruby' => RUBY_VERSION, 'checker_packages_tree_sha256' => tree(CHECKER),
+    'env' => { 'ruby' => RUBY_VERSION, 'checker_packages_tree_sha256' => DdcCommon.tree_sha256(DdcCommon.package_files(CHECKER)),
                'note' => 'host Ruby and gems as the operator installed them; the draft names Ruby 3.4.10 and the checker tree' },
     'expected_output' => { 'target' => "file:#{TABLE}", 'sha256' => TABLE_SHA256, 'source' => 'paper_declared',
                            'source_citation' => CITATION },
@@ -80,7 +80,7 @@ when 'declare'
                'section' => '8.4', 'citation' => CITATION, 'target' => "file:#{TABLE}", 'table_sha256' => TABLE_SHA256,
                'computation' => { 'harness' => 'scripts/selfapp/ddc_harness.rb at 549accc', 'table' => 'scripts/selfapp/verdict_table.rb at 15d0656',
                                   'bundle_inputs_manifest_sha256' => Digest::SHA256.file(File.join(BUNDLE, 'inputs_manifest.json')).hexdigest,
-                                  'checker_packages_tree_sha256' => tree(CHECKER) },
+                                  'checker_packages_tree_sha256' => DdcCommon.tree_sha256(DdcCommon.package_files(CHECKER)) },
                'declared_by' => 'main context (not the stage-1 distiller)'
              })
   puts File.read(DECLARATION)

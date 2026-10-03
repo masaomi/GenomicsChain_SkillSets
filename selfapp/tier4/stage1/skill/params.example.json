@@ -1,0 +1,8 @@
+{
+  "subject_generation": {
+    "generator_dir": "<repo>/selfapp/generator",
+    "variant_spec": "<repo>/selfapp/variants_v1.json",
+    "make_variants": "<repo>/scripts/selfapp/make_variants.rb"
+  },
+  "input_bundle": "<repo>/log/selfapp/ddc_inputs_v1"
+}

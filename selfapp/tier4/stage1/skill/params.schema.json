@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "genomicschain:selfapp/tier4/stage1/params/v1",
+  "title": "Parameter file of the Tier-4 stage-1 Skill (SYNTHETIC -- FICTIONAL STUDY)",
+  "description": "Exactly two parameters. Every path is a string; a relative path resolves against the directory that holds the parameter file. The checker root and the Ruby interpreter are not parameters: they are the environment, supplied at invocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["subject_generation", "input_bundle"],
+  "properties": {
+    "subject_generation": {
+      "description": "Parameter 1: how the subjects were made. Identified by hash and read against the bundle after the table is written; never passed to the harness or the table script.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator_dir", "variant_spec", "make_variants"],
+      "properties": {
+        "generator_dir": {
+          "description": "Directory of the subject generator (in the source repository: selfapp/generator). Hashed as a tree; never run.",
+          "type": "string",
+          "minLength": 1
+        },
+        "variant_spec": {
+          "description": "The planted-fault variant specification (in the source repository: selfapp/variants_v1.json). Must be JSON with base.id, base.tree_sha256 and variants[].id.",
+          "type": "string",
+          "minLength": 1
+        },
+        "make_variants": {
+          "description": "The script that applies the spec (in the source repository: scripts/selfapp/make_variants.rb). Only its MakeVariants.plan is called, in a separate process; it writes nothing.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "input_bundle": {
+      "description": "Parameter 2: the frozen input bundle, a directory holding inputs_manifest.json and exactly the files it names. Read only.",
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
