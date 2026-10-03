@@ -3,6 +3,7 @@
 require 'json'
 require 'digest'
 require 'rbconfig'
+require 'time'
 
 module KairosMcp
   # Manifest — Reproducibility Manifest for GenomicsChain job blocks.
@@ -97,6 +98,17 @@ module KairosMcp
 
     def self.validate_tier2!(record)
       Tier2Validator.validate!(record)
+    end
+
+    # Tier-4 distillation record (self-application design §7.3, O-2 (a)):
+    # a Skill's package digest with the Tier-3 judgments of that Skill.
+    # Not deployed to production in v0.1; no tool registers it.
+    def self.build_tier4_distillation(data)
+      Tier4Builder.build(data)
+    end
+
+    def self.validate_tier4!(record)
+      Tier4Validator.validate!(record)
     end
 
     def self.validate_tier1!(record)
@@ -561,6 +573,133 @@ module KairosMcp
         record['repository'] = d['repository'].transform_keys(&:to_s) if d['repository']
         record['submission_key'] = d['submission_key'] if d['submission_key']
         record
+      end
+    end
+
+    module Tier4Validator
+      SCHEMA_PATH = File.expand_path('../../schemas/tier4_distillation.schema.json', __dir__)
+
+      def self.validate!(record)
+        require 'json-schema'
+        errors = JSON::Validator.fully_validate(
+          schema, record,
+          errors_as_objects: true,
+          version: :draft4
+        )
+        return true if errors.empty?
+        raise SchemaViolation, "tier4_distillation schema violation: #{errors.first[:message]}"
+      end
+
+      def self.schema
+        @schema ||= JSON.parse(File.read(SCHEMA_PATH))
+      end
+    end
+
+    # Tier-4 distillation record 0.1 (self-application design §7.1, §7.3).
+    #
+    # Tier 4 authors and Tier 3 judges (INV-S4). So the record carries the
+    # Skill's identity and the Tier-3 verdicts that judged it, and the two pass
+    # flags are DERIVED here from those verdicts; a caller that supplies them
+    # is refused, because a distiller that could write its own pass flag would
+    # be judging its own Skill.
+    #
+    # The order INV-S4 requires — package digest recorded, then the second
+    # seed drawn, then the reference fixed — is checked on the recorded times.
+    # Those times are self-reported; what makes them evidence is an external
+    # timestamp, not this check. The check only refuses a record that
+    # contradicts itself.
+    #
+    # Until the Tier-3 records exist (S9), the cited Tier-3 runs are named by
+    # execution identity (jobspec_digest + result_hash) and tier3_record_ref
+    # is null (§7.3).
+    module Tier4Builder
+      TIER4_RECORD_VERSION = '0.1'
+      PASS_EXECUTION = 'completed'
+      PASS_COMPARISON = 'match_exact'
+      DERIVED_FIELDS = %w[reversion_passed other_data_passed leaderboard_eligible].freeze
+
+      # The S-1 tree rule: sha256 over "<sha256>  <relative path>\n" lines,
+      # sorted bytewise by path (scripts/selfapp/ddc_common.rb).
+      def self.package_digest(package_files)
+        lines = package_files.map { |f| f.transform_keys(&:to_s) }
+                             .sort_by { |f| f['relative_path'].b }
+                             .map { |f| "#{f['sha256']}  #{f['relative_path']}\n" }
+        Digest::SHA256.hexdigest(lines.join)
+      end
+
+      def self.build(data)
+        d = deep_strings(data)
+        raise ManifestError, 'operator field is required for tier4_distillation' if d['operator'].nil?
+
+        supplied = DERIVED_FIELDS & d.keys
+        unless supplied.empty?
+          raise ManifestError, "#{supplied.join(', ')} are derived, not supplied (INV-S4)"
+        end
+
+        files = Array(d['package_files']).map { |f| { 'relative_path' => f['relative_path'], 'sha256' => f['sha256'] } }
+                                         .sort_by { |f| f['relative_path'].to_s.b }
+        raise ManifestError, 'package_files is required' if files.empty?
+        recomputed = package_digest(files)
+        unless recomputed == d['package_digest']
+          raise ManifestError, "package_digest #{d['package_digest'].inspect} does not match package_files (#{recomputed})"
+        end
+
+        reversion = d['reversion'] || raise(ManifestError, 'reversion is required')
+        other = d['other_data'] || raise(ManifestError, 'other_data is required (performed: false with a reason when not done)')
+        check_order!(d['package_digest_recorded_at'], other)
+
+        record = {
+          'record_type' => 'tier4_distillation',
+          'record_version' => TIER4_RECORD_VERSION,
+          'mcp_tool_name' => 'gc_tier4_submit',
+          'mcp_tool_version' => KairosMcp::VERSION,
+          'subject_ref' => d['subject_ref'],
+          'stage' => d['stage'],
+          'package_digest' => recomputed,
+          'package_files' => files,
+          'package_digest_recorded_at' => d['package_digest_recorded_at'],
+          'distiller' => d['distiller'],
+          'acceptance' => d['acceptance'],
+          'source' => d['source'],
+          'reversion' => reversion,
+          'other_data' => other,
+          'reversion_passed' => passed?(reversion),
+          'other_data_passed' => other['performed'] == true ? passed?(other) : nil,
+          'trust_tier' => d['trust_tier'] || 'self_reported',
+          'leaderboard_eligible' => false,
+          'recorded_at' => d['recorded_at'] || Time.now.utc.iso8601,
+          'operator' => Builder.build_operator(d['operator'], d)
+        }
+        record['submission_key'] = d['submission_key'] if d['submission_key']
+        record
+      end
+
+      def self.passed?(check)
+        check['execution_verdict'] == PASS_EXECUTION && check['comparison_verdict'] == PASS_COMPARISON
+      end
+
+      def self.check_order!(digest_at, other)
+        return unless other['performed'] == true
+
+        times = [['package_digest_recorded_at', digest_at], ['seed_drawn_at', other['seed_drawn_at']],
+                 ['reference_fixed_at', other['reference_fixed_at']]]
+        parsed = times.map do |name, t|
+          Time.iso8601(t.to_s)
+        rescue ArgumentError
+          raise ManifestError, "#{name} is not an ISO 8601 time (#{t.inspect})"
+        end
+        return if parsed.each_cons(2).all? { |a, b| a < b }
+
+        raise ManifestError, 'INV-S4 order violated: the package digest must be recorded before the seed is ' \
+                             "drawn, and the seed drawn before the reference is fixed (#{times.map(&:last).join(' / ')})"
+      end
+
+      def self.deep_strings(obj)
+        case obj
+        when Hash then obj.each_with_object({}) { |(k, v), h| h[k.to_s] = deep_strings(v) }
+        when Array then obj.map { |v| deep_strings(v) }
+        else obj
+        end
       end
     end
 

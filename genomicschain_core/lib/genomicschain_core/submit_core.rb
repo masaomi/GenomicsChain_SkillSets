@@ -231,8 +231,10 @@ module KairosMcp
             #   tier1 report_content_hash / static_readiness
             #   tier2 adjudication_digest  / codescan_evidence_digest
             #   tier3 jobspec_digest       / result_hash
+            #   tier4 package_digest       / (none: both checks are in the claim)
             out[:idempotency_key] = Digest::SHA256.hexdigest(
-              [manifest['jobspec_digest'] || manifest['report_content_hash'] || manifest['adjudication_digest'],
+              [manifest['jobspec_digest'] || manifest['report_content_hash'] || manifest['adjudication_digest'] ||
+                 manifest['package_digest'],
                manifest['result_hash'] || manifest.dig('headline', 'static_readiness') ||
                  manifest['codescan_evidence_digest'],
                pubkey].compact.join('|')

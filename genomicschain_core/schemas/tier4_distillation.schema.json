@@ -1,0 +1,445 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier4_distillation.schema.json",
+  "title": "Tier-4 distillation record 0.1",
+  "description": "A Skill distilled from a computation that passed Tier 3, with the Tier-3 judgments of the Skill. Tier 4 authors; Tier 3 judges: the pass flags are derived from the cited Tier-3 verdicts by the builder, never supplied (INV-S4, self-application design §7). Not deployed to production in v0.1.",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "stage",
+    "package_digest",
+    "package_files",
+    "package_digest_recorded_at",
+    "distiller",
+    "acceptance",
+    "source",
+    "reversion",
+    "other_data",
+    "reversion_passed",
+    "other_data_passed",
+    "trust_tier",
+    "leaderboard_eligible",
+    "operator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_type": {
+      "enum": [
+        "tier4_distillation"
+      ]
+    },
+    "record_version": {
+      "enum": [
+        "0.1"
+      ]
+    },
+    "mcp_tool_name": {
+      "enum": [
+        "gc_tier4_submit"
+      ]
+    },
+    "mcp_tool_version": {
+      "type": "string"
+    },
+    "subject_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "The Skill identity."
+    },
+    "stage": {
+      "enum": [
+        "stage0",
+        "stage1"
+      ]
+    },
+    "package_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over the lines \"<sha256>  <relative path>\\n\" of every regular file of the package, sorted bytewise by path (the S-1 tree rule)."
+    },
+    "package_files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "relative_path",
+          "sha256"
+        ],
+        "properties": {
+          "relative_path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "package_digest_recorded_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+    },
+    "distiller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "context": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "sha256"
+      ],
+      "description": "The acceptance conditions, fixed by a context other than the distiller before distillation.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobspec_digest",
+        "result_hash",
+        "tier3_record_ref"
+      ],
+      "description": "The Tier-3 run the Skill was distilled from.",
+      "properties": {
+        "jobspec_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "result_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "tier3_record_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Synoptis proof id of the Tier-3 record, once it exists (S9). null until then: the record cites the execution identity (jobspec_digest + result_hash) instead (self-application design §7.3)."
+        }
+      }
+    },
+    "reversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobspec_digest",
+        "result_hash",
+        "execution_verdict",
+        "comparison_verdict",
+        "tier3_record_ref",
+        "expected_output_sha256",
+        "expected_output_source"
+      ],
+      "properties": {
+        "jobspec_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "result_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "execution_verdict": {
+          "enum": [
+            "completed",
+            "env_failed",
+            "data_blocked",
+            "outputs_unusable"
+          ]
+        },
+        "comparison_verdict": {
+          "enum": [
+            "no_target_declared",
+            "match_exact",
+            "match_normalized",
+            "mismatch",
+            "not_attempted"
+          ]
+        },
+        "tier3_record_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Synoptis proof id of the Tier-3 record, once it exists (S9). null until then: the record cites the execution identity (jobspec_digest + result_hash) instead (self-application design §7.3)."
+        },
+        "expected_output_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "expected_output_source": {
+          "enum": [
+            "paper_declared",
+            "llm_extracted",
+            "operator_supplied"
+          ]
+        }
+      }
+    },
+    "other_data": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "jobspec_digest",
+            "result_hash",
+            "execution_verdict",
+            "comparison_verdict",
+            "tier3_record_ref",
+            "performed",
+            "seed",
+            "seed_drawn_at",
+            "reference_sha256",
+            "reference_fixed_at"
+          ],
+          "properties": {
+            "jobspec_digest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "result_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "execution_verdict": {
+              "enum": [
+                "completed",
+                "env_failed",
+                "data_blocked",
+                "outputs_unusable"
+              ]
+            },
+            "comparison_verdict": {
+              "enum": [
+                "no_target_declared",
+                "match_exact",
+                "match_normalized",
+                "mismatch",
+                "not_attempted"
+              ]
+            },
+            "tier3_record_ref": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Synoptis proof id of the Tier-3 record, once it exists (S9). null until then: the record cites the execution identity (jobspec_digest + result_hash) instead (self-application design §7.3)."
+            },
+            "performed": {
+              "enum": [
+                true
+              ]
+            },
+            "seed": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "seed_drawn_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+            },
+            "reference_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reference_fixed_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "performed",
+            "reason"
+          ],
+          "properties": {
+            "performed": {
+              "enum": [
+                false
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        }
+      ]
+    },
+    "reversion_passed": {
+      "type": "boolean"
+    },
+    "other_data_passed": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "null when the other-data check was not performed."
+    },
+    "trust_tier": {
+      "enum": [
+        "self_reported"
+      ]
+    },
+    "leaderboard_eligible": {
+      "enum": [
+        false
+      ],
+      "description": "Server-set. A distillation is never a leaderboard entry."
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256(canonical_json({digest_subject_hash, signed_identity, operator_pubkey})). Recovery lookup key (INV-10)."
+    },
+    "recorded_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+    },
+    "operator": {
+      "type": "object",
+      "description": "Operator identity envelope. Leaderboard-contributing verdicts require signed mode; anonymous is excluded from consensus.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mode",
+            "pubkey",
+            "signature"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "signed"
+              ]
+            },
+            "pubkey": {
+              "type": "string",
+              "pattern": "^ed25519:[A-Za-z0-9+/=_-]+$"
+            },
+            "signature": {
+              "type": "object",
+              "required": [
+                "algorithm",
+                "value",
+                "nonce",
+                "chain_tip_hash"
+              ],
+              "properties": {
+                "algorithm": {
+                  "enum": [
+                    "ed25519"
+                  ]
+                },
+                "signed_fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "value": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9+/=_-]+$",
+                  "maxLength": 256
+                },
+                "nonce": {
+                  "type": "string",
+                  "minLength": 32,
+                  "maxLength": 128,
+                  "pattern": "^[a-f0-9]+$"
+                },
+                "chain_tip_hash": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "mode",
+            "anonymous_id"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "anonymous"
+              ]
+            },
+            "anonymous_id": {
+              "type": "string",
+              "pattern": "^anonymous-[a-f0-9]{16,32}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "mode",
+            "legacy"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "alpha_legacy"
+              ]
+            },
+            "legacy": {
+              "enum": [
+                true
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
