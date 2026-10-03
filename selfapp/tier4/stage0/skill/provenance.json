@@ -1,0 +1,65 @@
+{
+  "notice": "SYNTHETIC — FICTIONAL STUDY. This Skill was distilled from a generated, fictional RNA-seq study (GenomicsChain self-application subject V0); not real data, not a real study.",
+  "skill": {
+    "name": "rnaseq_two_group_de",
+    "version": "0.1.0",
+    "tier": 4,
+    "distilled_on": "2026-10-03"
+  },
+  "source": {
+    "subject_ref": "selfapp://synthetic_rnaseq_v1/V0",
+    "repository": "GenomicsChain_SkillSets",
+    "path": "selfapp/synthetic_rnaseq_v1/synthetic_repo",
+    "commit": "549accc9b5b6016ccb906b613ea2ea8da73ad4a6",
+    "generator_tree_sha256": "daf3a8efe8ffca93a6ea90b95a44252d3f181b7f7679c9f2797b453c868e291d",
+    "generator_manifest": "selfapp/synthetic_rnaseq_v1/generator_manifest.json",
+    "derived_from": [
+      {
+        "path": "Snakefile",
+        "sha256": "ec19d36c980253824a2259c23641c37dc48436576a0a58825c6fd83c639690af"
+      },
+      {
+        "path": "config/config.yaml",
+        "sha256": "da4f8ea2f6ef3a200a640b3b9c7539b2cb4118de9bc55d02b395277258c4c2e8"
+      },
+      {
+        "path": "scripts/deseq2.R",
+        "sha256": "6cc0e115a37d56661e33874a67ab3f7b594e2a37ea81306e937ff7fe43136b70"
+      },
+      {
+        "path": "scripts/tximport.R",
+        "sha256": "f3fdff9e4aaf308ca998c3a89a7f58638a6a1952096396a586c3554a48b56b8d"
+      }
+    ]
+  },
+  "source_tier3_run": {
+    "date": "2026-10-03",
+    "record": "log/selfapp/s4c/launches/021_V0_t3_exec/result.txt",
+    "record_sha256": "d1556dc743a474c5aaa1887b222316ae2c3b84e8fc2fa10be12f4bf02af65d31",
+    "args": "log/selfapp/s4c/args/t3_V0.json",
+    "args_sha256": "7f979b3e97145b900526b7b69a9e02955d86efdca0b1673e6a86658496f45be4",
+    "jobspec_digest": "32eb8da644fdd8ee2df0d5986e1a6d8398a0b1d83416370d25559d376a8b5da1",
+    "result_hash": "227b0657c824fc7750681c17c31ca568b895ecdce90cdbe0f9ce89a74280ad9a",
+    "command": "docker run --rm --platform linux/amd64 -v \"$PWD\":/work -w /work synthetic-rnaseq:1.0 snakemake --cores 1"
+  },
+  "environment": {
+    "container_image": "synthetic-rnaseq:1.0",
+    "container_image_id": "sha256:004c13e8611f445b5be24dcac9749edd0a38a0aa136a0642a88c9ee7ee236504",
+    "platform": "linux/amd64",
+    "built_from": [
+      {
+        "path": "Dockerfile",
+        "sha256": "8b9c5b2e982e9c698c762c0d186f2175fccd45528749d4b787742815a310112a"
+      },
+      {
+        "path": "envs/rnaseq.lock",
+        "sha256": "1a138671d680d0207ab1b9680ac9e329e745cb0a2ae0c51c8a55c0ffe9bf7226"
+      }
+    ]
+  },
+  "invocation": "docker run --rm --platform linux/amd64 -v \"$PWD\":/work -w /work synthetic-rnaseq:1.0 snakemake --cores 1 --snakefile skill/Snakefile --configfile params.yaml",
+  "distiller": {
+    "model": "Claude Opus 5.5",
+    "model_id": "claude-opus-5-5"
+  }
+}

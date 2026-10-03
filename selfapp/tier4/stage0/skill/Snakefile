@@ -1,0 +1,125 @@
+# SYNTHETIC — FICTIONAL STUDY. Distilled from the GenomicsChain self-application subject V0 (a generated, fictional RNA-seq study); not real data, not a real study.
+#
+# Two-group RNA-seq differential expression with a label-permutation check:
+# trim -> salmon_index -> salmon_quant -> tximport -> deseq2.
+#
+# Every study-specific value comes from the parameter file given with
+# --configfile (schema: params.schema.json, next to this file). Paths in the
+# parameter file are relative to the working directory. Intermediate files,
+# tool reports and logs go under .work/; results/ holds only the table.
+
+import os
+
+from snakemake.utils import validate
+
+if not config:
+    raise ValueError("no parameters given: pass the parameter file with --configfile <file>")
+validate(config, "params.schema.json")
+
+SKILL_DIR = workflow.basedir
+
+# Fixed input layout and fixed parts of the computation (not parameters).
+READS = "data/synthetic_reads/synthetic_{sample}.fastq.gz"
+ADAPTER = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"
+TABLE = "results/synthetic_supplementary_table_S1.tsv"
+
+
+def read_samples(path):
+    with open(path) as fh:
+        rows = [line.rstrip("\n").split("\t") for line in fh if line.strip() and not line.startswith("#")]
+    header, body = rows[0], rows[1:]
+    return [dict(zip(header, row)) for row in body]
+
+
+SAMPLES = [row["sample"] for row in read_samples(config["sample_table"])]
+
+
+rule all:
+    input:
+        TABLE,
+
+
+rule trim:
+    input:
+        READS,
+    output:
+        fastq=".work/trimmed/{sample}.fastq.gz",
+        json=".work/fastp/{sample}.json",
+        html=".work/fastp/{sample}.html",
+    params:
+        adapter=ADAPTER,
+    log:
+        ".work/logs/trim/{sample}.log",
+    threads: 1
+    shell:
+        "fastp --thread 1 --in1 {input} --out1 {output.fastq} "
+        "--adapter_sequence {params.adapter} --qualified_quality_phred 20 "
+        "--length_required 30 --json {output.json} --html {output.html} > {log} 2>&1"
+
+
+rule salmon_index:
+    input:
+        config["reference"]["transcripts"],
+    output:
+        directory(".work/salmon_index"),
+    log:
+        ".work/logs/salmon_index.log",
+    threads: 1
+    shell:
+        "salmon index --transcripts {input} --index {output} --kmerLen 31 --threads 1 > {log} 2>&1"
+
+
+rule salmon_quant:
+    input:
+        fastq=".work/trimmed/{sample}.fastq.gz",
+        index=".work/salmon_index",
+    output:
+        ".work/salmon/{sample}/quant.sf",
+    params:
+        outdir=".work/salmon/{sample}",
+    log:
+        ".work/logs/salmon_quant/{sample}.log",
+    threads: 1
+    shell:
+        "salmon quant --index {input.index} --libType A --unmatedReads {input.fastq} "
+        "--validateMappings --threads 1 --output {params.outdir} > {log} 2>&1"
+
+
+rule tximport:
+    input:
+        quant=expand(".work/salmon/{sample}/quant.sf", sample=SAMPLES),
+        samples=config["sample_table"],
+        tx2gene=config["reference"]["tx2gene"],
+    output:
+        ".work/tximport/txi.rds",
+    params:
+        script=os.path.join(SKILL_DIR, "scripts", "tximport.R"),
+    log:
+        ".work/logs/tximport.log",
+    threads: 1
+    shell:
+        "Rscript {params.script:q} {input.samples} {input.tx2gene} .work/salmon {output} > {log} 2>&1"
+
+
+rule deseq2:
+    input:
+        txi=".work/tximport/txi.rds",
+        samples=config["sample_table"],
+    output:
+        TABLE,
+    params:
+        script=os.path.join(SKILL_DIR, "scripts", "deseq2.R"),
+        alpha=config["significance_threshold"],
+        draws=config["permutation_draws"],
+        seed=config["permutation_seed"],
+        design=config["comparison"]["design"],
+        variable=config["comparison"]["variable"],
+        numerator=config["comparison"]["numerator"],
+        denominator=config["comparison"]["denominator"],
+    log:
+        ".work/logs/deseq2.log",
+    threads: 1
+    shell:
+        "Rscript {params.script:q} {input.txi} {input.samples} {output} "
+        "{params.alpha} {params.draws} {params.seed} "
+        "{params.design:q} {params.variable:q} {params.numerator:q} {params.denominator:q} > {log} 2>&1"

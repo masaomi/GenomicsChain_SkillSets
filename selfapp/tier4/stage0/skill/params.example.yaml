@@ -1,0 +1,16 @@
+# SYNTHETIC — FICTIONAL STUDY. Distilled from the GenomicsChain self-application subject V0 (a generated, fictional RNA-seq study); not real data, not a real study.
+#
+# Parameter file holding subject V0's values. Copy it to params.yaml in the
+# working directory (see SKILL.md). Paths are relative to the working directory.
+sample_table: config/samples.tsv
+reference:
+  transcripts: data/synthetic_reference/synthetic_SynthRef_r3.transcripts.fa
+  tx2gene: data/synthetic_reference/synthetic_SynthRef_r3.tx2gene.tsv
+comparison:
+  design: "~ condition"
+  variable: condition
+  numerator: treated
+  denominator: control
+significance_threshold: 0.05
+permutation_seed: 20260929
+permutation_draws: 200

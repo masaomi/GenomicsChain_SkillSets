@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parameter file of the two-group RNA-seq differential-expression Skill",
+  "description": "SYNTHETIC — FICTIONAL STUDY. Distilled from the GenomicsChain self-application subject V0 (a generated, fictional RNA-seq study); not real data, not a real study. The parameter file may be YAML or JSON; paths are relative to the working directory the Skill is run in.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sample_table",
+    "reference",
+    "comparison",
+    "significance_threshold",
+    "permutation_seed",
+    "permutation_draws"
+  ],
+  "properties": {
+    "sample_table": {
+      "description": "Tab-separated sample table. Lines starting with '#' are skipped; the first other line is the header. Must have a column 'sample' (reads are read from data/synthetic_reads/synthetic_<sample>.fastq.gz) and the column named by comparison.variable.",
+      "type": "string",
+      "minLength": 1
+    },
+    "reference": {
+      "description": "The transcriptome the reads are quantified against.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transcripts", "tx2gene"],
+      "properties": {
+        "transcripts": {
+          "description": "Transcript FASTA used to build the salmon index.",
+          "type": "string",
+          "minLength": 1
+        },
+        "tx2gene": {
+          "description": "Tab-separated transcript-to-gene table with a header line; first column transcript id, second column gene id.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "comparison": {
+      "description": "The comparison formula: the DESeq2 design and the two levels of one sample-table column that are compared (log2 fold change = numerator over denominator).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design", "variable", "numerator", "denominator"],
+      "properties": {
+        "design": {
+          "description": "One-sided R model formula, e.g. '~ condition'. Must contain comparison.variable.",
+          "type": "string",
+          "pattern": "^\\s*~[A-Za-z0-9._ +:*]+$"
+        },
+        "variable": {
+          "description": "Sample-table column that holds the two groups.",
+          "type": "string",
+          "pattern": "^[A-Za-z.][A-Za-z0-9._]*$"
+        },
+        "numerator": {
+          "description": "Level of comparison.variable in the numerator of the fold change.",
+          "type": "string",
+          "minLength": 1
+        },
+        "denominator": {
+          "description": "Level of comparison.variable in the denominator of the fold change (the reference level). Every sample must carry the numerator or the denominator level.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "significance_threshold": {
+      "description": "Adjusted-p-value threshold passed to DESeq2 results() as alpha (it governs independent filtering, and so the padj column).",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "permutation_seed": {
+      "description": "Seed for R's set.seed() before the label permutations.",
+      "type": "integer",
+      "minimum": -2147483647,
+      "maximum": 2147483647
+    },
+    "permutation_draws": {
+      "description": "Number of random relabellings in the permutation check.",
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}
