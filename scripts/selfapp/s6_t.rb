@@ -42,13 +42,15 @@ opts = {}
 OptionParser.new do |o|
   o.on('--n N', Integer) { |v| opts[:n] = v }
   o.on('--a DIR') { |v| opts[:a] = v }
+  o.on('--attempt K', Integer) { |v| opts[:attempt] = v }
 end.parse!
 abort 'usage: s6_t.rb codex|commit|harness|compare --n N [--a DIR]' unless %w[codex commit harness compare].include?(step) && opts[:n]
 
 n = opts[:n]
 container = "selfapp_t_build_#{n}"
 image = "selfapp-t:#{n}"
-out = File.join(S6, "#{step}_#{n}")
+# A retried step writes beside the stopped one, which is kept as it was.
+out = File.join(S6, opts[:attempt] ? "#{step}_#{n}_attempt#{opts[:attempt]}" : "#{step}_#{n}")
 abort "#{out} exists" if File.exist?(out)
 
 def sh(*cmd)
@@ -100,11 +102,21 @@ when 'commit'
   File.write(File.join(out, 'docker_diff.txt'), must('docker', 'diff', container))
   _, _, code = sh('docker', 'cp', "#{container}:/build/BUILD_RECORD.md", File.join(out, 'BUILD_RECORD.md'))
   meta['build_record_copied'] = code.zero?
-  abort "image #{image} exists" if sh('docker', 'image', 'inspect', image)[2].zero?
-  meta['image_id'] = must('docker', 'commit', container, image).strip
-  # Nothing of the credentials may survive into the image.
+  if sh('docker', 'image', 'inspect', image)[2].zero?
+    # Committed from this container by an earlier run of this step that stopped
+    # at the credential search (2026-10-03: the old pattern "*.codex*" matched
+    # the empty tmpfs mount point /root/.codex itself).
+    meta['image_id'] = must('docker', 'image', 'inspect', image, '--format', '{{.Id}}').strip
+    meta['image_committed_by_earlier_run'] = true
+  else
+    meta['image_id'] = must('docker', 'commit', container, image).strip
+  end
+  # Nothing of the credentials may survive into the image: no file named
+  # auth.json, nothing inside any .codex directory (the tmpfs mount point
+  # itself stays as an empty directory), no token-shaped string where Codex worked.
   leak = must('docker', 'run', '--rm', '--network', 'none', image, 'bash', '-c',
-              'ls -A /root/.codex 2>/dev/null; find / -xdev \( -name auth.json -o -name "*.codex*" \) -print 2>/dev/null; true')
+              'find / -xdev \( -name auth.json -o -path "*/.codex/*" \) -print 2>/dev/null; ' \
+              'grep -rIl -E "refresh_token|\"access_token\"|id_token" /build /root /tmp 2>/dev/null; true')
   meta['credential_search'] = leak.lines.map(&:strip)
   abort "credentials may be in #{image}: #{leak}" unless leak.strip.empty?
   # Our own computation of the checker packages T holds (INV-S9's first half).
