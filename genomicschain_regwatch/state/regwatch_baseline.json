@@ -1,36 +1,326 @@
 {
   "rules_version": "regwatch-scan-0.1.0",
-  "recorded_at": "2026-09-14T07:42:15Z",
+  "recorded_at": "2026-10-04T04:19:58Z",
   "entries": {
     "ai-act-definition-guidelines": {
       "digest": "2960f5d95fecb1b12e5fcf81c4ac6bf1f3530aba912f8c97e95df2b194565e51",
       "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-gpai-guidelines": {
       "digest": "f078b3ac866fe78d57c2e77383aa668829e1c4678140b5c64e1d416b2dd07685",
       "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-transparency-guidelines": {
       "digest": "117cf021e3adb15fd970d1153d600ab3a3c20c7a0477d68e00585fccdf917af8",
       "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-transparency-ai-generated-content",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-highrisk-draft-guidelines": {
       "digest": "1d8fd7e7b47f91ca29bb12844ddde339d07e7e73f2604c4833ab630307111d92",
       "url": "https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-highrisk-guidelines-page": {
-      "digest": "ef83570e844dba0df6a6bb187c520717c872dec4e1f154e714107f7f44e6b1fa",
+      "digest": "c484cac78282f58aa8ea2d26b18d0d7807e7d6563aa6698bf6610ee4598ebdf2",
       "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
     },
     "mdcg-2025-6-mdr-ai-interplay": {
       "digest": "48db859581fb5f1677068cd4eca770e062c5fcc2a8483d6459daceeb98478626",
       "url": "https://health.ec.europa.eu/document/download/b78a17d7-e3cd-4943-851d-e02a2f22bbb4_en?filename=mdcg_2025-6_en.pdf",
-      "seen_at": "2026-09-14T07:42:15Z"
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "eu-gdi-project-end": {
+      "digest": "9d822628b0db030619cba427ce2fb3da42ec8f07024940c6e1c617108393ac25",
+      "url": "https://gdi.onemilliongenomes.eu/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "eic-accelerator-cutoff": {
+      "digest": "a750cf4ab1d5cc14b58be8ac0d3f32f530c2002429d43a5a687f99b3998a5f14",
+      "url": "https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ich-e6-r3-annex-2-eu-applies": {
+      "digest": "6ebc537a46300b2860fa8be7e38006500a4ee201843bfe5fc07bf95b084baafc",
+      "url": "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ehds-art73-implementing-act": {
+      "digest": "c176a071ac37db9059b94279b62db8ec349fe4ca7599b27f75eabc574a541f4e",
+      "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "bsi-c5-2026-applies": {
+      "digest": "a9cbf9f4b7af570040e8560b59f68bc71b05c523c499cc89ad9f66bf534d1b33",
+      "url": "https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-Angriffszielen/Cloud-Computing/Kriterienkatalog-C5/kriterienkatalog-c5_node.html",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ai-act-annex-iii-high-risk": {
+      "digest": "09ac8769b21be069ddb96220fbee154d4d686c749dc5fbec2320522978f9551d",
+      "url": "https://artificialintelligenceact.eu/article/6/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "cra-steward-reporting": {
+      "digest": "cbc14d3147dffb00cde55098b90f38dd3c967f3044e61341f14cacfa3a489fc8",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-open-source",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ai-act-annex-i-high-risk": {
+      "digest": "69d39905fe9995ecee74c767e068f7c631229f1b2b61c4bb91ee622c7c73e84e",
+      "url": "https://artificialintelligenceact.eu/annex/1/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ehds-secondary-use-omics": {
+      "digest": "c176a071ac37db9059b94279b62db8ec349fe4ca7599b27f75eabc574a541f4e",
+      "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ema-computerised-systems-gcp": {
+      "digest": "43a7673c4125519160c159b9c117a7a2437e93a51af39da47a8fe3f9c34b85b2",
+      "url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/guideline-computerised-systems-and-electronic-data-clinical-trials_en.pdf",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "eudralex-annex-22-ai": {
+      "digest": "7b42871680d72146114ab0f5cc5f3fad3428a2d41f8bee9fb09d25c6bbd7b618",
+      "url": "https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "eudralex-annex-11-revision": {
+      "digest": "7b42871680d72146114ab0f5cc5f3fad3428a2d41f8bee9fb09d25c6bbd7b618",
+      "url": "https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "edpb-blockchain-guidelines": {
+      "digest": "1e552bbfe69858b74f15faa64c9b8fdcd26b7530e67e58430d43e454bc94fc36",
+      "url": "https://www.edpb.europa.eu/our-work-tools/general-guidance/guidelines-recommendations-best-practices_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "edpb-scientific-research-guidelines": {
+      "digest": "7c6d2e06565b13bef08d5b5625fd0e0f130e82e7a00fc93e498856b1ab65b9b8",
+      "url": "https://www.edpb.europa.eu/public-consultations/guidelines-12026-on-processing-of-personal-data-for-scientific-research_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ich-e6-r3-annex-2": {
+      "digest": "6ebc537a46300b2860fa8be7e38006500a4ee201843bfe5fc07bf95b084baafc",
+      "url": "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ema-tmf-guideline": {
+      "digest": "69e6299397472765372c610785e79b323778b89621eeb03e8f0ebc43b27f105f",
+      "url": "https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-content-management-and-archiving-clinical-trial-master-file-paper-andor-electronic_en.pdf",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "rats-multi-verifier-draft": {
+      "digest": "91646d1a34978af8a954039428e20464f76b5fa4e5f7e90257c2fa702e06d5c2",
+      "url": "https://datatracker.ietf.org/doc/draft-ietf-rats-multi-verifier/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "scitt-composite-evidence-draft": {
+      "digest": "9a37d332703dbc1d8235dd69a61e6e8156a33f29e7682f8231cb7183f733574d",
+      "url": "https://datatracker.ietf.org/doc/draft-nobuo-scitt-composite-evidence-verification/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "slsa-verification-summary": {
+      "digest": "06d181a7d528ba789847a1473efbbf35ddd66a2cfe49a3f3cc060c8564da8a34",
+      "url": "https://slsa.dev/spec/v1.1/verification_summary",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ro-crate-signing": {
+      "digest": "e9a51909385adf06327fbfbff6a39dc67e996168358f804484cd070624b0ece4",
+      "url": "https://github.com/ResearchObject/ro-crate/issues/312",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "nf-prov-releases": {
+      "digest": "3c42eaba60584343a8ce2415895610bbb001a9b53f2973dc207f3d47437424c1",
+      "url": "https://github.com/nextflow-io/nf-prov/releases",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "seqera-gxp": {
+      "digest": "5c2cb81c28daacf2316775ac10810531d78588ce44b6a5458cc29445c16cea0f",
+      "url": "https://seqera.io/solutions/gxp/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "swissethics-general-consent": {
+      "digest": "2c8bad102c75403d644c1359301b96700faff72ced7601c9caad75d77673ee82",
+      "url": "https://swissethics.ch/en/documents/generalkonsent",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "sphn-ethical-framework": {
+      "digest": "6aa4a48990c20d5bbb8b85acd8a42d442bd6302b37aaa2dfee8c4c4538ce1afa",
+      "url": "https://sphn.ch/document-categories/ethical-framework/",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ai-act-art50-guidelines-text": {
+      "digest": "30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66",
+      "url": "https://ai-act-service-desk.ec.europa.eu/sites/default/files/2026-07/guidelines_on_the_implementation_of_the_transparency_obligations_for_certain_ai_systems_under_article_50_of_the_ai_act_bzptwqhk0ikg1dtlddap41psfy_131215.pdf",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ai-act-highrisk-consultation": {
+      "digest": "63d4871e2c13e46de7f28525692fd9af83ba528a388d5bcf557be76221f01cdb",
+      "url": "https://digital-strategy.ec.europa.eu/en/consultations/targeted-consultation-draft-guidelines-classification-high-risk-artificial-intelligence-systems",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ai-act-enforcement-page": {
+      "digest": "39f329e37d6729b5110af72f35399913281ae46e43c7df77774f1eb4abb8e4a6",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/enforcement-ai-act",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "fda-ai-drug-decision-guidance": {
+      "digest": "c9eff14cc2294a69dd1d970d6e60c41f11066908a16049f478f4755887aee182",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/considerations-use-artificial-intelligence-support-regulatory-decision-making-drug-and-biological",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "fda-e6r3-annex-2": {
+      "digest": "1399700067b7b81ed24a00f6710b1de5a5b3c5de36cb7df4f6f1766951caaa69",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/e6r3-good-clinical-practice-annex-2",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "fda-cdrh-guidance-plan": {
+      "digest": "bfd6e83a674610914aa3a01d9fc1ab7a1bd0287efb873c47dc8da4909c4b80e3",
+      "url": "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/cdrh-proposed-guidances-fiscal-year-2027-fy-2027",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "fda-csa-guidance": {
+      "digest": "4cf9c0c00c6a5a024b85b869481afdd146d37dfe26d248d7872fb30a8e9ab072",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/computer-software-assurance-production-and-quality-management-system-software",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "fda-electronic-systems-qa": {
+      "digest": "2ef8bca6aa32269aea4bead924cd8c3cb1b0eb9cc1b94fca3bea4e1a8cea3f9a",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/electronic-systems-electronic-records-and-electronic-signatures-clinical-investigations-questions",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "doj-data-security-program": {
+      "digest": "5e69da5219bb614b168a1fb679c3503b9b7fb74cd91cd1b30838f2829a04be18",
+      "url": "https://www.justice.gov/nsd/data-security",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "swissmedic-ich-e6r3": {
+      "digest": "8ca46ffa0f1d975902423804de91f7a4d78b119997e5f1c346481eac4b09b848",
+      "url": "https://www.swissmedic.ch/swissmedic/en/home/news/mitteilungen/einfuehrung-leitlinie-ich-gcp-e6-r3.html",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "bag-hfg-revision": {
+      "digest": "6b373ac36bc9a4f016704dc4e95673bbba7c8b822f25125fc56679171aaab735",
+      "url": "https://www.bag.admin.ch/de/humanforschung-revision-hfg-stfg",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "bj-ai-regulation": {
+      "digest": "99984a0b7eb9e3aced5a568780f7b482faa300be00606dda65270197c8df44e4",
+      "url": "https://www.bj.admin.ch/de/kuenstliche-intelligenz",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "bakom-electronic-signature": {
+      "digest": "a7d98bd6aac63f2832f6e7fa3d16fca7d93f661e195807941f954865c7118272",
+      "url": "https://www.bakom.admin.ch/de/elektronische-signatur",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "swiss-eu-package": {
+      "digest": "1c4db12bc9d85cbecf9408c70de0ffcaa05e50fd8355962d72f9ae174fc53d89",
+      "url": "https://www.seco.admin.ch/de/mra-schweiz-eu",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "digisante-health-data-space": {
+      "digest": "f8fd63edc7f0feec08339ae178b6cedad5d889ba889851cd089cc565ae17d92c",
+      "url": "https://www.digisante.admin.ch/de/bundesgesetz-datenraum-gesundheit",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "edoeb-news-2026": {
+      "digest": "d95e16e1151e02d6e60e261ee1ac5fd997e970df5db6ebbdf78db649366a4a65",
+      "url": "https://www.edoeb.admin.ch/de/2026-de",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "edoeb-data-breach-guide": {
+      "digest": "bda60c437e736fa8db4a1f063342efad7570e70bccb55da5376707242a4dbd72",
+      "url": "https://www.edoeb.admin.ch/de/leitfaden-data-breach",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "bj-adequate-countries": {
+      "digest": "0f4c814cd8c548b8d86dca5c362172024e14e457464a9d5c819e5e1b43c623cc",
+      "url": "https://www.bj.admin.ch/de/schweizerische-anerkennung-von-staaten-die-einen-angemessenen-datenschutz-gewaehrleisten",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "edpb-anonymisation-guidelines": {
+      "digest": "78518c4914ab814f5681234cc4ce062746492daee5f802b7c078608082bd2b85",
+      "url": "https://www.edpb.europa.eu/public-consultations/guidelines-022026-on-anonymisation_en",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ema-gcp-iwg": {
+      "digest": "5847eb4dff9c38a9b4bd23c3a28b9b5476201fc26e55056c47044e1f7a77a387",
+      "url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-clinical-practice/good-clinical-practice-inspectors-working-group",
+      "seen_at": "2026-10-04T02:43:37Z"
+    },
+    "ema-fda-ai-principles": {
+      "digest": "08880e6fe51a0f17ba40168ea21953e5a4b600d97d66e2193000cbc87ab75f99",
+      "url": "https://www.ema.europa.eu/en/documents/other/guiding-principles-good-ai-practice-drug-development_en.pdf",
+      "seen_at": "2026-10-04T02:50:22Z"
+    },
+    "ecfr-part11-versions": {
+      "digest": "cb700e1abddd74ff9af8cc03d7c4ae666eae5cfe1f870ccf84fd97d831fa7543",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=11",
+      "seen_at": "2026-10-04T02:50:22Z"
+    },
+    "fda-part11-scope-guidance": {
+      "digest": "60ae4752d26dace38efd7ddfe9aedffa30aa5c72b998e75afdee5a82f4c6b977",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application",
+      "seen_at": "2026-10-04T02:50:22Z"
+    },
+    "cra-reporting-page": {
+      "digest": "09ba2003d8700b88611bb1c06f40a624da0a3a96222a96bfc94e6ae115d96cc7",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-reporting",
+      "seen_at": "2026-10-04T02:50:22Z"
+    },
+    "ecfr-part202-versions": {
+      "digest": "8d68e16ea3c91d95b2490cc2cacd9824de14c92c9b599a24eacfd16d866144c3",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-28.json?part=202",
+      "seen_at": "2026-10-04T03:04:54Z"
+    },
+    "bag-hr-overview": {
+      "digest": "47df62bb33b9b235b60fbacb435e674b07993ff47b1a7e2a06844ff33d4fc764",
+      "url": "https://www.bag.admin.ch/de/die-regelung-der-humanforschung-in-der-schweiz",
+      "seen_at": "2026-10-04T03:04:54Z"
+    },
+    "fedlex-hfg-versions": {
+      "digest": "2bf2d3b433b514625bc0a8de064af735354bfabef3f15300658824115efe7a4a",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2013%2F617%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-hfv-versions": {
+      "digest": "33c81810c412e64b2b2c3007394b64d5305989557a7f900a48c4901ca14a24f7",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2013%2F642%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-klinv-versions": {
+      "digest": "8bac1234b5ba5e6bbd2ab93456ab134fb98e479db3eee88c8f987554af39ac22",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2013%2F643%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-gumg-versions": {
+      "digest": "301eacab5b3faa9f26e446649241972bf428bbacbc23f8703edf8669f972fbbd",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2022%2F537%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-dsg-versions": {
+      "digest": "81bced33aa6d7f4a9534a3e3523a883f1f9c4cc13c29b91e8ef1503a532565f9",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2022%2F491%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-dsv-versions": {
+      "digest": "d2232278e36235af12ad9a3c901b430efa0b8bfcfb5ef7775b54ca62942cac50",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2022%2F568%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-isg-versions": {
+      "digest": "f24d30cd80a14895a115e344e575e3b53926461fdc02c3729225e8634b545e7a",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2022%2F232%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "fedlex-zertes-versions": {
+      "digest": "3443dc643543faa3fc30e1f6e16842299a6fb3e132604b883c3a063411d5c48e",
+      "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2016%2F752%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
+      "seen_at": "2026-10-04T04:19:58Z"
     }
   }
 }

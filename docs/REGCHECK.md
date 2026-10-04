@@ -6,7 +6,7 @@ and this file records the condition under which that changes.
 ```
 (1) watch                    (2) frame                     (3) check
 genomicschain_regwatch       guidance.json                 check_record.json
-30 watched sources           16 points, 15 sources         one subject, one date
+67 watched sources           41 points, 67 sources         one subject, one date
 digest drift + countdown     articles, quotes, verdicts    questions, discrepancies
         │                            │                            │
         │  a source moves            │  a point goes stale         │  a record goes stale
@@ -27,8 +27,8 @@ published. That is why the join came before the publication and not after.
 
 | Piece | Where | State |
 |---|---|---|
-| Watch | `genomicschain_regwatch` v0.1.1 — 30 sources, `gc_regwatch_scan`, `gc_regwatch_report` | SkillSet, installed normally |
-| Frame | `GenomicsChain_2025/data/eu_ai_act/guidance.json` v0.1.5, published at `/eu-ai-act` | Rails data file, not a package |
+| Watch | `genomicschain_regwatch` v0.1.2 — 67 sources (37 added 2026-10-04: FDA, Swissmedic, FADP, GDPR, CRA, the sources the two published pages cite, and eight Swiss statutes through the fedlex SPARQL version list), `gc_regwatch_scan`, `gc_regwatch_report` | SkillSet, installed normally. Baseline recorded for 64 of 67 on 2026-10-04 (the other 3 cannot be fetched); before that only 6 of 30 had one, so 24 sources had never been compared |
+| Frame | `GenomicsChain_2025/data/eu_ai_act/guidance.json` v0.2.0 at `/eu-ai-act`, and `data/data_regulation/guidance.json` v0.1.0 at `/data-regulation` (GCP, FDA, Swiss research law, GDPR, FADP) — neither deployed as of 2026-10-04 | Rails data files, not a package |
 | Join | `scripts/gc_regcheck_staleness.rb` rules 0.1.0 | Operator script, alongside `gc_submit_client.rb` |
 | Check, run 1 | kept outside this repository — subject a third party's internal system | Record 0.1.1. **Not published** — operator decision 2026-09-14: the subject is someone else's system |
 | Check, run 2 | kept outside this repository — subject the hosted site | Record 0.2.0, `trust_tier: self_reported` |
