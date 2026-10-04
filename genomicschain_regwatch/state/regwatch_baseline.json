@@ -1,6 +1,6 @@
 {
   "rules_version": "regwatch-scan-0.1.0",
-  "recorded_at": "2026-10-04T04:19:58Z",
+  "recorded_at": "2026-10-04T04:28:38Z",
   "entries": {
     "ai-act-definition-guidelines": {
       "digest": "2960f5d95fecb1b12e5fcf81c4ac6bf1f3530aba912f8c97e95df2b194565e51",
@@ -321,6 +321,36 @@
       "digest": "3443dc643543faa3fc30e1f6e16842299a6fb3e132604b883c3a063411d5c48e",
       "url": "https://fedlex.data.admin.ch/sparqlendpoint?query=PREFIX+jolux%3A+%3Chttp%3A%2F%2Fdata.legilux.public.lu%2Fresource%2Fontology%2Fjolux%23%3E+SELECT+%3Fcons+%3Fdate+WHERE+%7B+%3Fcons+jolux%3AisMemberOf+%3Chttps%3A%2F%2Ffedlex.data.admin.ch%2Feli%2Fcc%2F2016%2F752%3E+%3B+jolux%3AdateApplicability+%3Fdate+.+%7D+ORDER+BY+DESC%28%3Fdate%29",
       "seen_at": "2026-10-04T04:19:58Z"
+    },
+    "gdpr-procedural-regulation-applies": {
+      "digest": "3cb64c0257be763dcf49c5ab06888949372e15d9ace810f14d227da10077a71e",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202025R2518%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232025R2518R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232025R2518%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
+    },
+    "eurlex-aiact-versions": {
+      "digest": "5aeedccc34e3d756af29bb09717edf81e631e78e21c7ed47a623677eafd4a1d2",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202024R1689%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232024R1689R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232024R1689%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
+    },
+    "eurlex-omnibus-versions": {
+      "digest": "d0e08c1f58ff11c1148cad83875492b98219d609b55e2342aebd557d9b6ba381",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202026R1744%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232026R1744R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232026R1744%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
+    },
+    "eurlex-gdpr-versions": {
+      "digest": "3dab75757ca0730c061ff3999b0ff221608a22644a2de92bad9b92db0c19f98c",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202016R0679%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232016R0679R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232016R0679%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
+    },
+    "eurlex-ctr-versions": {
+      "digest": "2981c7bbd94c2f908d84b858c87d86733e13dba08e93900e63fefbf89d19b0d0",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202014R0536%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232014R0536R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232014R0536%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
+    },
+    "eurlex-cra-versions": {
+      "digest": "7c0eb3a867ee6350ddd6eb6307a17d6cd1baa6b80ea2ead2965dd42fec72eab2",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202024R2847%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232024R2847R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232024R2847%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-04T04:28:38Z"
     }
   }
 }

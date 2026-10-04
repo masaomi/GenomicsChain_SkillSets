@@ -84,10 +84,10 @@ operator decides what that means.
 - kind: dated
 - due: 2027-04-02
 - title: GDPR procedural regulation (EU) 2025/2518 applies
-- url: https://data.europa.eu/eli/reg/2025/2518/oj
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202025R2518%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232025R2518R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232025R2518%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
 - watch: text
 - binds: supervisory authorities; parties to cross-border complaints and investigations
-- why: Added 2026-10-04. In force 2026-01-01, applies from 2027-04-02, and its Chapters III-IV only to complaints and ex officio investigations started after that date. It changes how a cross-border case against a controller runs, not what the controller must do. EUR-Lex behind the ELI link, so expect `unreachable`; the countdown is the point.
+- why: Added 2026-10-04. In force 2026-01-01, applies from 2027-04-02, and its Chapters III-IV only to complaints and ex officio investigations started after that date. It changes how a cross-border case against a controller runs, not what the controller must do. Watched through the Cellar SPARQL list of its versions, corrigenda and amending acts (EUR-Lex itself refuses automated clients); the countdown is the point.
 
 ## bsi-c5-2026-applies
 - kind: dated
@@ -311,7 +311,7 @@ operator decides what that means.
 - url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng
 - watch: text
 - binds: —
-- why: Permanently unreachable, and since 2026-09-14 the mechanism is known rather than assumed: EUR-Lex answers this route with **HTTP 202 and a 2,038-byte script-only interstitial**. Stripping the script leaves the empty string, whose digest is `e3b0c442…b855`. Recorded as a baseline it would have read `unchanged` on every later run — a permanent green light on the Official Journal text that the published high-risk dates rest on. The fetcher now rejects both halves (non-200, and a body that normalises to nothing), so this reports `unreachable`. It stays on the list precisely so the gap keeps showing: the dates were corroborated across four law-firm analyses, the OJ text has never been read first-hand, and whether the co-legislators kept a standards-readiness trigger or fixed dates is still unresolved.
+- why: Permanently unreachable, and since 2026-09-14 the mechanism is known rather than assumed: EUR-Lex answers this route with **HTTP 202 and a 2,038-byte script-only interstitial**. Stripping the script leaves the empty string, whose digest is `e3b0c442…b855`. Recorded as a baseline it would have read `unchanged` on every later run — a permanent green light on the Official Journal text that the published high-risk dates rest on. The fetcher now rejects both halves (non-200, and a body that normalises to nothing), so this reports `unreachable`. Since 2026-10-04 the act is also watched through Cellar (`eurlex-omnibus-versions`), which closes the gap for change detection; this entry stays so that the EUR-Lex block itself keeps showing: the dates were corroborated across four law-firm analyses, the OJ text has never been read first-hand, and whether the co-legislators kept a standards-readiness trigger or fixed dates is still unresolved.
 
 ---
 
@@ -594,3 +594,47 @@ The 2026-10-03 agent-team check found that FDA, Swissmedic and the Swiss data pr
 - watch: full
 - binds: trust service providers and anyone relying on Swiss qualified signatures
 - why: Added 2026-10-04. fedlex serves the consolidated text only through version-specific addresses and a script-rendered page, so the text itself cannot be watched; until today the Swiss statutes on the data-regulation page were carried as `unwatchable`. Their official SPARQL endpoint can list every consolidated version of an act with its date of applicability, and a new version of the text always arrives as a new entry in that list. This watches the list — 2 versions on 2026-10-04, latest applicable from 2020-01-01. A change means a new version exists and must be read; it does not say what changed. The result is XML and its digest was stable across repeated fetches.
+
+---
+
+# EU acts via the Publications Office Cellar SPARQL endpoint — added 2026-10-04
+
+## eurlex-aiact-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Regulation (EU) 2024/1689 (AI Act)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202024R1689%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232024R1689R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232024R1689%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: providers and deployers of AI systems
+- why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: 2 consolidated versions (latest 02024R1689-20260727), 4 corrigenda, 1 amending act (2026/1744). A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
+
+## eurlex-omnibus-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Regulation (EU) 2026/1744 (Digital Omnibus on AI)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202026R1744%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232026R1744R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232026R1744%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: —
+- why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: the act itself has a German-only corrigendum of 2026-09-29, CELEX 32026R1744R(01). A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
+
+## eurlex-gdpr-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Regulation (EU) 2016/679 (GDPR)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202016R0679%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232016R0679R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232016R0679%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: controllers and processors
+- why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: 1 consolidated version (2016-05-04), 3 corrigenda, no amending act. A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
+
+## eurlex-ctr-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Regulation (EU) No 536/2014 (Clinical Trials Regulation)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202014R0536%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232014R0536R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232014R0536%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: sponsors and investigators
+- why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: 3 consolidated versions (latest 02014R0536-20221205), 11 corrigenda; the pharmaceutical package that amends it was not yet adopted. A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
+
+## eurlex-cra-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Regulation (EU) 2024/2847 (Cyber Resilience Act)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202024R2847%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232024R2847R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232024R2847%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: manufacturers, importers, distributors, open-source stewards
+- why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: 1 consolidated version (2024-11-20), 7 corrigenda, 1 amending act (2025/327, the EHDS Regulation). A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
