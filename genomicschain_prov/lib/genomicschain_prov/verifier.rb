@@ -278,8 +278,9 @@ module GenomicsChainProv
               '(always anchor-reported: revocation is outside the signature)'
       tip = @manifest.dig('operator', 'signature', 'chain_tip_hash')
       says << "chain_tip_hash #{tip}: the anchor says it checked the submitter saw a fresh ledger tip; not verified here"
-      says << "admission rule #{@manifest['admission_rule']}: issued only at grade immutable, with every declared " \
-              'zk receipt verified and bound to its step'
+      rule = @manifest['admission_rule']
+      says << "admission rule #{rule}: " +
+              Identity::ADMISSION_RULES.fetch(rule, 'a rule this verifier does not know (a newer anchor?)')
       zv = @manifest['zk_verification']
       if zv && !@zk_confirmed
         says << "zk receipts: #{zv['receipts_verified']} verified by #{zv['verifier']} (risc0-zkvm #{zv['risc0_zkvm']}) " \

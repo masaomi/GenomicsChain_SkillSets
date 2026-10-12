@@ -220,6 +220,23 @@ class ProvVerifyTest < Minitest::Test
     end
   end
 
+  # v0.1.13: the admission rule is read by its own value, so a record made
+  # under the withdrawn gate is still described by the gate it was made under.
+  def test_the_admission_rule_is_described_by_the_rule_the_record_names
+    recorded do |text, route|
+      says = ->(r) { verify(text, r)['anchor_says'].find { |s| s.start_with?('admission rule') } }
+      assert_equal 'admission rule prov-admission-0.2: issued at any grade, the grade carried as computed, with ' \
+                   'every declared zk receipt verified and bound to its step', says.call(route)
+      with_rule = lambda do |rule|
+        ev = JSON.parse(route['evidence'])
+        ev['manifest']['admission_rule'] = rule
+        route.merge('evidence' => JSON.generate(ev))
+      end
+      assert_includes says.call(with_rule.call('prov-admission-0.1')), 'issued only at grade immutable'
+      assert_includes says.call(with_rule.call('prov-admission-9.9')), 'a rule this verifier does not know'
+    end
+  end
+
   # row 4
   def test_an_identity_outside_the_signature_is_ignored_and_the_manifest_key_is_used
     recorded do |text, route|

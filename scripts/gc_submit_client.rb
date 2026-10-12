@@ -28,7 +28,8 @@
 # --tier prov (Tier 2.5, design v0.1 §7): the bundle travels verbatim and the
 # params come from GenomicsChainProv::Identity, the function the anchor uses to
 # re-derive them; run genomicschain_prov/bin/gc_prov_check.rb first to see
-# whether the anchor will issue a record (grade immutable, receipts usable).
+# whether the anchor will issue a record (receipts usable) and which grade the
+# record will carry — any grade is recorded since design v0.1.13.
 # Each --zk-receipt file goes along as base64 under its own sha256, for every
 # receipt the bundle declares; the anchor verifies and discards them.
 #

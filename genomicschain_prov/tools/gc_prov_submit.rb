@@ -16,8 +16,9 @@ module KairosMcp
         #
         # The same skeleton as gc_tier2_submit — signed operator envelope,
         # pubkey-bound Bearer, a Synoptis proof, no operational chain write —
-        # with the bundle's own gates in front: Gate A (2 MB, depth 32), the
-        # immutable requirement, and the ZK receipt checks.
+        # with the bundle's own gates in front: Gate A (2 MB, depth 32) and the
+        # ZK receipt checks. No grade gate since design v0.1.13: the record
+        # carries the grade, whatever it is.
         #
         # What leaves this tool is the record's own vocabulary — grades,
         # counts, digests, codes. The bundle, the predicate's per-item output
@@ -34,8 +35,8 @@ module KairosMcp
           def description
             'Sign and record a provenance bundle (BioCompute Object) as a Tier-2.5 Synoptis proof (anchor ' \
               'profile). The bundle is submitted verbatim; the server recomputes its digest and re-derives every ' \
-              'signed field (grades, counts, platform, ZK receipt identities). A record is issued only when the ' \
-              'bundle grades immutable and every declared ZK receipt verifies and binds its step. Records a ' \
+              'signed field (grades, counts, platform, ZK receipt identities). A record is issued at any grade, ' \
+              'which it carries, provided every declared ZK receipt verifies and binds its step. Records a ' \
               'self_reported record of identities and counts; the bundle stays with the customer. Use dry_run to ' \
               'validate and to obtain the params to sign.'
           end
@@ -142,7 +143,7 @@ module KairosMcp
           end
 
           # Everything the real path checks except admission and the store,
-          # including the immutable gate and the ZK receipts — a dry run that
+          # including Gate A and the ZK receipts — a dry run that
           # skipped them would tell the customer "ok" for a bundle the real
           # submit refuses.
           def dry_run(bundle, identity, operator, zk_bytes)

@@ -1,7 +1,7 @@
 {
   "name": "genomicschain_prov",
-  "version": "0.2.0",
-  "description": "GenomicsChain service (2.5) provenance anchoring: writes a provenance bundle (BioCompute Object IEEE 2791-2020) from a computation's stages or fills in one a pipeline wrote thin, reads it back into the seven recorded conditions, grades pin strength with the Tier-2 six levels, records it on the anchor as a signed Tier-2.5 proof when it grades immutable (with optional ZK receipts verified and linked to their steps), and checks a bundle against its anchor proof. The bundle stays with the customer.",
+  "version": "0.3.0",
+  "description": "GenomicsChain service (2.5) provenance anchoring: writes a provenance bundle (BioCompute Object IEEE 2791-2020) from a computation's stages or fills in one a pipeline wrote thin, reads it back into the seven recorded conditions, grades pin strength with the Tier-2 six levels, records it on the anchor as a signed Tier-2.5 proof carrying its grade, whatever the grade (with optional ZK receipts verified and linked to their steps), and checks a bundle against its anchor proof. The bundle stays with the customer.",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",
   "depends_on": [

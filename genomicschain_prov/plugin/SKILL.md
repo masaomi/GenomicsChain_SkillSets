@@ -5,9 +5,10 @@ description: Write a pipeline's provenance bundle, or fill in one that was writt
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**. Prototype, v0.2.0 (writer 0.2.0, adapter 0.4.0, predicate
-0.3.7, record_version 0.3) — design `docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10,
-now v0.1.12 with two individual revisions), implementation units §9: U0–U5 done.
+Service (2.5) **provenance anchoring**. Prototype, v0.3.0 (writer 0.2.0, adapter 0.4.0, predicate
+0.3.7, record_version 0.3, admission rule prov-admission-0.2) — design
+`docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10, now v0.1.13 with three individual
+revisions), implementation units §9: U0–U5 done.
 
 ```
         a computation ─────────┐
@@ -37,7 +38,7 @@ re-derives everything from the bundle and records identities and counts, never t
 |---|---|---|
 | `bin/gc_prov_check.rb BUNDLE [--items] [--zk-receipt F] [--json]` | customer, no network | digest, grade with reasons, the params to sign, and whether the anchor would issue a record; exit 0 / 1 / 2 |
 | `scripts/gc_submit_client.rb --tier prov --bundle F [--zk-receipt F]` | customer → anchor `/mcp` | signs the params `Identity.derive` gives and sends the bundle as the exact text checked |
-| `gc_prov_submit` (MCP, anchor profile only) | anchor | Gate A (2 MB, depth 32) → **grade must be immutable** → ZK declarations → receipt checks ①–④ → Synoptis proof, 100-year TTL |
+| `gc_prov_submit` (MCP, anchor profile only) | anchor | Gate A (2 MB, depth 32) → ZK declarations → receipt checks ①–④ → Synoptis proof, 100-year TTL. Any grade is recorded as computed (no grade gate since v0.1.13) |
 | `GET /place/web/prov/proof/<id>` (place extension) | anchor, no authentication | the envelope fields + manifest + revoked; prov records only; 404 otherwise |
 | `bin/gc_prov_verify.rb BUNDLE --proof-id ID [--anchor-pubkey PEM] [--submitter-pubkey K] [--zk-receipt F]` | anyone | CONFIRMED / THE ANCHOR SAYS / NOT CHECKED, then the two warranty statements; exit 0 / 1 / 2 |
 | `zk_verifier/` → `gc_zk_verify` (Rust, risc0-zkvm =3.0.6, Cargo.lock) | anchor (required for receipts), optional elsewhere | `gc_zk_verify <image_id_hex> < receipt`: verifies one receipt, prints one JSON line with the journal's input digest and output sha256. Build: `cargo build --release --locked`; point `GC_ZK_VERIFY_BIN` at it |

@@ -113,13 +113,10 @@ module GcProvCheck
     lines.concat(zk_lines(result))
     lines << ''
     if issuable?(result)
-      lines << 'Tier 2.5: the anchor would issue a record for this bundle.'
+      lines << "Tier 2.5: the anchor would issue a record for this bundle, carrying grade #{g['grade_overall']} " \
+               '(the grade is recorded, not a condition; whoever reads the record draws its own line).'
     else
       lines << 'Tier 2.5: the anchor would NOT issue a record:'
-      unless adm['below'].empty?
-        lines << "  grade_overall must be #{adm['required_grade']}; below it: " +
-                 adm['below'].map { |k, v| "#{k}=#{v}" }.join(', ')
-      end
       lines << "  more than #{Identity::MAX_ZK_RECEIPTS} zk receipts declared" if adm['too_many_zk_receipts']
       adm['zk_defects'].each { |d| lines << "  zk receipt for stage #{d['stage'] || '?'}: #{d['defects'].join(', ')}" }
       lines << '  a zk receipt failed the local check (see above)' if result['zk_local']['state'] == 'failed'

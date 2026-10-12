@@ -146,9 +146,14 @@
     "grade_overall": {
       "type": "string",
       "enum": [
-        "immutable"
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
       ],
-      "description": "Pin strength: how far the locators written in the bundle let a third party go — not whether a rebuild succeeds. Admission rule prov-admission-0.1 issues a record only at immutable (design v0.1.12 §6.1)."
+      "description": "Pin strength: how far the locators written in the bundle let a third party go — not whether a rebuild succeeds. Admission rule prov-admission-0.2 issues a record at any grade and carries it as computed; a reader draws its own line on it (design v0.1.13 §6.1). Records made under prov-admission-0.1 are all immutable."
     },
     "grade_software": {
       "type": "string",
@@ -461,9 +466,10 @@
     "admission_rule": {
       "type": "string",
       "enum": [
-        "prov-admission-0.1"
+        "prov-admission-0.1",
+        "prov-admission-0.2"
       ],
-      "description": "grade_overall immutable, and every declared ZK receipt verified and linked to its step."
+      "description": "prov-admission-0.2 (design v0.1.13): issued at any grade, the grade carried as computed, and every declared ZK receipt verified and linked to its step. prov-admission-0.1 (v0.1.12, withdrawn): grade_overall immutable, and every declared ZK receipt verified and linked to its step."
     },
     "zk_verification": {
       "oneOf": [

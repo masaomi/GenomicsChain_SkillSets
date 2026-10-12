@@ -23,9 +23,11 @@ module GenomicsChainProv
     #
     # Two things this spec adds over Tier-2, both from v0.1.12 §6.1:
     #
-    #   the gate — no record unless grade_overall is immutable; and every
-    #   declared ZK receipt must arrive, verify against its image ID and bind
-    #   the step's recorded input and output (ZkVerifier ①–④);
+    #   the receipt gate — every declared ZK receipt must arrive, verify
+    #   against its image ID and bind the step's recorded input and output
+    #   (ZkVerifier ①–④). There is no grade gate: v0.1.13 withdrew the
+    #   immutable requirement, so a record is issued at any grade and carries
+    #   it as computed;
     #
     #   a lifetime — proof_ttl is 100 years, passed through core 0.6.0's
     #   store_proof!, where every other tier keeps the engine's 24 hours.
@@ -38,7 +40,6 @@ module GenomicsChainProv
       Core = KairosMcp::SkillSets::GenomicschainCore
       SubmitCore = Core::SubmitCore
 
-      class GradeBelowRequirement < SubmitCore::SubmitError; end
       class ZkDeclarationInvalid < SubmitCore::SubmitError; end
       class ZkReceiptRejected < SubmitCore::SubmitError; end
       class ZkVerifierUnavailable < SubmitCore::SubmitError; end
@@ -212,15 +213,9 @@ module GenomicsChainProv
         end
       end
 
-      # §6.1 (1) and (3): grade first — cheapest, and a bundle below immutable
-      # never costs a ZK verification — then the declarations, then the bytes.
+      # §6.1 (3): the declarations first — cheapest — then the bytes. No grade
+      # condition (v0.1.13).
       def admit!(adm)
-        unless adm['below'].empty?
-          raise GradeBelowRequirement,
-                "grade_overall #{adm['grade_overall']} is below #{adm['required_grade']}; a Tier 2.5 record " \
-                "is issued only at #{adm['required_grade']} (below: " \
-                "#{adm['below'].map { |k, v| "#{k}=#{v}" }.join(', ')})"
-        end
         if adm['too_many_zk_receipts']
           raise ZkDeclarationInvalid,
                 "#{adm['zk_receipts_declared']} zk receipts declared; at most #{Identity::MAX_ZK_RECEIPTS}"

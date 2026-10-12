@@ -74,12 +74,16 @@ class ProvCheckTest < Minitest::Test
     end
   end
 
-  def test_a_bundle_below_immutable_says_it_would_be_refused_and_where
+  # No grade gate since design v0.1.13: a bundle below immutable would be
+  # recorded, and the customer is told which grade the record will carry.
+  def test_a_bundle_below_immutable_would_be_recorded_with_its_grade
     with_bundle(checksums: false) do |path|
-      out, _, st = run_check(path, '--items')
-      assert_equal 1, st.exitstatus
-      assert_includes out, 'the anchor would NOT issue a record'
-      assert_match(/below it: .*inputs=local_path/, out)
+      out, err, st = run_check(path, '--items')
+      assert_equal 0, st.exitstatus, err
+      assert_includes out, 'grade: local_path'
+      assert_includes out, 'by category:'
+      assert_match(/inputs=local_path/, out)
+      assert_includes out, 'the anchor would issue a record for this bundle, carrying grade local_path'
       assert_includes out, 'S1_odd.kmat', 'locally, the items and their locators are shown'
     end
   end

@@ -31,14 +31,23 @@ module GenomicsChainProv
   # or the network.
   #
   # What it does NOT do is decide admission. Whether the anchor will issue a
-  # record (the immutable gate, the ZK checks) is `admission`, reported beside
-  # the identity, because a customer needs both answers and the anchor needs
-  # them in a fixed order.
+  # record (the ZK checks) is `admission`, reported beside the identity,
+  # because a customer needs both answers and the anchor needs them in a fixed
+  # order.
   module Identity
     RECORD_VERSION = '0.3'
     BUNDLE_DIGEST_CANONICALIZATION = 'kairos-sorted-json-0.1'
-    ADMISSION_RULE = 'prov-admission-0.1'
-    REQUIRED_GRADE = 'immutable'
+    ADMISSION_RULE = 'prov-admission-0.2'
+    # What each rule an anchor has issued under means, for the verifier's
+    # "the anchor says" line (§6.1 (1), v0.1.13). 0.1 stays: records were made
+    # under it on disposable local anchors, and an old record must not be read
+    # by the new rule.
+    ADMISSION_RULES = {
+      'prov-admission-0.1' => 'issued only at grade immutable, with every declared zk receipt verified ' \
+                              'and bound to its step',
+      'prov-admission-0.2' => 'issued at any grade, the grade carried as computed, with every declared zk ' \
+                              'receipt verified and bound to its step'
+    }.freeze
     MAX_ZK_RECEIPTS = 4
 
     LEVELS = Predicate::LEVELS
@@ -149,25 +158,22 @@ module GenomicsChainProv
     end
 
     # What stands between this bundle and a record, as far as the bundle alone
-    # can tell (§6.1 (1), (3)). The ZK checks that need the receipt bytes are
-    # ZkVerifier.check; this reports the declarations' own defects.
+    # can tell (§6.1 (3)). The grade is not among them: since v0.1.13 a record
+    # is issued at any grade and carries it, and whoever reads the record —
+    # Tier 3's route B, a third party — draws its own line on the signed grade.
+    # The ZK checks that need the receipt bytes are ZkVerifier.check; this
+    # reports the declarations' own defects.
     #
-    # @return [Hash] 'issuable' (bool, bundle-side only), 'grade_overall',
-    #   'below' {category => grade} for the categories under the requirement,
+    # @return [Hash] 'issuable' (bool, bundle-side only), 'grade_overall' (for
+    #   the reader, not a condition), 'zk_receipts_declared',
     #   'zk_defects' [{'stage','defects'}], 'too_many_zk_receipts'
     def admission(derived)
-      graded = derived['graded']
-      below = Predicate::CATEGORIES.each_with_object({}) do |cat, h|
-        grade = graded['grades'][cat]
-        h[cat] = grade unless grade == REQUIRED_GRADE
-      end
       receipts = Array(derived['np'].zk_receipts)
       defects = receipts.reject { |r| r['defects'].empty? }
                         .map { |r| { 'stage' => r['stage'], 'defects' => r['defects'] } }
       too_many = receipts.length > MAX_ZK_RECEIPTS
-      { 'issuable' => below.empty? && defects.empty? && !too_many,
-        'grade_overall' => graded['grade_overall'], 'required_grade' => REQUIRED_GRADE,
-        'below' => below, 'zk_receipts_declared' => receipts.length,
+      { 'issuable' => defects.empty? && !too_many,
+        'grade_overall' => derived['graded']['grade_overall'], 'zk_receipts_declared' => receipts.length,
         'zk_defects' => defects, 'too_many_zk_receipts' => too_many }
     end
 

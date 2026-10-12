@@ -224,7 +224,7 @@ class ProvSubmitTest < Minitest::Test
       assert_equal 'self_reported', m['trust_tier']
       assert_equal Identity::NOT_CHECKED, m['not_checked']
       assert_equal 9, m['not_checked'].length
-      assert_equal 'prov-admission-0.1', m['admission_rule']
+      assert_equal 'prov-admission-0.2', m['admission_rule']
       assert_equal 'prov-adapter-bco-0.4.0', m['adapter_version']
       assert_equal 'prov-writer-0.2.0', m['producer_version']
       assert_equal out[:submission_key], m['submission_key']
@@ -461,17 +461,28 @@ class ProvSubmitTest < Minitest::Test
     end
   end
 
-  # --- v0.1.12 §6.1 ------------------------------------------------------------------
+  # --- v0.1.12 §6.1, v0.1.13 --------------------------------------------------------
 
-  def test_a_bundle_below_immutable_is_refused_and_nothing_is_recorded
+  # v0.1.13 withdrew the immutable gate (it was GradeBelowRequirement under
+  # prov-admission-0.1): a bundle below immutable is recorded, and the record
+  # carries the grade it computed — the signed grade is what a reader judges.
+  def test_a_bundle_below_immutable_is_recorded_with_its_grade
     with_proofs do |registry, tip_source|
       b = bundle(checksums: false, marker: true)
-      err = assert_raises(Prov::GradeBelowRequirement) { record(registry, b, tip_source: tip_source) }
-      assert_match(/grade_overall local_path is below immutable/, err.message)
-      assert_match(/inputs=local_path/, err.message)
-      refute_includes err.message, MARKER, 'grades and category names only, never bundle values'
-      refute_includes err.message, 'S1_odd'
-      assert_empty registry.read(:proofs)
+      out = record(registry, b, tip_source: tip_source)
+
+      assert_equal 'recorded', out[:status]
+      signed = ProvSubmit.signed_params_for(b)
+      assert_equal "prov:prov-predicate-0.3.7:local_path:1/1:#{signed['bundle_digest']}:#{out[:submission_key]}",
+                   out[:claim]
+      m = manifests(registry).first
+      assert_equal 'local_path', m['grade_overall']
+      assert_equal 'local_path', m['grade_inputs']
+      assert_equal 'prov-admission-0.2', m['admission_rule']
+      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.3'])
+      stored = JSON.generate(registry.read(:proofs))
+      refute_includes stored, MARKER, 'the record carries grades and counts, never bundle values'
+      refute_includes stored, 'S1_odd'
     end
   end
 
@@ -672,9 +683,18 @@ class ProvSubmitTest < Minitest::Test
       li = ProvSubmit.signed_params_for(low)
       lop, = signed_operator(tip_source, li)
       out, err = capture_io { @response = tool.call('bundle' => low, 'identity' => li, 'operator' => lop) }
-      assert_match(/GradeBelowRequirement/, @response.first[:text])
+      assert_match(/"status": "recorded"/, @response.first[:text])
       [@response.first[:text], out, err].each { |s| refute_includes s, MARKER }
-      assert_equal 1, registry.read(:proofs).length
+
+      # refused: the signed identity claims a grade the bundle does not yield
+      forged = li.merge('grade_overall' => 'immutable')
+      fop, = signed_operator(tip_source, forged)
+      out, err = capture_io { @response = tool.call('bundle' => low, 'identity' => forged, 'operator' => fop) }
+      assert_match(/IdentityMismatch|does not match/, @response.first[:text])
+      [@response.first[:text], out, err].each { |s| refute_includes s, MARKER }
+      stored = Dir[File.join(dir, '**', '*')].select { |f| File.file?(f) }.map { |f| File.read(f) }.join
+      refute_includes stored, MARKER
+      assert_equal 2, registry.read(:proofs).length
     end
   end
 
@@ -688,10 +708,12 @@ class ProvSubmitTest < Minitest::Test
       assert_equal true, res.dig('checks', 'admission', 'issuable')
       assert_equal 'ok', res.dig('checks', 'gates')
 
+      # no grade gate (v0.1.13): a local_path bundle is issuable and says its grade
       low = JSON.parse(tool.call('bundle' => bundle(checksums: false), 'operator' => op, 'dry_run' => true).first[:text])
-      assert_equal false, low.dig('checks', 'admission', 'issuable')
-      assert_equal 'local_path', low.dig('checks', 'admission', 'below', 'inputs')
-      assert_match(/GradeBelowRequirement/, low.dig('checks', 'rejected'))
+      assert_equal true, low.dig('checks', 'admission', 'issuable')
+      assert_equal 'local_path', low.dig('checks', 'admission', 'grade_overall')
+      refute low['checks']['admission'].key?('below')
+      assert_equal 'ok', low.dig('checks', 'gates')
     end
   end
 
