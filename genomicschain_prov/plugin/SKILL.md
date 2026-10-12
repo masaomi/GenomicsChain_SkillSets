@@ -5,9 +5,9 @@ description: Write a pipeline's provenance bundle, or fill in one that was writt
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**, the half that runs off the anchor. Prototype, v0.1.5
-(writer 0.1.0, adapter 0.3.7, predicate 0.3.7) — design `docs/design/prov_anchoring_design_v0_1.md`
-(frozen at v0.1.10), implementation units §9.
+Service (2.5) **provenance anchoring**. Prototype, v0.2.0 (writer 0.2.0, adapter 0.4.0, predicate
+0.3.7, record_version 0.3) — design `docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10,
+now v0.1.12 with two individual revisions), implementation units §9: U0–U5 done.
 
 ```
         a computation ─────────┐
@@ -30,6 +30,30 @@ customer's pipeline ──▶ bundle (bco.json / ro-crate-metadata.json)
 
 The bundle is the digest subject, verbatim. Normalisation is for grading only; the anchor
 re-derives everything from the bundle and records identities and counts, never the bundle.
+
+## The record (U3–U5, design §6–§8, §6.1)
+
+| tool | where it runs | what it does |
+|---|---|---|
+| `bin/gc_prov_check.rb BUNDLE [--items] [--zk-receipt F] [--json]` | customer, no network | digest, grade with reasons, the params to sign, and whether the anchor would issue a record; exit 0 / 1 / 2 |
+| `scripts/gc_submit_client.rb --tier prov --bundle F [--zk-receipt F]` | customer → anchor `/mcp` | signs the params `Identity.derive` gives and sends the bundle as the exact text checked |
+| `gc_prov_submit` (MCP, anchor profile only) | anchor | Gate A (2 MB, depth 32) → **grade must be immutable** → ZK declarations → receipt checks ①–④ → Synoptis proof, 100-year TTL |
+| `GET /place/web/prov/proof/<id>` (place extension) | anchor, no authentication | the envelope fields + manifest + revoked; prov records only; 404 otherwise |
+| `bin/gc_prov_verify.rb BUNDLE --proof-id ID [--anchor-pubkey PEM] [--submitter-pubkey K] [--zk-receipt F]` | anyone | CONFIRMED / THE ANCHOR SAYS / NOT CHECKED, then the two warranty statements; exit 0 / 1 / 2 |
+| `zk_verifier/` → `gc_zk_verify` (Rust, risc0-zkvm =3.0.6, Cargo.lock) | anchor (required for receipts), optional elsewhere | `gc_zk_verify <image_id_hex> < receipt`: verifies one receipt, prints one JSON line with the journal's input digest and output sha256. Build: `cargo build --release --locked`; point `GC_ZK_VERIFY_BIN` at it |
+
+The ZK receipt checks: ① the bytes are the receipt the bundle declares; ② `Receipt::verify` against
+the declared image ID; ③ the journal's input digest is the step's recorded input SHA-256; ④ the
+SHA-256 of the journal's output bytes is the step's recorded output SHA-256 (journal convention
+`gc-zk-journal-0.1`). The record carries the receipt's identity only, never its bytes or journal.
+
+The writer adds `platform` (CPU architecture, OS name and release — never the host name; by default
+for `--plan`, only with `--platform-of-this-machine` for a Nextflow run) and `zk_receipts[]`
+(`--zk-receipts FILE` or a plan's `zk_receipts`). Extension schema:
+`genomicschain_core/schemas/bco_extension_genomicschain_v0_1.json` (not yet published at its URL).
+
+When installing on an anchor, install from a copy without `zk_verifier/target/` (`skillset install`
+copies the whole directory, and a release build tree is ~330 MB).
 
 ## What U0 measured (2026-09-20, nf-core/demo 1.2.0, nf-prov 1.7.0, Nextflow 26.04.6)
 
@@ -144,12 +168,21 @@ a defect in it.
 ## Tests
 
 ```bash
-ruby genomicschain_prov/test/adapter_bco_test.rb   # 44
-ruby genomicschain_prov/test/predicate_test.rb     # 33
-ruby genomicschain_prov/test/prov_write_test.rb    # 26 — 103 / 644 assertions in all
+cd genomicschain_prov
+T="$(ruby -e 'puts Gem::Specification.find_by_name("kairos-chain").gem_dir')/templates/skillsets"
+I="-Ilib -Itest -I../genomicschain_core/lib -I../genomicschain_tier2/lib -I$T/synoptis/lib -I$T/mmp/lib"
+ruby $I test/adapter_bco_test.rb   # 48
+ruby $I test/predicate_test.rb     # 33
+ruby $I test/prov_write_test.rb    # 32
+ruby $I test/prov_check_test.rb    # 5
+ruby $I test/prov_submit_test.rb   # 32  (the anchor side; needs synoptis, mmp, ed25519, json-schema)
+ruby $I test/prov_verify_test.rb   # 15
+(cd zk_verifier && cargo test --release)   # 4
 ```
 
-No gem beyond minitest, no network, no Docker (the writer's tests pass `--no-docker`'s equivalent
+Tests that need the real `gc_zk_verify` skip, naming the build command, when it is not built; the
+logic of ①–④ is also tested with an injected answer. The first three suites need no gem beyond
+minitest, no network, no Docker (the writer's tests pass `--no-docker`'s equivalent
 and a captured digest file). The predicate finds `PinStrength` through the sibling
 `../genomicschain_tier2/lib` when it is not already on the load path. The producer's tests actually
 run the two-step computation the principle demo shows — `(223 + 553) / 2 = 388` — so the checksums
