@@ -35,6 +35,10 @@ module GenomicsChainProv
     :params_total,    # entries in the parameter list
     :params_count,    # of those, entries carrying a value (not null / empty)
     :seed_recorded,   # true when a parameter whose name contains "seed" carries a value
+    :platform,        # {'cpu_architecture','os_name','os_release'} or nil — the producer's statement (v0.1.12)
+    :zk_receipts,     # [{'receipt_sha256','image_id','zkvm_name','zkvm_version','step_number','stage',
+                      #   'journal_convention','input_uri','output_uri','input_sha256','output_sha256','defects'}]
+                      #   declared ZK receipts as the bundle alone can read them (v0.1.12); [] when none
     :notes,           # [String] what the adapter saw and refused to invent a value for
     keyword_init: true
   ) do

@@ -8,8 +8,6 @@ module KairosMcp
   module SkillSets
     module GenomicschainCore
       module AnchorProfileRegistration
-        SKILLSET_NAME = 'genomicschain_core'
-
         module_function
 
         def install!
@@ -27,11 +25,14 @@ module KairosMcp
             unless method_defined?(:tool_class_names_without_gc_anchor)
               alias_method :tool_class_names_without_gc_anchor, :tool_class_names
 
+              # Any SkillSet may list anchor-only tools, not only this one (prov
+              # design §7, core change 1): genomicschain_prov lists
+              # gc_prov_submit there. A SkillSet without the key is untouched.
               define_method(:tool_class_names) do
                 AnchorProfileRegistration.install!
-                return tool_class_names_without_gc_anchor unless name == AnchorProfileRegistration::SKILLSET_NAME
+                anchor_tools = @metadata['anchor_profile_tool_classes']
+                return tool_class_names_without_gc_anchor unless anchor_tools.is_a?(Array) && !anchor_tools.empty?
 
-                anchor_tools = @metadata['anchor_profile_tool_classes'] || []
                 if KairosMcp::SkillSets::GenomicschainCore::Config.anchor_profile?
                   (tool_class_names_without_gc_anchor + anchor_tools).uniq
                 else

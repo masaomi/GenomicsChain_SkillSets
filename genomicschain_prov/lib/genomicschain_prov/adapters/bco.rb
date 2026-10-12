@@ -29,10 +29,14 @@ module GenomicsChainProv
     #
     # One extension of the standard is read: an `extension_domain` entry holding
     # `genomicschain_extension` (written by the enricher) may carry
-    #   producer:  {name, version}
-    #   checksums: [{uri, sha256}]   joined to inputs/outputs by exact locator
+    #   producer:    {name, version}
+    #   checksums:   [{uri, sha256}]   joined to inputs/outputs by exact locator
+    #   platform:    {cpu_architecture, os_name, os_release}   (design v0.1.12 §6.1)
+    #   zk_receipts: [{sha256, image_id, zkvm{name,version}, step_number,
+    #                  journal, input_uri, output_uri}]          (same)
     # because the standard's own checksum field is SHA-1 and the record wants
-    # SHA-256 beside it. The extension_schema URL is fixed (design §10-1).
+    # SHA-256 beside it, and because the standard has no field for the machine
+    # or for a proof. The extension_schema URL is fixed (design §10-1).
     #
     # Stage identity (review round 2): a stage is its POSITION after sorting
     # the steps on `step_number`, and every per-stage item carries that
@@ -50,7 +54,14 @@ module GenomicsChainProv
 
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
-      VERSION = 'prov-adapter-bco-0.3.7'
+      # 0.4.0 (design v0.1.12): reads `platform` and `zk_receipts`.
+      VERSION = 'prov-adapter-bco-0.4.0'
+
+      # ZK receipts this version can name (design §6.1). Anything else is a
+      # declaration defect, which the anchor refuses rather than records.
+      ZK_VM_NAME = 'risc0-zkvm'
+      ZK_JOURNALS = %w[gc-zk-journal-0.1].freeze
+      PLATFORM_KEYS = %w[cpu_architecture os_name os_release].freeze
 
       SPEC_MARK   = /2791|biocompute/i
       # A full SHA-1 or SHA-256 hash names the tree by its own hash. Shorter
@@ -106,8 +117,10 @@ module GenomicsChainProv
         outputs = outputs_of(bco['io_domain'], sha256_by_locator)
         recorded = params.reject { |p| unset?(p['value']) }
         producer = producer_of(extension)
+        platform = platform_of(extension, notes)
 
         notes << 'bundle names no producer' if producer.nil?
+        notes << 'bundle names no platform (cpu architecture, OS)' if platform.nil?
         notes << 'no tool besides the runtime in software_prerequisites' if software.empty?
         notes << 'no container reference anywhere in the bundle' if containers.empty?
         notes << 'no checksum on any input' if inputs.any? && inputs.none? { |i| i['checksum'] }
@@ -127,6 +140,8 @@ module GenomicsChainProv
           params_total: params.length,
           params_count: recorded.length,
           seed_recorded: recorded.any? { |p| p['param'].to_s =~ SEED },
+          platform: platform,
+          zk_receipts: zk_receipts_of(extension, steps, sha256_by_locator),
           notes: notes
         )
       end
@@ -206,8 +221,13 @@ module GenomicsChainProv
         holder[key] = as_list(holder[key], key).map { |e| block ? block.call(e) : readable(e) }
       end
 
+      # `zk_receipts[]` gets the list rule like `checksums[]`; a `platform` that
+      # is not an object says nothing and is removed, the rule for a field
+      # where an object belongs (§5 boundary, design v0.1.12 §6.1).
       def normalise_extension(ext)
         normalise!(ext, 'checksums')
+        normalise!(ext, 'zk_receipts')
+        ext.delete('platform') if ext.key?('platform') && !ext['platform'].is_a?(Hash)
         ext
       end
 
@@ -472,10 +492,91 @@ module GenomicsChainProv
         end
         return blocks.first || {} if blocks.length <= 1
 
-        merged = { 'checksums' => blocks.flat_map { |b| Array(b['checksums']) } }
+        merged = { 'checksums' => blocks.flat_map { |b| Array(b['checksums']) },
+                   'zk_receipts' => blocks.flat_map { |b| Array(b['zk_receipts']) } }
         producers = blocks.filter_map { |b| b['producer'] }.uniq
         merged['producer'] = producers.first if producers.length == 1
+        # The same rule for the machine as for the producer: two blocks naming
+        # different platforms is the bundle saying two things (v0.1.12).
+        platforms = blocks.filter_map { |b| platform_values(b['platform']) }.uniq
+        merged['platform'] = platforms.first if platforms.length == 1
+        merged['platform_conflict'] = true if platforms.length > 1
         merged
+      end
+
+      # design v0.1.12 §6.1 (2): what the producer says the computation ran on.
+      # Self-reported, never checked (`platform_as_written` on the record).
+      def platform_of(extension, notes)
+        if extension['platform_conflict']
+          notes << 'the extension blocks name different platforms; neither is recorded'
+          return nil
+        end
+        platform_values(extension['platform'])
+      end
+
+      def platform_values(raw)
+        return nil unless raw.is_a?(Hash)
+
+        h = PLATFORM_KEYS.to_h { |k| [k, blank_to_nil(raw[k])] }
+        h.values.all?(&:nil?) ? nil : h
+      end
+
+      # design v0.1.12 §6.1 (3): each declared receipt, read as far as the
+      # bundle alone allows — the step it names, the input and output its
+      # journal binds, and their recorded SHA-256s — plus the defects that make
+      # the declaration unusable. Nothing is dropped or repaired: a defective
+      # declaration is reported (gc_prov_check) and refused (the anchor), never
+      # quietly left out of the record. Defect codes are names, not values (§6).
+      def zk_receipts_of(extension, steps, sha256_by_locator)
+        decls = Array(extension['zk_receipts'])
+        by_number = steps.to_h { |pos, st| [st['step_number'].to_i, [pos, st]] }
+        shas = decls.map { |d| hex64(readable(d)['sha256']) }
+        decls.each_with_index.map do |raw, i|
+          d = readable(raw)
+          zkvm = d['zkvm'].is_a?(Hash) ? d['zkvm'] : {}
+          # the integer rule `ordered_steps` applies to the steps themselves
+          number = d['step_number'].to_s =~ /\A-?\d+\z/ ? d['step_number'].to_i : nil
+          pos, st = number.nil? ? nil : by_number[number]
+          input_uri = blank_to_nil(d['input_uri'])
+          output_uri = blank_to_nil(d['output_uri'])
+          r = {
+            'receipt_sha256' => shas[i],
+            'image_id' => hex64(d['image_id']),
+            'zkvm_name' => blank_to_nil(zkvm['name']),
+            'zkvm_version' => blank_to_nil(zkvm['version']),
+            'step_number' => number,
+            'stage' => pos,
+            'journal_convention' => blank_to_nil(d['journal']),
+            'input_uri' => input_uri,
+            'output_uri' => output_uri,
+            'input_sha256' => input_uri && sha256_by_locator[input_uri],
+            'output_sha256' => output_uri && sha256_by_locator[output_uri]
+          }
+          r['defects'] = zk_defects(r, st, shas)
+          r
+        end
+      end
+
+      def zk_defects(r, step, shas)
+        out = []
+        out << 'receipt_sha256_not_hex' unless r['receipt_sha256']
+        out << 'receipt_declared_twice' if r['receipt_sha256'] && shas.count(r['receipt_sha256']) > 1
+        out << 'image_id_not_hex' unless r['image_id']
+        out << 'zkvm_not_supported' unless r['zkvm_name'] == ZK_VM_NAME && r['zkvm_version']
+        out << 'journal_convention_unknown' unless ZK_JOURNALS.include?(r['journal_convention'])
+        if step.nil?
+          out << 'step_not_in_bundle'
+        else
+          out << 'input_not_in_step' unless r['input_uri'] && uris_of(step['input_list']).include?(r['input_uri'])
+          out << 'output_not_in_step' unless r['output_uri'] && uris_of(step['output_list']).include?(r['output_uri'])
+        end
+        out << 'input_has_no_sha256' unless r['input_sha256']
+        out << 'output_has_no_sha256' unless r['output_sha256']
+        out
+      end
+
+      def hex64(v)
+        v.is_a?(String) && v =~ SHA256_HEX ? v.downcase : nil
       end
 
       def producer_of(extension)

@@ -13,13 +13,18 @@
 #
 # Reads only. No network, no subprocess, no file resolution: a locator is a
 # string here, and whether it still resolves is `not_checked` on the record.
+# The parts that do touch something are required where they are used:
+# `Writer::Environment` / `Writer::NextflowRun` (the machine), `ZkVerifier`
+# (runs the gc_zk_verify binary), `VerdictSpec::Prov` / `ProvSubmit` and
+# `PlaceExtension` (the anchor, through core and Synoptis).
 require_relative 'genomicschain_prov/normalized'
 require_relative 'genomicschain_prov/adapters/bco'
 require_relative 'genomicschain_prov/predicate'
 require_relative 'genomicschain_prov/writer'
+require_relative 'genomicschain_prov/identity'
 
 module GenomicsChainProv
-  VERSION = '0.1.3'
+  VERSION = '0.2.0'
 
   # Part of the signed identity (`adapter_version`, design §6): the same bundle
   # under a different adapter version may normalise differently, so the record

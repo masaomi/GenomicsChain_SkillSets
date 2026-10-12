@@ -218,6 +218,10 @@ module GenomicsChainProv
       # @param tools_by_step [Hash] step_number => [{'name','version'}]
       # @param image_by_step [Hash] step_number => an image reference, digest-pinned where one was found
       # @param checksums [Hash] locator => {'sha1' =>, 'sha256' =>}
+      # @param platform [Hash, nil] written only when the caller asked for it (design
+      #   v0.1.12 §6.1: the machine running the enricher need not be the one the
+      #   tasks ran on)
+      # @param zk_receipts [Array<Hash>] receipt declarations (Writer.zk_declaration)
       # @return [Hash] a new bundle; the argument is not touched, because the
       #   digest subject is the bytes that were read (§4)
       # @return [Array(Hash, Array<String>)] the new bundle and what it refused
@@ -226,7 +230,7 @@ module GenomicsChainProv
       #   rejects, and an enricher that quietly replaced it would turn a
       #   malformed bundle into one that parses — laundering the very defect
       #   the boundary rule exists to surface (§5, round 7).
-      def enrich(bco, tools_by_step: {}, image_by_step: {}, checksums: {})
+      def enrich(bco, tools_by_step: {}, image_by_step: {}, checksums: {}, platform: nil, zk_receipts: [])
         out = JSON.parse(JSON.generate(bco))
         refused = []
         steps = out.dig('description_domain', 'pipeline_steps')
@@ -246,7 +250,7 @@ module GenomicsChainProv
           step['prerequisite'] = keep + entries
         end
         apply_io_checksums!(out['io_domain'], checksums)
-        refused.concat(set_extension!(out, checksums))
+        refused.concat(set_extension!(out, checksums, platform: platform, zk_receipts: zk_receipts))
         [out, refused]
       end
 
@@ -286,12 +290,12 @@ module GenomicsChainProv
       # two naming DIFFERENT producers cancel each other out, and a bundle
       # whose enrichment history is visible in its array length is a bundle
       # whose grade depends on how many times a command was run.
-      def set_extension!(bco, checksums)
+      def set_extension!(bco, checksums, platform: nil, zk_receipts: [])
         if bco.key?('extension_domain') && !bco['extension_domain'].is_a?(Array)
           return ['extension_domain is not an array; left untouched, and no checksum was written']
         end
 
-        block = Writer.extension_block(checksums)
+        block = Writer.extension_block(checksums, platform: platform, zk_receipts: zk_receipts)
         list = bco['extension_domain'] || []
         at = list.index do |e|
           e.is_a?(Hash) && e.dig('genomicschain_extension', 'producer', 'name') == Writer::PRODUCER_NAME
@@ -305,7 +309,8 @@ module GenomicsChainProv
 
       # @return [Hash] {'bco' => the enriched bundle, 'notes' => [String]}
       def read(launch_dir, bco:, versions_path: nil, trace_path: nil, work_root: 'work',
-               digest_map: {}, script_path: nil, jar_path: nil, checksums: true, docker: true)
+               digest_map: {}, script_path: nil, jar_path: nil, checksums: true, docker: true,
+               platform: nil, zk_receipts: [])
         notes = []
         steps = Array(bco.dig('description_domain', 'pipeline_steps')).select { |s| s.is_a?(Hash) }
 
@@ -315,7 +320,7 @@ module GenomicsChainProv
         notes << 'checksums were skipped (--no-checksums)' unless checksums
 
         enriched, refused = enrich(bco, tools_by_step: tools_by_step, image_by_step: image_by_step,
-                                        checksums: sums)
+                                        checksums: sums, platform: platform, zk_receipts: zk_receipts)
         { 'bco' => enriched, 'notes' => notes + refused }
       end
 

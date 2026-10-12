@@ -100,14 +100,17 @@ module KairosMcp
             @registry = registry
           end
 
-          def issue(subject_ref:, claim:, evidence:, actor_role:)
+          # ttl: nil falls through to the engine's default_ttl (prov design §6,
+          # core change 3). Before 0.6.0 there was no way to pass one, so every
+          # proof issued here inherited 86400 s — memory synoptis-proof-ttl-hazard.
+          def issue(subject_ref:, claim:, evidence:, actor_role:, ttl: nil)
             refuse_unattributable!
             refuse_unsigned!
 
             result = @engine.create_attestation(
               attester_id: @attester_id, subject_ref: subject_ref, claim: claim,
               evidence: evidence, actor_role: actor_role, actor_user_id: @actor_user_id,
-              crypto: @crypto, submitter_pubkey: @submitter_pubkey
+              crypto: @crypto, submitter_pubkey: @submitter_pubkey, ttl: ttl
             )
             result = symbolize(result)
 

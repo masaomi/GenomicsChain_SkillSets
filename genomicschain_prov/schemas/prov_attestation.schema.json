@@ -1,0 +1,509 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/prov_attestation.schema.json",
+  "title": "GenomicsChain Tier-2.5 provenance record (pin strength)",
+  "description": "Synoptis evidence manifest for a signed provenance bundle (design docs/design/prov_anchoring_design_v0_1.md §6, v0.1.12 §6.1). Identities and counts only: the bundle, its locators, its parameter values and any ZK receipt stay with the customer, bound here by digests. A self_reported record: the anchor re-derives every signed field from the bundle bytes but does not check that the bundle tells the truth about the run (not_checked). The grade is pin strength — what the written locators permit — not that a rebuild succeeds.",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "bundle_format",
+    "bundle_format_version",
+    "bundle_digest",
+    "bundle_digest_canonicalization",
+    "outputs_digest_rule",
+    "producer_name",
+    "producer_version",
+    "adapter_version",
+    "predicate_version",
+    "pin_strength_version",
+    "grade_overall",
+    "grade_software",
+    "grade_container",
+    "grade_environment",
+    "grade_inputs",
+    "grade_workflow",
+    "grade_runtime",
+    "stages_total",
+    "stages_with_environment",
+    "stages_with_own_environment",
+    "scripts_total",
+    "scripts_with_checksum",
+    "software_total",
+    "software_immutable",
+    "software_versioned",
+    "software_ranged",
+    "software_floating",
+    "software_local_path",
+    "software_absent",
+    "containers_total",
+    "containers_immutable",
+    "containers_versioned",
+    "containers_ranged",
+    "containers_floating",
+    "containers_local_path",
+    "containers_absent",
+    "inputs_total",
+    "inputs_with_checksum",
+    "inputs_internal",
+    "outputs_total",
+    "outputs_with_checksum",
+    "outputs_digest",
+    "params_count",
+    "params_total",
+    "workflow_repository_sha256",
+    "workflow_commit",
+    "platform_cpu_architecture",
+    "platform_os_name",
+    "platform_os_release",
+    "zk_receipts",
+    "trust_tier",
+    "toolchain",
+    "seed",
+    "not_checked",
+    "admission_rule",
+    "zk_verification",
+    "submission_key",
+    "operator"
+  ],
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": [
+        "prov_attestation"
+      ]
+    },
+    "record_version": {
+      "type": "string",
+      "enum": [
+        "0.3"
+      ],
+      "description": "Fixes the set of signed fields (design v0.1 §6). 0.3 = v0.1.12: platform_* and zk_receipts added."
+    },
+    "mcp_tool_name": {
+      "type": "string",
+      "enum": [
+        "gc_prov_submit"
+      ]
+    },
+    "mcp_tool_version": {
+      "type": "string"
+    },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^prov:sha256:[a-f0-9]{64}$",
+      "description": "The bundle names itself by its digest; no customer string enters the claim."
+    },
+    "bundle_format": {
+      "type": "string",
+      "enum": [
+        "bco",
+        "wrroc"
+      ]
+    },
+    "bundle_format_version": {
+      "type": "string",
+      "description": "The bundle's own statement (spec_version / conformsTo). Conformance to the format's schema is not checked: not_checked bundle_schema_conformance."
+    },
+    "bundle_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Canonical-JSON SHA-256 of the bundle under bundle_digest_canonicalization, recomputed by the anchor. Not the file sha256."
+    },
+    "bundle_digest_canonicalization": {
+      "type": "string",
+      "enum": [
+        "kairos-sorted-json-0.1"
+      ]
+    },
+    "outputs_digest_rule": {
+      "type": "string"
+    },
+    "producer_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "producer_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "adapter_version": {
+      "type": "string"
+    },
+    "predicate_version": {
+      "type": "string"
+    },
+    "pin_strength_version": {
+      "type": "string"
+    },
+    "grade_overall": {
+      "type": "string",
+      "enum": [
+        "immutable"
+      ],
+      "description": "Pin strength: how far the locators written in the bundle let a third party go — not whether a rebuild succeeds. Admission rule prov-admission-0.1 issues a record only at immutable (design v0.1.12 §6.1)."
+    },
+    "grade_software": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "grade_container": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "grade_environment": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "grade_inputs": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "grade_workflow": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "grade_runtime": {
+      "type": "string",
+      "enum": [
+        "immutable",
+        "versioned",
+        "ranged",
+        "floating",
+        "local_path",
+        "absent"
+      ]
+    },
+    "stages_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stages_with_environment": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stages_with_own_environment": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scripts_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scripts_with_checksum": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_immutable": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_versioned": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_ranged": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_floating": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_local_path": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "software_absent": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_immutable": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_versioned": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_ranged": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_floating": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_local_path": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "containers_absent": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "inputs_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "inputs_with_checksum": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "inputs_internal": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outputs_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outputs_with_checksum": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outputs_digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "params_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "params_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "workflow_repository_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the repository URL, never the URL itself."
+    },
+    "workflow_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platform_cpu_architecture": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Self-reported by the bundle writer (not_checked platform_as_written). null when the bundle does not say."
+    },
+    "platform_os_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Self-reported by the bundle writer (not_checked platform_as_written). null when the bundle does not say."
+    },
+    "platform_os_release": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Self-reported by the bundle writer (not_checked platform_as_written). null when the bundle does not say."
+    },
+    "zk_receipts": {
+      "type": "array",
+      "maxItems": 4,
+      "description": "Identities of the ZK receipts the bundle declares, each verified and linked to its step by the anchor before recording (zk_verification). Never the receipt bytes or journal values. A ZK receipt shows only that the named steps were computed correctly from the recorded inputs. It covers only those steps and does not show that the recorded inputs are the raw data.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "receipt_sha256",
+          "image_id",
+          "zkvm_name",
+          "zkvm_version",
+          "stage",
+          "journal_convention"
+        ],
+        "properties": {
+          "receipt_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "image_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "zkvm_name": {
+            "type": "string",
+            "enum": [
+              "risc0-zkvm"
+            ]
+          },
+          "zkvm_version": {
+            "type": "string"
+          },
+          "stage": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "journal_convention": {
+            "type": "string",
+            "enum": [
+              "gc-zk-journal-0.1"
+            ]
+          }
+        }
+      }
+    },
+    "trust_tier": {
+      "type": "string",
+      "enum": [
+        "self_reported"
+      ]
+    },
+    "toolchain": {
+      "type": "object",
+      "description": "The anchor's interpreter. Inside the anchor's signature, outside the submitter's (the bundle carries no grader interpreter)."
+    },
+    "seed": {
+      "type": "object",
+      "required": [
+        "recorded",
+        "detection"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "recorded": {
+          "type": "boolean"
+        },
+        "detection": {
+          "type": "string",
+          "enum": [
+            "heuristic"
+          ]
+        }
+      }
+    },
+    "not_checked": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "locator_reachability",
+          "bundle_truthfulness",
+          "bundle_schema_conformance",
+          "checksum_values_as_written",
+          "reference_genome_identification",
+          "seed_identification",
+          "platform_as_written",
+          "zk_guest_program_semantics",
+          "zk_inputs_are_raw_data"
+        ]
+      },
+      "description": "Fixed by the builder; a client value is discarded. A ZK receipt shows only that the named steps were computed correctly from the recorded inputs. It covers only those steps and does not show that the recorded inputs are the raw data. GenomicsChain guarantees its own procedure and record only. A Tier 3 record is a dated observation that the declared result was reached that day, not a promise of future reproduction."
+    },
+    "admission_rule": {
+      "type": "string",
+      "enum": [
+        "prov-admission-0.1"
+      ],
+      "description": "grade_overall immutable, and every declared ZK receipt verified and linked to its step."
+    },
+    "zk_verification": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verifier",
+            "risc0_zkvm",
+            "journal_convention",
+            "receipts_verified"
+          ],
+          "properties": {
+            "verifier": {
+              "type": "string"
+            },
+            "risc0_zkvm": {
+              "type": "string"
+            },
+            "journal_convention": {
+              "type": "string"
+            },
+            "receipts_verified": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      ]
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operator": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

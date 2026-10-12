@@ -497,6 +497,110 @@ class ProvWriteTest < Minitest::Test
     assert_includes refused_ext.join("\n"), 'extension_domain is not an array'
   end
 
+  # --- v0.1.12 §6.1: platform and ZK receipts ---------------------------------
+
+  CLI = File.expand_path('../bin/gc_prov_write.rb', __dir__)
+  ZK = File.expand_path('fixtures/zk_sizefactor_s1', __dir__)
+
+  def cli(*args)
+    out, err, status = Open3.capture3(RbConfig.ruby, CLI, *args)
+    assert status.success?, "gc_prov_write failed: #{err}"
+    [JSON.parse(out), err]
+  end
+
+  def extension(bco)
+    bco['extension_domain'].find { |e| e.key?('genomicschain_extension') }['genomicschain_extension']
+  end
+
+  def test_the_platform_names_the_machine_and_never_the_host
+    p = Env.platform(uname: { sysname: 'Linux', nodename: 'lab-host-07', release: '6.8.0-1012-aws',
+                              version: '#1 SMP', machine: 'x86_64' })
+    assert_equal({ 'cpu_architecture' => 'x86_64', 'os_name' => 'Linux', 'os_release' => '6.8.0-1012-aws' }, p)
+    refute_includes p.values, 'lab-host-07'
+    assert_equal %w[cpu_architecture os_name os_release], Env.platform.keys, 'this machine answers all three'
+  end
+
+  # --plan records this machine by default (the writer usually runs where the
+  # stages ran); a plan's own statement wins; --no-platform leaves it out.
+  def test_a_plan_records_the_platform_unless_told_otherwise
+    with_demo_computation do |dir|
+      plan_path = File.join(dir, 'plan.json')
+      File.write(plan_path, JSON.generate(demo_plan))
+      bco, = cli('--plan', plan_path, '--no-docker', '--no-grade')
+      assert_equal Env.platform, extension(bco)['platform']
+      assert_equal Env.platform, Bco.parse(bco).platform
+
+      bco, = cli('--plan', plan_path, '--no-docker', '--no-grade', '--no-platform')
+      refute extension(bco).key?('platform')
+
+      stated = { 'cpu_architecture' => 'x86_64', 'os_name' => 'Linux', 'os_release' => '5.15.0' }
+      File.write(plan_path, JSON.generate(demo_plan.merge('platform' => stated)))
+      bco, = cli('--plan', plan_path, '--no-docker', '--no-grade')
+      assert_equal stated, extension(bco)['platform']
+    end
+  end
+
+  # The enricher may run on a head node while the tasks ran elsewhere, so it
+  # writes a platform only when asked (§6.1 (2): never invent a value).
+  def test_the_enricher_records_a_platform_only_when_asked
+    with_fixture_launch_dir do |dir|
+      File.write(File.join(dir, 'bco.json'), File.read(File.join(FIXTURES, 'bco.json')))
+      digests = File.join(FIXTURES, 'container_digests.txt')
+      jar = File.join(dir, 'nextflow-26.04.6-one.jar')
+      bco, err = cli('--from-nextflow-run', dir, '--no-docker', '--container-digests', digests, '--nextflow-jar', jar)
+      refute extension(bco).key?('platform')
+      assert_includes err, 'no platform recorded: pass --platform-of-this-machine'
+
+      bco, = cli('--from-nextflow-run', dir, '--no-docker', '--container-digests', digests, '--nextflow-jar', jar,
+                 '--platform-of-this-machine')
+      assert_equal Env.platform, extension(bco)['platform']
+    end
+  end
+
+  # A receipt named in the plan becomes a declaration carrying the SHA-256 of
+  # the receipt file as found here; the adapter reads it back with no defect
+  # because the step, its input and its output all carry checksums.
+  def test_a_receipt_in_the_plan_is_declared_with_the_digest_of_its_file
+    with_demo_computation do |dir|
+      FileUtils.cp(File.join(ZK, 'receipt.succinct.bin'), File.join(dir, 'receipt.bin'))
+      image_id = File.read(File.join(ZK, 'image_id.txt')).strip
+      raw = demo_plan.merge('zk_receipts' => [{ 'receipt' => 'receipt.bin', 'image_id' => image_id.upcase,
+                                                'zkvm_version' => '3.0.6', 'step_number' => 2,
+                                                'input' => 'sum.txt', 'output' => 'out.txt' }])
+      plan = W.normalise_plan(raw)
+      resolved = Env.resolve!(plan, base_dir: dir, docker: false)
+      zk = Env.zk_declarations(plan['zk_receipts'], base_dir: dir)
+      bco = W.build(plan, checksums: resolved['checksums'], zk_receipts: zk['zk_receipts'])
+
+      decl = extension(bco)['zk_receipts'].first
+      assert_equal Digest::SHA256.file(File.join(dir, 'receipt.bin')).hexdigest, decl['sha256']
+      assert_equal image_id, decl['image_id'], 'the image ID is written lower-case'
+      assert_equal({ 'name' => 'risc0-zkvm', 'version' => '3.0.6' }, decl['zkvm'])
+      assert_equal 'gc-zk-journal-0.1', decl['journal']
+      read = Bco.parse(bco).zk_receipts.first
+      assert_empty read['defects']
+      assert_equal 2, read['stage']
+
+      FileUtils.rm(File.join(dir, 'receipt.bin'))
+      gone = Env.zk_declarations(plan['zk_receipts'], base_dir: dir)
+      assert_empty gone['zk_receipts'], 'no file, no digest, no declaration'
+      assert_includes gone['notes'].join, 'is not a readable file'
+    end
+  end
+
+  def test_a_receipt_entry_missing_a_field_is_refused_in_the_plan
+    err = assert_raises(W::PlanError) do
+      W.normalise_plan(demo_plan.merge('zk_receipts' => [{ 'receipt' => 'r.bin', 'image_id' => 'a' * 64,
+                                                           'step_number' => 1, 'input' => 'a.txt' }]))
+    end
+    assert_match(/zkvm_version, output/, err.message)
+    assert_raises(W::PlanError) do
+      W.normalise_plan(demo_plan.merge('zk_receipts' => [{ 'receipt' => 'r.bin', 'image_id' => 'not-hex',
+                                                           'zkvm_version' => '3.0.6', 'step_number' => 1,
+                                                           'input' => 'a.txt', 'output' => 'b.txt' }]))
+    end
+  end
+
   # Shaped like what nf-prov 1.7.0 actually emits (design §13.1): an SCM
   # extension, one runtime line, URIs, and no checksum, tool or container
   # anywhere.

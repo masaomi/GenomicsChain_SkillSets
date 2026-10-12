@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'digest'
+require 'etc'
 require 'open3'
 require 'rbconfig'
 require_relative '../predicate'
@@ -149,6 +150,34 @@ module GenomicsChainProv
       end
 
       # --- the machine ------------------------------------------------------
+
+      # What this machine is, for the bundle's `platform` (design v0.1.12
+      # §6.1): the kernel's own answer, no subprocess. `nodename` — the host
+      # name — is deliberately left out: it identifies a machine, not a
+      # platform, and the record has no use for it.
+      def platform(uname: Etc.uname)
+        { 'cpu_architecture' => uname[:machine].to_s, 'os_name' => uname[:sysname].to_s,
+          'os_release' => uname[:release].to_s }.reject { |_, v| v.strip.empty? }
+      end
+
+      # Declarations for the receipts a plan names, each with the SHA-256 of
+      # the receipt file measured here. A receipt that is not a readable file
+      # is left out and noted — the same rule as a missing input: never write
+      # a digest of bytes this machine did not see.
+      #
+      # @return [Hash] {'zk_receipts' => [declaration], 'notes' => [String]}
+      def zk_declarations(entries, base_dir: Dir.pwd)
+        notes = []
+        decls = Array(entries).filter_map do |e|
+          sums = digest_file(absolute(e['receipt'], base_dir))
+          if sums.nil?
+            notes << "zk receipt for step #{e['step_number']} left out: #{e['receipt']} is not a readable file"
+            next nil
+          end
+          Writer.zk_declaration(e, sums['sha256'])
+        end
+        { 'zk_receipts' => decls, 'notes' => notes }
+      end
 
       def digest_file(path)
         return nil unless File.file?(path) && File.readable?(path)

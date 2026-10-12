@@ -91,7 +91,8 @@ module KairosMcp
 
                 store_result = store_proof!(
                   attestor: attestor, registry: registry,
-                  subject_ref: spec.subject_ref, claim: claim, manifest: manifest
+                  subject_ref: spec.subject_ref, claim: claim, manifest: manifest,
+                  ttl: spec.respond_to?(:proof_ttl) ? spec.proof_ttl : nil
                 )
 
                 KairosMcp::Manifest::Signer.global_reservation.commit(nonce)
@@ -141,7 +142,11 @@ module KairosMcp
             raise BearerBindingError, 'operator pubkey does not match Bearer pubkey_hash'
           end
 
-          def store_proof!(attestor:, registry:, subject_ref:, claim:, manifest:)
+          # ttl: a spec that names its own proof lifetime passes it here (prov
+          # design §6, core change 4: a provenance record must outlive the
+          # engine's 24-hour default). nil keeps the engine default, so the
+          # Tier-1/2/3 proofs are unchanged.
+          def store_proof!(attestor:, registry:, subject_ref:, claim:, manifest:, ttl: nil)
             envelope = build_evidence_envelope(manifest)
             evidence_json = KairosMcp::Manifest.canonical_json(envelope)
             max_size = Config.max_evidence_size
@@ -151,7 +156,7 @@ module KairosMcp
             end
 
             result = attestor.issue(
-              subject_ref: subject_ref, claim: claim, evidence: evidence_json, actor_role: 'automated'
+              subject_ref: subject_ref, claim: claim, evidence: evidence_json, actor_role: 'automated', ttl: ttl
             )
             proof_id = result[:synoptis_proof_id]
             raise RecordingFailed, 'synoptis store returned no proof_id' if proof_id.nil? || proof_id.to_s.empty?
@@ -227,6 +232,16 @@ module KairosMcp
             if manifest['result_evidence_sha256']
               out[:result_evidence_sha256] = manifest['result_evidence_sha256']
             end
+            # A provenance record keys on its submission_key alone (prov design
+            # §6, core change 2): that key already binds the bundle digest, the
+            # whole signed identity — three procedure versions included — and
+            # the pubkey. Selected by record_type, not by the key's presence,
+            # because every tier's manifest carries a submission_key.
+            if manifest['record_type'] == 'prov_attestation'
+              out[:idempotency_key] = Digest::SHA256.hexdigest(submission_key.to_s)
+              return out
+            end
+
             # Digest subject first, headline result second, per tier:
             #   tier1 report_content_hash / static_readiness
             #   tier2 adjudication_digest  / codescan_evidence_digest

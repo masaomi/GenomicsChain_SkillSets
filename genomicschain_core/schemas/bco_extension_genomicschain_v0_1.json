@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://genomicschain.ch/schemas/bco_extension_genomicschain_v0_1.json",
+  "title": "GenomicsChain extension to an IEEE 2791 BioCompute Object",
+  "description": "The object held under `genomicschain_extension` in an `extension_domain` entry whose `extension_schema` is this URL. Written by gc_prov_write (producer or enricher) and read by the genomicschain_prov adapter (design docs/design/prov_anchoring_design_v0_1.md §4, §13.4-1, §6.1). Every value is the producer's own statement; GenomicsChain's record re-derives what it can from the bundle bytes and lists the rest as not_checked. NOT YET PUBLISHED at its URL: publishing is the operator's decision, before anything is sold (§6.1 (5)).",
+  "type": "object",
+  "properties": {
+    "producer": {
+      "description": "What wrote this block. A bundle whose blocks name different producers records neither.",
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string" }
+      }
+    },
+    "checksums": {
+      "description": "SHA-256 of the bytes behind a locator, joined to inputs, outputs, tools, the runtime and workflow scripts by the exact locator string. The standard's own field is SHA-1; this carries SHA-256 beside it. Two different digests for one locator pin nothing.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["uri", "sha256"],
+        "properties": {
+          "uri": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" }
+        }
+      }
+    },
+    "platform": {
+      "description": "What the computation ran on, as the producer states it (design v0.1.12 §6.1 (2)). Never the host name.",
+      "type": "object",
+      "properties": {
+        "cpu_architecture": { "type": "string", "description": "e.g. x86_64, arm64 (uname machine)" },
+        "os_name": { "type": "string", "description": "e.g. Linux, Darwin (uname sysname)" },
+        "os_release": { "type": "string", "description": "kernel release (uname release)" }
+      },
+      "additionalProperties": false
+    },
+    "zk_receipts": {
+      "description": "RISC Zero receipts covering named steps (design v0.1.12 §6.1 (3)). The receipt file stays with its producer; this declares its fingerprint and what its journal binds. A ZK receipt shows only that the named steps were computed correctly from the recorded inputs. It covers only those steps and does not show that the recorded inputs are the raw data.",
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["sha256", "image_id", "zkvm", "step_number", "journal", "input_uri", "output_uri"],
+        "properties": {
+          "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$", "description": "SHA-256 of the receipt file (bincode-serialised risc0 Receipt)" },
+          "image_id": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$", "description": "guest image ID: the 32 digest bytes (eight u32 words, little-endian) in hex" },
+          "zkvm": {
+            "type": "object",
+            "required": ["name", "version"],
+            "properties": {
+              "name": { "type": "string", "enum": ["risc0-zkvm"] },
+              "version": { "type": "string" }
+            }
+          },
+          "step_number": { "type": "integer", "description": "the pipeline_steps[].step_number the receipt covers" },
+          "journal": { "type": "string", "enum": ["gc-zk-journal-0.1"], "description": "journal = risc0 serde of ([u8;32], Vec<u8>): (SHA-256 of the step's input file, the step's output bytes)" },
+          "input_uri": { "type": "string", "description": "a locator in that step's input_list, with a SHA-256 in checksums[]" },
+          "output_uri": { "type": "string", "description": "a locator in that step's output_list, with a SHA-256 in checksums[]" }
+        }
+      }
+    }
+  }
+}

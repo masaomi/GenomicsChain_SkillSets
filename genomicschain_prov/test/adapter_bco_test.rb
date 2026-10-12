@@ -739,6 +739,86 @@ class AdapterBcoTest < Minitest::Test
     assert_equal 'immutable', GenomicsChainProv::Predicate.grade(n)['grades']['workflow']
   end
 
+  # --- v0.1.12 §6.1: platform and zk_receipts ----------------------------------------
+
+  def extension_of(bco)
+    bco['extension_domain'].find { |e| e.key?('genomicschain_extension') }['genomicschain_extension']
+  end
+
+  def test_platform_is_read_and_two_blocks_that_disagree_record_neither
+    bco = enriched_bco
+    extension_of(bco)['platform'] = { 'cpu_architecture' => 'x86_64', 'os_name' => 'Linux',
+                                      'os_release' => '6.8.0', 'nodename' => 'lab-host-07' }
+    assert_equal({ 'cpu_architecture' => 'x86_64', 'os_name' => 'Linux', 'os_release' => '6.8.0' },
+                 Bco.parse(bco).platform, 'only the three named keys, never a host name')
+
+    same = Marshal.load(Marshal.dump(bco))
+    same['extension_domain'] << { 'genomicschain_extension' => { 'platform' => extension_of(bco)['platform'] } }
+    assert_equal 'x86_64', Bco.parse(same).platform['cpu_architecture'], 'the same statement twice is one statement'
+
+    bco['extension_domain'] << { 'genomicschain_extension' => { 'platform' => { 'cpu_architecture' => 'arm64' } } }
+    np = Bco.parse(bco)
+    assert_nil np.platform
+    assert_includes np.notes, 'the extension blocks name different platforms; neither is recorded'
+
+    plain = enriched_bco
+    extension_of(plain)['platform'] = 'x86_64 Linux'
+    assert_nil Bco.parse(plain).platform, 'a platform that is not an object says nothing'
+    assert_includes Bco.parse(enriched_bco).notes, 'bundle names no platform (cpu architecture, OS)'
+  end
+
+  def zk_declaration(**over)
+    { 'sha256' => 'a' * 64, 'image_id' => 'b' * 64, 'zkvm' => { 'name' => 'risc0-zkvm', 'version' => '3.0.6' },
+      'step_number' => 2, 'journal' => 'gc-zk-journal-0.1',
+      'input_uri' => 'work/12/34/sum.txt', 'output_uri' => 'work/ab/cdef/out.txt' }.merge(over.transform_keys(&:to_s))
+  end
+
+  def test_zk_declarations_are_read_with_their_defects_and_never_dropped
+    bco = enriched_bco
+    ext = extension_of(bco)
+    ext['checksums'] += [{ 'uri' => 'work/12/34/sum.txt', 'sha256' => 'F' * 64 },
+                         { 'uri' => 'work/ab/cdef/out.txt', 'sha256' => '1' * 64 }]
+    ext['zk_receipts'] = [
+      zk_declaration,
+      'not an object',
+      zk_declaration(sha256: 'c' * 64, step_number: 9),
+      zk_declaration(sha256: 'd' * 64, image_id: 'xyz', zkvm: { 'name' => 'sp1', 'version' => '1' }),
+      zk_declaration(sha256: 'e' * 64, input_uri: 'a.txt', output_uri: 'work/12/34/sum.txt')
+    ]
+    zk = Bco.parse(bco).zk_receipts
+    assert_equal 5, zk.length, 'an unreadable declaration is kept and refused, not dropped'
+
+    good = zk[0]
+    assert_empty good['defects']
+    assert_equal 2, good['stage'], 'step_number 2 is the second stage after sorting'
+    assert_equal 'f' * 64, good['input_sha256']
+    assert_equal '1' * 64, good['output_sha256']
+
+    assert_includes zk[1]['defects'], 'receipt_sha256_not_hex'
+    assert_includes zk[1]['defects'], 'step_not_in_bundle'
+    assert_equal ['step_not_in_bundle'], zk[2]['defects']
+    assert_includes zk[3]['defects'], 'image_id_not_hex'
+    assert_includes zk[3]['defects'], 'zkvm_not_supported'
+    # a.txt is a step-1 input; sum.txt is step 2's input, not its output
+    assert_includes zk[4]['defects'], 'input_not_in_step'
+    assert_includes zk[4]['defects'], 'output_not_in_step'
+    assert_includes zk[4]['defects'], 'input_has_no_sha256'
+  end
+
+  def test_a_receipt_declared_twice_is_a_defect_on_both
+    bco = enriched_bco
+    extension_of(bco)['zk_receipts'] = [zk_declaration, zk_declaration]
+    Bco.parse(bco).zk_receipts.each { |r| assert_includes r['defects'], 'receipt_declared_twice' }
+  end
+
+  def test_zk_receipts_that_are_not_an_array_are_a_format_error
+    bco = enriched_bco
+    extension_of(bco)['zk_receipts'] = { 'sha256' => 'a' * 64 }
+    err = assert_raises(Bco::FormatError) { Bco.parse(bco) }
+    assert_match(/zk_receipts/, err.message)
+    assert_equal [], Bco.parse(enriched_bco).zk_receipts, 'no declaration, no receipts'
+  end
+
   def test_format_error_drops_the_parser_cause
     err = assert_raises(Bco::FormatError) { Bco.parse('{"spec_version": "SECRET-patient42"') }
     assert_nil err.cause

@@ -17,13 +17,17 @@ Registered **only** when `genomicschain.anchor_profile: true`:
 
 Off-anchor nodes (team workstation, genomicschain.ch app tier) use an empty tool surface from this package.
 
+Since 0.6.0 any SkillSet may list `anchor_profile_tool_classes` in its own `skillset.json`; `genomicschain_prov` uses this for `gc_prov_submit`. 0.6.0 also lets a verdict spec name its proof lifetime (`proof_ttl`), passed through `SubmitCore.store_proof!` and `SynoptisAttestor#issue(ttl:)`; specs without one keep the engine default, so Tier-1/2/3 proofs are unchanged.
+
 ## Deployment profiles
 
 | Node | Packages | anchor_profile | Submit tools |
 |------|----------|----------------|--------------|
-| meeting.genomicschain.io (anchor) | core + tier1 + tier2 + tier3 | `true` | yes |
+| meeting.genomicschain.io (anchor) | core + tier1 + tier2 + tier3 + prov | `true` | yes (prov adds `gc_prov_submit`) |
 | Team workstation | core + tier1 | `false` | no |
 | Tier-3 compute node | core + tier3 | `false` | no |
+| Customer workstation (provenance) | core + tier2 + prov | `false` | no (`gc_prov_check`, the submit client) |
+| Verifier | mmp + synoptis + core + tier2 + prov | `false` | no (`gc_prov_verify`) |
 
 Example off-anchor config: `config/genomicschain_core.off-anchor.yml.example`
 

@@ -1,0 +1,187 @@
+# frozen_string_literal: true
+
+require 'json'
+require 'digest'
+require_relative 'adapters/bco'
+require_relative 'predicate'
+
+# The bundle digest is core's canonical JSON (design §2, `kairos-sorted-json-0.1`)
+# — the same function the anchor uses, never a copy, so the customer's
+# gc_prov_check and the anchor cannot drift apart on the digest subject. Core
+# sits beside prov in a dev clone and under .kairos/skillsets/ when installed;
+# prov depends on it either way (skillset.json).
+begin
+  require 'genomicschain_core/manifest'
+rescue LoadError
+  sibling = File.expand_path('../../../genomicschain_core/lib', __dir__)
+  raise unless File.directory?(sibling)
+
+  $LOAD_PATH.unshift(sibling)
+  require 'genomicschain_core/manifest'
+end
+
+module GenomicsChainProv
+  # Identity — a bundle's bytes → the signed identity of its Tier-2.5 record
+  # (design v0.1 §6, record_version 0.3 per v0.1.12 §6.1).
+  #
+  # One function for every party: the customer's gc_prov_check computes the
+  # params to sign with it, the anchor derives them again from the bytes it
+  # received and refuses a submission that disagrees, and the verifier rebuilds
+  # them to check the submitter's signature. Nothing here reads a clock, a file
+  # or the network.
+  #
+  # What it does NOT do is decide admission. Whether the anchor will issue a
+  # record (the immutable gate, the ZK checks) is `admission`, reported beside
+  # the identity, because a customer needs both answers and the anchor needs
+  # them in a fixed order.
+  module Identity
+    RECORD_VERSION = '0.3'
+    BUNDLE_DIGEST_CANONICALIZATION = 'kairos-sorted-json-0.1'
+    ADMISSION_RULE = 'prov-admission-0.1'
+    REQUIRED_GRADE = 'immutable'
+    MAX_ZK_RECEIPTS = 4
+
+    LEVELS = Predicate::LEVELS
+    COUNT_FIELDS = (%w[stages_total stages_with_environment stages_with_own_environment
+                       scripts_total scripts_with_checksum software_total] +
+                    LEVELS.map { |l| "software_#{l}" } + %w[containers_total] +
+                    LEVELS.map { |l| "containers_#{l}" } +
+                    %w[inputs_total inputs_with_checksum inputs_internal
+                       outputs_total outputs_with_checksum outputs_digest params_count params_total]).freeze
+
+    # The set of signed fields is fixed by record_version (§6): a verifier
+    # builds `params` from the manifest with the set its record_version names,
+    # and treats an unknown record_version as "different version" (§8).
+    SIGNED_FIELDS = {
+      '0.3' => (%w[subject_ref bundle_format bundle_format_version bundle_digest
+                   bundle_digest_canonicalization outputs_digest_rule
+                   producer_name producer_version adapter_version predicate_version pin_strength_version
+                   grade_overall grade_software grade_container grade_environment grade_inputs
+                   grade_workflow grade_runtime] +
+                COUNT_FIELDS +
+                %w[workflow_repository_sha256 workflow_commit
+                   platform_cpu_architecture platform_os_name platform_os_release
+                   zk_receipts]).freeze
+    }.freeze
+
+    # The record's not_checked list (§6, §6.1 (4)): fixed by the builder,
+    # never taken from a client, the same nine items on every record of
+    # record_version 0.3 whether or not it carries a receipt.
+    NOT_CHECKED = %w[
+      locator_reachability bundle_truthfulness bundle_schema_conformance checksum_values_as_written
+      reference_genome_identification seed_identification
+      platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
+    ].freeze
+
+    # Design v0.1.12 §6.1, the two sentences every verifier output and every
+    # description of not_checked carries verbatim (memory warranty-scope,
+    # operator instruction 2026-10-12).
+    STATEMENTS = [
+      'A ZK receipt shows only that the named steps were computed correctly from the recorded inputs. ' \
+      'It covers only those steps and does not show that the recorded inputs are the raw data.',
+      'GenomicsChain guarantees its own procedure and record only. A Tier 3 record is a dated observation ' \
+      'that the declared result was reached that day, not a promise of future reproduction.'
+    ].freeze
+
+    module_function
+
+    # @param bundle [String, Hash] the bundle verbatim (JSON text or object)
+    # @return [Hash] 'signed' (the identity, string keys), 'graded' (the
+    #   predicate's full output, for the customer — never for the anchor's
+    #   logs, §6), 'np' (the normalised provenance), 'bundle_digest'
+    # @raise [Adapters::Bco::FormatError]
+    def derive(bundle)
+      text = bundle.is_a?(String) ? bundle : JSON.generate(bundle)
+      digest = bundle_digest(text)
+      np = Adapters::Bco.parse(text)
+      graded = Predicate.grade(np)
+      { 'signed' => signed(np, graded, digest), 'graded' => graded, 'np' => np, 'bundle_digest' => digest }
+    end
+
+    # The canonical-JSON SHA-256 of the bundle as parsed from its own bytes —
+    # not of the adapter's normalised copy, and not the file's sha256 (§2).
+    def bundle_digest(text)
+      parsed = JSON.parse(text)
+      KairosMcp::Manifest.canonical_json_sha256(parsed)
+    rescue JSON::ParserError
+      raise Adapters::Bco::FormatError, 'bundle is not valid JSON', cause: nil
+    end
+
+    def signed(np, graded, digest)
+      g = graded['grades']
+      c = graded['counts']
+      w = np.workflow || {}
+      platform = np.platform || {}
+      out = {
+        'subject_ref' => "prov:sha256:#{digest}",
+        'bundle_format' => np.format,
+        'bundle_format_version' => np.format_version,
+        'bundle_digest' => digest,
+        'bundle_digest_canonicalization' => BUNDLE_DIGEST_CANONICALIZATION,
+        'outputs_digest_rule' => graded['outputs_digest_rule'],
+        'producer_name' => np.producer && np.producer['name'],
+        'producer_version' => np.producer && np.producer['version'],
+        'adapter_version' => Adapters::Bco::VERSION,
+        'predicate_version' => graded['predicate_version'],
+        'pin_strength_version' => graded['pin_strength_version'],
+        'grade_overall' => graded['grade_overall']
+      }
+      %w[software container environment inputs workflow runtime].each { |k| out["grade_#{k}"] = g[k] }
+      COUNT_FIELDS.each { |k| out[k] = c[k] }
+      repo = w['repository']
+      out['workflow_repository_sha256'] = repo.nil? || repo.to_s.empty? ? nil : Digest::SHA256.hexdigest(repo.to_s)
+      out['workflow_commit'] = w['commit']
+      out['platform_cpu_architecture'] = platform['cpu_architecture']
+      out['platform_os_name'] = platform['os_name']
+      out['platform_os_release'] = platform['os_release']
+      out['zk_receipts'] = zk_identities(np)
+      out
+    end
+
+    # Per receipt: fingerprints and names only (§6.1). Never the input/output
+    # locators or digests the declaration binds — those stay in the bundle.
+    def zk_identities(np)
+      Array(np.zk_receipts).map do |r|
+        { 'receipt_sha256' => r['receipt_sha256'], 'image_id' => r['image_id'],
+          'zkvm_name' => r['zkvm_name'], 'zkvm_version' => r['zkvm_version'],
+          'stage' => r['stage'], 'journal_convention' => r['journal_convention'] }
+      end.sort_by { |r| [r['stage'].to_i, r['receipt_sha256'].to_s] }
+    end
+
+    # What stands between this bundle and a record, as far as the bundle alone
+    # can tell (§6.1 (1), (3)). The ZK checks that need the receipt bytes are
+    # ZkVerifier.check; this reports the declarations' own defects.
+    #
+    # @return [Hash] 'issuable' (bool, bundle-side only), 'grade_overall',
+    #   'below' {category => grade} for the categories under the requirement,
+    #   'zk_defects' [{'stage','defects'}], 'too_many_zk_receipts'
+    def admission(derived)
+      graded = derived['graded']
+      below = Predicate::CATEGORIES.each_with_object({}) do |cat, h|
+        grade = graded['grades'][cat]
+        h[cat] = grade unless grade == REQUIRED_GRADE
+      end
+      receipts = Array(derived['np'].zk_receipts)
+      defects = receipts.reject { |r| r['defects'].empty? }
+                        .map { |r| { 'stage' => r['stage'], 'defects' => r['defects'] } }
+      too_many = receipts.length > MAX_ZK_RECEIPTS
+      { 'issuable' => below.empty? && defects.empty? && !too_many,
+        'grade_overall' => graded['grade_overall'], 'required_grade' => REQUIRED_GRADE,
+        'below' => below, 'zk_receipts_declared' => receipts.length,
+        'zk_defects' => defects, 'too_many_zk_receipts' => too_many }
+    end
+
+    # The params a verifier rebuilds from a stored manifest, by its own
+    # record_version. nil for a record_version this code does not know.
+    def params_from_manifest(manifest)
+      fields = SIGNED_FIELDS[manifest['record_version']]
+      fields && fields.to_h { |k| [k, manifest[k]] }
+    end
+
+    # §6 claim string; the anchor and the verifier build it the same way.
+    def claim(signed, submission_key)
+      "prov:#{signed['predicate_version']}:#{signed['grade_overall']}:" \
+        "#{signed['stages_with_own_environment']}/#{signed['stages_total']}:#{signed['bundle_digest']}:#{submission_key}"
+    end
+  end
+end

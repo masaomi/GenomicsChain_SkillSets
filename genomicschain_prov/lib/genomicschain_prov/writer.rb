@@ -34,7 +34,11 @@ module GenomicsChainProv
     # Named in the bundle's own extension block and therefore in the signed
     # identity as `producer_version` (§6). A change in what this writer puts
     # in a bundle is a change in what the record says produced it.
-    VERSION = 'prov-writer-0.1.0'
+    # 0.2.0 (design v0.1.12): writes `platform` and `zk_receipts[]`.
+    VERSION = 'prov-writer-0.2.0'
+    # The one zkVM and the one journal shape v0.1.12 can verify (§6.1).
+    ZK_VM_NAME = 'risc0-zkvm'
+    ZK_JOURNAL = 'gc-zk-journal-0.1'
     SPEC_VERSION = 'https://w3id.org/ieee/ieee-2791-schema/2791object.json'
     # Decided 2026-09-20 (design §10-1, §13.4-6). The schema file lands in
     # `genomicschain_core/schemas/` with the v0.1 implementation; publishing it
@@ -50,8 +54,11 @@ module GenomicsChainProv
     #   re-running the writer gives a different bundle, and v0.1 does not ask
     #   for byte-identity — the digest names THIS file)
     # @param created [String, nil] overrides the timestamp, for the same reason
+    # @param platform [Hash, nil] {cpu_architecture, os_name, os_release} — the
+    #   plan's own statement, or this machine's (Environment.platform), or nil
+    # @param zk_receipts [Array<Hash>] declarations from `zk_declaration`
     # @return [Hash] the BCO
-    def build(plan, checksums: {}, object_id: nil, created: nil)
+    def build(plan, checksums: {}, object_id: nil, created: nil, platform: nil, zk_receipts: [])
       now = created || Time.now.utc.iso8601
       steps = plan['stages'].sort_by { |s| s['step_number'] }
       bco = {
@@ -60,7 +67,7 @@ module GenomicsChainProv
         'etag' => nil,
         'provenance_domain' => provenance_domain(plan, now),
         'usability_domain' => [plan['description'] || plan['name']],
-        'extension_domain' => [extension_block(checksums)],
+        'extension_domain' => [extension_block(checksums, platform: platform, zk_receipts: zk_receipts)],
         'description_domain' => {
           'keywords' => plan['keywords'] || [],
           'pipeline_steps' => steps.map { |s| pipeline_step(s) }
@@ -158,18 +165,36 @@ module GenomicsChainProv
     # the runtime and the workflow script alike. The adapter joins all of them
     # on the exact locator, which is why the key has to be the locator the
     # entry itself carries and not a path on this machine.
-    def extension_block(checksums)
+    #
+    # `platform` and `zk_receipts` (design v0.1.12 §6.1) appear only when there
+    # is something to say: a bundle with neither is the same shape a 0.1.0
+    # writer produced, apart from the producer version.
+    def extension_block(checksums, platform: nil, zk_receipts: [])
       rows = checksums.keys.sort.filter_map do |locator|
         sha256 = checksums[locator]['sha256']
         { 'uri' => locator, 'sha256' => sha256 } if sha256
       end
-      {
-        'extension_schema' => EXTENSION_SCHEMA,
-        'genomicschain_extension' => {
-          'producer' => { 'name' => PRODUCER_NAME, 'version' => VERSION },
-          'checksums' => rows
-        }
+      ext = {
+        'producer' => { 'name' => PRODUCER_NAME, 'version' => VERSION },
+        'checksums' => rows
       }
+      ext['platform'] = platform if platform
+      ext['zk_receipts'] = zk_receipts unless zk_receipts.nil? || zk_receipts.empty?
+      { 'extension_schema' => EXTENSION_SCHEMA, 'genomicschain_extension' => ext }
+    end
+
+    # One receipt declaration in the shape the adapter reads (§6.1). The
+    # receipt's own SHA-256 is measured by Environment from the file; the rest
+    # is the plan's statement. The journal convention is not a choice: it is
+    # the only one the anchor can link to the bundle.
+    def zk_declaration(entry, receipt_sha256)
+      { 'sha256' => receipt_sha256,
+        'image_id' => entry['image_id'],
+        'zkvm' => { 'name' => ZK_VM_NAME, 'version' => entry['zkvm_version'] },
+        'step_number' => entry['step_number'],
+        'journal' => ZK_JOURNAL,
+        'input_uri' => entry['input'],
+        'output_uri' => entry['output'] }
     end
 
     # Not the bundle digest. §6's `bundle_digest` is the canonical-JSON SHA-256
@@ -223,6 +248,8 @@ module GenomicsChainProv
       }
       plan['inputs'] = normalise_files(raw['inputs'], 'inputs') if raw.key?('inputs')
       plan['outputs'] = normalise_files(raw['outputs'], 'outputs') if raw.key?('outputs')
+      plan['platform'] = normalise_platform(raw['platform']) if raw.key?('platform')
+      plan['zk_receipts'] = normalise_zk_receipts(raw['zk_receipts']) if raw.key?('zk_receipts')
       numbers = plan['stages'].map { |s| s['step_number'] }
       raise PlanError, 'two stages share a step_number' if numbers.uniq.length != numbers.length
 
@@ -309,6 +336,39 @@ module GenomicsChainProv
 
         compact_h('param' => param, 'value' => p['value'].nil? ? nil : p['value'].to_s,
                   'step' => p['step'].nil? ? nil : p['step'].to_i)
+      end
+    end
+
+    # A plan may say what the computation ran on — for a run on another
+    # machine than the one writing the bundle. Stated, it wins over measuring.
+    def normalise_platform(raw)
+      raise PlanError, 'platform is not an object' unless raw.is_a?(Hash)
+
+      h = compact_h(%w[cpu_architecture os_name os_release].to_h { |k| [k, str(raw[k])] })
+      raise PlanError, 'platform names nothing' if h.empty?
+
+      h
+    end
+
+    # `[{receipt, image_id, zkvm_version, step_number, input, output}]` — the
+    # receipt file, the guest it was proved for, and the step's input and
+    # output whose digests the journal binds (§6.1). The shape is checked
+    # here; whether the step, input and output exist in the bundle is the
+    # adapter's reading, reported by gc_prov_check and refused by the anchor.
+    def normalise_zk_receipts(raw)
+      raise PlanError, 'zk_receipts is not an array' unless raw.is_a?(Array)
+
+      raw.each_with_index.map do |e, i|
+        where = "zk receipt #{i + 1}"
+        raise PlanError, "#{where} is not an object" unless e.is_a?(Hash)
+
+        r = { 'receipt' => str(e['receipt']), 'image_id' => str(e['image_id'])&.downcase,
+              'zkvm_version' => str(e['zkvm_version']), 'input' => str(e['input']), 'output' => str(e['output']) }
+        missing = r.select { |_, v| v.nil? }.keys
+        raise PlanError, "#{where} has no #{missing.join(', ')}" unless missing.empty?
+        raise PlanError, "#{where} image_id is not 64 hex" unless r['image_id'] =~ /\A[0-9a-f]{64}\z/
+
+        r.merge('step_number' => integer(e['step_number'], where))
       end
     end
 

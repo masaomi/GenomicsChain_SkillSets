@@ -72,6 +72,13 @@ module GcProvWrite
       o.on('--no-docker', 'do not ask Docker for image digests') { opts[:docker] = false }
       o.on('--run-version-commands', 'run the version_command lines the plan declares') { opts[:run_version_commands] = true }
       o.on('--no-grade', 'do not print the grade of what was written') { opts[:grade] = false }
+      # (a description must not start with "--": OptionParser reads it as another switch)
+      o.on('--no-platform', 'with a plan: do not record this machine\'s cpu architecture and OS') { opts[:platform] = false }
+      o.on('--platform-of-this-machine',
+           'with a Nextflow run: record this machine\'s cpu architecture and OS (off by default: ' \
+           'the tasks may have run elsewhere)') { opts[:platform] = true }
+      o.on('--zk-receipts PATH', 'a JSON array of {receipt, image_id, zkvm_version, step_number, input, output}; ' \
+                                 'receipt paths are relative to that file') { |v| opts[:zk] = v }
       o.on('-h', '--help') { puts o; exit 0 }
     end
     parser.parse!(argv)
@@ -99,9 +106,16 @@ module GcProvWrite
     resolved = W::Environment.resolve!(plan, base_dir: base, checksums: opts[:checksums],
                                              run_version_commands: opts[:run_version_commands],
                                              docker: opts[:docker], digest_map: digest_map)
+    # The plan's own statement of the platform wins; otherwise this machine,
+    # which for --plan is normally the one that ran the stages (design
+    # v0.1.12 §6.1). --no-platform leaves it out.
+    platform = plan['platform'] || (opts[:platform] == false ? nil : W::Environment.platform)
+    zk = W::Environment.zk_declarations(plan['zk_receipts'], base_dir: base)
+    extra = zk_from_file(opts)
     { 'bco' => W.build(plan, checksums: resolved['checksums'],
-                             object_id: opts[:object_id], created: opts[:created]),
-      'notes' => resolved['notes'] }
+                             object_id: opts[:object_id], created: opts[:created],
+                             platform: platform, zk_receipts: zk['zk_receipts'] + extra['zk_receipts']),
+      'notes' => resolved['notes'] + zk['notes'] + extra['notes'] }
   end
 
   def from_nextflow(opts)
@@ -109,11 +123,28 @@ module GcProvWrite
     path = opts[:bco] || File.join(launch, 'bco.json')
     bco = JSON.parse(File.read(path))
     digest_map = opts[:digests] ? GenomicsChainProv::Writer::NextflowRun.digests_from(File.read(opts[:digests])) : {}
-    GenomicsChainProv::Writer::NextflowRun.read(
+    extra = zk_from_file(opts)
+    out = GenomicsChainProv::Writer::NextflowRun.read(
       launch, bco: bco, versions_path: opts[:versions], trace_path: opts[:trace],
       work_root: opts[:work] || 'work', digest_map: digest_map, script_path: opts[:script],
-      jar_path: opts[:jar], checksums: opts[:checksums], docker: opts[:docker]
+      jar_path: opts[:jar], checksums: opts[:checksums], docker: opts[:docker],
+      platform: opts[:platform] == true ? W::Environment.platform : nil,
+      zk_receipts: extra['zk_receipts']
     )
+    out['notes'] += extra['notes']
+    out['notes'] << 'no platform recorded: pass --platform-of-this-machine if the tasks ran here' unless opts[:platform] == true
+    out
+  end
+
+  # --zk-receipts: the same entries a plan's `zk_receipts` holds, in a file of
+  # their own so a Nextflow run can declare them too.
+  def zk_from_file(opts)
+    return { 'zk_receipts' => [], 'notes' => [] } unless opts[:zk]
+
+    entries = W.normalise_zk_receipts(JSON.parse(File.read(opts[:zk])))
+    W::Environment.zk_declarations(entries, base_dir: File.dirname(File.expand_path(opts[:zk])))
+  rescue JSON::ParserError
+    raise W::PlanError, '--zk-receipts is not valid JSON'
   end
 
   def emit(bco, out)
@@ -131,13 +162,24 @@ module GcProvWrite
     notes.each { |n| warn "  - #{n}" }
     return unless opts[:grade]
 
-    graded = Predicate.grade(Bco.parse(bco))
+    np = Bco.parse(bco)
+    graded = Predicate.grade(np)
     counts = graded['counts']
     warn "grade: #{graded['grade_overall']}  (coverage #{graded['coverage']} stages with their own environment)"
     warn "  by category: #{graded['grades'].map { |k, v| "#{k}=#{v}" }.join(' ')}"
     warn "  inputs #{counts['inputs_with_checksum']}/#{counts['inputs_total']} with a checksum, " \
          "#{counts['inputs_internal']} internal; software #{counts['software_total']}, " \
          "containers #{counts['containers_total']}; params #{counts['params_count']}/#{counts['params_total']}"
+    # The anchor issues a Tier 2.5 record only at `immutable` (design v0.1.12
+    # §6.1); saying so here is the cheapest place for the customer to learn it.
+    unless graded['grade_overall'] == 'immutable'
+      warn '  Tier 2.5 records only bundles graded immutable; this one would be refused'
+    end
+    warn "  platform: #{np.platform ? np.platform.values.compact.join(' ') : 'not recorded'}"
+    Array(np.zk_receipts).each do |r|
+      state = r['defects'].empty? ? 'declared' : "unusable (#{r['defects'].join(', ')})"
+      warn "  zk receipt for stage #{r['stage'] || '?'}: #{state}"
+    end
   end
 end
 
