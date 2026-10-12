@@ -1,0 +1,188 @@
+{
+  "fixed_set": "self-application round 2 fixed set (expected-r2-v1)",
+  "built_by": {
+    "path": "scripts/selfapp/fixed_set_r2.rb",
+    "sha256": "e20e05db8069e1da1f4083a35c14591ec3be920b9c6396f54933d9a0c8817f92",
+    "bytes": 4968
+  },
+  "expectations": {
+    "path": "selfapp/round2/expected.json",
+    "sha256": "982e33d936831b37a9076675318249464bbc10419527feaef4bb354d3741a26a",
+    "bytes": 16297
+  },
+  "commit_c_prime": {
+    "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+    "git_archive_sha256": "bc076bfcf2c40720d6800c7de7d9f8cd4c17aa0293c4348dac391a53f91427ed",
+    "git_archive_bytes": 3471360,
+    "package_tree": {
+      "tree_sha256": "135d2301cb0b8715d73fa67e7d2aeb5eab536668550e58dde89b40bf7803d381",
+      "files": 132
+    }
+  },
+  "frozen_inputs": {
+    "manifest": {
+      "path": "log/selfapp/ddc_inputs_v1/inputs_manifest.json",
+      "sha256": "1bbd266757adcced6a66ab7ea270df2a7ce893fa5d75eb948983a9a7dbe93d7a",
+      "bytes": 205313
+    },
+    "tree": {
+      "path": "log/selfapp/ddc_inputs_v1",
+      "tree_sha256": "74dfe12b5ca39dfc9b5a871997f251d7d733b6f1cdd635698a63d713afb8c070",
+      "files": 1599
+    }
+  },
+  "round1": {
+    "fixed_set": {
+      "path": "selfapp/fixed_set_v1.json",
+      "sha256": "f0a2ce75b9fb24f731c1857a492eef7e23448393f84b4c6367917f4755198569",
+      "bytes": 6395
+    },
+    "fixed_set_ots": {
+      "path": "selfapp/fixed_set_v1.json.ots",
+      "sha256": "8ac036ed4d831deb8cb146191dbe5941341da8c77f83dd97b9be8fdc1a27a786",
+      "bytes": 4951
+    },
+    "expected": {
+      "path": "selfapp/expected_v1.json",
+      "sha256": "242528cd4c1bc7b5a1a55dedf959aa119f3d7d625757a0c8ab758cf206c8e0c7",
+      "bytes": 55553
+    },
+    "tier4_acceptance": {
+      "path": "selfapp/tier4_acceptance_v1.json",
+      "sha256": "b119162aaaa15ab32f3ee9e0acca53aed50b7fa3243d949a5b8bce00633a01c2",
+      "bytes": 13381
+    },
+    "verdict_tables": [
+      {
+        "path": "log/selfapp/s8/verdict_table_from_S5.tsv",
+        "sha256": "cb670b07de56c9da7ea4818257cd87a7ae8b5e365eadb93f76b10e31a6cb6105",
+        "bytes": 2313
+      },
+      {
+        "path": "log/selfapp/s8/verdict_table_from_S6_T.tsv",
+        "sha256": "cb670b07de56c9da7ea4818257cd87a7ae8b5e365eadb93f76b10e31a6cb6105",
+        "bytes": 2313
+      }
+    ],
+    "tier25_grade_bodies": [
+      {
+        "path": "log/selfapp/s5/harness_A_1/bodies/tier25_grade__V0.json",
+        "sha256": "57459d1233dec69a417be8d3e3f72cf2fdf0f9bb7465d7c28e6a4df00d600e5b",
+        "bytes": 7377
+      },
+      {
+        "path": "log/selfapp/s5/harness_A_1/bodies/tier25_grade__V6.json",
+        "sha256": "a83b44f401c3aa1f2941df68a66e404cea2b51a19a6ce2e416e14407323e6bc1",
+        "bytes": 7868
+      }
+    ]
+  },
+  "procedures_at_c_prime": [
+    {
+      "path": "scripts/selfapp/ddc_common.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "b2157892390ed26e9b1758f179180e1703cc68adf34258c62824860d00395ed5",
+      "bytes": 1504
+    },
+    {
+      "path": "scripts/selfapp/ddc_harness.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "a1b787c7e302480cd21d437c70271054dd036311a3ebb999b8e5125c863dfa5b",
+      "bytes": 8067
+    },
+    {
+      "path": "scripts/selfapp/ddc_compare.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "1b98aff3561510dbb690b8989565983f4afb07630e4dd2ab0a171e68335f6bc4",
+      "bytes": 5812
+    },
+    {
+      "path": "scripts/selfapp/verdict_table.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "f3e7e2a6466bd1fb2bd6b4b6bf137effc8e4e4ac8d989803bd7bf4ad4c8e81be",
+      "bytes": 2517
+    },
+    {
+      "path": "scripts/selfapp/s4b_reinstall.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "67157da531f0353f60f40e21946b7fdc901956e5a0a25dd86d2971e455c25683",
+      "bytes": 7208
+    },
+    {
+      "path": "scripts/selfapp/s6_t.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "3663d5032ba35edca3f25d8702f68d637982541a4b1e0d6351ca4226f42d7536",
+      "bytes": 8579
+    },
+    {
+      "path": "scripts/selfapp/s7_judge.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "2b3c771e9588239187af30fa9a8948b8cb8ee3979514211075ea659a250f456a",
+      "bytes": 5450
+    },
+    {
+      "path": "scripts/selfapp/s8_judge.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "2109b94a74d497095e5103c720ad97979208b7817fb2c92a861996e6bdba7cc9",
+      "bytes": 6073
+    },
+    {
+      "path": "scripts/gc_submit_client.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "97be88472a0e33312ce92e9059ee0784ab2886451074e1fa7b7d4c6745b5b2d9",
+      "bytes": 11096
+    },
+    {
+      "path": "genomicschain_prov/bin/gc_prov_verify.rb",
+      "commit": "809151618f2b4e06bdd279be2ee6537c8e8e016c",
+      "sha256": "82e18e34dfba6ddb16d892ff213dbb8b901a35bcef1b7f62c69a3cddb49c30c2",
+      "bytes": 6521
+    }
+  ],
+  "procedure_notes": "s4b_reinstall.rb, s6_t.rb, s7_judge.rb and s8_judge.rb are hard-wired to C and to round-1 directories; their round-2 parameterisation is written after this set and reported as such, with a diff against the blobs named here.",
+  "local_anchor_procedure": {
+    "path": "log/tier25_gate_withdrawn_20261012/up.sh",
+    "sha256": "0e15c7a48a990d991dbf10524723957aace2b76a943fc2401894d98ed1088f9d",
+    "bytes": 2161
+  },
+  "tier4": {
+    "stage0_skill": {
+      "path": "selfapp/tier4/stage0/skill",
+      "tree_sha256": "377a0a7d84b3633e1abedb1ca263c041603bd8d2e43cfd3c0351a78de1e898ec",
+      "files": 7
+    },
+    "stage1_skill": {
+      "path": "selfapp/tier4/stage1/skill",
+      "tree_sha256": "4b26227db3d630d9d7f94682794ed2a4a18cd686156c58394911ced9c8acb23a",
+      "files": 9
+    },
+    "records": [
+      {
+        "path": "log/selfapp/s7/package_digest.json",
+        "sha256": "2a86d3ce66d406332345191f249c62cb42f07413615848609409e93babe811c4",
+        "bytes": 1583
+      },
+      {
+        "path": "log/selfapp/s7/reference.json",
+        "sha256": "a0c0e2fd14aa2f2d1e26c763e8ede61b3142cf5199e9417678ea8291c2eb26a8",
+        "bytes": 1720
+      },
+      {
+        "path": "log/selfapp/s7/subject2_record.json",
+        "sha256": "c7e94707b30c9ab2842ff994c7cc2b29a32bd1bcfc0ec957d429b7ce67365fb2",
+        "bytes": 1267
+      },
+      {
+        "path": "log/selfapp/s8/package_digest.json",
+        "sha256": "d3e488e2d9b8e323f9c46081060a436791884ce071c17fc87421a14a02cc0fdf",
+        "bytes": 1593
+      },
+      {
+        "path": "log/selfapp/s8/declaration.json",
+        "sha256": "6ab1dbba09b099216128e81a88189243ce049a4d47e04a6e28a227d3b9dad698",
+        "bytes": 1000
+      }
+    ]
+  },
+  "statement": "No checker of commit C' was launched against selfapp/ or log/selfapp/ddc_inputs_v1/ before this set was written; the exceptions are listed in the expectations file under observed_before_fixing. This is the orchestrator statement; it is not an independent check."
+}
