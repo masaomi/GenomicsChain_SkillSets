@@ -23,7 +23,9 @@
 # chain. A running MCP server keeps the code it loaded at start; it has to be
 # restarted before any S4c launch uses A.
 #
-# Usage: ruby scripts/selfapp/s4b_reinstall.rb [--out log/selfapp/s4b]
+# Usage: ruby scripts/selfapp/s4b_reinstall.rb [--round 1|2] [--out DIR]
+#   round 1 (default): A from C, record under log/selfapp/s4b
+#   round 2: A' from C', record under log/selfapp/r2/s4b
 
 require 'digest'
 require 'json'
@@ -31,17 +33,31 @@ require 'open3'
 require 'optparse'
 require 'time'
 require 'tmpdir'
+require 'fileutils'
 require_relative 'ddc_common'
 
-C = '549accc9b5b6016ccb906b613ea2ea8da73ad4a6'
-C_ARCHIVE_SHA256 = '2875eec01fd16598aa2f8e0c673860f9ec8194a1e97fa0cf8f6af370a42ab302' # fixed_set_v1.json .commit_c
+# Round 1 installs A from C (fixed_set_v1.json .commit_c); round 2 installs A'
+# from C' (selfapp/round2/fixed_set.json .commit_c_prime, design §14). The
+# round-2 entry was added after round 2's fixing; round 1's values are as
+# they were.
+ROUNDS = {
+  1 => { commit: '549accc9b5b6016ccb906b613ea2ea8da73ad4a6', label: 'C', checker: 'A',
+         archive_sha256: '2875eec01fd16598aa2f8e0c673860f9ec8194a1e97fa0cf8f6af370a42ab302', out: 'log/selfapp/s4b' },
+  2 => { commit: '809151618f2b4e06bdd279be2ee6537c8e8e016c', label: "C'", checker: "A'",
+         archive_sha256: 'bc076bfcf2c40720d6800c7de7d9f8cd4c17aa0293c4348dac391a53f91427ed', out: 'log/selfapp/r2/s4b' }
+}.freeze
 INSTALL_ORDER = %w[genomicschain_core genomicschain_tier1 genomicschain_tier2 genomicschain_tier3 genomicschain_prov].freeze
 
-opts = { out: 'log/selfapp/s4b', data_dir: '.kairos' }
+opts = { round: 1, data_dir: '.kairos' }
 OptionParser.new do |o|
+  o.on('--round N', Integer) { |v| opts[:round] = v }
   o.on('--out DIR') { |v| opts[:out] = v }
   o.on('--data-dir DIR') { |v| opts[:data_dir] = v }
 end.parse!
+ROUND = ROUNDS.fetch(opts[:round]) { abort "unknown round #{opts[:round]}" }
+C = ROUND[:commit]
+C_ARCHIVE_SHA256 = ROUND[:archive_sha256]
+opts[:out] ||= ROUND[:out]
 
 abort 'run from the repository root' unless File.directory?('.git')
 abort "#{opts[:out]} exists" if File.exist?(opts[:out])
@@ -78,11 +94,12 @@ abort "git archive failed: #{err}" unless code.zero?
 archive_sha = Digest::SHA256.hexdigest(archive)
 abort "archive sha256 #{archive_sha} != fixed set #{C_ARCHIVE_SHA256}" unless archive_sha == C_ARCHIVE_SHA256
 
+design_path = 'docs/design/self_application_design_v0_1.md'
 record = {
-  record: 'self_application S4b — checker A reinstalled from the archive of C',
-  design: { path: 'docs/design/self_application_design_v0_1.md', version: '0.1.5',
-            sha256: Digest::SHA256.file('docs/design/self_application_design_v0_1.md').hexdigest },
-  commit_c: C, git_archive_sha256: archive_sha, git_archive_bytes: archive.bytesize,
+  record: "self_application S4b — checker #{ROUND[:checker]} reinstalled from the archive of #{ROUND[:label]} (round #{opts[:round]})",
+  design: { path: design_path, version: File.read(design_path)[/\*\*状態:\*\* 草稿 v([0-9.]+)/, 1],
+            sha256: Digest::SHA256.file(design_path).hexdigest },
+  round: opts[:round], commit_c: C, git_archive_sha256: archive_sha, git_archive_bytes: archive.bytesize,
   packages: INSTALL_ORDER,
   packages_note: 'DdcCommon::PACKAGES (what the DDC harness loads). genomicschain_regwatch left out: not a checker, not loaded by the harness; operator decision 2026-10-03.',
   install_root: install_root,
@@ -137,6 +154,7 @@ end
 record[:finished_at] = Time.now.utc.iso8601
 record[:mcp_server_note] = 'A running genomics-chain MCP server still holds the code it loaded at start. Restart it before any S4c launch.'
 
+FileUtils.mkdir_p(File.dirname(opts[:out]))
 Dir.mkdir(opts[:out])
 File.write(File.join(opts[:out], 'record.json'), JSON.pretty_generate(record) + "\n")
 puts "A tree sha256 #{record[:a][:tree_sha256]} (#{record[:a][:file_count]} files), matches archive: #{record[:a][:matches_archive]}"

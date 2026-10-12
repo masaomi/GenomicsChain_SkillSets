@@ -21,12 +21,25 @@ require 'time'
 require_relative 'ddc_common'
 
 REPO = File.realpath(File.join(__dir__, '..', '..'))
-S8 = File.join(REPO, 'log/selfapp/s8')
+# Round 2 (design §14, added after round 2's fixing): the same judgments on A'.
+# It reads round 1's declaration, Skill digest and invocation from
+# log/selfapp/s8 and writes work, args, launches and its runs-log entries
+# under log/selfapp/r2/. `declare` is round 1 only.
+#   ruby scripts/selfapp/s8_judge.rb declared|skill --round 2
+if (i = ARGV.index('--round'))
+  ROUND = Integer(ARGV[i + 1])
+  ARGV.slice!(i, 2)
+else
+  ROUND = 1
+end
+abort "unknown round #{ROUND}" unless [1, 2].include?(ROUND)
+S8_R1 = File.join(REPO, 'log/selfapp/s8')
+S8 = ROUND == 1 ? S8_R1 : File.join(REPO, 'log/selfapp/r2/s8')
 DRAFT = File.join(REPO, 'docs/preprint/genomicschain_tiers_preprint_20261003_v0_2/preprint.md')
-DECLARATION = File.join(S8, 'declaration.json')
+DECLARATION = File.join(S8_R1, 'declaration.json')
 BUNDLE = File.join(REPO, 'log/selfapp/ddc_inputs_v1')
 CHECKER = File.join(REPO, '.kairos/skillsets')
-RUNS_LOG = File.join(REPO, 'log/selfapp/ddc_runs.jsonl')
+RUNS_LOG = File.join(REPO, ROUND == 1 ? 'log/selfapp/ddc_runs.jsonl' : 'log/selfapp/r2/ddc_runs.jsonl')
 TABLE = 'results/verdict_table.tsv'
 TABLE_SHA256 = 'cb670b07de56c9da7ea4818257cd87a7ae8b5e365eadb93f76b10e31a6cb6105'
 CITATION = 'GenomicsChain tiers preprint, working draft v0.2 (2026-10-03), section 8.4, Table 8.4'
@@ -71,6 +84,7 @@ end
 
 case ARGV.first
 when 'declare'
+  abort "declare is round 1 only; round 2 uses round 1's declaration" unless ROUND == 1
   abort "#{DECLARATION} exists" if File.exist?(DECLARATION)
   text = File.read(DRAFT)
   abort 'the draft does not declare the table sha256' unless text.include?(TABLE_SHA256) && text.include?('### 8.4 ')
@@ -94,9 +108,9 @@ when 'declared'
          'S8 precondition: the declared computation under Tier 3')
 
 when 'skill'
-  record = JSON.parse(File.read(File.join(S8, 'package_digest.json')))
+  record = JSON.parse(File.read(File.join(S8_R1, 'package_digest.json')))
   abort 'stage-1 Skill differs from its recorded digest' unless tree(SKILL) == record['package_digest']
-  invocation = JSON.parse(File.read(File.join(S8, 'skill_invocation.json')))
+  invocation = JSON.parse(File.read(File.join(S8_R1, 'skill_invocation.json')))
   work = File.join(S8, 'tier3_work', 'skill')
   launch('skill_reversion', tier3_args('selfapp://tier4/stage1/skill', work, invocation.fetch('command')),
          'S8 reversion check: the distilled stage-1 Skill under Tier 3') do |dir|

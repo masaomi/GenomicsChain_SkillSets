@@ -20,12 +20,19 @@ require 'yaml'
 require_relative 'ddc_common'
 
 REPO = File.realpath(File.join(__dir__, '..', '..'))
+# Round 2 (design §14, added after round 2's fixing) re-runs the same judge
+# on A': it reads round 1's package digest, reference and second subject from
+# log/selfapp/s7 and writes its own work under log/selfapp/r2/s7.
+#   ruby scripts/selfapp/s7_judge.rb [--round 2]
+ROUND = ARGV.include?('--round') ? Integer(ARGV[ARGV.index('--round') + 1]) : 1
+abort "unknown round #{ROUND}" unless [1, 2].include?(ROUND)
 S7 = File.join(REPO, 'log/selfapp/s7')
+OUT = ROUND == 1 ? S7 : File.join(REPO, 'log/selfapp/r2/s7')
 PACKAGE = File.join(REPO, 'selfapp/tier4/stage0/skill')
 DIGEST = JSON.parse(File.read(File.join(S7, 'package_digest.json')))
 REFERENCE = JSON.parse(File.read(File.join(S7, 'reference.json')))
-WORK = File.join(S7, 'tier3_work')
-ARGS = File.join(S7, 'args')
+WORK = File.join(OUT, 'tier3_work')
+ARGS = File.join(OUT, 'args')
 S1 = 'results/synthetic_supplementary_table_S1.tsv'
 V0_DECLARED = '22fe3ff699a91e4ded9a3f58fc0996b95c9bff817c294e0421f2fda68e02508a'
 COMMAND = 'docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work synthetic-rnaseq:1.0 ' \
@@ -96,7 +103,8 @@ subjects.each do |name, s|
   record[name] = { 'workdir_tree_sha256' => tree.call(dir), 'params_sha256' => Digest::SHA256.file(File.join(dir, 'params.yaml')).hexdigest,
                    'args_sha256' => Digest::SHA256.file(path).hexdigest, 'expected_sha256' => s[:expected]['sha256'] }
 end
-File.write(File.join(S7, 'judge_setup.json'), "#{JSON.pretty_generate('package_digest' => DIGEST['package_digest'],
+File.write(File.join(OUT, 'judge_setup.json'), "#{JSON.pretty_generate('round' => ROUND,
+                                                                       'package_digest' => DIGEST['package_digest'],
                                                                       'reference_sha256' => REFERENCE['reference_sha256'],
                                                                       'script_sha256' => Digest::SHA256.file(__FILE__).hexdigest,
                                                                       'subjects' => record)}\n")
