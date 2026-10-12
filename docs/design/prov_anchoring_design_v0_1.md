@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.11 —— 凍結後の個別改訂を 1 件反映（§14 の先頭行。U1b の実装が突き当たった事実 2 件で、review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
+**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.12 —— 凍結後の個別改訂を 2 件反映（§14 の先頭 2 行。v0.1.11 は U1b の実装が突き当たった事実 2 件、v0.1.12 は 2026-10-11/12 の operator 決定 3 件——発行の関門としての immutable、CPU と OS、ZK 証明の検証——で §6.1 に集めた。どちらも review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
 round 5〜8 は名目上は設計 review だったが、産出物の 9 割近くが adapter の実装修正であり、設計の review に test が走っていること
 自体がその徴候だった。残る懸案は review の巡ではなく**実装の queue** に置く。設計に変更が要るときは、実装が突き当たった事実を
 持って個別に改訂する。以下は凍結時点の状態の記録（round 8
@@ -354,12 +354,16 @@ workflow_repository_sha256, workflow_commit  — repository は URL の sha256�
                             者でも候補の URL を当てて sha256 を突き合わせることはできる——隠すのは名前であって存在ではない）。
                             commit は SCM extension の scm_commit そのまま（hash か名前）。無ければ null。tag らしさの推測
                             `workflow_ref` は署名の外（§5）
+platform_cpu_architecture, platform_os_name, platform_os_release
+                            v0.1.12（§6.1）。束の GenomicsChain 拡張の `platform` が名乗る値。書き出し器の自己申告で、無ければ null
+zk_receipts                 v0.1.12（§6.1）。束の拡張の `zk_receipts[]` から導出した列。項目ごとに {receipt_sha256, image_id,
+                            zkvm_name, zkvm_version, stage, journal_convention}。stage、receipt_sha256 の順に並べる。無ければ []
 ```
 
 **null になりうる欄（5 つ）:** `producer_name` / `producer_version`（束が名乗らない。nf-prov）、`outputs_digest`（checksum つきの出力が
 0 本）、`workflow_commit` と `workflow_repository_sha256`（SCM extension が無い——`gc_prov_write` が shell / R / Python の計算から
 書く束は SCM を持たない。round 3: 必須のままだと §4.1 の最初の非 Nextflow producer が anchor に届かない）。schema は五つを
-`["string","null"]` にし、null は「無い」の意味で署名に入る。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
+`["string","null"]` にし、null は「無い」の意味で署名に入る（v0.1.12 で `platform_*` の 3 つが加わり 8 つ。§6.1）。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
 固定する**: 検証者は manifest の `record_version` の集合で `params` を組み立て、知らない `record_version` は版違いの見出しへ（§8）。
 v0.1.8 で `scripts_total` / `scripts_with_checksum` を署名欄に足したので、**`record_version` は 0.2 に上げる**（round 7、opus5:
 欄の集合を変えながら 0.1 のままなら、不変条件が自分の文面で破れている）。0.1 の proof はまだ存在しない——U3 が未着手なので、
@@ -370,7 +374,8 @@ v0.1.8 で `scripts_total` / `scripts_with_checksum` を署名欄に足したの
 署名しない——round 1）、`seed`
 （`{recorded, detection: heuristic}`。名前の推測なので署名の外——round 2）、`not_checked`（builder が固定した列 6 項目:
 `locator_reachability`, `bundle_truthfulness`, `bundle_schema_conformance`, `checksum_values_as_written`,
-`reference_genome_identification`, `seed_identification`。schema は enum で固定し、client が送ってきた値は捨てる）。
+`reference_genome_identification`, `seed_identification`。v0.1.12 で 3 項目を足して 9 項目——§6.1。schema は enum で固定し、client が送ってきた値は捨てる）、
+`admission_rule` と `zk_verification`（v0.1.12、§6.1）。
 同一性は「束の bytes ＋ 名前つきの手順の版」から導出される——束だけからではない。
 **記録に入れないもの:** 束の本文、入力・出力の locator の列、パラメータの値、repository の URL。すべて digest で束縛し、顧客の手元に残す。
 Synoptis の evidence 上限は 64 KB（`Config.max_evidence_size`）だが、記録は同一性と数だけ（試算 2.3 KB: §6 の欄を fixture の値で組み、
@@ -423,9 +428,107 @@ submission_key も変わるので、同じ束・同じ鍵でも新しい proof �
 版のずれに語彙が無いと、顧客には「一致しない」としか見えない。
 
 **schema:** `genomicschain_prov/schemas/prov_attestation.schema.json`（置き場所は §7）。`record_type: prov_attestation`、
-`record_version: 0.2`（§6。v0.1.8 で署名欄が増えたため 0.1 から上げた）、`mcp_tool_name: gc_prov_submit`、`additionalProperties: false`。title は「pin strength」で、「再構築十分性」とは
+`record_version: 0.3`（§6。v0.1.8 で署名欄が増えたため 0.1 から 0.2 に、v0.1.12 で `platform_*` と `zk_receipts` が増えたため 0.3 に上げた。
+どちらの時点でも proof はまだ存在しない）、`mcp_tool_name: gc_prov_submit`、`additionalProperties: false`。title は「pin strength」で、「再構築十分性」とは
 書かない（等級は locator が第三者に何を許すかであって、再構築できることではない）。`not_checked` は必須で、builder が固定した
-6 項目の列（上）を enum で持つ。
+9 項目の列（上と §6.1）を enum で持つ。
+
+### 6.1 v0.1.12 の追加 — 発行の関門、CPU と OS、ZK 証明の検証（2026-10-11/12、operator 決定）
+
+**なぜ。** ruling `ruling_service_plan_two_stage_drive_vk_20261011` の D9（ZK 証明を 11/15 から任意で添付できる）と D13（Tier 2.5 は
+自己申告の構成的な記録のまま、immutable の要件と CPU・OS を足す）、および L2 `ruling_tier25_gate_and_zk_verify_20261012` の
+G1（immutable は発行の関門）と G2（anchor が 11/15 から ZK 証明の中身を確かめる）。凍結後の個別改訂で、review の巡ではない。
+
+```
+                              今（v0.1.11）                     v0.1.12
+発行するか                    どの等級でも発行                  grade_overall = immutable のときだけ（未満は拒否）
+CPU と OS                     欄が無い                          束の拡張 platform → 署名欄 3 つ（無ければ null）
+ZK 証明                       欄が無い                          束の拡張 zk_receipts[] → 署名欄 zk_receipts。
+                                                                証明の bytes は提出に添えて送り、anchor が検証してから記録
+record_version                0.2                               0.3
+not_checked                   6 項目                            9 項目
+```
+
+**(1) 発行の関門（G1）。** anchor は述語の `grade_overall` が `immutable` でない束を拒否する（`GradeBelowRequirement`）。記録は作らない。
+拒否の応答は、`environment / inputs / workflow / runtime` のうち immutable に届かない分類とその等級だけを返す——等級は記録が載せる
+種類の値で、束の内容ではない（`items[]` は返さない、§6 の不変条件）。`dry_run` も同じ判定を `checks.admission` に出す。記録には
+server が決める欄 `admission_rule: "prov-admission-0.1"` を置く（意味: grade_overall が immutable で、宣言されたすべての ZK 証明が
+検証と照合を通った）。等級の欄は残す——関門の下でも `grade_software` / `grade_container` は immutable 未満でありうる（環境は二経路の
+強い方なので）、そして関門は将来ゆるめうる（ゆるめても、関門の下で出た記録はすべて immutable なので矛盾しない。逆向きは矛盾する）。
+**Tier 3 の route B（D11）**はこれに合わせて「Tier 2.5 の記録がある（＝ grade_overall immutable、inputs も immutable）かつ
+outputs_with_checksum ≥ 1」になる。Tier 3 が 2.5 の束を読む実装はこの設計の外。
+
+**(2) CPU と OS（D13）。** 束の `genomicschain_extension.platform = {cpu_architecture, os_name, os_release}`。書き出し器が
+自己申告で書く（v0.1 のほかの値と同じく anchor は確かめない → `not_checked: platform_as_written`）。値は Ruby の `Etc.uname` の
+`machine` / `sysname` / `release` で、**`nodename`（host 名）は書かない**。`gc_prov_write --plan` は既定で書き（plan が `platform` を
+書いていればそちらを使う。別の machine で走った計算を記述するため。`--no-platform` で書かない）、補完器 `--from-nextflow-run` は
+**既定で書かない**——補完器を走らせる machine が task の走った machine とは限らない（cluster・cloud の実行）ので、
+`--platform-of-this-machine` を明示したときだけ書く。値を作らない原則（§4.1）の適用。拡張 block が複数あって `platform` が食い違えば
+どちらも記録しない（producer と同じ規則、§4）。文字列でない値は「無い」（§5 の境界規則）。署名欄 `platform_*` は null 可。関門には
+入れない（等級に関係しない）。
+
+**(3) ZK 証明（D9、G2）。** 束の側の宣言、送り方、anchor の検証、記録に載るもの、の順に書く。
+
+*束の宣言。* `genomicschain_extension.zk_receipts[]`、項目ごとに:
+
+| 欄 | 意味 |
+|---|---|
+| `sha256` | 証明 file（RISC Zero の `Receipt` を bincode で直列化した bytes）の SHA-256、64 hex |
+| `image_id` | guest program の image ID、64 hex（32 bytes を little-endian の u32 8 個として並べた hex——RISC Zero の慣習） |
+| `zkvm` | `{name, version}`。v0.1 が受けるのは `risc0-zkvm` だけ |
+| `step_number` | 証明が覆う段。束の `pipeline_steps[].step_number` を名指す（記録には位置 `stage` として載る、§5） |
+| `journal` | journal の形の名前。v0.1 は `gc-zk-journal-0.1` だけ: risc0 serde の `([u8; 32], Vec<u8>)` = (段の入力 file の SHA-256, 段の出力 bytes) |
+| `input_uri`, `output_uri` | journal が束縛する段の入力と出力の locator。その段の `input_list` / `output_list` にあり、拡張の `checksums[]` に SHA-256 があること |
+
+宣言の読み取りはアダプタが行う（束から決定的に導ける部分）。宣言が壊れている——欄が欠ける、hex でない、段が無い、locator が
+その段の list に無い、locator に SHA-256 が無い、同じ `sha256` が二度宣言される——なら、anchor は提出を拒否する
+（`ZkDeclarationInvalid`。理由は欄の名前と位置だけ）。境界規則（§5）はここにも当てる: `zk_receipts` が配列でなければ `FormatError`、
+object でない要素は空の項目として残り、宣言の欠陥として拒否される。拡張 block が複数あれば `zk_receipts[]` は連結する（`checksums[]` と同じ）。
+上限は 1 束あたり 4 本、1 本あたり 512 KiB（succinct receipt は計算の大きさに依らず約 224 KB——実測 223,746 bytes、KairosChain_2026
+`log/zk_demo_sizefactor_20260929/03_proofs`）。
+
+*送り方。* 証明の bytes は束の外にある（束は証明の指紋しか持たない）。client は提出の引数 `zk_receipt_bytes`（`{receipt_sha256 → base64}`）に
+添える。署名はしない——署名される同一性は束から導いた `zk_receipts` で、bytes はその `sha256` に一致しなければならない。宣言された
+すべての証明に bytes が要り、宣言されていない bytes が来たら拒否する（束縛されない材料を受け取らない）。**bytes は 1 回の検証の間だけ
+memory に持ち、disk にも log にも書かない**（束と同じ不変条件、§6）。外部 process には stdin で渡し、一時 file を作らない。
+
+*anchor の検証。* 証明 1 本ごとに、版を固定した Rust の小さな検証 program `gc_zk_verify`（§7）を呼ぶ。入力は bytes（stdin）と image ID、
+出力は JSON 1 行: 証明が image ID に対して検証できたか（`Receipt::verify`）、journal が `gc-zk-journal-0.1` として読めたか、読めたなら
+journal の入力 digest と、出力 bytes の SHA-256。anchor は次の 4 つがすべて成り立つときだけ記録に進む——どれか一つでも欠ければ
+`ZkReceiptRejected`（理由の符号だけ。journal の値は返さない）:
+
+```
+① bytes の sha256 = 宣言の sha256
+② Receipt::verify(image_id) が通る（RISC Zero の検証。0.012 秒程度——同上の実測）
+③ journal の入力 digest = 束が input_uri に記録した SHA-256
+④ sha256(journal の出力 bytes) = 束が output_uri に記録した SHA-256
+```
+
+③④ が「この証明はこの束のこの段の計算のものだ」という結び付けで、これが無いと ② は「どこかの計算が正しかった」としか言わない。
+検証 program が無い・時間切れ（30 秒）・異常終了は `ZkVerifierUnavailable` で、拒否として返す（証明を確かめずに記録することはしない。
+証明の無い束は検証 program なしで通る）。
+
+*記録に載るもの。* 署名欄 `zk_receipts`（上の表から、指紋・image ID・zkVM の名前と版・段の位置・journal の形の名前だけ）と、
+server が決める欄 `zk_verification = {verifier, risc0_zkvm, journal_convention, receipts_verified}`（証明が 0 本なら null）。
+**証明の bytes、journal の値、入力・出力の locator と digest は載せない**（記録は同一性と数だけ、2026-09-20 の決定）。
+
+*言葉。* 検証道具の出力と `not_checked` の説明に、次の 2 文をそのまま置く（記憶 `warranty-scope`、2026-10-12 operator 指示）:
+
+> (a) ZK 証明が示すのは、指定した段の計算が、記録された入力から正しく行われたことだけです。対象は指定した段だけで、記録された入力が
+> 生データそのものであることは示しません。
+> (b) GenomicsChain が保証するのは自らの手順と記録だけです。Tier 3 の記録は、その日に宣言どおりの結果に至ったという日付つきの
+> 観察であり、将来の再現の約束ではありません。
+
+**(4) not_checked に足す 3 項目。** `platform_as_written`（CPU と OS は書き出し器の申告のまま）、`zk_guest_program_semantics`
+（image ID は program を名指すが、その program が何を計算するかは確かめていない）、`zk_inputs_are_raw_data`（(a) の後半）。
+9 項目は record_version 0.3 で固定し、証明の有無に依らず常に全部を載せる。
+
+**(5) 拡張の schema。** `genomicschain_core/schemas/bco_extension_genomicschain_v0_1.json` を U3 で作り、`producer`・`checksums[]`・
+`platform`・`zk_receipts[]` を定める。URL（§10-1）はまだ公開していないので、v0_1 のまま欄を足してよい。**公開は売る前、operator の
+判断**（外向きの行為）。
+
+**(6) 版。** アダプタは `platform` と `zk_receipts` を読むので 0.4.0 に上げる（`adapter_version` は署名欄なので、古い版で読んだ等級と
+区別される）。述語は変えない（等級の規則は動かない）。record_version は 0.3。
 
 ## 7. 道具と置き場所
 
@@ -437,6 +540,7 @@ submission_key も変わるので、同じ束・同じ鍵でも新しい proof �
 | `gc_prov_submit` | `genomicschain_prov/tools/`（prov の `skillset.json` の `anchor_profile_tool_classes`。core の登録を汎用化して読む） | anchor のみ | — | Tier-2 submit と同じ骨。ただし束の gate は §6 の Gate A。`dry_run` で `signed_params` を返す |
 | `gc_prov_proof` | `genomicschain_prov/lib/genomicschain_prov/place_extension.rb`——MCP tool ではなく **Meeting Place の公開 route**。prov の `skillset.json` の `place_extensions[]` に `{class, require, public_routes: ["/place/web/prov/"]}` を書き、Hestia の `PlaceRouter#register_extension(public_routes:)` が `/place/web/prov/proof/<proof_id>` を **認証なし・GET/HEAD のみ・公開 rate limiter つき**で Bearer の前に dispatch する（round 3 で実物を読んだ: MCP の `tools/call` は body を読む前に Bearer を検査し、anchor では service_grant の AccessGate も重ねてかかるので、tool として登録しても 1 本だけ認証の外には出せない） | anchor のみ（Meeting Place が動いている node） | — | `proof_id` → registry の envelope。**返すのは次の欄だけ**: `proof_id, version, attester_id, subject_ref, claim, evidence`（canonical JSON の文字列 `{manifest, manifest_body_sha256}` そのまま）`, merkle_root, timestamp, ttl, submitter_pubkey, signature` に、`evidence` を parse した `manifest` と registry の `revoked` を足す。`actor_user_id`（Bearer の `--user` 名）・`actor_role`・`metadata` は**返さない**（署名の外の欄で、検証に要らず、顧客の token 名を漏らす——round 3、3 席）。`manifest.record_type` が `prov_attestation` でなければ not found と同じ返事（registry は全 tier で 1 本の `proofs.jsonl`。Tier-2 の manifest は repo の URL を hash せずに持つ——round 3、codex と verifier）。既存の `attestation_verify` は `valid / errors / content_hash / checked_at / proof_id` を返すだけで evidence を返さず、`attestation_list` は要約だけなので、第三者は manifest を読めない（round 2 の P0）。この route が §8 の第一段の材料。**extension の契約**（Hestia `PlaceRouter` が要求する、round 4）: `initialize(router)`、`public_call(env) → Rack の三つ組か nil`、`call(env, peer_id:) → nil`、`public_route_prefixes → ['/place/web/prov']`（`skillset.json` の `public_routes` は記録、class 側の列挙が `meeting_place_start` 経由の再登録でも効く）。見つからない・prov でない → HTTP 404 に JSON `{"error":"not_found"}`（extension 自身が組む。`public_call` が nil を返すと router の既定 404 は text/html）。rate limit は Hestia の公開 limiter: **30 requests/分 / client IP**、skillset catalog と共有 |
 | `gc_prov_verify` | `genomicschain_prov/bin/`（同上） | 検証者（GenomicsChain または第三者） | anchor の `gc_prov_proof` route を GET | 束 + proof_id → envelope を取る → digest・等級を再計算 → manifest と照合 → 提出者の署名（と、鍵があれば anchor の署名）を**手元で**検証 → 「確かめたこと／確かめていないこと」（§8） |
+| `gc_zk_verify`（v0.1.12） | `genomicschain_prov/zk_verifier/`（Rust の crate。`Cargo.toml` と `Cargo.lock` を repo に置き、`risc0-zkvm` を 3.0.6 に固定。記憶 `skillsets-ruby-first` の「他言語は避けられないときだけ、lock で固定」の適用——RISC Zero の検証は Rust にしか無い）。Ruby 側の呼び口は `lib/genomicschain_prov/zk_verifier.rb`（実行 file の場所は環境変数 `GC_ZK_VERIFY_BIN`、無ければ crate の `target/release/gc_zk_verify`） | anchor（必須、証明つきの提出を受けるなら）、顧客と検証者（任意） | 使わない | 証明の bytes を stdin、image ID を引数で受け、§6.1 ③④ の材料を JSON 1 行で返す。証明を作る機能（prover）は持たない |
 
 **package の依存:**
 
@@ -465,8 +569,8 @@ attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Ti
 
 | Node | Packages | anchor_profile | 使う tool |
 |---|---|---|---|
-| anchor | core + tier1 + tier2 + tier3 + **prov** | true | `gc_prov_submit` |
-| 顧客 workstation | core + tier2 + **prov** | false | `gc_prov_check`, client |
+| anchor | core + tier1 + tier2 + tier3 + **prov**、＋ `gc_zk_verify` の実行 file（v0.1.12。anchor の Docker image に Rust の build 段を足して作る。HTTP の request body 上限は束 2 MB ＋ 証明 4 本の base64 で **5 MB 以上**——§6 の Gate A の配備条件を置き換える） | true | `gc_prov_submit` |
+| 顧客 workstation | core + tier2 + **prov**（ZK 証明を自分で確かめたいときだけ `gc_zk_verify`） | false | `gc_prov_check`, client |
 | 検証者 | core + tier2 + **prov**。core の depends_on が synoptis を、synoptis の depends_on が mmp を**要求する**（自動では入らない。install + enable の順は mmp → synoptis → core → tier2 → prov）。anchor の署名検証は `Synoptis::Verifier` と `MMP::Crypto`、提出者の署名検証は `ed25519` gem（`gem install ed25519`、README） | false | `gc_prov_verify` |
 
 **顧客の鍵と Bearer:** 既存のとおり、顧客が `--keygen` で ed25519 鍵を作り、GenomicsChain が `gc_issue_bound_token.rb` で
@@ -503,6 +607,9 @@ route の JSON を `ProofEnvelope.from_h` で envelope に戻し（`manifest`・
   - 提出者の署名（manifest.operator の ed25519 署名。--submitter-pubkey で渡された鍵で検証。渡されなければ
     manifest 内の pubkey で検証し「manifest 内の鍵と自己整合」と書く——それは提出者の同一性の証明ではない）
   - 段 N 本のうち自分で環境を宣言した k、software M 本のうち immutable a / versioned b / ...、入力 K 本のうち checksum つき k'
+  - （v0.1.12）CPU と OS: 束が名乗る値 = manifest の platform_*（束から読み直した照合であって、申告が正しいかではない）
+  - （v0.1.12）ZK 証明: --zk-receipt で証明 file を渡され、手元に gc_zk_verify があるときだけ、§6.1 の ①〜④ を自分で行い
+    「確かめたこと」に置く。無いときは下の「anchor が言っていること」へ
 版が違うとき（見出しを別にする）
   - 「adapter / predicate / pin_strength の版が手元（x, y, z）と proof（x', y', z'）で違うので等級は再導出していない」
     ——不一致とは書かない。manifest の record_version を知らないときも同じ見出し（署名欄の集合が分からないので提出者の署名も、
@@ -515,12 +622,16 @@ anchor が言っていること（この tool は確かめていない）
   - proof の鮮度（timestamp と ttl を印刷し、expired は「TTL を過ぎた」と書く。「記録が無効」とは書かない）
   - 失効（revoked）——**鍵があっても anchor-reported のまま**。revoked は registry の別 file から足した欄で、署名の外にある。
     書き換えても envelope の署名は通るので、「確かめた」には移せない（round 3、codex）
+  - （v0.1.12）発行の関門: admission_rule の名前（grade_overall が immutable で、証明がすべて検証と照合を通ったときだけ発行した）
+  - （v0.1.12）ZK 証明を N 本、検証 program V（risc0-zkvm の版）で確かめ、束の入出力と照合した（zk_verification）——自分で確かめなかった証明について
 確かめていないこと（manifest の not_checked をそのまま写す）
   - locator の先が今も取得できるか
   - 束が実行を正しく写しているか（producer と補完器の出力を信じている）
   - 束が規格の schema に適合しているか／束に書かれた checksum が正しいか（書かれたまま数えている）
   - 参照ゲノムが何だったか、乱数シードが何だったか（名前の推測は記録に無い）
   - 出力が正しいか、再構築して同じ出力が出るか  ← (iii) の仕事
+  - （v0.1.12）CPU と OS の申告が正しいか、ZK の guest program が何を計算するか、記録された入力が生データそのものか
+出力の末尾には §6.1 の (a)(b) の 2 文をそのまま置く
 ```
 
 **`gc_prov_proof` が返せないとき、何を印刷するか（round 2 の P0: expired 以外の `valid: false` に描き方が無かった）。**
@@ -552,9 +663,9 @@ Synoptis の engine と Verifier の語彙をそのまま使い、検証者が�
 | U1 | BCO アダプタ `adapters/bco.rb` → `NormalizedProvenance` | `adapter_bco_test.rb`: fixture から 7 種類が取れる。空欄は nil |
 | U1b | 汎用の最小書き出し器 `bin/gc_prov_write.rb`（§4.1。v0.1.11 で `tools/` から訂正——§7 の規則どおり、`Skillset#load!` は `tools/*.rb` をどの node でも eager に require する）: 段の一覧を受け取り、版・digest・checksum・パラメータ・seed・実行系の版を集めて BCO を書く。Tier-3 executor から呼べる形（logic は `lib/genomicschain_prov/writer*`、CLI は bin） | **済（2026-09-21）**。`prov_write_test.rb` 26 本: 2 段の shell 計算（デモの 223, 553, 2 → 388、test の中で実際に走らせる）から BCO が出て、U1 のアダプタで読め、全部集めると `immutable`。checksum を省くと **`local_path`**（v0.1.11 で訂正——workflow は予告どおり `floating` に落ちるが、入力の相対 path は §5 で floating より下の `local_path` なので、最弱である全体はそこで止まる。§4.1 の「floating 止まり」＝ floating を超えられない、は正しい）。checksum が上げていた 4 分類（workflow・runtime・environment・inputs）がすべて落ちることを 1 本で押さえる |
 | U2 | 述語 `predicate.rb`（PinStrength を呼ぶ） | `predicate_test.rb`: 手書きの小さな正規化来歴 6 つで 6 等級が出る。fixture の等級が固定される（数値を test に書く） |
-| U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`、`lib/genomicschain_prov/place_extension.rb`（`gc_prov_proof` route）。core の 4 か所（§7）と prov の core pin | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本のうち prov に対応のある 11 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復。toolchain_ruby・tier1 content hash・applied stage の 3 本は prov に無い）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 100 年で Tier-2 の proof は 24 時間のままの 1 本、`idempotency_key` が束ごとに違う 1 本、版ずれの拒否が三つの版を返す 1 本、`gc_prov_proof` route が prov の envelope を §7 の欄だけで返し、未知の id と Tier-2 の id に 404 を返し、`actor_user_id` を含まない 1 本、**Authorization header 無しで route が答え、同じ条件で prov の `tools/call` は拒まれる** 1 本（§0 の約束の test、round 4。unit test ではなく U4 と同じ使い捨て local anchor で回す——route と `/mcp` の順序は `HttpServer` にある、round 5）、SCM 無しの束が null の repo hash で記録される 1 本、script の checksum で workflow が immutable になる 1 本を足す |
-| U4 | `gc_prov_check` と client の `--tier prov` | `submit_client_test.rb` に prov の 1 本。使い捨て local anchor で dry_run → 実提出 → 回復まで（09-09 の Tier-2 と同じ手順） |
-| U5 | `gc_prov_verify` | fixture + local anchor の proof で「確かめたこと／いないこと」が出る。改竄した束で不一致が出る。§8 の表の 8 行と版違いの見出しが 1 本ずつ。`--submitter-pubkey` 無しで「自己整合」の文言、`--anchor-pubkey` 有りで anchor の行が「確かめたこと」へ移る |
+| U3 | `genomicschain_prov` に `verdict_spec/prov.rb`、`prov_submit.rb`、`schemas/prov_attestation.schema.json`、`tools/gc_prov_submit.rb`、`lib/genomicschain_prov/place_extension.rb`（`gc_prov_proof` route）。core の 4 か所（§7）と prov の core pin | `prov_submit_test.rb`: `tier2_submit_test.rb` の 14 本のうち prov に対応のある 11 本を写して通す（digest 不一致・identity 不一致・trust_tier 持込・重複回復。toolchain_ruby・tier1 content hash・applied stage の 3 本は prov に無い）。ただし DoS gate の 1 本は「2 MB 超を弾く／64 KB 超の束を通す」に書き換え、dry_run の 1 本（Tier-2 には無い）、TTL が 100 年で Tier-2 の proof は 24 時間のままの 1 本、`idempotency_key` が束ごとに違う 1 本、版ずれの拒否が三つの版を返す 1 本、`gc_prov_proof` route が prov の envelope を §7 の欄だけで返し、未知の id と Tier-2 の id に 404 を返し、`actor_user_id` を含まない 1 本、**Authorization header 無しで route が答え、同じ条件で prov の `tools/call` は拒まれる** 1 本（§0 の約束の test、round 4。unit test ではなく U4 と同じ使い捨て local anchor で回す——route と `/mcp` の順序は `HttpServer` にある、round 5）、SCM 無しの束が null の repo hash で記録される 1 本、script の checksum で workflow が immutable になる 1 本を足す。**v0.1.12 で足す（§6.1）**: immutable 未満の束が拒否され記録が増えない 1 本（拒否の応答に `items[]` の値が無い）、`platform` の無い束が null 3 つで、有る束が値つきで記録される 1 本、証明の無い束が `zk_receipts: []`・`zk_verification: null` で記録される 1 本（任意は本当に任意）、本物の証明（KairosChain_2026 の size-factor デモの succinct receipt を fixture に写す）が ①〜④ を通って記録され、bytes が registry にも log にも現れない 1 本、①〜④ のそれぞれを一つずつ壊して拒否される 4 本、宣言された証明の bytes が欠ける／宣言に無い bytes が来る 1 本、検証 program が無いと証明つきの束だけが拒否される 1 本、拡張の schema file が `platform` と `zk_receipts[]` を定める 1 本。`gc_zk_verify` 自体は crate の test（本物の receipt が通り、1 byte 変えると落ちる） |
+| U4 | `gc_prov_check` と client の `--tier prov` | `submit_client_test.rb` に prov の 1 本。使い捨て local anchor で dry_run → 実提出 → 回復まで（09-09 の Tier-2 と同じ手順）。v0.1.12: 関門に届かない束で `gc_prov_check` が「発行されない、届かない分類はこれ」と出す、証明つきの束で client が `zk_receipt_bytes` を添えて送り記録される、を local anchor で 1 本ずつ |
+| U5 | `gc_prov_verify` | fixture + local anchor の proof で「確かめたこと／いないこと」が出る。改竄した束で不一致が出る。§8 の表の 8 行と版違いの見出しが 1 本ずつ。`--submitter-pubkey` 無しで「自己整合」の文言、`--anchor-pubkey` 有りで anchor の行が「確かめたこと」へ移る。v0.1.12: `--zk-receipt` 有りで証明の行が「確かめたこと」へ移り、無しで「anchor が言っていること」に残る。出力の末尾に §6.1 (a)(b) の 2 文 |
 | U6 | WRROC アダプタ（v0.2） | 同じ fixture の `ro-crate-metadata.json` から U1 と同じ 7 種類 |
 | U7 | 第二の機関目撃者（v0.2）— proof_id と時刻に別鍵で countersign する protocol | 設計から |
 
@@ -788,6 +899,7 @@ registry の形のときだけ image、checksum の経路には locator が要�
 
 | 版 | 日付 | 何が変わったか |
 |---|---|---|
+| v0.1.12 | 2026-10-12 | **凍結後、二つ目の個別改訂。** review の巡ではなく operator の決定 3 件（ruling `ruling_service_plan_two_stage_drive_vk_20261011` の D9・D13、L2 `ruling_tier25_gate_and_zk_verify_20261012` の G1・G2）。新しい §6.1 に集め、§6・§7・§8・§9 は該当行だけ直した。(1) immutable は発行の関門: `grade_overall` が immutable 未満の束は拒否し記録しない、server が決める欄 `admission_rule`、Tier 3 の route B もこれに合わせる。(2) CPU と OS: 束の拡張 `platform` を書き出し器が自己申告で書き（host 名は書かない、補完器は明示したときだけ）、署名欄 `platform_*` 3 つ（null 可）。(3) ZK 証明: 束の拡張 `zk_receipts[]` で宣言し、bytes は提出に添え、anchor が版固定の Rust program `gc_zk_verify`（risc0-zkvm 3.0.6）で検証し、journal の入出力 digest を束の段の入出力と照合してから記録する。記録には同一性だけ（指紋・image ID・zkVM の名前と版・段・journal の形）と server の欄 `zk_verification`。bytes と journal の値は載せない。operator は当初の選択肢文が「v0.2 に回す」と書いていた (B) を選び、追加の質問で「11/15 から」と答えた。(4) not_checked 9 項目、record_version 0.3、アダプタ 0.4.0、拡張の schema file を U3 で作る（公開は operator の判断）。(5) HTTP の body 上限 5 MB 以上。根拠の実測: succinct receipt 223,746 bytes、検証 0.012 秒、journal = (入力 file の SHA-256, 出力 bytes)（KairosChain_2026 `log/zk_demo_sizefactor_20260929/03_proofs`、`00_prereg/instances.csv` で input_sha256 = registered_commitment_sha256） |
 | v0.1.11 | 2026-09-21 | **凍結後、最初の個別改訂。** review の巡ではなく、U1b の実装が突き当たった事実 2 件（凍結の記の「設計を改訂する条件」）。(1) §9 の U1b が `tools/gc_prov_write.rb` と書いていたが、§7 は round 3 に「CLI は `tools/` に置かない——`Skillset#load!` が `tools/*.rb` をどの node でも eager に require する」と決めている。gem の `skillset.rb` を読んで再確認したうえで §9 を `bin/` に訂正し、§7 の表に `gc_prov_write` の行を足した（v0.1 の §9 は round 3 より前に書かれた行が残っていた）。(2) §9 の完了の印「checksum を省くと等級が floating」を実測 `local_path` に訂正。workflow は予告どおり `floating` に落ちるが、plan が入力を相対 path で名指すため入力は §5 で floating より下の `local_path` になり、最弱である全体はそこで止まる。§4.1 の「floating 止まり」は正しい（floating を超えられない、の意）。意図——「等級は集めた分だけ上がる」——は test が 4 分類すべての落下で押さえている。U1b の実装そのもの: writer 0.1.0、`prov_write_test.rb` 26 本、prov 全体で 103 本 / 644 assertions 緑 |
 | v0.1 | 2026-09-20 | 起草。§0–§12 |
 | v0.1.1 | 2026-09-20 | U0 の実測（§13）、unknowns pass（§10-1/9/10/11） |
