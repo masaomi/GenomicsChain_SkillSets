@@ -22,6 +22,15 @@
 #        --key operator.key --token kc_xxx --url http://localhost:8080/mcp \
 #        --tip <proofs tip hash>|--data-dir /app/.kairos [--dry-run] [--print-only]
 #   ruby scripts/gc_submit_client.rb --tier tier1 --report r.json ...
+#   ruby scripts/gc_submit_client.rb --tier prov --bundle bco.json \
+#        [--zk-receipt receipt.bin ...] --key operator.key --token kc_xxx ...
+#
+# --tier prov (Tier 2.5, design v0.1 §7): the bundle travels verbatim and the
+# params come from GenomicsChainProv::Identity, the function the anchor uses to
+# re-derive them; run genomicschain_prov/bin/gc_prov_check.rb first to see
+# whether the anchor will issue a record (grade immutable, receipts usable).
+# Each --zk-receipt file goes along as base64 under its own sha256, for every
+# receipt the bundle declares; the anchor verifies and discards them.
 #
 # --dry-run asks the anchor to validate only (no admission, no store). The
 # envelope is still signed so the dry run exercises the same bytes.
@@ -45,7 +54,7 @@ require 'genomicschain_core/tier2_submit'
 
 module GcSubmitClient
   GC = KairosMcp::SkillSets::GenomicschainCore
-  TOOL = { 'tier1' => 'gc_tier1_submit', 'tier2' => 'gc_tier2_submit' }.freeze
+  TOOL = { 'tier1' => 'gc_tier1_submit', 'tier2' => 'gc_tier2_submit', 'prov' => 'gc_prov_submit' }.freeze
 
   module_function
 
@@ -81,11 +90,33 @@ module GcSubmitClient
 
   # --- what gets signed -------------------------------------------------------
 
+  # For prov, `subject` is the bundle's text: the digest the anchor recomputes
+  # is of the bytes it receives, so the client derives from the same bytes.
   def signed_params(tier, subject, repository)
     case tier
     when 'tier2' then GC::Tier2Submit.signed_params_for(subject, repository)
     when 'tier1' then GC::Tier1Submit.signed_params_for(subject)
+    when 'prov' then load_prov && GenomicsChainProv::Identity.derive(subject)['signed']
     else raise ArgumentError, "unknown tier #{tier.inspect}"
+    end
+  end
+
+  # genomicschain_prov needs genomicschain_tier2 (the PinStrength rule); both
+  # are loaded only for --tier prov, so Tier-1/2 use needs neither.
+  def load_prov
+    %w[genomicschain_tier2 genomicschain_prov].each do |pkg|
+      lib = File.join(REPO, pkg, 'lib')
+      $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+    end
+    require 'genomicschain_prov'
+    true
+  end
+
+  # receipt sha256 => base64, the shape gc_prov_submit's zk_receipt_bytes takes.
+  def receipt_bytes(paths)
+    Array(paths).to_h do |p|
+      bytes = File.binread(p)
+      [Digest::SHA256.hexdigest(bytes), Base64.strict_encode64(bytes)]
     end
   end
 
@@ -111,13 +142,16 @@ module GcSubmitClient
     }
   end
 
-  def tool_arguments(tier, subject, subject_json, params, repository, operator, dry_run)
+  def tool_arguments(tier, subject, subject_json, params, repository, operator, dry_run, zk_receipt_bytes: nil)
     case tier
     when 'tier2'
       args = { 'adjudication' => subject, 'identity' => params, 'operator' => operator }
       args['repository'] = repository if repository && !repository.empty?
     when 'tier1'
       args = { 'report_json' => subject_json, 'operator' => operator }
+    when 'prov'
+      args = { 'bundle' => subject_json, 'identity' => params, 'operator' => operator }
+      args['zk_receipt_bytes'] = zk_receipt_bytes if zk_receipt_bytes && !zk_receipt_bytes.empty?
     end
     args['dry_run'] = true if dry_run
     args
@@ -178,9 +212,11 @@ if $PROGRAM_NAME == __FILE__
   OptionParser.new do |o|
     o.on('--keygen') { opts[:keygen] = true }
     o.on('--key PATH') { |v| opts[:key] = v }
-    o.on('--tier TIER', %w[tier1 tier2]) { |v| opts[:tier] = v }
+    o.on('--tier TIER', %w[tier1 tier2 prov]) { |v| opts[:tier] = v }
     o.on('--adjudication FILE') { |v| opts[:subject] = v }
     o.on('--report FILE') { |v| opts[:subject] = v }
+    o.on('--bundle FILE') { |v| opts[:subject] = v }
+    o.on('--zk-receipt FILE') { |v| (opts[:zk] ||= []) << v }
     o.on('--repository-url URL') { |v| (opts[:repository] ||= {})['url'] = v }
     o.on('--repository-commit SHA') { |v| (opts[:repository] ||= {})['commit'] = v }
     o.on('--url URL') { |v| opts[:url] = v }
@@ -198,12 +234,12 @@ if $PROGRAM_NAME == __FILE__
     exit 0
   end
 
-  abort '--adjudication FILE (tier2) or --report FILE (tier1) is required' unless opts[:subject]
+  abort '--adjudication FILE (tier2), --report FILE (tier1) or --bundle FILE (prov) is required' unless opts[:subject]
   abort '--key PATH is required (create one with --keygen)' unless opts[:key]
 
   subject_json = File.read(opts[:subject])
-  subject = JSON.parse(subject_json)
   tier = opts[:tier]
+  subject = tier == 'prov' ? subject_json : JSON.parse(subject_json)
   tool = GcSubmitClient::TOOL.fetch(tier)
 
   tip = opts[:tip] || (opts[:data_dir] && GcSubmitClient.tip_from_data_dir(opts[:data_dir], synoptis_lib: opts[:synoptis_lib]))
@@ -212,7 +248,8 @@ if $PROGRAM_NAME == __FILE__
   key = GcSubmitClient.load_key(opts[:key])
   params = GcSubmitClient.signed_params(tier, subject, opts[:repository])
   operator = GcSubmitClient.operator_envelope(key, tool, params, tip)
-  arguments = GcSubmitClient.tool_arguments(tier, subject, subject_json, params, opts[:repository], operator, opts[:dry_run])
+  arguments = GcSubmitClient.tool_arguments(tier, subject, subject_json, params, opts[:repository], operator, opts[:dry_run],
+                                            zk_receipt_bytes: GcSubmitClient.receipt_bytes(opts[:zk]))
   request = GcSubmitClient.jsonrpc(tool, arguments)
 
   if opts[:print_only]

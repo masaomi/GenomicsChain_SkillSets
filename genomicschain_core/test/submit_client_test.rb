@@ -8,6 +8,8 @@ require 'json'
 require 'digest'
 require 'open3'
 require 'rbconfig'
+require 'fileutils'
+require 'base64'
 require 'kairos_mcp/version'
 require_relative 'proofs_sandbox'
 require 'kairos_mcp/skillset'
@@ -103,6 +105,76 @@ class SubmitClientTest < Minitest::Test
                                                            'llm' => { 'provider' => 'p', 'model' => 'm', 'invoked_at' => 't' } },
                'manifest' => {} }
     assert_equal GC::Tier1Submit.signed_params_for(report), GcSubmitClient.signed_params('tier1', report, nil)
+  end
+
+  # --tier prov (prov design §9 U4): what the client signs for a bundle is
+  # what the anchor's VerdictSpec::Prov derives, so SubmitCore records it; and
+  # the CLI sends the bundle as text, with every --zk-receipt as base64 under
+  # its own sha256.
+  def test_prov_bundle_signed_by_the_client_is_recorded_and_sent_with_its_receipts
+    GcSubmitClient.load_prov
+    require 'genomicschain_prov/writer/environment'
+    require 'genomicschain_prov/prov_submit'
+    zk = File.expand_path('../../genomicschain_prov/test/fixtures/zk_sizefactor_s1', __dir__)
+    with_key do |path, key, info|
+      Dir.mktmpdir do |d|
+        bundle_path, receipt = prov_bundle(d, zk)
+        text = File.read(bundle_path)
+        registry, tip_source, = ProofsSandbox.context(File.join(d, 'proofs'))
+        KairosMcp::Manifest::Signer.bootstrap_seen_list!(tip_source: tip_source)
+        params = GcSubmitClient.signed_params('prov', text, nil)
+        assert_equal GenomicsChainProv::ProvSubmit.signed_params_for(text), params
+        op = GcSubmitClient.operator_envelope(key, 'gc_prov_submit', params, tip_source.latest_tip_hash)
+        fake = Class.new(GenomicsChainProv::ZkVerifier) do
+          def run(_b, _i) = { 'verified' => true, 'journal_ok' => true, 'tool' => 'gc_zk_verify', 'version' => '0.1.0',
+                              'risc0_zkvm' => '3.0.6', 'journal_convention' => 'gc-zk-journal-0.1',
+                              'journal_input_sha256' => '5cb5cfc3a976faa8b8db6a8799ebc3372097833845e38d99e9247c14a86aede3',
+                              'journal_output_sha256' => '7d8c053239d53b373ae09674c2bd3f1456038c414e54534762ba7592ec9b4515' }
+        end.new(bin: '/nonexistent')
+        out = GenomicsChainProv::ProvSubmit.submit(
+          bundle: text, identity: params, operator: op, bearer_pubkey_hash: info['pubkey_hash'],
+          tip_source: tip_source, attestor: StubAttestor.new(registry: registry), registry: registry,
+          zk_receipt_bytes: GcSubmitClient.receipt_bytes([receipt]), zk_verifier: fake
+        )
+        assert_equal 'recorded', out[:status]
+        assert out[:claim].start_with?('prov:prov-predicate-0.3.7:immutable:1/1:')
+
+        req_json, err, st = Open3.capture3(RbConfig.ruby, CLIENT, '--tier', 'prov', '--bundle', bundle_path,
+                                           '--zk-receipt', receipt, '--key', path, '--data-dir', d, '--print-only')
+        assert st.success?, err
+        req = JSON.parse(req_json)
+        args = req.dig('params', 'arguments')
+        assert_equal 'gc_prov_submit', req.dig('params', 'name')
+        assert_equal text, args['bundle'], 'the bundle travels as the exact text that was checked'
+        assert_equal params, args['identity']
+        bytes = File.binread(receipt)
+        assert_equal({ Digest::SHA256.hexdigest(bytes) => Base64.strict_encode64(bytes) }, args['zk_receipt_bytes'])
+      end
+    end
+  end
+
+  def prov_bundle(dir, zk)
+    w = GenomicsChainProv::Writer
+    FileUtils.mkdir_p(File.join(dir, 'tools'))
+    %w[S1_odd.kmat S1_odd__valid_exact.sfq3].each { |f| FileUtils.cp(File.join(zk, f), dir) }
+    receipt = File.join(dir, 'receipt.bin')
+    FileUtils.cp(File.join(zk, 'receipt.succinct.bin'), receipt)
+    File.write(File.join(dir, 'tools', 'checker.sh'), "#!/bin/sh\n")
+    File.write(File.join(dir, 'run.sh'), "#!/bin/sh\n")
+    plan = w.normalise_plan(
+      'name' => 'size-factor-check', 'script' => 'run.sh',
+      'runtime' => { 'engine' => 'sh', 'version' => '5.2.21', 'uri' => '/bin/sh', 'path' => '/bin/sh' },
+      'stages' => [{ 'name' => 'sizefactor', 'inputs' => ['S1_odd.kmat'], 'outputs' => ['S1_odd__valid_exact.sfq3'],
+                     'tools' => [{ 'name' => 'checker.sh', 'version' => '0.1.0', 'uri' => 'tools/checker.sh' }] }],
+      'zk_receipts' => [{ 'receipt' => 'receipt.bin', 'image_id' => File.read(File.join(zk, 'image_id.txt')).strip,
+                          'zkvm_version' => '3.0.6', 'step_number' => 1, 'input' => 'S1_odd.kmat',
+                          'output' => 'S1_odd__valid_exact.sfq3' }]
+    )
+    resolved = w::Environment.resolve!(plan, base_dir: dir, docker: false)
+    decl = w::Environment.zk_declarations(plan['zk_receipts'], base_dir: dir)
+    path = File.join(dir, 'bco.json')
+    File.write(path, JSON.pretty_generate(w.build(plan, checksums: resolved['checksums'], zk_receipts: decl['zk_receipts'])))
+    [path, receipt]
   end
 
   # The CLI builds a tools/call request and, with --print-only, sends nothing.
