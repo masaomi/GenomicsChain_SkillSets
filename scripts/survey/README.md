@@ -30,8 +30,8 @@ match. Which papers were drawn is therefore checkable; how each one scored is no
 | `q3_draw.rb` | the registered Q3 draw (seed 202610131, n = 372) | Q3 sampling pre-registration, 2026-10-13 |
 | `q3_workflow.js` | Q3 reads (items via args) | launch records, 2026-10-13 (q3a), 2026-10-14 (q3b), 2026-10-15 (q3c) |
 | `check_run.rb` | the after-run check: schema, assessor fields, b1 hash, fetch manifest, transcript model count, isolation scan; moves excluded reads aside and prints the replacements due | q3b launch record, 2026-10-14. Known limit: it reads one transcript per position, so a position the Workflow tool re-ran (q3b, cut by a usage limit) must be checked by hand |
-| `combine_strata.rb` | the combined column of the tiers preprint v0.6 §3.4: Q4 and Q3 weighted by frame size per paper, by estimated steps per step | — (written while drafting, 2026-10-15; output `combined_strata.json` `e5e28c7b…`) |
-| `make_figures_3_4.rb` | Figures 3 and 4 of the tiers preprint v0.6 from `stats_rater3.json` and `combined_strata.json` | — (written while drafting, 2026-10-15) |
+| `combine_strata.rb` | the combined column of the tiers preprint v0.6 §3.4: Q4 and Q3 weighted by frame size per paper, by estimated steps per step | script manifest, 2026-10-15, recorded after the computation (output `combined_strata.json` `1145724c…`) |
+| `make_figures_3_4.rb` | Figures 3 and 4 of the tiers preprint v0.6 from `stats_rater3.json` and `combined_strata.json` | script manifest, 2026-10-15, recorded after the computation |
 | `final_distinctness.rb` | checks that all valid reads are distinct papers (ids, titles, fetched-JATS hashes) and writes the DOI list | final record, 2026-10-15 (DOI list `6dd31af1…`) |
 | `stats_stage1.rb` | statistics of the July reading (claude-opus-4-6) | — |
 | `stats_rater3.rb` | statistics of the rater-3 reading, per stratum | — |

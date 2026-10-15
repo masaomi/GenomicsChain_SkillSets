@@ -51,7 +51,7 @@ claims = [
   ['exact_pins_partial', 'Exact tool versions named, environment not closed', false],
   ['release_snapshot', 'Dated release snapshot (e.g. Bioconductor)', true],
   ['env_lock_claimed', 'Lockfile or conda environment claimed', true],
-  ['container_digest_claimed', 'Container claimed (none cites a digest)', true],
+  ['container_digest_claimed', 'Container claimed (no paper text cites a digest)', true],
 ]
 x0 = 350; scale = 4.6; y = 80; b = []
 b << text(20, 30, 'Environment-capture claim, one per paper (1,000 papers, two strata combined)', size: 16, weight: 'bold')
@@ -84,7 +84,7 @@ b = []
 steps = q4['computational_steps'] + q3['computational_steps']
 b << text(20, 30, "#{int(steps)} computational steps in 1,000 papers (two strata combined)", size: 16, weight: 'bold')
 b << text(20, 50, 'Each step is scored 0–2 on four axes; the lowest axis sets the step verdict. Reader claude-opus-5-5.', fill: INK2)
-b << text(20, 86, 'Which axis caps the step', size: 13.5, weight: 'bold')
+b << text(20, 86, 'Which axis caps the step (ties split evenly)', size: 13.5, weight: 'bold')
 axes = [%w[version Version\ (environment)], %w[data Data], %w[params Parameters], %w[code Code]]
 lx = 170; sc = 3.4; y = 104
 axes.each do |key, label|
@@ -97,8 +97,10 @@ axes.each do |key, label|
 end
 m = cb['axis_scores_pct']
 b << text(20, y + 14, "Mean axis score: data #{format('%.2f', m['data']['mean'])}, code #{format('%.2f', m['code']['mean'])}, version #{format('%.2f', m['version']['mean'])}, parameters #{format('%.2f', m['params']['mean'])}.", size: 11.5, fill: INK2)
-b << text(20, y + 30, 'Version cannot reach 2 at stage 1: closure needs the code check.', size: 11.5, fill: INK2)
-b << %(<line x1="465" y1="70" x2="465" y2="#{y + 34}" stroke="#{RULE}" stroke-width="1"/>)
+u = cb['unique_lowest_axis_pct']
+b << text(20, y + 30, "Single lowest axis only: version #{f1(u['version'])}%, data #{f1(u['data'])}%, parameters #{f1(u['params'])}%, code #{f1(u['code'])}%.", size: 11.5, fill: INK2)
+b << text(20, y + 46, 'Version cannot reach 2 at stage 1, so it ties for lowest on most steps.', size: 11.5, fill: INK2)
+b << %(<line x1="465" y1="70" x2="465" y2="#{y + 50}" stroke="#{RULE}" stroke-width="1"/>)
 b << text(490, 86, 'Step verdict', size: 13.5, weight: 'bold')
 verdicts = [['R', 'R★  declared closure'], ['RI', 'RI  partially ready'], ['NI', 'NI  needs investigation'], ['X', 'X  blocked']]
 rx = 650; sc2 = 2.0; y2 = 104
@@ -114,9 +116,9 @@ end
 n4 = q4['papers_no_step_at_RI']; n3 = q3['papers_no_step_at_RI']; nc = cb['papers_no_step_at_RI']
 b << text(490, y + 14, "No step reaches RI in #{f1(nc['pct'])}% of papers (Q4 #{n4['k']} of #{q4['n']}, Q3 #{n3['k']} of #{q3['n']}).", size: 11.5, fill: INK2)
 b << text(490, y + 30, 'Median 19 computational steps per paper; wet-lab steps excluded.', size: 11.5, fill: INK2)
-b << text(20, y + 60, 'Combined: each stratum\'s steps weighted by frame size over sample size (Q4 and Q3 then weigh 50% each). Bars in the two panels are on different scales.', size: 11, fill: INK2)
-b << text(20, y + 76, 'Source: stats_rater3.rb and combine_strata.rb on the per-paper reports (rubric v0.2.5); counts in Supplementary S2, Table S2.3.', size: 11, fill: INK2)
-fig4 = svg(900, y + 90,
+b << text(20, y + 76, 'Combined: each stratum\'s steps weighted by frame size over sample size (Q4 and Q3 then weigh 50% each). Bars in the two panels are on different scales.', size: 11, fill: INK2)
+b << text(20, y + 92, 'Source: stats_rater3.rb and combine_strata.rb on the per-paper reports (rubric v0.2.5); counts in Supplementary S2, Table S2.3.', size: 11, fill: INK2)
+fig4 = svg(900, y + 106,
            "Step-level results of the Tier-1 stage-1 reading by claude-opus-5-5 over #{int(steps)} computational steps in 1,000 papers. Left: which of the four axes caps each step (ties split evenly). Right: the per-step verdict; the top verdict is unreachable at stage 1 by construction.", b)
 
 File.write(File.join(out_dir, 'fig3_survey_capture_claims.svg'), fig3)
