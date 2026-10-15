@@ -28,7 +28,9 @@ match. Which papers were drawn is therefore checkable; how each one scored is no
 | `extension_workflow.js` | Q4 extension, positions 303–637 (items via args) | launch records, 2026-10-12/13 |
 | `frame_fetch.rb` | builds and hashes the 2025-Q3 frame, no draw | Q3 sampling pre-registration, 2026-10-13 |
 | `q3_draw.rb` | the registered Q3 draw (seed 202610131, n = 372) | Q3 sampling pre-registration, 2026-10-13 |
-| `q3_workflow.js` | Q3 reads (items via args) | launch record (to come) |
+| `q3_workflow.js` | Q3 reads (items via args) | launch records, 2026-10-13 (q3a), 2026-10-14 (q3b), 2026-10-15 (q3c) |
+| `check_run.rb` | the after-run check: schema, assessor fields, b1 hash, fetch manifest, transcript model count, isolation scan; moves excluded reads aside and prints the replacements due | q3b launch record, 2026-10-14. Known limit: it reads one transcript per position, so a position the Workflow tool re-ran (q3b, cut by a usage limit) must be checked by hand |
+| `final_distinctness.rb` | checks that all valid reads are distinct papers (ids, titles, fetched-JATS hashes) and writes the DOI list | final record, 2026-10-15 (DOI list `6dd31af1…`) |
 | `stats_stage1.rb` | statistics of the July reading (claude-opus-4-6) | — |
 | `stats_rater3.rb` | statistics of the rater-3 reading, per stratum | — |
 | `agreement.rb` | agreement between readers (κ, AC1, ICC, Bland–Altman) | analysis rules fixed 2026-10-13 before first run |
