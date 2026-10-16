@@ -4,7 +4,7 @@ These are the scripts and prompts that drew, read and analysed the Tier-1 readin
 genomics preprints (rubric v0.2.5). They are **byte-identical copies** of the files as run in the
 author's `corpus/repro_survey_2026_07/`; they were not edited for publication, so their SHA-256 can be
 checked against the author's instance ledger. The read, draw and check scripts were recorded there before
-their runs; every file in this directory is listed in a script manifest recorded on 2026-10-15, which for
+their runs; every file in this directory is listed in a script manifest recorded on 2026-10-15 (files changed since are in the record that freezes the tiers preprint v0.6), which for
 the analysis scripts is the first record and was made after the computation. That is also why absolute
 paths of the author's machine remain in some of them.
 

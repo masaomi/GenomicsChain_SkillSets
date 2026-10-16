@@ -49,7 +49,7 @@ claims = [
   ['none', 'No pinning stated', false],
   ['floating', 'Floating versions (open ranges, "latest")', false],
   ['exact_pins_partial', 'Exact tool versions named, environment not closed', false],
-  ['release_snapshot', 'Dated release snapshot (e.g. Bioconductor)', true],
+  ['release_snapshot', 'Dated release snapshot', true],
   ['env_lock_claimed', 'Lockfile or conda environment claimed', true],
   ['container_digest_claimed', 'Container claimed (no paper text cites a digest)', true],
 ]
