@@ -11,6 +11,7 @@ require 'kairos_mcp/version'
 require 'kairos_mcp/kairos_chain/chain'
 require 'kairos_mcp/storage/file_backend'
 require_relative 'proofs_sandbox'
+require_relative 'idempotency_fixture'
 require 'kairos_mcp/skillset'
 require 'genomicschain_core'
 
@@ -154,8 +155,7 @@ class Tier3SubmitCoreTest < Minitest::Test
     )
   end
 
-  def signed_operator(tip_source, vr)
-    sk = Ed25519::SigningKey.generate
+  def signed_operator(tip_source, vr, sk: Ed25519::SigningKey.generate)
     pk = sk.verify_key
     nonce = SecureRandom.hex(16)
     tip = tip_source.latest_tip_hash
@@ -385,6 +385,18 @@ class Tier3SubmitCoreTest < Minitest::Test
       assert_equal first[:synoptis_proof_id], second[:synoptis_proof_id]
       assert_equal true, second[:recovered]
       assert_equal 1, registry.read(:proofs).length
+    end
+  end
+
+  # Design v0.1.15 (10) (viii): the key on both paths, pinned before core 0.6.2.
+  def test_idempotency_key_matches_the_r0_fixture
+    with_proofs do |registry, tip_source|
+      vr = verdict_result(job_spec)
+      op, pkhash, = signed_operator(tip_source, vr, sk: IdempotencyFixture::SIGNING_KEY)
+      att = StubAttestor.new(registry: registry)
+      first = submit(registry, tip_source, vr, op, pkhash, att)
+      second = submit(registry, tip_source, vr, op, pkhash, att)
+      IdempotencyFixture.check(self, 'tier3_verdict', first, second)
     end
   end
 

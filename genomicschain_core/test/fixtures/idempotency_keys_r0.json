@@ -1,0 +1,41 @@
+{
+  "what": "Idempotency keys returned by SubmitCore for each record type, on the fresh and the recovery path (design v0.1.15 (10) (viii), step R0).",
+  "rule": "Captured before core 0.6.2 changes the idempotency-key branch. Never regenerate after that change: a value that moves is the regression the fixture exists to catch.",
+  "captured_on": "2026-10-18",
+  "captured_with": {
+    "genomicschain_core": "0.6.1",
+    "genomicschain_prov": "0.4.0",
+    "git_head": "960ffce",
+    "ruby": "3.4.10"
+  },
+  "signing_key": "Ed25519 seed = SHA-256 of \"gc-v0.1.15-r0-idempotency-fixture\" (test/idempotency_fixture.rb)",
+  "inputs": {
+    "prov_attestation": "genomicschain_prov/test/prov_submit_test.rb bundle (no ZK, checksums, fixed object_id)",
+    "tier1_report": "tier1_submit_test.rb base_report",
+    "tier2_adjudication": "tier2_submit_test.rb adjudication + repository",
+    "tier3_verdict": "tier3_submit_test.rb verdict_result(job_spec)",
+    "tier4_distillation": "tier4_spec_test.rb spec (default distillation)"
+  },
+  "keys": {
+    "prov_attestation": {
+      "fresh": "8f8f78992c199c34513169d8c01a9fb4d433ff0bf596936ab47cfff249f5aa90",
+      "recovery": "8f8f78992c199c34513169d8c01a9fb4d433ff0bf596936ab47cfff249f5aa90"
+    },
+    "tier1_report": {
+      "fresh": "db91a6532ce6d3af42eb70ab8e8950a6dad4a35158187aeb5ae020c7e07b7460",
+      "recovery": "db91a6532ce6d3af42eb70ab8e8950a6dad4a35158187aeb5ae020c7e07b7460"
+    },
+    "tier2_adjudication": {
+      "fresh": "5ae09d1081fb8564996fa3857eb75f9279ec115cdecea5ebb5ffc84b08841885",
+      "recovery": "5ae09d1081fb8564996fa3857eb75f9279ec115cdecea5ebb5ffc84b08841885"
+    },
+    "tier3_verdict": {
+      "fresh": "966efab383f090a20146610b0844436ea4041c4cf919d90005d29170ea14a983",
+      "recovery": "966efab383f090a20146610b0844436ea4041c4cf919d90005d29170ea14a983"
+    },
+    "tier4_distillation": {
+      "fresh": "0913446f5b8a1e5cd5d9a7c4d008ca81bccc91c254b3c7f8825ab5e5bd3c3f9a",
+      "recovery": "0913446f5b8a1e5cd5d9a7c4d008ca81bccc91c254b3c7f8825ab5e5bd3c3f9a"
+    }
+  }
+}

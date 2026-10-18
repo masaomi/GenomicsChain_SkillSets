@@ -39,6 +39,7 @@ require 'genomicschain_prov/writer/environment'
 require 'genomicschain_prov/prov_submit'
 require 'genomicschain_prov/place_extension'
 require_relative '../tools/gc_prov_submit'
+require_relative '../../genomicschain_core/test/idempotency_fixture'
 
 GCoreP = KairosMcp::SkillSets::GenomicschainCore
 
@@ -172,8 +173,7 @@ class ProvSubmitTest < Minitest::Test
     end
   end
 
-  def signed_operator(tip_source, params, tool: 'gc_prov_submit')
-    sk = Ed25519::SigningKey.generate
+  def signed_operator(tip_source, params, tool: 'gc_prov_submit', sk: Ed25519::SigningKey.generate)
     nonce = SecureRandom.hex(16)
     tip = tip_source.latest_tip_hash
     payload = KairosMcp::Manifest.canonical_json(
@@ -351,6 +351,22 @@ class ProvSubmitTest < Minitest::Test
       out2 = record(registry, bundle(object_id: '00000000-0000-4000-8000-000000000002'), tip_source: tip_source)
       refute_equal out1[:idempotency_key], out2[:idempotency_key]
       assert_equal Digest::SHA256.hexdigest(out1[:submission_key]), out1[:idempotency_key]
+    end
+  end
+
+  # Design v0.1.15 (10) (viii): the value itself, on both paths, pinned in
+  # core's R0 fixture before core 0.6.2 turns this record type's branch into a
+  # list. The bundle probes nothing (no machine, docker: false), so the key
+  # does not depend on the host the test runs on.
+  def test_idempotency_key_matches_the_r0_fixture
+    with_proofs do |registry, tip_source|
+      b = bundle
+      identity = ProvSubmit.signed_params_for(b)
+      op, pkhash = signed_operator(tip_source, identity, sk: IdempotencyFixture::SIGNING_KEY)
+      att = ProvStubAttestor.new(registry: registry)
+      first = submit(registry, tip_source, b, identity, op, pkhash, att)
+      second = submit(registry, tip_source, b, identity, op, pkhash, att)
+      IdempotencyFixture.check(self, 'prov_attestation', first, second)
     end
   end
 
