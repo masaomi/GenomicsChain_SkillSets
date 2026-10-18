@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.13 —— 凍結後の個別改訂を 3 件反映（§14 の先頭 3 行。v0.1.11 は U1b の実装が突き当たった事実 2 件、v0.1.12 は 2026-10-11/12 の operator 決定 3 件——発行の関門としての immutable、CPU と OS、ZK 証明の検証——で §6.1 に集めた。v0.1.13 は同じ日の operator 決定で、v0.1.12 の関門を撤回し、Tier 3 の route B の線を D11 の元の形に戻した。いずれも review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
+**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.14 —— 凍結後の個別改訂を 4 件反映（§14 の先頭 4 行。v0.1.14 は計算資源の欄（§6.2、2026-10-17 実装）。v0.1.11 は U1b の実装が突き当たった事実 2 件、v0.1.12 は 2026-10-11/12 の operator 決定 3 件——発行の関門としての immutable、CPU と OS、ZK 証明の検証——で §6.1 に集めた。v0.1.13 は同じ日の operator 決定で、v0.1.12 の関門を撤回し、Tier 3 の route B の線を D11 の元の形に戻した。いずれも review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
 round 5〜8 は名目上は設計 review だったが、産出物の 9 割近くが adapter の実装修正であり、設計の review に test が走っていること
 自体がその徴候だった。残る懸案は review の巡ではなく**実装の queue** に置く。設計に変更が要るときは、実装が突き当たった事実を
 持って個別に改訂する。以下は凍結時点の状態の記録（round 8
@@ -363,7 +363,7 @@ zk_receipts                 v0.1.12（§6.1）。束の拡張の `zk_receipts[]`
 **null になりうる欄（5 つ）:** `producer_name` / `producer_version`（束が名乗らない。nf-prov）、`outputs_digest`（checksum つきの出力が
 0 本）、`workflow_commit` と `workflow_repository_sha256`（SCM extension が無い——`gc_prov_write` が shell / R / Python の計算から
 書く束は SCM を持たない。round 3: 必須のままだと §4.1 の最初の非 Nextflow producer が anchor に届かない）。schema は五つを
-`["string","null"]` にし、null は「無い」の意味で署名に入る（v0.1.12 で `platform_*` の 3 つが加わり 8 つ。§6.1）。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
+`["string","null"]` にし、null は「無い」の意味で署名に入る（v0.1.12 で `platform_*` の 3 つが加わり 8 つ。§6.1。v0.1.14 で `gpus_total`・`gpu_models`・`gpu_vendors_probed`・`machine_source`・`resources_sources` の 5 つが加わり 13。§6.2）。それ以外の署名欄は必須。**署名される欄の集合は `record_version` で
 固定する**: 検証者は manifest の `record_version` の集合で `params` を組み立て、知らない `record_version` は版違いの見出しへ（§8）。
 v0.1.8 で `scripts_total` / `scripts_with_checksum` を署名欄に足したので、**`record_version` は 0.2 に上げる**（round 7、opus5:
 欄の集合を変えながら 0.1 のままなら、不変条件が自分の文面で破れている）。0.1 の proof はまだ存在しない——U3 が未着手なので、
@@ -539,6 +539,219 @@ server が決める欄 `zk_verification = {verifier, risc0_zkvm, journal_convent
 
 **(6) 版。** アダプタは `platform` と `zk_receipts` を読むので 0.4.0 に上げる（`adapter_version` は署名欄なので、古い版で読んだ等級と
 区別される）。述語は変えない（等級の規則は動かない）。record_version は 0.3。
+
+### 6.2 v0.1.14 の追加 — 計算資源（2026-10-14 起草、10-16 査読 2 回、10-17 凍結・実装、operator 決定）
+
+凍結した草案 `docs/design/prov_v0_1_14_resources_draft.md`（sha256 fe85d0a9…）の §6.2 を写した。〔査読 r1〕などの印は草案のまま
+残す。写した後に変えたのは (4) の表の plan の行だけで、その理由は下の「実装で決めたこと」の 2 項目めにある。
+
+**なぜ。** Tier 3 が焼き直す機械を選ぶには、各段がどれだけの資源を要したかが要る。nf-core の失敗の多くは、段が要求した量を機械が
+満たせないことで起きる。機械学習では GPU のベンダーと型番が、走るかどうかを決める。
+
+```
+                              今（v0.1.13）            v0.1.14
+束の拡張                      platform, zk_receipts    ＋ resources（machine と steps[]）
+等級                          7 つ（全体 + 6 分類）    7 つは同じ規則のまま ＋ grade_resources（別の規則 gc-resources-0.1）
+全体の等級 grade_overall      最弱の 4 分類            変えない（資源は入れない、案イ）
+署名欄                        record_version 0.3       ＋ 9 欄、record_version 0.4〔査読 r1: 6 → 9〕
+not_checked                   9 項目                   10 項目（＋ resources_as_written）
+アダプタ / 述語の版           bco-0.4.0 / 0.3.7        変えない
+```
+
+#### (1) 束に書くもの — `genomicschain_extension.resources`
+
+| 部分 | 中身 |
+|---|---|
+| `machine` | `cpu_model`、`logical_cores`、`memory_total_bytes`、`disk_free_bytes`（作業 dir のある disk、書き出した時点）、`gpu_probe`（探した道具ごとの名前・版・結果）、`gpus[]`（`vendor`、`model`、`memory_bytes`、`driver_version`、`runtime` = `{name, version}` 例 CUDA・ROCm） |
+| `steps[]` | `step_number` で段を名指す。`requested` = `{cpus, memory_bytes, time_seconds, disk_bytes, accelerators}`、`observed` = `{peak_memory_bytes, realtime_seconds, cpu_percent, read_bytes, write_bytes, cpu_model}`。どの欄も任意 |
+
+不変条件:
+
+- **探して無かったことと、探していないことを分ける。** `gpus` を `[]` と書くのは、`gpu_probe` に名前のある道具が少なくとも一つ
+  正常に走り、何も報告しなかったときだけ。道具が一つも無ければ（`nvidia-smi`・`rocm-smi` が無い Linux など）`gpus` は書かず、
+  note に残す。〔反証 2026-10-16〕この不変条件は §5 にある句の適用ではなく、この改訂で足す規則である（§5 の近い規則は「分類が空なら
+  absent」）。帰結: 探査の道具が無い CPU だけの Linux 機では `gpus` が書かれず、`full` に届かない。`--plan` で書く束なら plan に `gpus: []` を
+  書けば届く（plan が書いた値は `source: plan`）。〔凍結 10-17〕補完器 `--from-nextflow-run` とは併用できない（`gc_prov_write.rb` 90 行で
+  二つは排他）ので、r3 の「plan に書けば届く」は補完器の束には当たらない。
+- **`machine` は書き出し器が探った機械であって、task が使えた環境とは限らない**〔凍結 10-17、名前を正す〕。macOS の Docker Desktop で
+  走らせた task は Linux の仮想機械の中で走り、host の GPU を使えない。`--gpus` を付けずに走らせた container も同じ。記録の
+  `gpu_models` は「その機械に GPU があった」であって「task が GPU を使えた」ではない。
+- **値を作らない**（§4.1）。集められなかった欄は書かない。trace に列の無い値は無い。
+- **機械や人を特定する値は書かない。** host 名、利用者名、機器の serial・UUID、MAC、PCI の bus id。trace の `hostname` 列は読まない。
+- **機械の欄は、その機械で走った計算にだけ書く。** 補完器 `--from-nextflow-run` は `machine` を既定で書かない（cluster・cloud では
+  補完器の機械と task の機械が違う。platform と同じ理由）。`--machine-of-this-machine` を明示したときだけ書く。段ごとの値は trace が
+  task ごとに持つので、この問題が無く、既定で読む。
+- 拡張 block が複数あって `machine` が食い違えば、どちらも読まない。`steps[]` は段ごとに、食い違う欄だけ読まない（platform・
+  producer と同じ規則）。
+- 自己申告である。anchor は確かめない（`not_checked` に `resources_as_written`）。
+
+#### (2) 等級 — `grade_resources`（規則 `gc-resources-0.1`。全体の等級には入れない）
+
+段の判定を先に決める。**要求あり** = その段に `requested.cpus` と `requested.memory_bytes` の両方がある。**観測あり** = その段に
+`observed.peak_memory_bytes` と `observed.realtime_seconds` の両方がある。**機械が揃う** = `cpu_model`・`logical_cores`・
+`memory_total_bytes` があり、GPU を探した結果（`gpus`、空でもよい）がある。
+
+```
+absent   resources が無い、または読める値が一つも無い
+partial  何かある（機械の欄の一部、または一部の段の値）が、steps に届かない
+steps    全段が「要求あり」か「観測あり」のどちらかを満たす（段ごとにどちらでもよい）
+full     全段が要求ありと観測ありの両方を満たし、かつ機械が揃う
+```
+
+- **一つの extension block の中で情報が増えて等級が下がることは無い**（operator の「あれば点数が高くなる」）。各段は下の段の条件を
+  含む。〔査読 r1〕ただし block が二つあって `machine` が食い違えば、その欄は読まない（(1) の規則）ので、block を足すと下がりうる。
+- **段が一つも無い束は、多くて `partial`**〔査読 r1〕。「全段が満たす」は段が 0 個だと何も調べずに成り立ってしまう。述語が段の無い束の
+  環境を `absent` にするのと同じ向き。`steps[]` の `step_number` がどの段も名指さなければ、その項目は読まない。
+- **一つの段に値が複数来たとき**（Snakemake の benchmark は job ごとに file を書く、retry や scatter）〔査読 r1〕: 要求は最大、観測の
+  `peak_memory_bytes`・`realtime_seconds`・`cpu_percent` は最大、`read_bytes`・`write_bytes` は合計。機械の選び方に効くのは一つの job
+  の最大だから。
+- 全段の条件は**全段**で満たす（最弱の段が決める、§5 と同じ）。1 段だけ値があっても `partial`。
+- 決定的である。同じ束から同じ等級が出る。数でない値・負の値は「無い」とする。〔反証 2026-10-16〕§5 の境界規則は文字列の欄の規則
+  （「文字列か数値でなければ『無い』」）で、数の値の規則は §5 に無い。これはこの改訂で足す規則である。
+
+例（r0 との比較）:
+
+| 束 | r0 の等級 | r1 の等級 |
+|---|---|---|
+| nf-core を既定の設定で走らせ、補完器で埋めた（trace は既定の 14 列、機械は書かない） | absent | steps（全段に観測あり） |
+| 同じ run で `trace.fields` に既定の 14 列と `cpus,memory` を並べた〔反証: `trace.fields` は列の一覧を置き換える。`cpus,memory` だけを書くと `peak_rss`・`realtime` が消える〕 | absent（機械が無いので先へ進めない） | steps（全段に両方あるが、機械が無い） |
+| 上の行の設定で手元の機械で走らせ、`--machine-of-this-machine` も付けた | observed | full（GPU の探査の道具が一つでも走った場合）〔凍結 10-17: r3 の「無ければ plan に書けば」は CLI に無い道なので消した〕 |
+| `--plan` で書いた束（機械は自動、段の値は無し） | machine | partial |
+
+**`grade_overall` には入れない（案イ）。** 資源の欄は「locator が第三者に何を許すか」（§5 の等級の意味）ではなく、「走らせるのに要る
+条件」である。最弱の 4 分類に入れると、資源の欄が無い束はすべて全体 `absent` に落ちる。全体 `immutable` の束 X は、資源が無くても
+全体 `immutable` のまま、`grade_resources` が `absent` と並ぶ。
+
+#### (3) 記録に載るもの（record_version 0.4）
+
+0.3 の署名欄はそのまま全部残し、次の 9 欄を足す（〔査読 r1〕r2 の 6 欄に、値の出どころを示す 3 欄を足した）:
+
+| 欄 | 中身 | null の意味 |
+|---|---|---|
+| `resources_rule_version` | `gc-resources-0.1` | — |
+| `grade_resources` | absent / partial / steps / full | — |
+| `stages_with_requested_resources` | 要求ありの段の数（分母は既存の `stages_total`） | — |
+| `stages_with_observed_resources` | 観測ありの段の数（同上） | — |
+| `gpus_total` | GPU の枚数 | 探していない |
+| `gpu_models` | `[{vendor, model, count}]`、vendor・model の順に並べる。anchor の導出で絞る〔査読 r1〕: 16 項目まで、文字列は 128 文字まで・使える文字は英数字・空白・`._-()+/` だけ、UUID の形や 12 桁以上の 16 進の連なりを含む文字列は落とす（機器の serial を記録に出さない。書き出し器の規則を anchor でも守る）。`count` は 1〜64 の整数 | 探していない（`[]` は探して無かった） |
+| `gpu_vendors_probed` | 正常に走った探査が対象とするベンダーの集合（`nvidia`・`amd`・`intel`・`apple`）を並べたもの〔査読 r1〕。`nvidia-smi` は nvidia、`rocm-smi` は amd、macOS の `system_profiler` は apple・intel・amd を覆う。Linux には Intel の探査が無い（§10）〔反証 r2〕。`rocm-smi` だけが走った NVIDIA 機の `[]` を、読み手が「AMD を探して無かった」と読めるように | 探していない |
+| `machine_source` | `probe`（書き出し器が機械を探った）か `plan`（顧客が書いた）〔査読 r1〕。plan に書いた値で `full` に届いたことを記録の上で見せる | 機械の欄が無い |
+| `resources_sources` | 段の値の `source` の集合（`nextflow_trace`・`snakemake_benchmark`・`gnu_time`・`bsd_time`・`gc_resources_input`・`plan`）を並べたもの〔査読 r1〕 | 段の値が無い |
+
+`gpus_total` は、`count` が正しく読めた項目の `count` の合計。`gpu_models` は文字列の絞り込みを通った項目だけを並べるので、合計との
+差が「型番を伏せたか、16 項目を超えて並べなかった GPU の枚数」になる〔査読 r1: 二つの関係が書かれていなかった。反証 r2: 16 項目の上限の分も差に入る〕。macOS の `system_profiler` は内蔵の GPU も返す。
+Apple や Intel の内蔵 GPU も GPU として数える（機械学習の道具が使うことがある）。〔実装 10-17、名前を正す〕束の `gpus[]` は GPU 1 枚に
+つき 1 項目で、項目の `count` は読まない。`gpus_total` は束の `gpus[]` の項目の数（項目がすべてオブジェクトのときに限って読む）。
+`gpu_models` の `count` は、絞り込みを通った項目を (vendor, model) で束ねた数で、その合計と `gpus_total` の差が伏せた枚数になる
+〔実装の査読 r2: r1 の後に足した文が、`gpus_total` を `gpu_models` の合計と書いていた〕。
+
+型番以外の値（CPU の型番、メモリ量、段ごとの値）は記録に載せない。束にある（§6 の「記録は同一性と数だけ」）。GPU のベンダーと型番は
+platform（§6.1 (2)）と同じく、記録だけで Tier 3 が機械を振り分けられるように載せる（operator 決定）。`not_checked` は 10 項目に
+なり、record_version 0.4 で固定する。
+
+#### (4) 取り込み口 — どのパイプライン道具でも、資源の情報を出せれば登録する
+
+**operator の方針（2026-10-14、r2）:** 「全部が全部 nf-core を使うわけではないので、その他のパイプラインツール、例えば snakemake とか、
+独自パイプラインなどを使った場合にもし、リソース情報を出力できれば登録する、という方向性で良い」。記憶 `service-2-5-decisions` の
+「束を出す側は差し替え可能（Nextflow に縛らない）」と同じ線。
+
+形は一つ、取り込み口は道具ごと。等級は束の `resources` の共通の形だけから出すので、どの道具から来た値かで等級は変わらない。
+
+```
+Nextflow の trace ──────────┐
+Snakemake の benchmark ─────┤
+GNU time の出力 ────────────┼──▶ 取り込み口（道具ごと） ──▶ resources（共通の形） ──▶ gc-resources-0.1 ──▶ grade_resources
+資源の汎用 file（JSON） ────┤
+plan に顧客が書いた値 ──────┘
+```
+
+| 取り込み口 | 要求（requested） | 観測（observed） | 段との結び方 |
+|---|---|---|---|
+| Nextflow の trace（`--from-nextflow-run`） | `cpus memory time disk accelerator`（`accelerator` は要求した GPU の数。2026-01 の Nextflow から `accelerator`・`accelerator_type` 列がある〔反証 r2〕。既定の 14 列には無い。`trace.fields` は列の一覧を置き換えるので、既定の 14 列と足す列を並べて書く〔反証 2026-10-16〕） | `peak_rss realtime %cpu read_bytes write_bytes cpu_model` | task の hash（container の列と同じ、`nextflow_run.rb` の `trace_image`） |
+| Snakemake の benchmark file（rule に `benchmark:` を書いたもの） | 8.11 以降の `--benchmark-extended` で `threads`・`resources` | `s`（実時間）・`max_rss`・`io_in`・`io_out`（Snakemake の `benchmark.py` はどれも 1024×1024 で割る、つまり MiB。文書は io を bytes と書く〔反証 2026-10-16〕）・`cpu_time` | plan の段に benchmark file の path を書く。rule と段の対応は顧客が決める |
+| GNU time の `-v`（最大メモリは kbytes）と、macOS の BSD time の `-l`（最大メモリは bytes）〔反証 2026-10-16: macOS の `/usr/bin/time` は GNU ではない。形式も単位も違うので読み手は二つ〕 | — | 最大メモリ・実時間・CPU 時間 | 同上 |
+| 資源の汎用 file `gc-resources-input-0.1`（JSON） | 欄はすべて任意 | 同左 | 段の `step_number` を直接書く。独自パイプラインはこれを出せば足りる |
+| plan に書いた値 | 顧客が書いたまま | —〔実装 10-17、operator: plan は要求値だけ。観測値を書いた plan は断る〕 | plan の段そのもの |
+
+規則:
+
+- **値の出どころを束に書く。** 段の値ごとに `source`（`nextflow_trace`、`snakemake_benchmark`、`gnu_time`、`bsd_time`、`gc_resources_input`、
+  `plan`。(3) の `resources_sources` と同じ 6 つ〔反証 r2〕）。記録には載せない（束にある）。
+- **知らない列や欄は読まない。** Snakemake の extended 形式は `params` と `wildcards`（試料名が入りうる）も書くが、取り込み口は
+  資源の列だけを読み、ほかは束に写さない。
+- **単位を外して数にする。** 人の読む形（`11.2 MB`、`663ms`）なら丸めがあったことを note に残す。Nextflow には `trace.raw = true`
+  を手順書で勧める。Snakemake の文書は `max_rss` を megabytes とも MiB とも書き、io を bytes と書くが、code（`benchmark.py`）はどれも MiB で書く。
+  file を書いた Snakemake の版の code に従い、実装で実物の file を見て確かめ、note に残す。
+- **書き出し器は段を走らせないので、観測値を作らない。** 観測値はどれも、道具が実際に測って書いた file からだけ来る。測る道具が無い
+  独自パイプラインには、段を時間とメモリの測定で包む別の道具（仮称 `gc_prov_measure`）を後で用意し、汎用 file を書かせる（§10）。
+- `--plan` で書く束は、plan に `machine` が無ければ書き出す機械を探って書く（別の機械で走った計算を記述するなら plan に書く。
+  `--no-machine` で書かない。platform と同じ）。
+- GPU の探索: Linux は `nvidia-smi --query-gpu=…` と `rocm-smi`、macOS は `system_profiler SPDisplaysDataType -json`。どの道具を
+  試し、どれが走ったかを `gpu_probe` に書く。
+
+#### (5) 版
+
+| 何 | 今 | v0.1.14 |
+|---|---|---|
+| アダプタ `prov-adapter-bco` | 0.4.0 | **0.4.0 のまま**（アダプタは拡張の知らない key を読まない。`resources` は別の読み手が読む） |
+| 述語 `prov-predicate` | 0.3.7 | **0.3.7 のまま**（7 つの等級の規則は動かない） |
+| 資源の規則 | — | `gc-resources-0.1`（新規、署名欄） |
+| 書き出し器 | 0.2.0 | 0.3.0 |
+| record_version | 0.3 | 0.4 |
+| admission_rule | prov-admission-0.2 | 変えない |
+| 拡張の schema（core） | `resources` 無し | `resources` を足す（schema は最上位で知らない key を拒まないので、古い束も通る） |
+| package | prov 0.3.0、core 0.6.0 | prov 0.4.0、core 0.6.1 |
+| 検証器の再導出の条件 | 三つの版で全か無か（`Prov::VERSION_FIELDS`、`verdict_spec/prov.rb` 57 行、`Verifier#rederive`、`verifier.rb` 221 行） | **二つに分ける**〔査読 r1〕: 7 つの等級と数は今の三つの版で再導出する。資源の 9 欄は `resources_rule_version` とアダプタの版が手元と同じときだけ再導出し、違えば資源の欄だけ「版違い」の見出しへ。r2 の「四つの版で全か無か」では、資源の規則を一度上げただけで 0.4 の記録すべての 7 つの等級が再導出されなくなり、別の規則にした理由が消える |
+| 0.3 に固定された code〔査読 r1: r2 の表に無かった。このままだと最初の提出が schema 違反になる〕 | `prov_attestation.schema.json`（`record_version` の enum が `["0.3"]`、`not_checked` が 9 項目ちょうど、最上位の `additionalProperties: false`）、`Identity::RECORD_VERSION`（`identity.rb` 38 行）、`SIGNED_FIELDS`（'0.3' だけ）、`Identity.params_from_manifest`（182–185 行。版ごとの欄の集合 `SIGNED_FIELDS` は 64–65 行〔反証 r2〕）、`Identity.derive`、`NOT_CHECKED`（79 行）、`Verifier::NOT_CHECKED_TEXT`（`verifier.rb` 31–41 行）、`Prov.versions` と `ProcedureVersionMismatch` の文面（`verdict_spec/prov.rb` 75–78、140–146 行）、`gc_prov_submit.rb` 119–124 行 | どれも版ごとに持つ。schema は `record_version` で分け（0.3 の記録が今のまま通ること）、0.4 は 9 欄と `not_checked` 10 項目。`NOT_CHECKED_TEXT` に `resources_as_written` の文。`Prov.versions` と拒否の文面に `resources_rule_version` を足す。prov の `depends_on` を core `>= 0.6.1` に |
+
+#### (6) 既存の記録・自己検査・ZK の実演との関係
+
+**この改訂は、既にある等級・記録・証明の意味を一つも変えない。** そうなるように (5) の版を選んだ。
+
+| 既にあるもの | 影響 | 根拠 |
+|---|---|---|
+| 0.3 の記録（第 2 回の自己検査 E-25 の V0・V6） | 意味は変わらない。新しい検証器でも、アダプタ・述語・pin の版が一致するので等級を再導出して「一致」と言える | 検証器は版が一致するときだけ再導出する（§8）。r0 のように述語を上げると、新しい検証器では「版違い」の見出しになっていた |
+| 同じ束を 0.4 で記録し直した場合 | 7 つの等級と数は同じ。違うのは足した 9 欄、`record_version`、`not_checked`、`submission_key` と claim の末尾 | 0.4 の記録は別の記録として発行される。0.3 の記録は残る |
+| ZK 証明（Supplementary S1 の実測、anchor の `gc_zk_verify`） | 無し | journal の形 `gc-zk-journal-0.1`、検証の 4 条件、署名欄 `zk_receipts` を変えない |
+| Tier 3 の route B の線 | 無し | 線は `grade_overall`・`grade_inputs`・`outputs_with_checksum` だけを読む |
+
+実装の受け入れ条件（非退行の test）: (i) 既存の test 束すべてで 7 つの等級と数が 0.3.0 と同じ、(ii) 変更の前に prov 0.3.0 で 0.3 の記録を
+一つ作って fixture として保存し、新しい検証器で「一致」と読む〔反証 2026-10-16: 今の test は記録をその場で作るので、0.3 の fixture は
+まだ無い〕、(iii) 資源の欄を足しても `grade_overall` が動かない、(iv) 段の無い束は多くて `partial`、(v) 資源の規則の版だけが違う 0.4 の
+fixture で、7 つの等級と数は「一致」、資源の欄は「版違い」、(vi) 機器の serial に見える文字列を `model` に入れた束で、記録の
+`gpu_models` から落ちる〔(iv)〜(vi) は査読 r1〕。加えて、手元にだけある第 2 回の V0・V6 の束で (i) を一度
+確かめ、`selfapp/round2/expected.json` の E-25 の等級と同じであることを記録する（自己検査のやり直しではなく、確認の 1 行）。
+
+#### (7) Tier 3 との関係
+
+route B の線（§6.1 (1)）は変えない。Tier 3 は束の資源の欄を、焼き直す機械の選択と実行前の費用の見積もり（`gc_tier3_estimate` の
+`n_cores`・`ram_gb`）に使う。Tier 3 の `jobspec_digest` は資源を含まない（Tier 3 の code の事実: `JobSpec#digest` は subject_ref・env・data・pipeline だけを覆う、
+`genomicschain_tier3/lib/genomicschain_tier3/execution/backend.rb` 103 行。〔反証 2026-10-16〕r2 は §6.1 を根拠に挙げたが、§6.1 は
+jobspec_digest に触れていない）ので、資源の欄は Tier 3 の同一性にも
+入らない。機械学習で同じ GPU でも結果が揺れること（非決定性）は資源の欄の外にあり、Tier 3 の比較の許容誤差の問題である。
+
+#### 実装で決めたこと（2026-10-17。prov 0.4.0、core 0.6.1、書き出し器 0.3.0）
+
+凍結後の実装の待ち行列（L2 `handoff_tier25_v0114_v0115_implementation_20261017`）のうち、operator に尋ねた 3 件と、規則の空白を
+埋めた細部。どれも消す・直す・名前を正す方向で、新しい署名欄も新しい CLI の口も足していない。
+
+| 何 | 決めたこと | 根拠 |
+|---|---|---|
+| D5 GPU の型番の絞り込み | ベンダーは nvidia・amd・intel・apple の 4 つだけ。型番は、次のどれかを文字列のどこかに含めば落とす（区切りの文字は問わない）: 12 桁以上の 16 進の連なり（UUID もこれに含まれる）、8 桁以上の数字、IPv4（`.`・`-`・`_` 区切り）、MAC（`-`・`_`・空白区切りと、点で 3 つに区切る形）、host 名（点が二つ、または点の後に英字の名前）、`/` で始まる文字列、英字と数字が 3 つ以上ずつ混ざった 8 文字以上の語（serial の形）。落ちた GPU も `gpus_total` には数える。ベンダーは前後の空白を除いて小文字にしてから四つと比べ、型番は前後の空白を除いて記録する。同じ型番が 64 枚を超える組は `gpu_models` に載せない。path は文字列の先頭だけを見る（operator の言い方のとおり）。残る危険（operator が受け入れた、実装の査読 r2 で足した 3 つを含む）: 点の無い host 名、短い service tag、文字列の途中の path、4 文字ずつ横棒で区切った serial、横棒で区切った 3 組の MAC は型番と見分けられず通る。AMD の角括弧つきの名前は伏せる | operator 2026-10-17「ベンダー限定＋形で落とす」「path と長い数字だけ足す」「伏せたままにする」。凍結時の規則では「SN-Z9Y8X7W6V5U4」「gpu17.cluster.uzh.ch」「10.0.0.17」が、実装の査読 r1 では「NVIDIA (node3.local)」が記録に出た |
+| plan の観測値 | plan に書けるのは要求値だけ。`resources.observed` を書いた plan は理由を添えて断る | operator 2026-10-17。(4) の規則「観測値はどれも、道具が実際に測って書いた file からだけ来る」と表の plan の行が食い違っていたので、規則の側に合わせた |
+| D4 の三つの追加 | どれも足さない（署名欄 `stages_requesting_accelerators`、補完器の `--machine PATH` は待ち行列に残す）。macOS で container を使った段があるときに `gpus` と `gpu_probe` を書かない修正だけを入れた | operator 2026-10-17「何も足さない」。macOS の修正は (1) の凍結時の文「task が GPU を使えたとは限らない」の帰結で、書く量を減らす向き |
+| `gpus[]` の数え方 | 束の `gpus[]` は GPU 1 枚につき 1 項目。anchor は (vendor, model) で束ねて `count` を出す。plan の `count` は書き出し器が項目に展開する | 待ち行列。(1) の表に `count` が無かった |
+| `source` の無い machine | `plan` として読む。`probe` は強い主張なので、書かれていなければ名乗らせない | 規則の空白 |
+| 機械の探査 | 命令は固定の引数で、命令の process が 10 秒で終わらなければ打ち切る（結果は `timeout`。命令が残した子 process が出力を握り続ける場合と、SIGKILL で終わらない場合は待ち続ける）。探査が報告した GPU を一つでも読めなければ、その探査は `failed` とし、その探査の GPU は書かない（読み損じを「探して無かった」と署名しない）。`gpus` は答えた探査があれば書き、Linux で rocm-smi だけが失敗すれば NVIDIA の GPU だけが載る（`gpu_vendors_probed` も nvidia だけ）。`gpus` はオブジェクトだけからなるときに読み、`gpu_vendors_probed` は `gpus` を読んだときだけ出す。macOS の規則: plan では、道具・runtime の `image` か OCI の image 参照の `uri` があれば GPU の行を書かない（Singularity の `.sif` や `https://` の image は見分けない）。Nextflow の補完では、macOS なら常に書かない（nf-prov の束は task が container で走っても container を名乗らないので、work/ が消えた後には見分けられない。operator 2026-10-17）。探査の出力が読めない形（rocm-smi の最上位がオブジェクトでない、`card…` の項目がオブジェクトでない、system_profiler の一覧が無いか一覧でない、型番が空）は `failed`。rocm-smi は `Card Series` を `Card Model`（PCI の番号）より先に採る。SIGKILL で終わらない process（固まった driver）は待ち続けることを、operator は残る危険として受け入れた（`--no-machine` で避けられる） | operator 2026-10-17「足す」（打ち切り）。実装の査読 r1 |
+| 段の項目の読み方 | 知らない `source` の項目、束のどの段も名指さない `step_number` の項目は読まない（note に残す）。段の `cpu_model` は job で一つに揃うときだけ読み、それだけでは書かれた値に数えない（等級を上げも下げもしない）。数は値で比べる（2^53 未満の整数値の Float は等しい Integer として比べるので 4 と 4.0 は同じ。合計した値も同じ。2^53 以上の Float は Float のまま比べる）。`resources_sources` には、値が残った出どころだけを並べる（同じ block の中では、最大を採る欄はその最大を出した出どころ、同点ならその両方、合計の欄は足したすべて） | 「知らない欄は読まない」(4) と同じ向き。実装の査読 r1 で、CPU 名の食い違いが同じ block の中で等級を下げていた |
+| Nextflow の `-resume` | `pipeline_info/execution_trace*.txt` をすべて名前の順に読み、task の hash ごと・欄ごとに後のファイルの値を採る。後のファイルの空欄（`-`）は前の値を消さない。読んだファイル名を note に残す。trace の短い hash と段の結び付きは、一つの trace ファイルの中と束の段の間で 1 対 1 のときだけ読む（同じ短い hash を持つものが二つあれば、どちらも読まない）。別の trace ファイルの同じ短い hash は同じ task とみなすので、以前の起動の別の task と偶然一致すれば値が混ざりうる | 待ち行列。実装の査読 r1 |
+| 0.3 の client | anchor が 0.4.0 に上がった後、0.3 の署名欄で提出した client は `ProcedureVersionMismatch` で断られ、anchor の版（`resources_rule` を含む）が返る。記録は増えない。逆向き（0.4 の client と 0.3.0 の anchor）は版違いではなく `IdentityMismatch` になるので、anchor を先に上げる | 待ち行列「Policy for 0.3 clients」。実装の査読 r1 |
+| 記録の schema | 0.3 の `prov_attestation.schema.json` は変えず、0.4 を別ファイル `prov_attestation_v0_4.schema.json` にした。`resources_rule_version` は `gc-resources-N.M` の形を許す | 0.3 の記録が今のまま通ることを、ファイルが変わっていないことで示せる |
+
+受け入れの確認（2026-10-17）: (i) nf-core の fixture、0.3 の fixture、自己検査の V0・V6 の 4 束で、0.3 の署名欄 51 個が変更の前後で
+一致。(ii) 変更前の prov 0.3.0 で作った記録（`genomicschain_prov/test/fixtures/record_v0_3/`、作った版は `made_with.json`）を新しい検証器が
+「一致」と読む。(iii)〜(vi) は test（`resources_test.rb`、`prov_verify_test.rb`）。E-25 の確認の 1 行: V0・V6 とも、E-25 の manifest の
+欄のうち束から出る 21 欄が一致、claim の形も一致（自己検査のやり直しではない）。
 
 ## 7. 道具と置き場所
 
@@ -739,6 +952,23 @@ U0〜U5 が v0.1。U0 を先にするのは、アダプタの欄名を実物で�
     immutable に戻る。補完器は段ごとにだけ書くのでどちらでも補完した束は変わらない。退けた理由: 正直な `:latest` の申告が workflow
     全体の checksum で覆われる方が、段ごとの申告が下がることより隠す向きに倒れる
 
+**v0.1.14 で足した未決（§6.2、2026-10-14 の草案のまま）。**
+
+- `full` は共有 cluster の run では届きにくい（機械が一つに決まらない）。段ごとの `cpu_model` で機械の条件を代えるかは、実際の束を
+  見てから決める。
+- Nextflow の trace の `accelerator`・`accelerator_type` 列は要求した GPU の数と種類で、走った機械の GPU の型番ではない〔反証 r2: r2 は
+  「GPU の列を持たない」と書いたが、2026-01 の Nextflow から列がある〕。cluster で GPU を使った段の機械の型番は、顧客が plan で書くしかない。
+  Linux の Intel の GPU を探る道具を足すか。
+- 測る道具の無い独自パイプライン向けに、段を時間とメモリの測定で包む道具（仮称 `gc_prov_measure`）を作るか。作るなら書き出し器
+  とは別の道具にし、汎用 file `gc-resources-input-0.1` を書かせる。
+- Snakemake の benchmark は `benchmark:` を書いた rule だけを測る。全段に書いていない束は `partial` に留まる。手順書で全 rule への
+  `benchmark:` を勧めるか。
+- 取り込み口を足す順番。実物の束が来た道具から足す（selective survival）。最初は Nextflow と汎用 file、次に Snakemake。
+- 手順書に書く、値が取れる条件〔査読 r1〕: Nextflow の `peak_rss` は task の container に `ps`（procps）が要り、macOS で直接走らせると
+  `-` になる。slim な image には `/usr/bin/time` が無いことが多く、bash の `time` には `-v` が無い。古い GNU time（1.7）は最大メモリを
+  約 4 倍に出すと二つの査読が述べた（未確認。出力に版が出ないので、版を確かめる手順を書く）。Snakemake の benchmark は job ごとの
+  file で、段との対応は (2) の集め方に従う。
+
 ## 11. デモ → 設計の対応表
 
 | デモ（`demo.html`） | 設計 |
@@ -911,6 +1141,7 @@ registry の形のときだけ image、checksum の経路には locator が要�
 
 | 版 | 日付 | 何が変わったか |
 |---|---|---|
+| v0.1.14 | 2026-10-14 | **凍結後、四つ目の個別改訂。** operator の決定（計算資源の記録、案イ、GPU の型番を記録に）。束の拡張 `resources`（`machine` と段ごとの `steps[]`。取り込み口は道具ごと——Nextflow の trace、Snakemake の benchmark、GNU time、汎用 file、plan——で、等級は共通の形だけから出す）、新しい規則 `gc-resources-0.1` による `grade_resources`（absent < partial < steps < full、全段の最弱、段の無い束は多くて partial、`grade_overall` には入れない）、署名欄 9 つ（値の出どころ 3 欄を含む。GPU の型番は anchor の導出で絞る）、`not_checked` 10 項目、`record_version` 0.4。アダプタ 0.4.0 と述語 0.3.7 は変えない（7 つの等級の規則は動かず、0.3 の記録は新しい検証器でも再導出される）。検証器の再導出は、7 つの等級と資源の欄を分けて版を見る。route B の線は変えない |（2026-10-17 実装: prov 0.4.0、core 0.6.1、書き出し器 0.3.0。operator の決定 3 件——D5 はベンダー限定＋形で落とす、plan は要求値だけ、D4 は何も足さない——と規則の空白を埋めた細部は §6.2 の「実装で決めたこと」）|
 | v0.1.13 | 2026-10-12 | **凍結後、三つ目の個別改訂。** operator の決定 2 件（L2 `ruling_tier25_gate_withdrawn_20261012`）。(1) v0.1.12 の G1（immutable を発行の関門にする）を撤回: anchor はどの等級でも記録を発行し、等級を計算したとおりに載せる。`admission_rule` は `prov-admission-0.2`。`GradeBelowRequirement` を削り、schema の `grade_overall` を 6 段階に戻し、`admission_rule` は 0.1 と 0.2 の両方を許す（0.1 の記録が使い捨ての local anchor に残っているため）。検証器は記録の `admission_rule` をその名前の意味で読む。(2) Tier 3 の route B は Tier 3 の側で署名された等級を読み、D11 の元の線（`grade_overall` ≥ versioned、inputs = immutable、`outputs_with_checksum` ≥ 1）に戻す。§6.1 (1)、§8、§9 の U3・U4 の行を直した。code: prov 0.3.0（記録の欄の意味が変わり、0.2.0 の検証器は新しい記録を誤って説明するため minor を上げた）、test は prov 6 本・core・tier1/2/3・regwatch すべて緑。G2（ZK 証明の検証）は変えない |
 | v0.1.12 | 2026-10-12 | **凍結後、二つ目の個別改訂。** review の巡ではなく operator の決定 3 件（ruling `ruling_service_plan_two_stage_drive_vk_20261011` の D9・D13、L2 `ruling_tier25_gate_and_zk_verify_20261012` の G1・G2）。新しい §6.1 に集め、§6・§7・§8・§9 は該当行だけ直した。(1) immutable は発行の関門: `grade_overall` が immutable 未満の束は拒否し記録しない、server が決める欄 `admission_rule`、Tier 3 の route B もこれに合わせる。(2) CPU と OS: 束の拡張 `platform` を書き出し器が自己申告で書き（host 名は書かない、補完器は明示したときだけ）、署名欄 `platform_*` 3 つ（null 可）。(3) ZK 証明: 束の拡張 `zk_receipts[]` で宣言し、bytes は提出に添え、anchor が版固定の Rust program `gc_zk_verify`（risc0-zkvm 3.0.6）で検証し、journal の入出力 digest を束の段の入出力と照合してから記録する。記録には同一性だけ（指紋・image ID・zkVM の名前と版・段・journal の形）と server の欄 `zk_verification`。bytes と journal の値は載せない。operator は当初の選択肢文が「v0.2 に回す」と書いていた (B) を選び、追加の質問で「11/15 から」と答えた。(4) not_checked 9 項目、record_version 0.3、アダプタ 0.4.0、拡張の schema file を U3 で作る（公開は operator の判断）。(5) HTTP の body 上限 5 MB 以上。根拠の実測: succinct receipt 223,746 bytes、検証 0.012 秒、journal = (入力 file の SHA-256, 出力 bytes)（KairosChain_2026 `log/zk_demo_sizefactor_20260929/03_proofs`、`00_prereg/instances.csv` で input_sha256 = registered_commitment_sha256） |
 | v0.1.11 | 2026-09-21 | **凍結後、最初の個別改訂。** review の巡ではなく、U1b の実装が突き当たった事実 2 件（凍結の記の「設計を改訂する条件」）。(1) §9 の U1b が `tools/gc_prov_write.rb` と書いていたが、§7 は round 3 に「CLI は `tools/` に置かない——`Skillset#load!` が `tools/*.rb` をどの node でも eager に require する」と決めている。gem の `skillset.rb` を読んで再確認したうえで §9 を `bin/` に訂正し、§7 の表に `gc_prov_write` の行を足した（v0.1 の §9 は round 3 より前に書かれた行が残っていた）。(2) §9 の完了の印「checksum を省くと等級が floating」を実測 `local_path` に訂正。workflow は予告どおり `floating` に落ちるが、plan が入力を相対 path で名指すため入力は §5 で floating より下の `local_path` になり、最弱である全体はそこで止まる。§4.1 の「floating 止まり」は正しい（floating を超えられない、の意）。意図——「等級は集めた分だけ上がる」——は test が 4 分類すべての落下で押さえている。U1b の実装そのもの: writer 0.1.0、`prov_write_test.rb` 26 本、prov 全体で 103 本 / 644 assertions 緑 |
