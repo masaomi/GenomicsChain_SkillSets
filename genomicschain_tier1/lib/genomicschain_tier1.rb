@@ -4,6 +4,7 @@
 # Submit path lives in genomicschain_core (gc_tier1_submit); this package holds
 # the schema, the rubric knowledge, the core-contract guard, and the assessment
 # path behind gc_tier1_assess (spec: doc/gc_tier1_assess_spec_v0_2.md).
+require 'json'
 require 'genomicschain_core'
 require_relative 'genomicschain_tier1/core_contract_guard'
 
@@ -16,6 +17,9 @@ module KairosMcp
       # The previous '../../assets/...' resolved outside the package entirely; it
       # went unnoticed because nothing loaded the schema until gc_tier1_assess.
       SCHEMA_V0_2_6 = File.expand_path('../assets/report_schema_v0_2_6.json', __dir__)
+      # The report's assessor_stack names this, so it is read from the manifest
+      # that install.sh copies rather than kept as a second constant to forget.
+      VERSION = JSON.parse(File.read(File.expand_path('../skillset.json', __dir__))).fetch('version')
     end
   end
 end

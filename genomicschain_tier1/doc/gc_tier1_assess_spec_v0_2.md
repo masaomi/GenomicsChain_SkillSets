@@ -353,11 +353,22 @@ before implementation.
     "llm_overreach": []
   },
   "assessor_stack": { "operator_id": "...", "stage": "stage1-prose-only",
-                      "llm": {"provider": "anthropic", "model": "...", "invoked_at": "..."} },
+                      "assessor_version": "genomicschain_tier1 0.2.4",
+                      "llm": {"provider": "bedrock", "model": "claude-sonnet-5-5",
+                              "model_requested": "eu.anthropic.claude-sonnet-5-5",
+                              "effort": "high", "effort_source": "model default; not sent in the request",
+                              "invoked_at": "..."} },
   "human_signoff_required": true,
   "next_step": "Human review and sign-off (rubric R5 / protocol §10), then gc_tier1_submit on the anchor."
 }
 ```
+
+`assessor_version`, `model_requested`, `effort` and `effort_source` were added in 0.2.4
+(2026-10-18); the schema's `assessor_stack.llm` permits them without a schema bump.
+`model` is what the provider says answered, `model_requested` the ID `llm_call` was asked
+to use (present only where `llm_call` reports it). No effort is sent on the Bedrock path,
+so `effort` is that model's documented default and `effort_source` says so; on any other
+provider, or a model without a listed default, both are omitted rather than guessed.
 
 Fixed in the emitted report:
 

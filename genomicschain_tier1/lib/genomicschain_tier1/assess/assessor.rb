@@ -38,6 +38,21 @@ module KairosMcp
             report_content_hash assessed_at assessor_id canonical_id
           ].freeze
 
+          # Effort is not sent: gc_tier1_assess passes none, and llm_client's
+          # BedrockAdapter has no output_config (operator decision 2026-10-18 to
+          # keep it so). The model's documented default therefore applies, and
+          # the report says that it is a default, not a setting someone chose.
+          # Defaults per Anthropic's model documentation as of 2026-10-06.
+          DEFAULT_EFFORT = {
+            'claude-sonnet-5-5' => 'high', 'claude-sonnet-5' => 'high',
+            'claude-opus-5-5' => 'medium', 'claude-opus-5' => 'high',
+            'claude-haiku-5-5' => 'medium'
+          }.freeze
+          # Only on a path verified to send no effort. Another provider (the
+          # claude_code fallback on an AuthError, say) may apply its own, so the
+          # report leaves effort out rather than guess it.
+          EFFORT_UNSENT_PROVIDERS = %w[bedrock].freeze
+
           class AssessError < StandardError; end
 
           def initialize(llm:, rubric_path: PreCommit::RUBRIC_PATH)
@@ -56,7 +71,7 @@ module KairosMcp
             )
             return dry_run(input, pre) if input['dry_run']
 
-            llm_fields, invoked_at, model, provider = score(input)
+            llm_fields, llm_stack = score(input)
             overreach = llm_fields.keys & RESERVED
             llm_fields = llm_fields.reject { |k, _| RESERVED.include?(k) }
 
@@ -65,8 +80,7 @@ module KairosMcp
               lock_cited_in_sources: lock_cited?(input, llm_fields)
             )
 
-            report = build_report(input, pre, llm_fields, derived,
-                                  provider: provider, model: model, invoked_at: invoked_at)
+            report = build_report(input, pre, llm_fields, derived, llm_stack: llm_stack)
             report_json = JSON.pretty_generate(report)
             outcome = Validator.validate!(report_json, report)
 
@@ -173,8 +187,26 @@ module KairosMcp
               'provider_override' => input.dig('llm', 'provider')
             )
             fields = extract_fields(response)
-            [fields, invoked_at, response['model'] || input.dig('llm', 'model') || 'unknown',
-             response['provider'] || input.dig('llm', 'provider') || 'unknown']
+            provider = response['provider'] || input.dig('llm', 'provider') || 'unknown'
+            model = response['model'] || input.dig('llm', 'model') || 'unknown'
+            [fields, llm_stack(provider, model, response['requested_model'], invoked_at)]
+          end
+
+          # model is what the provider says answered; model_requested is the ID
+          # llm_call was asked to use (a Bedrock inference profile such as
+          # eu.anthropic.claude-sonnet-5-5, which names the region as well), and
+          # is present only where llm_call reports it.
+          def llm_stack(provider, model, model_requested, invoked_at)
+            effort = (DEFAULT_EFFORT[model.to_s.sub(/\A(?:[a-z]+\.)?anthropic\./, '')] if
+                      EFFORT_UNSENT_PROVIDERS.include?(provider))
+            {
+              'provider' => provider,
+              'model' => model,
+              'model_requested' => model_requested,
+              'effort' => effort,
+              'effort_source' => effort && 'model default; not sent in the request',
+              'invoked_at' => invoked_at
+            }.compact
           end
 
           # Providers disagree on where the text lives, and llm_client passes the
@@ -240,7 +272,7 @@ module KairosMcp
             end
           end
 
-          def build_report(input, pre, llm, derived, provider:, model:, invoked_at:)
+          def build_report(input, pre, llm, derived, llm_stack:)
             {
               'rubric_version' => '0.2.5',
               'metric_semantics_version' => '0.2.5',
@@ -273,7 +305,10 @@ module KairosMcp
               'assessor_stack' => {
                 'operator_id' => input['operator_id'],
                 'stage' => pre['funnel_stage'],
-                'llm' => { 'provider' => provider, 'model' => model, 'invoked_at' => invoked_at }
+                # Read from this package's own skillset.json, so it names the
+                # code that produced the report and not a caller's idea of it.
+                'assessor_version' => "genomicschain_tier1 #{GenomicschainTier1::VERSION}",
+                'llm' => llm_stack
               },
               'manifest' => {
                 'b1_manifest_hash' => pre['b1_manifest_hash'],

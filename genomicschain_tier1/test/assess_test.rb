@@ -310,6 +310,50 @@ class ReportShapeTest < Minitest::Test
     assert KairosMcp::SkillSets::GenomicschainCore::B1ManifestHash.matches?(report)
   end
 
+  def assess_via(response)
+    out = A::Assessor.new(llm: ->(_payload) { response.merge('fields' => llm_fields(steps: [step('C1')])) })
+                     .run(base_args)
+    assert_equal 'ok', out.dig('guards', 'schema')
+    out['report']['assessor_stack']
+  end
+
+  # The report names the code that produced it, read from skillset.json.
+  def test_assessor_stack_names_this_packages_version
+    stack = assess_via('status' => 'ok', 'model' => 'stub-model', 'provider' => 'stub')
+    version = JSON.parse(File.read(File.expand_path('../skillset.json', __dir__)))['version']
+    assert_equal "genomicschain_tier1 #{version}", stack['assessor_version']
+  end
+
+  # Nothing sends effort on the Bedrock path, so the report gives the model's
+  # default and says it is one.
+  def test_bedrock_reports_the_models_default_effort_and_the_requested_id
+    stack = assess_via('status' => 'ok', 'model' => 'claude-sonnet-5-5', 'provider' => 'bedrock',
+                       'requested_model' => 'eu.anthropic.claude-sonnet-5-5')
+    llm = stack['llm']
+    assert_equal 'claude-sonnet-5-5', llm['model']
+    assert_equal 'eu.anthropic.claude-sonnet-5-5', llm['model_requested']
+    assert_equal 'high', llm['effort']
+    assert_match(/default; not sent/, llm['effort_source'])
+  end
+
+  def test_a_model_whose_default_differs_is_recorded_with_its_own
+    llm = assess_via('status' => 'ok', 'model' => 'claude-opus-5-5', 'provider' => 'bedrock')['llm']
+    assert_equal 'medium', llm['effort']
+  end
+
+  # A fallback provider or an unlisted model may apply an effort of its own;
+  # the report leaves the field out rather than guess. An llm_call that does
+  # not report the requested ID leaves that out too.
+  def test_effort_and_requested_id_are_omitted_rather_than_guessed
+    other = assess_via('status' => 'ok', 'model' => 'claude-sonnet-5-5', 'provider' => 'claude_code')['llm']
+    unlisted = assess_via('status' => 'ok', 'model' => 'claude-next', 'provider' => 'bedrock')['llm']
+    [other, unlisted].each do |llm|
+      refute llm.key?('effort')
+      refute llm.key?('effort_source')
+      refute llm.key?('model_requested')
+    end
+  end
+
   def test_repro_index_is_refused_below_four_steps
     small = run_assess(llm_fields(steps: [step('C1')]))
     assert_nil small.dig('derived', 'headline', 'repro_index')
