@@ -21,10 +21,11 @@ require_relative 'genomicschain_prov/normalized'
 require_relative 'genomicschain_prov/adapters/bco'
 require_relative 'genomicschain_prov/predicate'
 require_relative 'genomicschain_prov/writer'
+require_relative 'genomicschain_prov/resources'
 require_relative 'genomicschain_prov/identity'
 
 module GenomicsChainProv
-  VERSION = '0.3.0'
+  VERSION = '0.4.0'
 
   # Part of the signed identity (`adapter_version`, design §6): the same bundle
   # under a different adapter version may normalise differently, so the record

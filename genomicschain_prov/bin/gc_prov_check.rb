@@ -8,8 +8,9 @@
 #
 #   what is this bundle's digest          (the digest subject, §2)
 #   what grade, and why                   (§5; per item, with reasons)
+#   what the resources grade is           (v0.1.14 §6.2; beside the grade, not in it)
 #   what exactly would be signed          (signed_params, §6)
-#   will the anchor issue a record        (immutable gate, ZK declarations)
+#   will the anchor issue a record        (the ZK declarations; any grade is recorded)
 #   do my ZK receipts hold                (①–④ locally, when gc_zk_verify is
 #                                          installed and --zk-receipt is given)
 #
@@ -67,9 +68,11 @@ module GcProvCheck
       'zk_local' => zk_local(derived, admission, receipt_paths, verifier),
       'graded' => derived['graded'],
       'platform' => derived['np'].platform,
-      'notes' => derived['np'].notes,
+      'resources' => derived['resources'].slice('machine', 'steps'),
+      'notes' => derived['np'].notes + derived['resources']['notes'],
       'versions' => { 'adapter' => Bco::VERSION, 'predicate' => derived['graded']['predicate_version'],
-                      'pin_strength' => derived['graded']['pin_strength_version'] } }
+                      'pin_strength' => derived['graded']['pin_strength_version'],
+                      'resources_rule' => derived['signed']['resources_rule_version'] } }
   end
 
   # ①–④ on this machine. Not run — and said so — when the bundle declares
@@ -110,6 +113,7 @@ module GcProvCheck
              "params #{c['params_count']}/#{c['params_total']}"
     p = result['platform']
     lines << "  platform: #{p ? p.values.compact.join(' ') : 'not recorded (the record will carry null)'}"
+    lines.concat(resource_lines(result['signed_params'], c['stages_total']))
     lines.concat(zk_lines(result))
     lines << ''
     if issuable?(result)
@@ -122,7 +126,8 @@ module GcProvCheck
       lines << '  a zk receipt failed the local check (see above)' if result['zk_local']['state'] == 'failed'
     end
     v = result['versions']
-    lines << "  (adapter #{v['adapter']}, predicate #{v['predicate']}, pin_strength #{v['pin_strength']} — " \
+    lines << "  (adapter #{v['adapter']}, predicate #{v['predicate']}, pin_strength #{v['pin_strength']}, " \
+             "resources rule #{v['resources_rule']}, record_version #{result['record_version']} — " \
              'the anchor refuses a signature made under other versions)'
     result['notes'].each { |n| lines << "  note: #{n}" }
     if items
@@ -133,6 +138,22 @@ module GcProvCheck
       end
     end
     lines.join("\n")
+  end
+
+  # What the record will say about resources (v0.1.14 §6.2 (3)). The
+  # per-stage values and the machine stay in the bundle; only the GPU vendors
+  # and models reach the record, filtered as the anchor filters them.
+  def resource_lines(sp, stages_total)
+    gpus = if sp['gpus_total'].nil? then 'not looked for'
+           else
+             named = Array(sp['gpu_models']).map { |g| "#{g['count']} × #{g['vendor']} #{g['model']}" }
+             "#{sp['gpus_total']}#{named.empty? ? '' : " (#{named.join(', ')})"}"
+           end
+    sources = Array(sp['resources_sources'])
+    ["  resources: #{sp['grade_resources']} (#{sp['resources_rule_version']}; not part of the grade above) — " \
+     "requested on #{sp['stages_with_requested_resources']}/#{stages_total} stages, observed on " \
+     "#{sp['stages_with_observed_resources']}/#{stages_total}, from #{sources.empty? ? 'nowhere' : sources.join(', ')}",
+     "  machine: #{sp['machine_source'] || 'not recorded'}; GPUs #{gpus}"]
   end
 
   def zk_lines(result)

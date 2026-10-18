@@ -5,10 +5,10 @@ description: Write a pipeline's provenance bundle, or fill in one that was writt
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**. Prototype, v0.3.0 (writer 0.2.0, adapter 0.4.0, predicate
-0.3.7, record_version 0.3, admission rule prov-admission-0.2) — design
-`docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10, now v0.1.13 with three individual
-revisions), implementation units §9: U0–U5 done.
+Service (2.5) **provenance anchoring**. Prototype, v0.4.0 (writer 0.3.0, adapter 0.4.0, predicate
+0.3.7, resources rule gc-resources-0.1, record_version 0.4, admission rule prov-admission-0.2) — design
+`docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10, now v0.1.14 with four individual
+revisions), implementation units §9: U0–U5 done; v0.1.14 (computing resources) implemented.
 
 ```
         a computation ─────────┐
@@ -55,6 +55,38 @@ for `--plan`, only with `--platform-of-this-machine` for a Nextflow run) and `zk
 
 When installing on an anchor, install from a copy without `zk_verifier/target/` (`skillset install`
 copies the whole directory, and a release build tree is ~330 MB).
+
+## Computing resources (v0.1.14, design §6.2)
+
+Tier 3 needs to know what each stage asked for and used, and which GPU the run had, before it can
+pick a machine to rebuild on. The bundle's extension gets `resources`: the `machine` and per-stage
+`steps[]`. Their grade is separate and never enters `grade_overall`.
+
+```
+absent   nothing readable
+partial  something, but not every stage
+steps    every stage has requested (cpus + memory_bytes) or observed (peak_memory_bytes + realtime_seconds)
+full     every stage has both, and the machine has cpu_model, logical_cores, memory_total_bytes and a GPU answer
+```
+
+| where the values come from | `gc_prov_write` | what it gives |
+|---|---|---|
+| this machine | `--plan` by default (`--no-machine` to leave out); a Nextflow run only with `--machine-of-this-machine` | CPU model, logical cores, memory, free disk, GPUs via `nvidia-smi` / `rocm-smi` / `system_profiler`. Never a host name, user, serial, UUID, MAC or PCI id. A probe command whose own process has not exited after 10 s is killed (`result: timeout`). `gpus` is written when some probe answered; a probe that cannot read a GPU it reported counts as failed and contributes none (`gpus: []` = looked, none, for the vendors in `gpu_vendors_probed`). On macOS, a plan whose stages used containers (a tool's or the runtime's `image`, or an OCI image `uri`; a Singularity `.sif` or `https://` image is not recognised) gets no GPU lines, and a Nextflow run enriched on macOS never does (nf-prov names no container even when tasks ran in one). Probe output in a shape this code cannot read is `failed`. A process SIGKILL cannot end (a wedged driver) is still waited for: use `--no-machine` |
+| the plan | `machine` (with `gpus[].count`) and each stage's `resources.requested` | requested values only — a plan that states an observed value is refused |
+| a Nextflow trace | `--from-nextflow-run` reads every `pipeline_info/execution_trace*.txt` (or `--trace`) | requested `cpus memory time disk accelerator`, observed `peak_rss realtime %cpu read_bytes write_bytes cpu_model`; joined by task hash, one to one within a trace file and among the bundle's steps (a short hash two of them share is not read; across trace files the same short hash is taken as the same task); under `-resume` a later file wins per field. Set `trace.raw = true` for exact values; `trace.fields` replaces the default list, so list the defaults beside what you add |
+| a measuring tool's file | `--resources PATH` (repeatable), format `gc-resources-input-0.1` | `{format, measured_by, steps: [{step_number, requested, observed}]}`, bytes and seconds as plain numbers |
+
+The record (0.4) adds nine fields: `resources_rule_version`, `grade_resources`,
+`stages_with_requested_resources`, `stages_with_observed_resources`, `gpus_total`, `gpu_models`,
+`gpu_vendors_probed`, `machine_source`, `resources_sources`. Of the resource values, only GPU vendors and models
+leave the bundle — beside three closed-vocabulary fields derived from it (`machine_source`, `resources_sources`,
+`gpu_vendors_probed`) — filtered by the anchor (vendors nvidia / amd / intel / apple; a model containing a serial,
+host name, IP, MAC, UUID or long hex/digit run, or starting with `/`, is left out and still counted in `gpus_total`;
+a host name without a dot passes). `not_checked` gains
+`resources_as_written`. A client older than 0.4.0 is refused with the anchor's versions; a 0.4.0 client
+against a 0.3.0 anchor gets IdentityMismatch instead, so upgrade the anchor first. A 0.3 record
+still verifies, and the verifier re-derives the resource fields under their own rule version, apart
+from the seven grades.
 
 ## What U0 measured (2026-09-20, nf-core/demo 1.2.0, nf-prov 1.7.0, Nextflow 26.04.6)
 
@@ -174,10 +206,11 @@ T="$(ruby -e 'puts Gem::Specification.find_by_name("kairos-chain").gem_dir')/tem
 I="-Ilib -Itest -I../genomicschain_core/lib -I../genomicschain_tier2/lib -I$T/synoptis/lib -I$T/mmp/lib"
 ruby $I test/adapter_bco_test.rb   # 48
 ruby $I test/predicate_test.rb     # 33
-ruby $I test/prov_write_test.rb    # 32
-ruby $I test/prov_check_test.rb    # 5
-ruby $I test/prov_submit_test.rb   # 32  (the anchor side; needs synoptis, mmp, ed25519, json-schema)
-ruby $I test/prov_verify_test.rb   # 15
+ruby $I test/prov_write_test.rb    # 60
+ruby $I test/resources_test.rb     # 37
+ruby $I test/prov_check_test.rb    # 6
+ruby $I test/prov_submit_test.rb   # 35  (the anchor side; needs synoptis, mmp, ed25519, json-schema)
+ruby $I test/prov_verify_test.rb   # 20  (incl. the prov 0.3.0 record in test/fixtures/record_v0_3)
 (cd zk_verifier && cargo test --release)   # 4
 ```
 

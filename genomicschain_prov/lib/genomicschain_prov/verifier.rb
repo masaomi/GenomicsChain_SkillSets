@@ -37,7 +37,9 @@ module GenomicsChainProv
       'seed_identification' => 'which random seed was used (a name guess is not recorded)',
       'platform_as_written' => 'whether the CPU architecture and OS the bundle states are true',
       'zk_guest_program_semantics' => 'what the ZK guest program computes (the image ID names a program, not its meaning)',
-      'zk_inputs_are_raw_data' => 'whether the inputs a ZK receipt binds are the raw data'
+      'zk_inputs_are_raw_data' => 'whether the inputs a ZK receipt binds are the raw data',
+      'resources_as_written' => 'whether the computing resources the bundle states (the machine, its GPUs, each ' \
+                                "stage's requested and observed values) are true"
     }.freeze
     NOT_RECONSTRUCTED = 'whether the outputs are correct, or whether a rebuild gives the same outputs (Tier 3)'
 
@@ -60,8 +62,8 @@ module GenomicsChainProv
 
     def run
       @out = { 'state' => nil, 'proof_id' => @route && @route['proof_id'], 'bundle_digest' => nil,
-               'confirmed' => [], 'version_note' => nil, 'anchor_says' => [], 'record_notes' => [],
-               'not_checked' => [], 'statements' => Identity::STATEMENTS }
+               'confirmed' => [], 'version_note' => nil, 'resources_version_note' => nil, 'anchor_says' => [],
+               'record_notes' => [], 'not_checked' => [], 'statements' => Identity::STATEMENTS }
       @out['bundle_digest'] = Identity.bundle_digest(@text)
       return not_comparable(fetch_reason) if @fetch_error || @route.nil?
 
@@ -218,22 +220,80 @@ module GenomicsChainProv
 
     # §8: re-derive only under the same procedure versions; a version
     # difference is reported under its own heading and is not a mismatch.
+    #
+    # Two gates, not one (v0.1.14 §6.2 (5)). The seven grades and the counts
+    # are re-derived when adapter, predicate and pin_strength match; the nine
+    # resource fields when the resource rule and the adapter match. One gate
+    # over all four would let a single change of the resource rule stop every
+    # 0.4 record's seven grades from re-deriving — and the reason the resource
+    # rule is a rule of its own would be gone. A 0.3 record has no resource
+    # field, and nothing is said about resources for it.
     def rederive(params)
-      local = { 'adapter_version' => Adapters::Bco::VERSION, 'predicate_version' => Predicate::PREDICATE_VERSION,
-                'pin_strength_version' => Predicate::PIN_STRENGTH_VERSION }
+      res_keys = params.keys & Resources::SIGNED_FIELDS
+      derived = nil
+      local = Identity.procedure_versions
       if local.any? { |k, v| params[k] != v }
         @out['version_note'] = 'adapter / predicate / pin_strength differ — here ' \
                                "(#{local.values.join(', ')}), in the proof (#{local.keys.map { |k| params[k] }.join(', ')}). " \
                                'The grade was not re-derived. This is a difference of version, not a mismatch.'
+      else
+        derived = Identity.derive(@text)['signed']
+        wrong = (params.keys - res_keys).reject { |k| derived[k] == params[k] }
+        confirm('grades_and_counts', wrong.empty?,
+                wrong.empty? ? "grade #{params['grade_overall']} and every signed count re-derived from the bundle" :
+                               "re-derived from the bundle and different: #{wrong.join(', ')}")
+        @out['summary'] = summary(params)
+      end
+      rederive_resources(params, res_keys, derived) unless res_keys.empty?
+    end
+
+    def rederive_resources(params, keys, derived)
+      local = Identity.resources_versions
+      if local.any? { |k, v| params[k] != v }
+        @out['resources_version_note'] = 'resource rule / adapter differ — here ' \
+                                         "(#{local.values.join(', ')}), in the proof " \
+                                         "(#{local.keys.map { |k| params[k] }.join(', ')}). The resource fields were " \
+                                         'not re-derived. This is a difference of version, not a mismatch.'
         return
       end
 
-      derived = Identity.derive(@text)['signed']
-      wrong = params.keys.reject { |k| derived[k] == params[k] }
-      confirm('grades_and_counts', wrong.empty?,
-              wrong.empty? ? "grade #{params['grade_overall']} and every signed count re-derived from the bundle" :
-                             "re-derived from the bundle and different: #{wrong.join(', ')}")
-      @out['summary'] = summary(params)
+      derived ||= Identity.derive(@text)['signed']
+      wrong = keys.reject { |k| derived[k] == params[k] }
+      confirm('resources', wrong.empty?,
+              wrong.empty? ? "resources grade #{params['grade_resources']} and every resource field re-derived from the bundle" :
+                             "resource fields re-derived from the bundle and different: #{wrong.join(', ')}")
+      # Only from fields that re-derived: a mismatching record's values are
+      # whatever it holds, and the summary does arithmetic on them
+      # (implementation review r1: `gpus_total: "2"` crashed the verifier).
+      (@out['summary'] ||= []).concat(resources_summary(params, derived['stages_total'])) if wrong.empty?
+    end
+
+    # What the record says about resources, with where it came from beside
+    # the grade (queue item: machine_source and resources_sources).
+    # The stage count comes from the bundle, not the record: the record's
+    # count may be the field that failed the other gate (review r2).
+    def resources_summary(p, total)
+      sources = Array(p['resources_sources'])
+      [
+        "resources: #{p['grade_resources']} (#{p['resources_rule_version']}, not part of the overall grade); " \
+        "requested on #{p['stages_with_requested_resources']}/#{total} stages, observed on " \
+        "#{p['stages_with_observed_resources']}/#{total}; values from #{sources.empty? ? 'nowhere' : sources.join(', ')}",
+        "machine as stated (#{p['machine_source'] || 'none'}): #{gpu_line(p)}"
+      ]
+    end
+
+    def gpu_line(p)
+      return 'GPUs not looked for' if p['gpus_total'].nil?
+
+      probed = Array(p['gpu_vendors_probed'])
+      looked = probed.empty? ? 'stated, no probe ran' : "probed for #{probed.join(', ')}"
+      return "no GPU (#{looked})" if p['gpus_total'].zero?
+
+      models = Array(p['gpu_models'])
+      withheld = p['gpus_total'] - models.sum { |g| g['count'] }
+      named = models.map { |g| "#{g['count']} × #{g['vendor']} #{g['model']}" }
+      line = "#{p['gpus_total']} GPU(s)#{named.empty? ? '' : ": #{named.join(', ')}"} (#{looked})"
+      withheld.positive? ? "#{line}; #{withheld} with the model withheld" : line
     end
 
     def summary(p)

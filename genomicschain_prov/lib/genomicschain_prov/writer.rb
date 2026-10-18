@@ -35,7 +35,9 @@ module GenomicsChainProv
     # identity as `producer_version` (§6). A change in what this writer puts
     # in a bundle is a change in what the record says produced it.
     # 0.2.0 (design v0.1.12): writes `platform` and `zk_receipts[]`.
-    VERSION = 'prov-writer-0.2.0'
+    # 0.3.0 (design v0.1.14): writes `resources` — the machine and each stage's
+    # requested and observed values.
+    VERSION = 'prov-writer-0.3.0'
     # The one zkVM and the one journal shape v0.1.12 can verify (§6.1).
     ZK_VM_NAME = 'risc0-zkvm'
     ZK_JOURNAL = 'gc-zk-journal-0.1'
@@ -57,8 +59,9 @@ module GenomicsChainProv
     # @param platform [Hash, nil] {cpu_architecture, os_name, os_release} — the
     #   plan's own statement, or this machine's (Environment.platform), or nil
     # @param zk_receipts [Array<Hash>] declarations from `zk_declaration`
+    # @param resources [Hash, nil] {'machine' =>, 'steps' => [...]} from `resources_block`
     # @return [Hash] the BCO
-    def build(plan, checksums: {}, object_id: nil, created: nil, platform: nil, zk_receipts: [])
+    def build(plan, checksums: {}, object_id: nil, created: nil, platform: nil, zk_receipts: [], resources: nil)
       now = created || Time.now.utc.iso8601
       steps = plan['stages'].sort_by { |s| s['step_number'] }
       bco = {
@@ -67,7 +70,8 @@ module GenomicsChainProv
         'etag' => nil,
         'provenance_domain' => provenance_domain(plan, now),
         'usability_domain' => [plan['description'] || plan['name']],
-        'extension_domain' => [extension_block(checksums, platform: platform, zk_receipts: zk_receipts)],
+        'extension_domain' => [extension_block(checksums, platform: platform, zk_receipts: zk_receipts,
+                                                          resources: resources)],
         'description_domain' => {
           'keywords' => plan['keywords'] || [],
           'pipeline_steps' => steps.map { |s| pipeline_step(s) }
@@ -166,10 +170,11 @@ module GenomicsChainProv
     # on the exact locator, which is why the key has to be the locator the
     # entry itself carries and not a path on this machine.
     #
-    # `platform` and `zk_receipts` (design v0.1.12 §6.1) appear only when there
-    # is something to say: a bundle with neither is the same shape a 0.1.0
-    # writer produced, apart from the producer version.
-    def extension_block(checksums, platform: nil, zk_receipts: [])
+    # `platform`, `zk_receipts` (design v0.1.12 §6.1) and `resources` (v0.1.14
+    # §6.2) appear only when there is something to say: a bundle with none of
+    # them is the same shape a 0.1.0 writer produced, apart from the producer
+    # version.
+    def extension_block(checksums, platform: nil, zk_receipts: [], resources: nil)
       rows = checksums.keys.sort.filter_map do |locator|
         sha256 = checksums[locator]['sha256']
         { 'uri' => locator, 'sha256' => sha256 } if sha256
@@ -180,6 +185,7 @@ module GenomicsChainProv
       }
       ext['platform'] = platform if platform
       ext['zk_receipts'] = zk_receipts unless zk_receipts.nil? || zk_receipts.empty?
+      ext['resources'] = resources unless resources.nil? || resources.empty?
       { 'extension_schema' => EXTENSION_SCHEMA, 'genomicschain_extension' => ext }
     end
 
@@ -195,6 +201,42 @@ module GenomicsChainProv
         'journal' => ZK_JOURNAL,
         'input_uri' => entry['input'],
         'output_uri' => entry['output'] }
+    end
+
+    # The `resources` object (§6.2 (1)): the machine, when there is one, and
+    # every stage entry from every source, ordered by stage and then source so
+    # the same inputs give the same bytes. Several entries for one stage are
+    # kept as they came; reducing them is the reader's rule (§6.2 (2)), and
+    # the bundle keeps what each tool wrote.
+    #
+    # @param machine [Hash, nil] Environment.machine's, or the plan's
+    # @param steps [Array<Hash>] {'step_number', 'source', 'requested', 'observed', ...}
+    # @return [Hash, nil] nil when there is nothing to write
+    def resources_block(machine: nil, steps: [])
+      out = {}
+      out['machine'] = machine if machine && !machine.empty?
+      kept = Array(steps).reject { |e| (e['requested'] || {}).empty? && (e['observed'] || {}).empty? }
+      out['steps'] = kept.sort_by { |e| [e['step_number'], e['source'].to_s] } unless kept.empty?
+      out.empty? ? nil : out
+    end
+
+    # Whether any stage of the plan ran in a container, in any of the forms a
+    # plan can say it: a tool's or the runtime's `image`, or a `uri` that is an
+    # image reference (`docker://…`, `ref@sha256:…`). On macOS a container runs
+    # in a Linux virtual machine that cannot reach the host GPU (§6.2 (1));
+    # implementation review r1 found the check looking at tools' `image` only.
+    def plan_uses_containers?(plan)
+      items = plan['stages'].flat_map { |s| s['tools'] } + [plan['runtime']].compact
+      items.any? { |t| t['image'] || GenomicsChainProv::Adapters::Bco.oci_ref?(t['uri']) }
+    end
+
+    # The requested values a plan states, one entry per stage that states any.
+    def plan_resource_steps(plan)
+      plan['stages'].filter_map do |s|
+        next nil if s['requested'].nil? || s['requested'].empty?
+
+        { 'step_number' => s['step_number'], 'source' => 'plan', 'requested' => s['requested'] }
+      end
     end
 
     # Not the bundle digest. §6's `bundle_digest` is the canonical-JSON SHA-256
@@ -250,6 +292,7 @@ module GenomicsChainProv
       plan['outputs'] = normalise_files(raw['outputs'], 'outputs') if raw.key?('outputs')
       plan['platform'] = normalise_platform(raw['platform']) if raw.key?('platform')
       plan['zk_receipts'] = normalise_zk_receipts(raw['zk_receipts']) if raw.key?('zk_receipts')
+      plan['machine'] = normalise_machine(raw['machine']) if raw.key?('machine')
       numbers = plan['stages'].map { |s| s['step_number'] }
       raise PlanError, 'two stages share a step_number' if numbers.uniq.length != numbers.length
 
@@ -260,7 +303,7 @@ module GenomicsChainProv
       where = "stage #{index + 1}"
       raise PlanError, "#{where} is not an object" unless raw.is_a?(Hash)
 
-      {
+      stage = {
         'step_number' => raw.key?('step_number') ? integer(raw['step_number'], where) : index + 1,
         'name' => str(raw['name']) || "stage_#{index + 1}",
         'description' => str(raw['description']),
@@ -268,6 +311,8 @@ module GenomicsChainProv
         'outputs' => normalise_files(raw['outputs'], "#{where} outputs"),
         'tools' => Array(raw['tools']).each_with_index.map { |t, j| normalise_tool(t, "#{where} tool #{j + 1}") }
       }
+      stage['requested'] = normalise_stage_resources(raw['resources'], where) if raw.key?('resources')
+      stage
     end
 
     def normalise_files(raw, where)
@@ -370,6 +415,107 @@ module GenomicsChainProv
 
         r.merge('step_number' => integer(e['step_number'], where))
       end
+    end
+
+    # A stage's resources as the plan states them: what it ASKED for, and
+    # only that (§6.2 (4), operator 2026-10-17). An observed value comes from a
+    # file that a measuring tool wrote — a Nextflow trace, a
+    # gc-resources-input file — never from a person typing it, so a plan that
+    # states one is refused rather than recorded as a measurement.
+    REQUESTED_KEYS = %w[cpus memory_bytes time_seconds disk_bytes accelerators].freeze
+
+    def normalise_stage_resources(raw, where)
+      raise PlanError, "#{where} resources is not an object" unless raw.is_a?(Hash)
+      if raw.key?('observed')
+        raise PlanError, "#{where} resources: a plan states requested values only; observed values come from a " \
+                         'file a measuring tool wrote (pass it with --resources)'
+      end
+
+      extra = raw.keys - ['requested']
+      raise PlanError, "#{where} resources: unknown key #{extra.first}" unless extra.empty?
+
+      requested_numbers(raw['requested'], "#{where} resources.requested")
+    end
+
+    def requested_numbers(raw, where)
+      raise PlanError, "#{where} is not an object" unless raw.is_a?(Hash)
+
+      extra = raw.keys - REQUESTED_KEYS
+      raise PlanError, "#{where}: unknown key #{extra.first} (known: #{REQUESTED_KEYS.join(', ')})" unless extra.empty?
+
+      raw.each { |k, v| raise PlanError, "#{where}.#{k} is not a non-negative number" unless plain_number?(v) }
+      raw.dup
+    end
+
+    # Finite and not negative: YAML's `.inf` and `.nan` are Floats, and a
+    # bundle carrying one is refused by the anchor's restricted subset.
+    def plain_number?(value)
+      value.is_a?(Numeric) && value.finite? && value >= 0
+    end
+
+    # The machine as the plan states it — for a computation that ran on
+    # another machine than the one writing the bundle (a cluster node, a cloud
+    # instance). Recorded as `source: plan`. A GPU entry may say `count` for
+    # several of the same; it is written as that many entries, one per GPU,
+    # which is the shape the probe writes and the reader counts.
+    MACHINE_TEXT = %w[cpu_model].freeze
+    MACHINE_NUMBERS = %w[logical_cores memory_total_bytes disk_free_bytes].freeze
+    GPU_KEYS = %w[vendor model memory_bytes driver_version runtime count].freeze
+    # The vendors the anchor names on the record (Resources::GPU_VENDORS); the
+    # extension schema allows no other.
+    GPU_VENDORS = %w[nvidia amd intel apple].freeze
+    MAX_GPUS = 64
+
+    def normalise_machine(raw)
+      raise PlanError, 'machine is not an object' unless raw.is_a?(Hash)
+
+      extra = raw.keys - (MACHINE_TEXT + MACHINE_NUMBERS + ['gpus'])
+      raise PlanError, "machine: unknown key #{extra.first}" unless extra.empty?
+
+      m = {}
+      m['cpu_model'] = str(raw['cpu_model']) if str(raw['cpu_model'])
+      MACHINE_NUMBERS.each do |k|
+        next unless raw.key?(k)
+        raise PlanError, "machine.#{k} is not a non-negative number" unless plain_number?(raw[k])
+
+        m[k] = raw[k]
+      end
+      m['gpus'] = normalise_gpus(raw['gpus']) if raw.key?('gpus')
+      raise PlanError, 'machine names nothing' if m.empty?
+
+      m.merge('source' => 'plan')
+    end
+
+    def normalise_gpus(raw)
+      raise PlanError, 'machine.gpus is not an array' unless raw.is_a?(Array)
+
+      gpus = raw.each_with_index.flat_map do |g, i|
+        where = "machine.gpus entry #{i + 1}"
+        raise PlanError, "#{where} is not an object" unless g.is_a?(Hash)
+
+        extra = g.keys - GPU_KEYS
+        raise PlanError, "#{where}: unknown key #{extra.first}" unless extra.empty?
+        raise PlanError, "#{where} has no vendor or model" if str(g['vendor']).nil? || str(g['model']).nil?
+        unless GPU_VENDORS.include?(str(g['vendor']).downcase)
+          raise PlanError, "#{where} vendor is not one of #{GPU_VENDORS.join(', ')}"
+        end
+        if g.key?('memory_bytes') && !plain_number?(g['memory_bytes'])
+          raise PlanError, "#{where} memory_bytes is not a non-negative number"
+        end
+
+        count = g.key?('count') ? g['count'] : 1
+        raise PlanError, "#{where} count is not an integer from 1 to #{MAX_GPUS}" unless count.is_a?(Integer) && count.between?(1, MAX_GPUS)
+
+        entry = compact_h('vendor' => str(g['vendor']).downcase, 'model' => str(g['model']),
+                          'memory_bytes' => g['memory_bytes'],
+                          'driver_version' => str(g['driver_version']),
+                          'runtime' => g['runtime'].is_a?(Hash) ? compact_h('name' => str(g['runtime']['name']),
+                                                                             'version' => str(g['runtime']['version'])) : nil)
+        Array.new(count) { entry.dup }
+      end
+      raise PlanError, "machine.gpus lists more than #{MAX_GPUS} GPUs" if gpus.length > MAX_GPUS
+
+      gpus
     end
 
     # --- small helpers --------------------------------------------------------

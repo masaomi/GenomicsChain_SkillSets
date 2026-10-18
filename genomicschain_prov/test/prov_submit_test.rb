@@ -218,17 +218,19 @@ class ProvSubmitTest < Minitest::Test
                    out[:claim]
       m = manifests(registry).first
       assert_equal 'prov_attestation', m['record_type']
-      assert_equal '0.3', m['record_version']
+      assert_equal '0.4', m['record_version']
       assert_equal "prov:sha256:#{signed['bundle_digest']}", m['subject_ref']
       assert_equal 'immutable', m['grade_overall']
       assert_equal 'self_reported', m['trust_tier']
       assert_equal Identity::NOT_CHECKED, m['not_checked']
-      assert_equal 9, m['not_checked'].length
+      assert_equal 10, m['not_checked'].length
+      assert_equal 'resources_as_written', m['not_checked'].last
       assert_equal 'prov-admission-0.2', m['admission_rule']
       assert_equal 'prov-adapter-bco-0.4.0', m['adapter_version']
-      assert_equal 'prov-writer-0.2.0', m['producer_version']
+      assert_equal 'prov-writer-0.3.0', m['producer_version']
       assert_equal out[:submission_key], m['submission_key']
-      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.3'])
+      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.4'])
+      assert_equal 'gc-resources-0.1', m['resources_rule_version']
     end
   end
 
@@ -479,10 +481,42 @@ class ProvSubmitTest < Minitest::Test
       assert_equal 'local_path', m['grade_overall']
       assert_equal 'local_path', m['grade_inputs']
       assert_equal 'prov-admission-0.2', m['admission_rule']
-      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.3'])
+      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.4'])
       stored = JSON.generate(registry.read(:proofs))
       refute_includes stored, MARKER, 'the record carries grades and counts, never bundle values'
       refute_includes stored, 'S1_odd'
+    end
+  end
+
+  # v0.1.14 §6.2 (3): a record with every resource field filled passes the
+  # 0.4 schema and carries only GPU vendors and models — the machine's other
+  # values and every stage value stay in the bundle. A model shaped like a
+  # serial is left out and still counted.
+  def test_a_bundle_with_resources_is_recorded_with_the_nine_fields_only
+    with_proofs do |registry, tip_source|
+      bco = JSON.parse(bundle)
+      machine = { 'source' => 'probe', 'cpu_model' => 'AMD EPYC 7763 64-Core Processor', 'logical_cores' => 64,
+                  'memory_total_bytes' => 549_755_813_888, 'disk_free_bytes' => 1,
+                  'gpu_probe' => [{ 'tool' => 'nvidia-smi', 'result' => 'ok' }],
+                  'gpus' => [{ 'vendor' => 'nvidia', 'model' => 'NVIDIA H100 80GB HBM3' }] * 2 +
+                            [{ 'vendor' => 'nvidia', 'model' => 'SN-Z9Y8X7W6V5U4' }] }
+      steps = [{ 'step_number' => 1, 'source' => 'nextflow_trace',
+                 'requested' => { 'cpus' => 4, 'memory_bytes' => 8 * 1024**3 },
+                 'observed' => { 'peak_memory_bytes' => 5 * 1024**3, 'realtime_seconds' => 41.5,
+                                 'cpu_model' => 'AMD EPYC 7763 64-Core Processor' } }]
+      bco['extension_domain'].first['genomicschain_extension']['resources'] = { 'machine' => machine, 'steps' => steps }
+      b = JSON.generate(bco)
+      out = record(registry, b, tip_source: tip_source)
+
+      assert_equal 'recorded', out[:status]
+      m = manifests(registry).first
+      assert_equal 'full', m['grade_resources']
+      assert_equal 3, m['gpus_total']
+      assert_equal [{ 'vendor' => 'nvidia', 'model' => 'NVIDIA H100 80GB HBM3', 'count' => 2 }], m['gpu_models']
+      assert_equal %w[nvidia], m['gpu_vendors_probed']
+      assert_equal %w[nextflow_trace], m['resources_sources']
+      stored = JSON.generate(registry.read(:proofs))
+      ['SN-Z9Y8X7W6V5U4', 'EPYC', '549755813888', '41.5'].each { |v| refute_includes stored, v }
     end
   end
 
@@ -663,6 +697,32 @@ class ProvSubmitTest < Minitest::Test
     assert_equal zk['required'].sort, written['zk_receipts'].first.keys.sort
   end
 
+  # implementation review r1: the writer produced resources the published
+  # extension schema rejects. Everything a plan can put there now validates.
+  def test_the_resources_the_writer_writes_validate_against_the_extension_schema
+    begin
+      require 'json_schemer'
+    rescue LoadError
+      skip 'json_schemer not installed'
+    end
+    path = File.expand_path('../../genomicschain_core/schemas/bco_extension_genomicschain_v0_1.json', __dir__)
+    schemer = JSONSchemer.schema(JSON.parse(File.read(path)))
+    plan = W.normalise_plan(
+      'name' => 'x', 'stages' => [{ 'name' => 'a', 'resources' => { 'requested' => { 'cpus' => 2, 'memory_bytes' => 10 } } }],
+      'machine' => { 'cpu_model' => 'AMD EPYC', 'logical_cores' => 8, 'memory_total_bytes' => 1,
+                     'gpus' => [{ 'vendor' => 'NVIDIA', 'model' => 'NVIDIA H100', 'count' => 2,
+                                  'runtime' => { 'name' => 'CUDA', 'version' => '12.2' } }] }
+    )
+    steps = W.plan_resource_steps(plan) +
+            [{ 'step_number' => 1, 'source' => 'gc_resources_input', 'measured_by' => 't',
+               'observed' => { 'peak_memory_bytes' => 5, 'realtime_seconds' => 1.5, 'cpu_model' => 'AMD EPYC' } }]
+    ext = W.build(plan, resources: W.resources_block(machine: plan['machine'], steps: steps))['extension_domain']
+           .first['genomicschain_extension']
+    assert_empty schemer.validate(ext).map { |e| e['error'] }
+    probed = { 'source' => 'probe', 'cpu_model' => 'x', 'gpu_probe' => [{ 'tool' => 'nvidia-smi', 'result' => 'timeout' }] }
+    assert schemer.valid?(ext.merge('resources' => { 'machine' => probed }))
+  end
+
   # §6: neither the bundle nor the predicate's per-item output reaches the
   # anchor's logs, its response or its registry — exercised through the MCP
   # tool on both outcomes, recorded and refused.
@@ -743,7 +803,24 @@ class ProvSubmitTest < Minitest::Test
       res = JSON.parse(tool.call('bundle' => b, 'identity' => identity, 'operator' => op).first[:text])
       assert_equal 'ProcedureVersionMismatch', res['error']
       assert_equal({ 'adapter' => 'prov-adapter-bco-0.4.0', 'predicate' => 'prov-predicate-0.3.7',
-                     'pin_strength' => 'pin-strength-0.1.0' }, res['versions'])
+                     'pin_strength' => 'pin-strength-0.1.0', 'resources_rule' => 'gc-resources-0.1' }, res['versions'])
+    end
+  end
+
+  # v0.1.14 §6.2 (5): a client older than prov 0.4.0 signs the 0.3 identity,
+  # which has no resources_rule_version. It is told what the anchor runs and
+  # nothing is recorded — the same path as any other version skew.
+  def test_a_record_version_0_3_identity_is_refused_with_the_anchors_versions
+    with_tool do |tool, registry, tip_source|
+      b = bundle
+      identity = ProvSubmit.signed_params_for(b).slice(*Identity::SIGNED_FIELDS['0.3'])
+      op, = signed_operator(tip_source, identity)
+      res = JSON.parse(tool.call('bundle' => b, 'identity' => identity, 'operator' => op).first[:text])
+      assert_equal 'ProcedureVersionMismatch', res['error']
+      assert_includes res['message'], 'resources_rule_version'
+      assert_includes res['message'], 'record_version 0.4'
+      assert_equal 'gc-resources-0.1', res.dig('versions', 'resources_rule')
+      assert_empty registry.read(:proofs)
     end
   end
 

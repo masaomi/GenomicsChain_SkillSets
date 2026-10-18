@@ -4,6 +4,7 @@ require 'json'
 require 'digest'
 require_relative 'adapters/bco'
 require_relative 'predicate'
+require_relative 'resources'
 
 # The bundle digest is core's canonical JSON (design §2, `kairos-sorted-json-0.1`)
 # — the same function the anchor uses, never a copy, so the customer's
@@ -22,7 +23,7 @@ end
 
 module GenomicsChainProv
   # Identity — a bundle's bytes → the signed identity of its Tier-2.5 record
-  # (design v0.1 §6, record_version 0.3 per v0.1.12 §6.1).
+  # (design v0.1 §6; record_version 0.3 per v0.1.12 §6.1, 0.4 per v0.1.14 §6.2).
   #
   # One function for every party: the customer's gc_prov_check computes the
   # params to sign with it, the anchor derives them again from the bytes it
@@ -35,7 +36,9 @@ module GenomicsChainProv
   # because a customer needs both answers and the anchor needs them in a fixed
   # order.
   module Identity
-    RECORD_VERSION = '0.3'
+    # What a record issued now carries. 0.3 records stay readable: the sets
+    # below are kept per version, and the verifier picks by the record's own.
+    RECORD_VERSION = '0.4'
     BUNDLE_DIGEST_CANONICALIZATION = 'kairos-sorted-json-0.1'
     ADMISSION_RULE = 'prov-admission-0.2'
     # What each rule an anchor has issued under means, for the verifier's
@@ -61,26 +64,38 @@ module GenomicsChainProv
     # The set of signed fields is fixed by record_version (§6): a verifier
     # builds `params` from the manifest with the set its record_version names,
     # and treats an unknown record_version as "different version" (§8).
+    BASE_SIGNED_FIELDS = (%w[subject_ref bundle_format bundle_format_version bundle_digest
+                             bundle_digest_canonicalization outputs_digest_rule
+                             producer_name producer_version adapter_version predicate_version pin_strength_version
+                             grade_overall grade_software grade_container grade_environment grade_inputs
+                             grade_workflow grade_runtime] +
+                          COUNT_FIELDS +
+                          %w[workflow_repository_sha256 workflow_commit
+                             platform_cpu_architecture platform_os_name platform_os_release
+                             zk_receipts]).freeze
     SIGNED_FIELDS = {
-      '0.3' => (%w[subject_ref bundle_format bundle_format_version bundle_digest
-                   bundle_digest_canonicalization outputs_digest_rule
-                   producer_name producer_version adapter_version predicate_version pin_strength_version
-                   grade_overall grade_software grade_container grade_environment grade_inputs
-                   grade_workflow grade_runtime] +
-                COUNT_FIELDS +
-                %w[workflow_repository_sha256 workflow_commit
-                   platform_cpu_architecture platform_os_name platform_os_release
-                   zk_receipts]).freeze
+      '0.3' => BASE_SIGNED_FIELDS,
+      # v0.1.14 §6.2 (3): the 0.3 fields unchanged, and the nine resource fields after them
+      '0.4' => (BASE_SIGNED_FIELDS + Resources::SIGNED_FIELDS).freeze
     }.freeze
 
-    # The record's not_checked list (§6, §6.1 (4)): fixed by the builder,
-    # never taken from a client, the same nine items on every record of
-    # record_version 0.3 whether or not it carries a receipt.
-    NOT_CHECKED = %w[
-      locator_reachability bundle_truthfulness bundle_schema_conformance checksum_values_as_written
-      reference_genome_identification seed_identification
-      platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
-    ].freeze
+    # The record's not_checked list (§6, §6.1 (4), §6.2 (3)): fixed by the
+    # builder, never taken from a client, the same items on every record of a
+    # record_version whether or not it carries a receipt or a resource.
+    NOT_CHECKED_BY_VERSION = {
+      '0.3' => %w[
+        locator_reachability bundle_truthfulness bundle_schema_conformance checksum_values_as_written
+        reference_genome_identification seed_identification
+        platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
+      ].freeze,
+      '0.4' => %w[
+        locator_reachability bundle_truthfulness bundle_schema_conformance checksum_values_as_written
+        reference_genome_identification seed_identification
+        platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
+        resources_as_written
+      ].freeze
+    }.freeze
+    NOT_CHECKED = NOT_CHECKED_BY_VERSION.fetch(RECORD_VERSION)
 
     # Design v0.1.12 §6.1, the two sentences every verifier output and every
     # description of not_checked carries verbatim (memory warranty-scope,
@@ -97,14 +112,31 @@ module GenomicsChainProv
     # @param bundle [String, Hash] the bundle verbatim (JSON text or object)
     # @return [Hash] 'signed' (the identity, string keys), 'graded' (the
     #   predicate's full output, for the customer — never for the anchor's
-    #   logs, §6), 'np' (the normalised provenance), 'bundle_digest'
+    #   logs, §6), 'resources' (the resource reader's output, the same
+    #   reservation), 'np' (the normalised provenance), 'bundle_digest'
     # @raise [Adapters::Bco::FormatError]
     def derive(bundle)
       text = bundle.is_a?(String) ? bundle : JSON.generate(bundle)
       digest = bundle_digest(text)
       np = Adapters::Bco.parse(text)
       graded = Predicate.grade(np)
-      { 'signed' => signed(np, graded, digest), 'graded' => graded, 'np' => np, 'bundle_digest' => digest }
+      # After the adapter, which refuses what is not a BCO: the resource
+      # reader itself refuses nothing (§6.2).
+      resources = Resources.derive(text, np.stages)
+      { 'signed' => signed(np, graded, digest).merge(resources['signed']), 'graded' => graded,
+        'resources' => resources, 'np' => np, 'bundle_digest' => digest }
+    end
+
+    # The procedure versions the seven grades and the counts are derived
+    # under (§6, §8), and the two the resource fields are (§6.2 (5)): the
+    # adapter, because it fixes the stage positions, and the resource rule.
+    def procedure_versions
+      { 'adapter_version' => Adapters::Bco::VERSION, 'predicate_version' => Predicate::PREDICATE_VERSION,
+        'pin_strength_version' => Predicate::PIN_STRENGTH_VERSION }
+    end
+
+    def resources_versions
+      { 'adapter_version' => Adapters::Bco::VERSION, 'resources_rule_version' => Resources::RULE_VERSION }
     end
 
     # The canonical-JSON SHA-256 of the bundle as parsed from its own bytes —

@@ -106,9 +106,10 @@ module GcProvVerify
       r['confirmed'].each { |c| lines << "  [#{c['ok'] ? 'ok' : 'MISMATCH'}] #{c['detail']}" }
       Array(r['summary']).each { |s| lines << "    #{s}" }
     end
-    if r['version_note']
+    notes = [r['version_note'], r['resources_version_note']].compact
+    unless notes.empty?
       lines << '' << 'NOT RE-DERIVED (a different version, not a mismatch):'
-      lines << "  #{r['version_note']}"
+      notes.each { |n| lines << "  #{n}" }
     end
     unless r['anchor_says'].empty?
       lines << '' << 'THE ANCHOR SAYS (not checked by this tool unless marked confirmed):'

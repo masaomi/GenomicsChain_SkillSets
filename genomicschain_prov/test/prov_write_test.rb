@@ -27,6 +27,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'genomicschain_prov'
 require 'genomicschain_prov/writer/environment'
 require 'genomicschain_prov/writer/nextflow_run'
+require 'genomicschain_prov/writer/resources_input'
 
 class ProvWriteTest < Minitest::Test
   W = GenomicsChainProv::Writer
@@ -599,6 +600,391 @@ class ProvWriteTest < Minitest::Test
                                                            'zkvm_version' => '3.0.6', 'step_number' => 1,
                                                            'input' => 'a.txt', 'output' => 'b.txt' }]))
     end
+  end
+
+  # --- v0.1.14 §6.2: computing resources --------------------------------------
+
+  R = GenomicsChainProv::Resources
+
+  def resources_of(bco) = extension(bco)['resources']
+  def resource_grade(bco) = GenomicsChainProv::Identity.derive(JSON.generate(bco))['signed']['grade_resources']
+
+  # A fake for the fixed-argv runner: argv's first word => [stdout, state].
+  def runner(answers)
+    ->(argv) { answers.fetch(argv.first(2).join(' '), answers.fetch(argv.first, [nil, :not_found])) }
+  end
+
+  def test_a_plan_states_requested_values_and_they_reach_the_bundle_as_the_plans
+    raw = demo_plan
+    raw['stages'][0]['resources'] = { 'requested' => { 'cpus' => 2, 'memory_bytes' => 1024**3 } }
+    plan = W.normalise_plan(raw)
+    bco = W.build(plan, resources: W.resources_block(steps: W.plan_resource_steps(plan)))
+    assert_equal [{ 'step_number' => 1, 'source' => 'plan', 'requested' => { 'cpus' => 2, 'memory_bytes' => 1024**3 } }],
+                 resources_of(bco)['steps']
+    assert_equal 'partial', resource_grade(bco), 'one stage of two'
+  end
+
+  # Operator, 2026-10-17: a plan states what was asked for; what was used
+  # comes from a file a measuring tool wrote.
+  def test_a_plan_that_states_an_observed_value_is_refused
+    raw = demo_plan
+    raw['stages'][0]['resources'] = { 'observed' => { 'peak_memory_bytes' => 1 } }
+    err = assert_raises(W::PlanError) { W.normalise_plan(raw) }
+    assert_includes err.message, 'requested values only'
+    raw['stages'][0]['resources'] = { 'requested' => { 'cpus' => '4' } }
+    assert_raises(W::PlanError) { W.normalise_plan(raw) }
+    raw['stages'][0]['resources'] = { 'requested' => { 'ram' => 4 } }
+    assert_match(/unknown key ram/, assert_raises(W::PlanError) { W.normalise_plan(raw) }.message)
+  end
+
+  def test_a_plan_states_the_machine_and_a_gpu_count_becomes_one_entry_per_gpu
+    raw = demo_plan.merge('machine' => { 'cpu_model' => 'AMD EPYC 7763', 'logical_cores' => 64,
+                                         'memory_total_bytes' => 512 * 1024**3,
+                                         'gpus' => [{ 'vendor' => 'NVIDIA', 'model' => 'NVIDIA A100-SXM4-80GB', 'count' => 4 }] })
+    m = W.normalise_plan(raw)['machine']
+    assert_equal 'plan', m['source']
+    assert_equal 4, m['gpus'].length
+    assert_equal 'nvidia', m['gpus'].first['vendor']
+    signed = GenomicsChainProv::Identity.derive(JSON.generate(W.build(W.normalise_plan(raw),
+                                                                       resources: W.resources_block(machine: m))))['signed']
+    assert_equal 4, signed['gpus_total']
+    assert_equal 'plan', signed['machine_source']
+    assert_nil signed['gpu_vendors_probed'], 'stated, not probed'
+    assert_raises(W::PlanError) { W.normalise_plan(demo_plan.merge('machine' => { 'hostname' => 'x' })) }
+  end
+
+  def test_the_linux_probe_reads_cpu_memory_disk_and_the_gpus_and_never_the_host
+    files = { '/proc/cpuinfo' => "processor\t: 0\nmodel name\t: AMD EPYC 7763 64-Core Processor\n",
+              '/proc/meminfo' => "MemTotal:       528280000 kB\nMemFree: 1 kB\n" }
+    answers = {
+      'nvidia-smi --query-gpu=name,memory.total,driver_version' =>
+        ["NVIDIA A100-SXM4-80GB, 81920, 535.104.05\nNVIDIA A100-SXM4-80GB, 81920, 535.104.05\n", :ok],
+      'nvidia-smi --version' => ["NVIDIA-SMI version  : 535.104.05\nNVML version        : 535.104\nDRIVER version      : 535.104.05\nCUDA Version        : 12.2\n", :ok],
+      'df -Pk' => ["Filesystem 1024-blocks Used Available Capacity Mounted on\n/dev/x 100 50 40 50% /\n", :ok]
+    }
+    out = Env.machine(work_dir: '/data', uname: { sysname: 'Linux', nodename: 'gpu17.cluster.uzh.ch' },
+                      runner: runner(answers), read: ->(p) { files[p] })
+    m = out['machine']
+    assert_equal 'AMD EPYC 7763 64-Core Processor', m['cpu_model']
+    assert_equal 528_280_000 * 1024, m['memory_total_bytes']
+    assert_equal 40 * 1024, m['disk_free_bytes']
+    assert_equal [{ 'tool' => 'nvidia-smi', 'version' => '535.104.05', 'result' => 'ok' },
+                  { 'tool' => 'rocm-smi', 'result' => 'not_found' }], m['gpu_probe']
+    assert_equal 2, m['gpus'].length
+    assert_equal({ 'vendor' => 'nvidia', 'model' => 'NVIDIA A100-SXM4-80GB', 'memory_bytes' => 81_920 * 1024**2,
+                   'driver_version' => '535.104.05', 'runtime' => { 'name' => 'CUDA', 'version' => '12.2' } }, m['gpus'][0])
+    refute_includes JSON.generate(out), 'gpu17'
+  end
+
+  # §6.2 (1): `gpus` is written only when a probe answered. With none here,
+  # "not looked for" is the truth, and the note says the cost.
+  def test_with_no_gpu_probe_on_linux_gpus_are_not_written
+    out = Env.machine(uname: { sysname: 'Linux' }, runner: runner({}), read: ->(_) {})
+    refute out['machine'].key?('gpus')
+    assert_includes out['notes'].join, 'cannot reach full'
+  end
+
+  def test_the_macos_probe_reads_the_gpu_and_never_the_display_serials
+    profile = { 'SPDisplaysDataType' => [{ 'sppci_model' => 'Apple M2 Max', 'spdisplays_vendor' => 'sppci_vendor_Apple',
+                                           'spdisplays_ndrvs' => [{ '_name' => 'DELL U2720Q',
+                                                                    '_spdisplays_display-serial-number' => 'CN0ABC12345' }] }] }
+    answers = { 'system_profiler' => [JSON.generate(profile), :ok],
+                'sysctl -n' => ["Apple M2 Max\n", :ok], 'df -Pk' => [nil, :failed] }
+    m = Env.machine(uname: { sysname: 'Darwin' }, runner: runner(answers))['machine']
+    assert_equal [{ 'vendor' => 'apple', 'model' => 'Apple M2 Max' }], m['gpus']
+    refute_includes JSON.generate(m), 'CN0ABC12345'
+    refute m.key?('disk_free_bytes'), 'a failed df leaves the field out'
+  end
+
+  # Named at the freeze: a container on macOS cannot use the host's GPU.
+  def test_containers_on_macos_drop_the_gpu_lines
+    notes = []
+    m = Env.without_host_gpus({ 'cpu_model' => 'Apple M2 Max', 'gpus' => [], 'gpu_probe' => [] }, notes)
+    assert_equal({ 'cpu_model' => 'Apple M2 Max' }, m)
+    assert_includes notes.join, 'cannot use this machine\'s GPU'
+  end
+
+  def test_trace_values_in_raw_and_human_form
+    assert_equal [11_744_051, true], NF.trace_value('11.2 MB', 'bytes')
+    assert_equal [11_744_051, false], NF.trace_value('11744051', 'bytes')
+    assert_equal [0.663, true], NF.trace_value('663ms', 'duration')
+    assert_equal [3723, true], NF.trace_value('1h 2m 3s', 'duration')
+    assert_equal [6, false], NF.trace_value('6000', 'duration'), 'trace.raw durations are milliseconds'
+    assert_equal [79.9, false], NF.trace_value('79.9%', 'percent')
+    assert_nil NF.trace_value('-', 'bytes')
+    assert_nil NF.trace_value('a lot', 'bytes')
+  end
+
+  # Under -resume: every trace is read and a later value wins per field; a
+  # cell the later file left empty does not erase an earlier measurement.
+  def test_traces_from_a_resumed_run_merge_with_the_later_file_winning
+    head = "task_id\thash\tname\tcpus\trealtime\tpeak_rss\n"
+    first, = NF.resources_from_trace("#{head}1\t2d/111dbf\tA\t2\t1000\t100\n")
+    second, = NF.resources_from_trace("#{head}1\t2d/111dbf\tA\t4\t-\t200\n")
+    merged = NF.merge_trace_resources([first, second])['2d/111dbf']
+    assert_equal({ 'cpus' => 4 }, merged['requested'])
+    assert_equal({ 'realtime_seconds' => 1, 'peak_memory_bytes' => 200 }, merged['observed'])
+  end
+
+  def test_the_generic_resources_file_is_read_with_what_measured_it
+    text = JSON.generate('format' => 'gc-resources-input-0.1', 'measured_by' => 'gc_prov_measure 0.0 (test)',
+                         'steps' => [{ 'step_number' => 1, 'observed' => { 'peak_memory_bytes' => 10, 'realtime_seconds' => 2,
+                                                                            'wall' => 3, 'cpu_percent' => -1 } },
+                                     { 'step_number' => 'x' }])
+    r = W::ResourcesInput.read(text, name: 'm.json')
+    assert_equal [{ 'step_number' => 1, 'source' => 'gc_resources_input', 'measured_by' => 'gc_prov_measure 0.0 (test)',
+                    'observed' => { 'peak_memory_bytes' => 10, 'realtime_seconds' => 2 } }], r['steps']
+    notes = r['notes'].join("\n")
+    assert_includes notes, 'wall not read'
+    assert_includes notes, 'cpu_percent is not a non-negative number'
+    assert_includes notes, 'no integer step_number'
+    assert_raises(W::PlanError) { W::ResourcesInput.read('{"format":"other"}') }
+  end
+
+  # The design's table of examples (§6.2 (2)), row by row, on the real run.
+  def with_traced_launch_dir(trace_text)
+    with_fixture_launch_dir do |dir|
+      File.write(File.join(dir, 'results', 'pipeline_info', 'execution_trace_2026-09-20_18-02-30.txt'), trace_text)
+      yield dir
+    end
+  end
+
+  def test_example_row_1_the_default_trace_gives_steps_and_leaves_the_grade_alone
+    with_traced_launch_dir(File.read(File.join(FIXTURES, 'execution_trace.txt'))) do |dir|
+      out = enriched_fixture(dir)
+      signed = GenomicsChainProv::Identity.derive(JSON.generate(out['bco']))['signed']
+      assert_equal 'steps', signed['grade_resources']
+      assert_equal [0, 8], signed.values_at('stages_with_requested_resources', 'stages_with_observed_resources')
+      assert_equal ['nextflow_trace'], signed['resources_sources']
+      assert_nil signed['machine_source'], 'the enricher writes no machine unless asked'
+      assert_equal 'absent', signed['grade_overall'], 'the seven grades do not see the resources'
+      assert_includes out['notes'].join, 'set trace.raw = true'
+    end
+  end
+
+  def test_example_rows_2_and_3_requested_columns_then_this_machine
+    rows = File.read(File.join(FIXTURES, 'execution_trace.txt')).lines
+    trace = (["#{rows.first.chomp}\tcpus\tmemory\n"] + rows.drop(1).map { |l| "#{l.chomp}\t2\t6 GB\n" }).join
+    with_traced_launch_dir(trace) do |dir|
+      assert_equal 'steps', resource_grade(enriched_fixture(dir)['bco']), 'both on every stage, no machine'
+      machine = { 'cpu_model' => 'Apple M2 Max', 'logical_cores' => 12, 'memory_total_bytes' => 32 * 1024**3,
+                  'gpu_probe' => [{ 'tool' => 'system_profiler', 'result' => 'ok' }],
+                  'gpus' => [{ 'vendor' => 'apple', 'model' => 'Apple M2 Max' }], 'source' => 'probe' }
+      out = enriched_fixture(dir, machine: machine, host_os: 'Linux')
+      assert_equal 'full', resource_grade(out['bco'])
+      darwin = enriched_fixture(dir, machine: machine, host_os: 'Darwin')
+      assert_equal 'steps', resource_grade(darwin['bco']),
+                   'the captured .command.run ran in a container: on macOS the GPU lines are dropped'
+    end
+  end
+
+  def test_example_row_4_a_plan_with_the_machine_probed_and_no_stage_values_is_partial
+    with_demo_computation do |dir|
+      plan_path = File.join(dir, 'plan.json')
+      File.write(plan_path, JSON.generate(demo_plan))
+      bco, err = cli('--plan', plan_path, '--no-docker')
+      assert_equal 'probe', resources_of(bco)['machine']['source']
+      assert_equal 'partial', resource_grade(bco)
+      assert_includes err, 'resources: partial (not part of the grade above)'
+      refute_includes err, 'Tier 2.5 records only bundles graded immutable', 'gone since v0.1.13'
+
+      bco, = cli('--plan', plan_path, '--no-docker', '--no-grade', '--no-machine')
+      refute extension(bco).key?('resources')
+    end
+  end
+
+  def test_the_cli_carries_a_generic_resources_file_into_the_bundle
+    with_demo_computation do |dir|
+      plan_path = File.join(dir, 'plan.json')
+      File.write(plan_path, JSON.generate(demo_plan))
+      File.write(File.join(dir, 'measured.json'),
+                 JSON.generate('format' => 'gc-resources-input-0.1', 'measured_by' => 'test',
+                               'steps' => [1, 2].map { |n| { 'step_number' => n, 'observed' => { 'peak_memory_bytes' => 1, 'realtime_seconds' => 1 } } }))
+      bco, = cli('--plan', plan_path, '--no-docker', '--no-grade', '--no-machine', '--resources', File.join(dir, 'measured.json'))
+      assert_equal 'steps', resource_grade(bco)
+      assert_equal %w[gc_resources_input], resources_of(bco)['steps'].map { |e| e['source'] }.uniq
+    end
+  end
+
+  # --- implementation review r1 --------------------------------------------------
+
+  def test_every_container_form_a_plan_can_state_counts_for_the_macos_rule
+    refute W.plan_uses_containers?(W.normalise_plan(demo_plan))
+    image = demo_plan.tap { |p| p['stages'][0]['tools'][0]['image'] = 'quay.io/biocontainers/seqtk:1.4--he4a0461_1' }
+    assert W.plan_uses_containers?(W.normalise_plan(image))
+    uri = demo_plan.tap { |p| p['stages'][1]['tools'][0]['uri'] = "docker://biocontainers/fastqc@sha256:#{'a' * 64}" }
+    assert W.plan_uses_containers?(W.normalise_plan(uri))
+    runtime = demo_plan.tap { |p| p['runtime']['image'] = 'rocker/r-ver:4.4.1' }
+    assert W.plan_uses_containers?(W.normalise_plan(runtime))
+  end
+
+  MAC_MACHINE = { 'cpu_model' => 'Apple M2 Max', 'logical_cores' => 12, 'memory_total_bytes' => 1,
+                  'gpu_probe' => [{ 'tool' => 'system_profiler', 'result' => 'ok' }],
+                  'gpus' => [{ 'vendor' => 'apple', 'model' => 'Apple M2 Max' }], 'source' => 'probe' }.freeze
+
+  # Operator 2026-10-17 (review r2): nf-prov names no container even when the
+  # tasks ran in one, so on macOS a Nextflow run never gets GPU lines.
+  def test_on_macos_a_nextflow_run_never_gets_gpu_lines
+    Dir.mktmpdir('gc_prov_nf_mac') do |dir|
+      bare = thin_nextflow_bundle
+      bare['description_domain']['pipeline_steps'][0]['prerequisite'] =
+        [{ 'name' => 'seqtk', 'uri' => { 'uri' => "quay.io/biocontainers/seqtk:1.4--he4a0461_1@sha256:#{'c' * 64}" } }]
+      out = NF.read(dir, bco: bare, docker: false, checksums: false, machine: MAC_MACHINE, host_os: 'Darwin')
+      refute resources_of(out['bco'])['machine'].key?('gpus')
+      kept = NF.read(dir, bco: bare, docker: false, checksums: false, machine: MAC_MACHINE, host_os: 'Linux')
+      assert resources_of(kept['bco'])['machine'].key?('gpus')
+      native = NF.read(dir, bco: thin_nextflow_bundle, docker: false, checksums: false, machine: MAC_MACHINE, host_os: 'Darwin')
+      refute resources_of(native['bco'])['machine'].key?('gpus'), 'no container declared: still dropped on macOS'
+      assert_equal 'Apple M2 Max', resources_of(native['bco'])['machine']['cpu_model'], 'the rest of the machine stays'
+    end
+  end
+
+  def trace_head = "task_id\thash\tname\tstatus\trealtime\tpeak_rss\n"
+
+  def two_step_bundle(hash_a, hash_b, number_a: 1)
+    b = thin_nextflow_bundle
+    step = b['description_domain']['pipeline_steps'][0]
+    b['description_domain']['pipeline_steps'] = [step.merge('step_number' => number_a, 'name' => hash_a),
+                                                 step.merge('step_number' => 2, 'name' => hash_b, 'output_list' => [])]
+    b
+  end
+
+  # One row, two tasks: a printed short hash that begins both tasks' hashes
+  # cannot say which one it measured.
+  def test_a_trace_row_two_tasks_share_is_not_read
+    Dir.mktmpdir('gc_prov_nf_amb') do |dir|
+      trace = File.join(dir, 'trace.txt')
+      File.write(trace, "#{trace_head}1\t7a/51f65b\tA\tCOMPLETED\t1000\t100\n")
+      bco = two_step_bundle('7a51f65b' + '0' * 24, '7a51f65b' + '1' * 24)
+      out = NF.read(dir, bco: bco, docker: false, checksums: false, trace_paths: [trace])
+      refute extension(out['bco']).key?('resources')
+      assert_includes out['notes'].join, 'cannot be told apart'
+    end
+  end
+
+  def test_two_rows_printing_one_short_hash_are_not_read
+    by_hash, = NF.resources_from_trace("#{trace_head}1\t7a/51f65b\tA\tCOMPLETED\t1000\t100\n2\t7a/51f65b\tB\tCOMPLETED\t9000\t900\n")
+    assert by_hash['7a/51f65b']['ambiguous']
+    merged = NF.merge_trace_resources([by_hash])
+    assert merged['7a/51f65b']['ambiguous']
+    single, = NF.resources_from_trace("#{trace_head}3\t7a/51f65b\tA\tCACHED\t1000\t100\n")
+    [[by_hash, single], [single, by_hash]].each do |files|
+      assert NF.merge_trace_resources(files)['7a/51f65b']['ambiguous'], 'stays ambiguous across files, either order'
+    end
+  end
+
+  # A string step_number is what the adapter accepts; beside an integer from a
+  # --resources file it used to crash the sort.
+  def test_a_string_step_number_is_written_as_the_integer_the_adapter_reads
+    Dir.mktmpdir('gc_prov_nf_str') do |dir|
+      trace = File.join(dir, 'trace.txt')
+      File.write(trace, "#{trace_head}1\taa/bbccdd\tA\tCOMPLETED\t1000\t100\n2\tcc/ddeeff\tB\tCOMPLETED\t2000\t200\n")
+      bco = two_step_bundle('aabbccdd' + '0' * 24, 'ccddeeff' + '0' * 24, number_a: '1')
+      extra = [{ 'step_number' => 2, 'source' => 'gc_resources_input', 'requested' => { 'cpus' => 1, 'memory_bytes' => 1 } }]
+      out = NF.read(dir, bco: bco, docker: false, checksums: false, trace_paths: [trace], resource_steps: extra)
+      assert_equal [1, 2, 2], resources_of(out['bco'])['steps'].map { |e| e['step_number'] }
+    end
+  end
+
+  def test_the_later_trace_file_by_name_wins
+    Dir.mktmpdir('gc_prov_nf_resume') do |dir|
+      info = File.join(dir, 'results', 'pipeline_info')
+      FileUtils.mkdir_p(info)
+      File.write(File.join(info, 'execution_trace_2026-01-02_00-00-00.txt'), "#{trace_head}1\taa/bbccdd\tA\tCACHED\t-\t200\n")
+      File.write(File.join(info, 'execution_trace_2026-01-01_00-00-00.txt'), "#{trace_head}1\taa/bbccdd\tA\tCOMPLETED\t1000\t100\n")
+      bco = two_step_bundle('aabbccdd' + '0' * 24, 'ffffffff' + '0' * 24)
+      out = NF.read(dir, bco: bco, docker: false, checksums: false)
+      assert_equal({ 'realtime_seconds' => 1, 'peak_memory_bytes' => 200 }, resources_of(out['bco'])['steps'].first['observed'])
+    end
+  end
+
+  # A probe answers `ok` only when it read every GPU it reported.
+  def test_probes_that_cannot_read_a_gpu_say_failed_not_none
+    rocm = ->(json) { runner('rocm-smi --showproductname' => [JSON.generate(json), :ok]) }
+    _, gpus = Env.probe_rocm(rocm.call('card0' => { 'Card Series' => 'AMD Instinct MI250X' }))
+    assert_equal [{ 'vendor' => 'amd', 'model' => 'AMD Instinct MI250X' }], gpus
+    probe, gpus = Env.probe_rocm(rocm.call('card0' => { 'Card SKU' => 'D65209' }))
+    assert_equal ['failed', []], [probe['result'], gpus]
+
+    nv = runner('nvidia-smi --query-gpu=name,memory.total,driver_version' =>
+                  ["WARNING: infoROM is corrupted at gpu 0000:3B:00.0\nNVIDIA A100, 81920, 535.1\n", :ok])
+    probe, gpus = Env.probe_nvidia(nv)
+    assert_equal ['failed', []], [probe['result'], gpus]
+
+    sp = ->(out) { runner('system_profiler SPDisplaysDataType' => [out, :ok]) }
+    assert_equal 'failed', Env.probe_system_profiler(sp.call('[1, 2]')).first['result']
+    unknown = JSON.generate('SPDisplaysDataType' => [{ 'sppci_model' => 'Mystery GPU', 'spdisplays_vendor' => 'acme' }])
+    assert_equal 'failed', Env.probe_system_profiler(sp.call(unknown)).first['result']
+  end
+
+  # review r2: output this code cannot read is `failed`, never "none".
+  def test_probe_output_in_an_unreadable_shape_is_failed
+    rocm = ->(json) { Env.probe_rocm(runner('rocm-smi --showproductname' => [JSON.generate(json), :ok])) }
+    [[], nil, 'x', { 'card0' => nil }, { 'card0' => 'MI250X' }].each do |shape|
+      assert_equal 'failed', rocm.call(shape).first['result'], shape.inspect
+    end
+    probe, gpus = rocm.call('system' => { 'Driver version' => '6.1' }, 'card0' => { 'Card Series' => 'AMD Instinct MI250X' })
+    assert_equal ['ok', [{ 'vendor' => 'amd', 'model' => 'AMD Instinct MI250X' }]], [probe['result'], gpus]
+    _, gpus = rocm.call('card0' => { 'Card Model' => '0x74a1', 'Card Series' => 'AMD Instinct MI300X' })
+    assert_equal 'AMD Instinct MI300X', gpus.first['model'], 'the series, not the PCI device id'
+
+    sp = ->(out) { Env.probe_system_profiler(runner('system_profiler SPDisplaysDataType' => [out, :ok])) }
+    ['{}', '{"SPDisplaysDataType":null}', '"x"',
+     JSON.generate('SPDisplaysDataType' => [{ 'sppci_model' => '  ', 'spdisplays_vendor' => 'sppci_vendor_Apple' }])].each do |out|
+      assert_equal 'failed', sp.call(out).first['result'], out
+    end
+    assert_equal ['ok', []], sp.call('{"SPDisplaysDataType":[]}').then { |p, g| [p['result'], g] }, 'an explicit empty list is none'
+  end
+
+  def test_a_trace_with_two_rows_for_one_short_hash_is_read_end_to_end_without_crashing
+    Dir.mktmpdir('gc_prov_nf_dup') do |dir|
+      trace = File.join(dir, 'trace.txt')
+      File.write(trace, "#{trace_head}1\taa/bbccdd\tA\tCOMPLETED\t1000\t100\n2\taa/bbccdd\tB\tCOMPLETED\t9000\t900\n")
+      bco = two_step_bundle('aabbccdd' + '0' * 24, 'ffffffff' + '0' * 24)
+      out = NF.read(dir, bco: bco, docker: false, checksums: false, trace_paths: [trace])
+      refute extension(out['bco']).key?('resources')
+      assert_includes out['notes'].join, 'step 1: the trace row cannot be told apart'
+    end
+  end
+
+  def test_a_step_number_that_is_not_an_integer_gets_its_own_note
+    notes = []
+    NF.trace_resource_steps([{ 'step_number' => 'x', 'name' => 'aabbccdd' + '0' * 24 }],
+                            { 'aa/bbccdd' => { 'requested' => { 'cpus' => 1 }, 'observed' => {} } }, notes)
+    assert_includes notes.join, 'step_number is not an integer'
+  end
+
+  def test_df_takes_a_directory_named_with_a_tilde
+    seen = nil
+    run = ->(argv) { seen = argv; [nil, :failed] }
+    Env.disk_free('~nosuchuser_q', run)
+    assert_equal File.absolute_path('~nosuchuser_q'), seen.last
+  end
+
+  def test_df_reads_the_available_column_even_when_the_file_system_name_has_a_space
+    seen = nil
+    run = lambda do |argv|
+      seen = argv
+      ["Filesystem 1024-blocks Used Available Capacity Mounted on\nmap auto_home 100 50 40 56% /System/Volumes/Data/home\n", :ok]
+    end
+    assert_equal 40 * 1024, Env.disk_free('-odd', run)
+    assert_equal ['df', '-Pk', '--', File.expand_path('-odd')], seen
+  end
+
+  def test_a_probe_that_hangs_is_cut_off
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    assert_equal [nil, :timeout], Env.run_fixed(%w[sleep 5], timeout: 0.3)
+    assert_operator Process.clock_gettime(Process::CLOCK_MONOTONIC) - started, :<, 3
+  end
+
+  def test_a_plan_machine_must_be_finite_and_name_one_of_the_four_vendors
+    [{ 'memory_total_bytes' => Float::INFINITY },
+     { 'gpus' => [{ 'vendor' => 'acme', 'model' => 'Turbo' }] },
+     { 'gpus' => [{ 'vendor' => 'nvidia', 'model' => 'A100', 'memory_bytes' => -1 }] }].each do |m|
+      assert_raises(W::PlanError, m.inspect) { W.normalise_plan(demo_plan.merge('machine' => m)) }
+    end
+    yaml = "name: x\nstages:\n  - name: a\nmachine:\n  memory_total_bytes: .inf\n"
+    assert_raises(W::PlanError) { W.normalise_plan(W.load_plan(yaml)) }
   end
 
   # Shaped like what nf-prov 1.7.0 actually emits (design §13.1): an SCM

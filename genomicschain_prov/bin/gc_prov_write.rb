@@ -31,6 +31,7 @@
 #   ruby genomicschain_prov/bin/gc_prov_write.rb --plan plan.json --no-checksums
 #   ruby genomicschain_prov/bin/gc_prov_write.rb --from-nextflow-run /tmp/run \
 #        --container-digests digests.txt --out bco.json
+#   ruby genomicschain_prov/bin/gc_prov_write.rb --plan plan.json --resources measured.json
 #
 # The bundle goes to --out (or stdout). What was and was not collected goes to
 # stderr, always: a bundle is worth what was gathered into it, and the one
@@ -43,6 +44,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'genomicschain_prov'
 require 'genomicschain_prov/writer/environment'
 require 'genomicschain_prov/writer/nextflow_run'
+require 'genomicschain_prov/writer/resources_input'
 
 module GcProvWrite
   W = GenomicsChainProv::Writer
@@ -52,7 +54,7 @@ module GcProvWrite
   module_function
 
   def options(argv)
-    opts = { checksums: true, docker: true, run_version_commands: false, grade: true }
+    opts = { checksums: true, docker: true, run_version_commands: false, grade: true, resources: [] }
     parser = OptionParser.new do |o|
       o.banner = 'Usage: gc_prov_write.rb --plan PLAN | --from-nextflow-run DIR [options]'
       o.on('--plan PATH', 'a plan (JSON or YAML) naming the stages of a computation') { |v| opts[:plan] = v }
@@ -79,6 +81,12 @@ module GcProvWrite
            'the tasks may have run elsewhere)') { opts[:platform] = true }
       o.on('--zk-receipts PATH', 'a JSON array of {receipt, image_id, zkvm_version, step_number, input, output}; ' \
                                  'receipt paths are relative to that file') { |v| opts[:zk] = v }
+      o.on('--no-machine', 'with a plan: do not record this machine\'s CPU, memory, disk and GPUs') { opts[:machine] = false }
+      o.on('--machine-of-this-machine',
+           'with a Nextflow run: record this machine\'s CPU, memory, disk and GPUs (off by default: ' \
+           'the tasks may have run elsewhere)') { opts[:machine] = true }
+      o.on('--resources PATH', 'a gc-resources-input-0.1 file of per-stage requested and observed values ' \
+                               '(repeatable)') { |v| opts[:resources] << v }
       o.on('-h', '--help') { puts o; exit 0 }
     end
     parser.parse!(argv)
@@ -112,10 +120,40 @@ module GcProvWrite
     platform = plan['platform'] || (opts[:platform] == false ? nil : W::Environment.platform)
     zk = W::Environment.zk_declarations(plan['zk_receipts'], base_dir: base)
     extra = zk_from_file(opts)
+    machine = plan_machine(plan, base, opts)
+    inputs = resources_from_files(opts)
+    resources = W.resources_block(machine: machine['machine'],
+                                  steps: W.plan_resource_steps(plan) + inputs['steps'])
     { 'bco' => W.build(plan, checksums: resolved['checksums'],
                              object_id: opts[:object_id], created: opts[:created],
-                             platform: platform, zk_receipts: zk['zk_receipts'] + extra['zk_receipts']),
-      'notes' => resolved['notes'] + zk['notes'] + extra['notes'] }
+                             platform: platform, zk_receipts: zk['zk_receipts'] + extra['zk_receipts'],
+                             resources: resources),
+      'notes' => resolved['notes'] + zk['notes'] + extra['notes'] + machine['notes'] + inputs['notes'] }
+  end
+
+  # The plan's own statement of the machine wins, as with the platform;
+  # otherwise this machine, which for --plan is normally the one that ran the
+  # stages (design v0.1.14 §6.2 (4)). --no-machine leaves it out. A probe on
+  # macOS of a run whose stages used containers (any form, Writer.plan_uses_containers?)
+  # drops the GPU lines: a container there runs in a Linux virtual machine that
+  # cannot use the host's GPU.
+  def plan_machine(plan, base, opts)
+    return { 'machine' => plan['machine'], 'notes' => [] } if plan['machine']
+    return { 'machine' => nil, 'notes' => [] } if opts[:machine] == false
+
+    probed = W::Environment.machine(work_dir: base)
+    if W.plan_uses_containers?(plan) && Etc.uname[:sysname] == 'Darwin'
+      probed['machine'] = W::Environment.without_host_gpus(probed['machine'], probed['notes'])
+    end
+    probed
+  end
+
+  def resources_from_files(opts)
+    opts[:resources].each_with_object({ 'steps' => [], 'notes' => [] }) do |path, acc|
+      r = W::ResourcesInput.read(File.read(path), name: File.basename(path))
+      acc['steps'].concat(r['steps'])
+      acc['notes'].concat(r['notes'])
+    end
   end
 
   def from_nextflow(opts)
@@ -124,15 +162,18 @@ module GcProvWrite
     bco = JSON.parse(File.read(path))
     digest_map = opts[:digests] ? GenomicsChainProv::Writer::NextflowRun.digests_from(File.read(opts[:digests])) : {}
     extra = zk_from_file(opts)
+    inputs = resources_from_files(opts)
+    machine = opts[:machine] == true ? W::Environment.machine(work_dir: launch) : { 'machine' => nil, 'notes' => [] }
     out = GenomicsChainProv::Writer::NextflowRun.read(
       launch, bco: bco, versions_path: opts[:versions], trace_path: opts[:trace],
       work_root: opts[:work] || 'work', digest_map: digest_map, script_path: opts[:script],
       jar_path: opts[:jar], checksums: opts[:checksums], docker: opts[:docker],
       platform: opts[:platform] == true ? W::Environment.platform : nil,
-      zk_receipts: extra['zk_receipts']
+      zk_receipts: extra['zk_receipts'], machine: machine['machine'], resource_steps: inputs['steps']
     )
-    out['notes'] += extra['notes']
+    out['notes'] += extra['notes'] + machine['notes'] + inputs['notes']
     out['notes'] << 'no platform recorded: pass --platform-of-this-machine if the tasks ran here' unless opts[:platform] == true
+    out['notes'] << 'no machine recorded: pass --machine-of-this-machine if the tasks ran here' unless opts[:machine] == true
     out
   end
 
@@ -170,12 +211,17 @@ module GcProvWrite
     warn "  inputs #{counts['inputs_with_checksum']}/#{counts['inputs_total']} with a checksum, " \
          "#{counts['inputs_internal']} internal; software #{counts['software_total']}, " \
          "containers #{counts['containers_total']}; params #{counts['params_count']}/#{counts['params_total']}"
-    # The anchor issues a Tier 2.5 record only at `immutable` (design v0.1.12
-    # §6.1); saying so here is the cheapest place for the customer to learn it.
-    unless graded['grade_overall'] == 'immutable'
-      warn '  Tier 2.5 records only bundles graded immutable; this one would be refused'
-    end
+    # Since v0.1.13 the anchor records a bundle at any grade and carries the
+    # grade as computed; the line that said "immutable only" was left over
+    # from v0.1.12 and is gone.
     warn "  platform: #{np.platform ? np.platform.values.compact.join(' ') : 'not recorded'}"
+    res = GenomicsChainProv::Resources.derive(JSON.generate(bco), np.stages)
+    r = res['signed']
+    warn "  resources: #{r['grade_resources']} (not part of the grade above) — requested on " \
+         "#{r['stages_with_requested_resources']}/#{counts['stages_total']} stages, observed on " \
+         "#{r['stages_with_observed_resources']}/#{counts['stages_total']}; machine " \
+         "#{r['machine_source'] || 'not recorded'}; GPUs #{r['gpus_total'].nil? ? 'not looked for' : r['gpus_total']}"
+    res['notes'].each { |n| warn "  - #{n}" }
     Array(np.zk_receipts).each do |r|
       state = r['defects'].empty? ? 'declared' : "unusable (#{r['defects'].join(', ')})"
       warn "  zk receipt for stage #{r['stage'] || '?'}: #{state}"

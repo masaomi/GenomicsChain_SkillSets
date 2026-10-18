@@ -19,6 +19,8 @@ Off-anchor nodes (team workstation, genomicschain.ch app tier) use an empty tool
 
 Since 0.6.0 any SkillSet may list `anchor_profile_tool_classes` in its own `skillset.json`; `genomicschain_prov` uses this for `gc_prov_submit`. 0.6.0 also lets a verdict spec name its proof lifetime (`proof_ttl`), passed through `SubmitCore.store_proof!` and `SynoptisAttestor#issue(ttl:)`; specs without one keep the engine default, so Tier-1/2/3 proofs are unchanged.
 
+0.6.1 adds `resources` to the BCO extension schema (`schemas/bco_extension_genomicschain_v0_1.json`): the machine and each stage's requested and observed values, which `genomicschain_prov` 0.4.0 writes and grades (design v0.1.14 §6.2). Nothing else in core changes.
+
 ## Deployment profiles
 
 | Node | Packages | anchor_profile | Submit tools |

@@ -46,7 +46,9 @@ module GenomicsChainProv
       class FormatRejected < SubmitCore::SubmitError; end
       # A signed identity that differs from the anchor's derivation only in the
       # procedure versions is a version skew, not a forgery; it gets its own
-      # class so the tool can return the anchor's three versions (§6).
+      # class so the tool can return the anchor's versions (§6). A client
+      # older than v0.1.14 signs no resources_rule_version and lands here too:
+      # it is told what the anchor runs, and nothing is recorded (§6.2 (5)).
       class ProcedureVersionMismatch < SubmitCore::IdentityMismatch; end
 
       MCP_TOOL = 'gc_prov_submit'
@@ -54,9 +56,15 @@ module GenomicsChainProv
       BUNDLE_MAX_BYTES = 2 * 1024 * 1024    # Gate A (§6)
       BUNDLE_MAX_DEPTH = 32
       PROOF_TTL = 3_153_600_000             # 100 years (§6)
-      VERSION_FIELDS = %w[adapter_version predicate_version pin_strength_version].freeze
+      VERSION_FIELDS = %w[adapter_version predicate_version pin_strength_version resources_rule_version].freeze
       SERVER_SET_FIELDS = %w[trust_tier not_checked admission_rule zk_verification toolchain seed].freeze
-      SCHEMA_PATH = File.expand_path('../../../schemas/prov_attestation.schema.json', __dir__)
+      # One schema per record_version (§6.2 (5)): the 0.3 file is the one 0.3
+      # records were validated against, left byte for byte as it was.
+      SCHEMA_PATHS = {
+        '0.3' => File.expand_path('../../../schemas/prov_attestation.schema.json', __dir__),
+        '0.4' => File.expand_path('../../../schemas/prov_attestation_v0_4.schema.json', __dir__)
+      }.freeze
+      SCHEMA_PATH = SCHEMA_PATHS.fetch(Identity::RECORD_VERSION)
 
       # @param bundle [String, Hash] the bundle, verbatim
       # @param identity [Hash] the signed identity the customer claims
@@ -74,7 +82,7 @@ module GenomicsChainProv
 
       def self.versions
         { 'adapter' => Adapters::Bco::VERSION, 'predicate' => Predicate::PREDICATE_VERSION,
-          'pin_strength' => Predicate::PIN_STRENGTH_VERSION }
+          'pin_strength' => Predicate::PIN_STRENGTH_VERSION, 'resources_rule' => Resources::RULE_VERSION }
       end
 
       def proof_ttl
@@ -142,7 +150,8 @@ module GenomicsChainProv
           raise ProcedureVersionMismatch,
                 "procedure versions differ from the anchor's (#{skewed.join(', ')}); anchor runs " \
                 "adapter #{expected['adapter_version']}, predicate #{expected['predicate_version']}, " \
-                "pin_strength #{expected['pin_strength_version']}"
+                "pin_strength #{expected['pin_strength_version']}, resources rule #{expected['resources_rule_version']} " \
+                "(record_version #{Identity::RECORD_VERSION})"
         end
         bad = expected.keys.reject { |k| @identity.key?(k) && @identity[k] == expected[k] }
         extra = @identity.keys - expected.keys
@@ -192,14 +201,20 @@ module GenomicsChainProv
 
       def self.validate!(record)
         require 'json-schema'
-        errors = JSON::Validator.fully_validate(schema, record, errors_as_objects: true, version: :draft4)
+        unless SCHEMA_PATHS.key?(record['record_version'])
+          raise KairosMcp::Manifest::SchemaViolation, 'prov_attestation schema violation: unknown record_version'
+        end
+
+        errors = JSON::Validator.fully_validate(schema(record['record_version']), record,
+                                                errors_as_objects: true, version: :draft4)
         return true if errors.empty?
 
         raise KairosMcp::Manifest::SchemaViolation, "prov_attestation schema violation: #{errors.first[:message]}"
       end
 
-      def self.schema
-        @schema ||= JSON.parse(File.read(SCHEMA_PATH))
+      def self.schema(record_version = Identity::RECORD_VERSION)
+        @schemas ||= {}
+        @schemas[record_version] ||= JSON.parse(File.read(SCHEMA_PATHS.fetch(record_version)))
       end
 
       private
