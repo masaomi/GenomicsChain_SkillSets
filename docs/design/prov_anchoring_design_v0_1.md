@@ -2,7 +2,7 @@
 
 **日付:** 2026-09-20
 **著者:** masaomi（起草は Claude Fable 5.1、このセッション）
-**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.14 —— 凍結後の個別改訂を 4 件反映（§14 の先頭 4 行。v0.1.14 は計算資源の欄（§6.2、2026-10-17 実装）。v0.1.11 は U1b の実装が突き当たった事実 2 件、v0.1.12 は 2026-10-11/12 の operator 決定 3 件——発行の関門としての immutable、CPU と OS、ZK 証明の検証——で §6.1 に集めた。v0.1.13 は同じ日の operator 決定で、v0.1.12 の関門を撤回し、Tier 3 の route B の線を D11 の元の形に戻した。いずれも review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
+**状態:** **凍結 v0.1.10（2026-09-21、operator 決定）。現在 v0.1.15 —— 凍結後の個別改訂を 5 件反映（§14 の先頭 5 行。v0.1.15 は環境の置き場所から今も取れるかの観察（§6.3、2026-10-18 実装）、v0.1.14 は計算資源の欄（§6.2、2026-10-17 実装）。v0.1.11 は U1b の実装が突き当たった事実 2 件、v0.1.12 は 2026-10-11/12 の operator 決定 3 件——発行の関門としての immutable、CPU と OS、ZK 証明の検証——で §6.1 に集めた。v0.1.13 は同じ日の operator 決定で、v0.1.12 の関門を撤回し、Tier 3 の route B の線を D11 の元の形に戻した。いずれも review の巡ではない）。** これ以降、設計 review の巡は回さない。理由は §14 の凍結の記に書いた——
 round 5〜8 は名目上は設計 review だったが、産出物の 9 割近くが adapter の実装修正であり、設計の review に test が走っていること
 自体がその徴候だった。残る懸案は review の巡ではなく**実装の queue** に置く。設計に変更が要るときは、実装が突き当たった事実を
 持って個別に改訂する。以下は凍結時点の状態の記録（round 8
@@ -753,6 +753,336 @@ jobspec_digest に触れていない）ので、資源の欄は Tier 3 の同一
 「一致」と読む。(iii)〜(vi) は test（`resources_test.rb`、`prov_verify_test.rb`）。E-25 の確認の 1 行: V0・V6 とも、E-25 の manifest の
 欄のうち束から出る 21 欄が一致、claim の形も一致（自己検査のやり直しではない）。
 
+### 6.3 v0.1.15 の追加 — 環境の置き場所から今も取れるかの観察（2026-10-16 起草、10-16/17 査読 2 回、10-17 凍結、10-18 実装、operator 決定）
+
+凍結した草案 `docs/design/prov_v0_1_15_reachability_draft.md`（sha256 0eff5589…）の §6.3 を写した。〔査読 r1〕などの印は草案のまま
+残す。写した後に変えた箇所には〔実装 10-18〕の印を付け、理由は下の「実装で決めたこと」にある。
+
+#### (1) なぜ等級にも prov の記録にも入れず、別の記録にするか
+
+| 判断 | 理由 |
+|---|---|
+| 等級に入れない | §5 の規則は決定的（同じ束から同じ等級）。届くかどうかは時刻・registry の方針で変わる。混ぜると §8 の検証者の再導出が「不一致」を出しうる |
+| prov の記録に入れない | prov の記録は一時点の言明で、同じ束・同じ鍵の再提出は既存の proof の回復になる（§6 の submission_key）。観察は何度も見直すもので、回復の仕組みと合わない。入れれば record_version も上がり、v0.1.14 の 0.4、v0.1.16 の ZK と版を取り合う |
+| 別の記録として重ねる | prov の記録・アダプタ・述語・資源の規則・ZK の検証はどれも変わらない |
+
+#### (2) 範囲と数える単位
+
+対象は `NormalizedProvenance` の環境の置き場所: `containers`、`software`（containers 以外。アダプタでは containers は software の一部なので、
+この分類の項目の数は `software_total − containers_total`〔反証 r2〕）、`workflow` の repository と commit、`runtime`。
+**入力（データ）は対象外**（§10）。
+
+**数える単位を二つ持つ〔査読 r1〕。** nf-core の束では段が task なので、container の項目は段ごとに並ぶ。査読者の見積もりでは、10 試料の
+rnaseq で数百〜数千項目が 50 前後の image を指す（未計測〔反証 r2〕）。そこで:
+
+- **問い合わせは、置き場所の文字列が同じものを一度だけ**行う（`distinct`）。
+- 記録には分類ごとに **項目の数**（`items`、prov の記録の `containers_total` などと同じ数え方）と **異なる置き場所の数**（`distinct`）の
+  両方を載せ、結果の段ごとの数は `distinct` で数える。項目の結果は、その置き場所の結果をそのまま受け継ぐ。
+- 問い合わせる順は決定的にする: 分類の順（workflow_repository → workflow_commit → runtime → containers → software。〔実装 10-18、
+  operator〕凍結時は containers が先だった。予算が尽きたとき、Tier 3 に欠かせない少数の項目を先に問い合わせ終えるため）、分類の中は
+  置き場所の文字列の辞書順。
+
+#### (3) 提出の流れ
+
+```
+顧客                                                anchor（SubmitCore の順に）
+gc_submit_client --tier prov-reach
+  束（verbatim）と提出ごとの nonce に署名し、
+  prov の proof_id は署名の外の引数で送る ────────▶ gc_prov_reach（SubmitCore の順〔反証 r2: r3 の初稿の図は順が違った〕）
+                                                       ① 入口: 束の digest・Gate A（2 MB、深さ 32）・アダプタによる導出（置き場所を
+                                                          取り出す。ネットワークにも台帳にも触れない。prov の今の型と同じ）・署名された
+                                                          同一性と束の一致
+                                                       ② Bearer の照合
+                                                       ③ 回復の確認（同じ署名の再送はここで既存の記録が返る）
+                                                       ④ 署名の確認
+                                                       ⑤ server が決める欄: prov の記録を proof_id で引き、bundle_digest と
+                                                          prov_proof_ref の一致を確かめ、問い合わせる（(5) の関門と予算の内側で）
+                                                       ⑥ 記録を発行する。束と置き場所は捨てる
+  ◀── proof_id、数、項目ごとの結果（応答だけ） ────
+```
+
+**問い合わせは署名の確認の後だけ〔査読 r1〕。** 今の SubmitCore は、入口の検査（`apply_gates!`）→ Bearer の照合 → 回復の確認 → 署名の確認
+（`verify_admission!`）→ server が決める欄（`server_set_fields`）→ 記録、の順に進む（`submit_core.rb` の `submit`）。⑤ は
+`server_set_fields` の中で行い、`apply_gates!` では行わない（prov は ZK の検証を `apply_gates!` で行っているが、その型を真似ない）。
+台帳を引くのも ⑤ で行う（署名を確かめる前の呼び出しに、proof_id があるかどうかを答えない）。したがって、署名の無い呼び出し、Bearer の
+違う呼び出し、同じ署名の再送は、外へ一つも問い合わせず、prov の記録を proof_id で引かない。〔凍結 10-17〕回復の確認は submission_key で
+既存の記録を探す台帳の照合で、署名を確かめる前に行われる（今の core の動き）。r3 の「台帳も引かない」は誤り。**dry_run は問い合わせない**: 分類ごとの `items` と `distinct`
+と、名前を引かずに決められる拒否の数（scheme、userinfo、port、IP の直書き、扱わない種類）だけを返す。名前を引く判定（(5) の関門の
+3・4）は dry_run では行わない〔反証 r2: r3 の初稿は「(5) で拒まれる数」を返すと書き、名前を引かずには決められなかった〕。
+
+拒否するのは形の誤りだけ: prov の記録が台帳に無い、prov の記録が取り消されている（〔実装 10-18、operator〕取り下げられた申告の上に新しい観察を重ねない）、`bundle_digest` が一致しない、`prov_proof_ref` が一致しない、署名が通らない、束が
+入口の上限を超える、(5) の予算を超えた提出。**数の中身では拒否しない**（v0.1.13 の「どの等級でも発行する」と同じ考え方）。
+
+**再提出は新しい観察にする。** client が提出ごとに作る 32 bytes の乱数を、署名される同一性の欄 `observation_nonce` に入れる。core の
+SubmitCore は `submission_key`（digest の主語・署名される同一性・公開鍵）で既存の proof を探して回復を返すので（`submit_core.rb` 50–62 行）、
+nonce が同一性に入っていれば別の key になる。claim と idempotency key は (7)。
+
+**顧客への項目ごとの結果〔査読 r1〕。** 数だけでは、顧客は「どれが取れなかったか」が分からず、Tier 3 の準備に使えない。そこで応答にだけ、
+束の中の位置（分類と、その分類での項目の番号）ごとの結果の段を返す。置き場所の文字列は返さない（顧客は束を持っているので位置で足りる）。
+この項目ごとの結果は記録にも log にも書かない。返す相手は署名を確かめた提出者だけなので、提出者が既に持っている束の情報より多くを
+渡すことはない。
+
+#### (4) 結果の段と、答えた相手の種類
+
+**結果の段（異なる置き場所ごと）〔査読 r1 で 7 段に〕:**
+
+```
+digest_match    置き場所が中身の指紋で名指され、相手が同じ指紋で存在を答えた。相手の答えであり、anchor は中身を取り寄せていない
+exists          存在の答えが返ったが、名指しが中身の指紋ではない（tag、版の名前、git の ref の名前）
+access_denied   相手は答えたが、匿名では読めないと言った（401・403）。私設のものも、存在しないものもここに入る
+                （Docker Hub は存在しない repository にも匿名には 401 を返す）。「消えた」とも「ある」とも読まない
+not_found       存在しないと答えが返った（404、版が無い）
+error           答えが得られなかった（時間切れ、429、TLS の失敗、相手の一時的な失敗）。「消えた」とは読まない
+not_attempted   anchor 自身の予算や遮断で問い合わせなかった（(5) の上限、同じ host の連続失敗で止めた）。相手の状態について何も言わない
+not_checkable   点検の方法が無い、または (5) の関門で拒んだ（local_path、absent、扱わない scheme、置き場所が無い、userinfo つき、
+                443 以外の port、名前が引けない、公開でない宛先）
+```
+
+〔査読 r1〕「関門で拒んだ」と「名前が引けない」を同じ `not_checkable` にまとめるのは、二つを分けると、anchor の内側の DNS でどの名前が
+引けるかを外から探れてしまうため。顧客には (3) の項目ごとの結果で同じ `not_checkable` が返る。
+
+| 置き場所の種類 | 問い合わせ（中身は取り寄せない） | 最良の結果 |
+|---|---|---|
+| OCI image、digest で名指し（`…@sha256:…`） | registry の manifest に HEAD（`/v2/<name>/manifests/<digest>`、Accept に OCI と Docker の manifest と index の型）。401 の `WWW-Authenticate: Bearer realm=…` には匿名の token を一度だけ取りに行く（realm の URL も (5) の関門を通す）。応答の `Docker-Content-Digest` が名指しの digest と同じ | digest_match |
+| OCI image、tag で名指し | 同じ HEAD を tag で | exists |
+| git の repository | **子 process を使わない**〔査読 r1〕。smart HTTP の ref の広告（`GET <repo>/info/refs?service=git-upload-pack`）を、(5) の関門を通した同じ接続で、8 MB まで流しながら読む。
+超えたら `not_attempted`（anchor の上限）〔反証 r2: 広告は `refs/pull/*` を含み、nf-core/modules で 660,232 bytes、bioconda-recipes で
+4,677,728 bytes。1 MB では足りない〕 | exists |
+| git の commit（hash） | 上の ref の広告に、その hash を先端に持つ ref があれば digest_match。無ければ not_checkable（先端でない commit は、object を取り寄せないと確かめられない）〔査読 r1: r2 は ls-remote で digest_match を出すと書いたが、ls-remote は ref の名前で照合し、先端しか見えない〕 | digest_match か not_checkable |
+| git の commit（hash でない名前） | ref の広告にその名前があれば exists | exists |
+| conda の package | **完全な指定だけ**〔査読 r1〕: `channel::name==version`（`==`）で、channel が明示され `defaults` でなく、version に `*`・範囲・比較の印が無いもの。〔反証 r2〕`=` 一つは conda では前方一致（`=1.17` は `1.17.*`）なので not_checkable。`==` でも build は固定されないので結果は exists まで。版ごとの API `https://api.anaconda.org/release/<channel>/<name>/<version>`（200 か 404）。channel・name・version は `[A-Za-z0-9._+-]` だけ（path を組み立てるので）。それ以外は not_checkable。今の書き出し器は conda の置き場所を書かない（Nextflow の補完器は image を道具の uri に書く）ので、当面は数が 0 になりうる | exists |
+| https の URL（道具の配布物など） | HEAD（拒まれたら Range 0-0 の GET を送り、header を受け取ったら本文を読まずに接続を閉じる） | exists |
+| local_path、absent、未対応の scheme、置き場所の無い項目 | 問い合わせない | not_checkable |
+
+**答えた相手の種類〔査読 r1〕。** 置き場所は顧客が書くので、顧客が自分の registry を指し、どんな digest にも「ある」と答えさせることが
+できる。記録だけを読む第三者には、それが公開の registry の答えか顧客の server の答えかが見えない。そこで `digest_match` と `exists` を、
+答えた host の種類で分けて数える:
+
+- `public_registry` — 規則 `gc-reachability-0.1` に固定した一覧の host: `registry-1.docker.io`（`docker.io`）、`quay.io`、`ghcr.io`、
+  `public.ecr.aws`、`mcr.microsoft.com`、`registry.gitlab.com`、`community.wave.seqera.io`、`github.com`、`gitlab.com`、`bitbucket.org`、
+  `codeberg.org`、`api.anaconda.org`。〔反証 r2〕`community.wave.seqera.io` を足した——repository の nf-core の fixture は image 4 つのうち 2 つが
+  ここにある。
+  一覧を変えるときは規則の版を上げる。
+- `other_host` — それ以外（私設の registry、顧客の server、大学の server）。
+- 〔実装 10-18、operator〕種類は束に書かれた host で決める。token の取り先（realm）や転送先は、その host が選んだものであって顧客が
+  選んだものではないので、種類を変えない（例: Docker Hub の realm は auth.docker.io、Wave の realm は cerbero.seqera.io、GitHub の配布物
+  は release-assets.githubusercontent.com へ転送される）。一覧は上の 12 件のまま。`docker.io` は `registry-1.docker.io` と同じ扱い。
+
+一覧は operator が見直せる既定であって、品質の判定ではない（`other_host` は「悪い」ではなく「答えた相手の素性を記録が言えない」）。
+
+#### (5) anchor を守る関門と予算（anchor が顧客の書いた宛先に問い合わせるため）〔査読 r1 で書き直し〕
+
+**一つの関門 `gate(url)` を、置き場所、`WWW-Authenticate` の realm の URL、すべての redirect 先に、同じように通す。**
+
+```
+gate(url):
+  1. scheme は https だけ。userinfo（user:pass@）があれば拒む。port は 443 だけ
+  2. host が anchor 自身の名前・自身の公開 IP なら拒む
+  3. 名前を引き、A と AAAA の答えをすべて取る。一つでも下の 4 に落ちれば拒む
+  4. 埋め込まれた IPv4 を取り出してから判定する（IPv4-mapped ::ffff:0:0/96、IPv4-compatible、NAT64 64:ff9b::/96——IANA は
+     Globally Reachable を True とする——、6to4 2002::/16——同じく N/A）。Teredo 2001::/32（N/A）と 64:ff9b:1::/48（False、埋め込みの
+     位置が決まらない）は取り出さずに拒む〔反証 r2〕。IANA の IPv4・IPv6 Special-Purpose Address Registry で Globally Reachable が
+     True でない範囲と、multicast の範囲（multicast の registry にある）はすべて拒む（例: 0.0.0.0/8、10/8、100.64/10、127/8、
+     169.254/16、172.16/12、192.0.0/24、192.0.2/24、192.168/16、198.18/15、198.51.100/24、203.0.113/24、224/4（multicast）、240/4、
+     ::/128、::1、100::/64、2001:2::/48、2001:db8::/32、3fff::/20、5f00::/16、fc00::/7、fe80::/10、ff00::/8（multicast））。
+     一覧は実装の時点で IANA の CSV から作り、その日付を規則の版と一緒に残す。
+     言語の便利な判定（Ruby の `IPAddr#private?` など）に頼らない——0.0.0.0、100.64/10、NAT64 を通してしまう（査読 r1 で Ruby 3.4.10 にて確認）
+  5. 確かめた IP に接続を固定し、TLS は SNI に元の host 名を送り、証明書をその host 名で検証する（VERIFY_PEER）。検証を切らない
+  6. proxy を使わない（環境変数の proxy も読まない。proxy が名前を引くと固定が無効になる。Ruby の Net::HTTP は既定で環境変数の
+     `http_proxy` を読むので、proxy の引数を明示して無効にする〔反証 r2〕）
+```
+
+redirect は 3 回まで、毎回 `gate` を通す。realm の URL も `gate` を通し、redirect と同じ回数と時間の予算に数える。
+〔実装 10-18〕anchor 自身の名前と住所、operator が足す拒否の範囲は `genomicschain_core.yml` の `genomicschain.reach`（`own_names`、
+`own_addresses`、`denylist`）に書く。
+
+**時間と大きさ:**
+
+- 1 問い合わせは**壁時計で 10 秒**（接続・TLS・header まで含めた期限。読み取りごとの待ち時間ではない）。1 観察の合計は 60 秒。
+- header は 64 KiB まで。JSON（token、conda の API）は 1 MB まで、git の ref の広告は 8 MB まで、**伸長した後の bytes で数える**
+  （`Accept-Encoding: identity` を送り、圧縮で返ってきても伸長しながら数える）。JSON の超過は error、広告の超過は `not_attempted`。
+- HEAD で足りないときの Range GET は、header を受け取ったら本文を読まずに閉じる（Range を無視して全体を返す server がある）。
+
+**予算（共有の IP と worker を守る）:**
+
+- 1 観察で問い合わせる異なる置き場所は 200 まで。超えた分は `not_attempted`。
+- 同じ host への問い合わせは 1 観察で、`public_registry` の host なら 100 まで、それ以外の host なら 20 まで、同時に 2 本まで
+  〔反証 r2: nf-core の image は quay.io などに集まるので、一律 20 では大半が `not_attempted` になる〕。同じ host で時間切れか 5xx が 3 回続いたら、その host の残りは
+  `not_attempted`（遮断）。
+- anchor 全体で同時に進む観察は 2 つまで。同じ鍵からは同時に 1 つ、1 日に 24 観察まで。超えた提出は拒む（形の誤りと同じ扱い。
+  記録は作らない）。
+- 〔実装 10-18、operator〕予算は 1 回の観察の中だけで数える。観察をまたいだ host ごとの回数と、429 を受けたときの anchor 全体の
+  停止は足さない（§10）。realm と転送先への問い合わせは、束に書かれた host の予算に数える。1 回の観察の中の問い合わせは 1 本ずつ
+  順に行うので、host ごとに同時 2 本までは常に守られる。anchor 全体の上限は anchor の process の memory に持つ（§10）。鍵は提出者の
+  公開鍵（Bearer はその鍵に束縛されている）。
+
+**漏らさない:**
+
+- 置き場所の文字列・解決した IP・応答を disk にも log にも書かない。結果の cache は持たない。
+- 問い合わせの層の境界で例外をすべて受け止め、決まった符号（`timeout`、`tls`、`dns`、`refused`、`http_<code>`、`too_large`）だけを
+  持つ型の例外に置き換える。ライブラリの message（host 名や URL を含む）は捨てる。子 process は使わない（argv や stderr に置き場所が
+  出ない）。
+- **配備条件:** anchor の名前解決は query log を残さない resolver を使う。cloud の flow log や SNI を記録する egress の proxy を置くなら、
+  置き場所の host 名がそこに残ることを受け入れたと §10 に書く。
+
+問い合わせそのものは、宛先の持ち主に「GenomicsChain の IP からこの置き場所が引かれた」ことを知らせる。これは避けられない。
+
+#### (6) 記録 — `prov_reachability`（record_version 0.1）
+
+**顧客が署名する欄（署名される同一性）:**
+
+```
+subject_ref               "prov-reach:sha256:<bundle_digest>"   〔実装 10-18、operator: prov の記録の prov:sha256: と形をそろえた〕
+prov_proof_ref            sha256(prov の記録の proof_id)
+bundle_digest             点検した束（anchor が計算し直す）
+reachability_rule         gc-reachability-0.1（(4) の結果の段と host の一覧、(5) の関門と予算を含む）
+scope                     "environment"
+observation_nonce         提出ごとの 32 bytes の乱数（hex）
+```
+
+prov の記録の proof_id そのものは署名の外の引数で渡し、記録には載せない〔査読 r1: r2 の (3) は「proof_id に署名する」と書き、(6) と
+食い違っていた〕。base の §10-14 で proof_id は prov の記録を読む鍵なので、観察の記録を読める者に渡さない。両方の proof_id を持つ
+検証者は、`prov_proof_ref` で二つの記録のつながりを確かめられる。
+
+**anchor が決める欄（anchor の proof の署名で守られる）:**
+
+```
+observer                  "anchor"（顧客側の観察は (9) で "customer"）
+observed_at               anchor が問い合わせを終えた時刻（UTC）
+checker                   {gc_prov_reach の版, アダプタの版}
+same_signer               prov の記録と同じ鍵か
+counts                    分類（containers, software, workflow_repository, workflow_commit, runtime）ごとに
+                          items: 項目の数
+                          distinct: 異なる置き場所の数、と結果の段ごとの数
+                            {digest_match: {public_registry, other_host}, exists: {public_registry, other_host},
+                             access_denied, not_found, error, not_attempted, not_checkable}
+backing                   gc-backing-0.1 の札（下）: counts は anchor_observed、prov の記録との照合は procedure_checked
+not_checked               5 項目（下）
+```
+
+**札の語彙 `gc-backing-0.1` はこの改訂で定める**〔査読 r1: r2 では未承認の Tier 3 段階 0 の草案にだけ定義があった〕。base 設計の §6.3 に
+置き、Tier 3 段階 0 はここを引く。core に定数として置く（二つの package が使うため）。
+
+| 札 | 意味 |
+|---|---|
+| `procedure_checked` | GenomicsChain の手順が、記録や提出された材料から導き直した |
+| `anchor_observed` | GenomicsChain の anchor が自分の位置から観察した。導き直せない、日付つきの観察 |
+| `customer_signed` | 宣言した鍵で署名された申告が存在する（誰が言ったか） |
+| `customer_stated` | 申告の中身（何を言ったか） |
+| `not_checked` | 誰も確かめていない |
+| `platform_audit_log`・`hardware_attested` | 予約（Tier 3 の段階 1・2） |
+
+**`not_checked`（record_version 0.1 で固定）:** `reachability_from_other_networks`（anchor の位置から見た結果）、`content_not_fetched`
+（中身は取り寄せていない。digest_match も相手の答え）、`answerer_independence`（`other_host` の答えは、束を書いた本人の server のもの
+でありうる）〔査読 r1〕、`buildability`（組み立ててはいない、③）、`future_reachability`（将来も取れることは言わない）。
+
+**記録に載せないもの:** 置き場所の文字列、解決した digest や IP、応答、host 名、prov の記録の proof_id、項目ごとの結果。prov の記録の
+`not_checked: locator_reachability` はそのまま残す（prov の記録自身は点検していない）。
+
+**検証者の表示〔査読 r1〕:** 分類をまたいだ合計や、`digest_match` と `exists` を足した数は**出さない**。結果の段ごとに一行ずつ、段の意味を
+添えて出す。`observer`、`same_signer`、`observed_at` と観察からの日数を必ず出す。次の文を置く:
+> この観察は、GenomicsChain の anchor が、記録の日時に、自分のネットワークの位置から問い合わせた結果です。中身を取り寄せては
+> おらず、「同じ指紋で存在する」も置き場所の側の答えです。公開の registry 以外の答えは、束を書いた本人の server のものでありえます。
+> 組み立てられることも、将来も取れることも示しません。
+
+#### (7) 記録の土台 — 寿命、claim、idempotency、読み口〔査読 r1〕
+
+| 何 | 決め | 理由 |
+|---|---|---|
+| 寿命 | `proof_ttl` = 3,153,600,000 秒（100 年、prov と同じ） | 指定しないと Synoptis の既定 86,400 秒で、観察は翌日に `expired` と読まれる（記憶 `synoptis-proof-ttl-hazard`）。観察の新しさは `observed_at` で読み、寿命では読まない |
+| claim | `prov-reach:<reachability_rule>:<bundle_digest>:<submission_key>` | Synoptis は (attester, subject_ref, claim) が同じ proof を二度作らず、core は既存の proof_id を返す。数が同じ二つの観察が一つにまとめられないよう、提出ごとに変わる submission_key で終える。〔凍結 10-17〕r3 の「`existing` が返ったら失敗として扱う」は消した——spec の hook は store の状態を受け取らず（`submit_core.rb` 92–109 行）、claim が提出ごとに変わるので、この型では `existing` に届かない |
+| idempotency key | `sha256(submission_key)` | core の分岐（`submit_core.rb` 240 行、今は `prov_attestation` だけ）を、**新しい型を列挙する一覧**にする（初めは `prov_attestation` と `prov_reachability`）。既定の枝（Tier 1〜4）は一文字も変えない |
+| 読み口 | 公開の読み口（`place_extension.rb` 73 行、今は `prov_attestation` だけ）と `Verifier#unreadable_reason` に `prov_reachability` を足す〔実装 10-18: `unreadable_reason` には足さず、`gc_prov_verify` が `record_type` で観察の検証器 `ReachVerifier` を選ぶ（§8）〕 | |
+| 登録 | `genomicschain_prov/skillset.json` の `anchor_profile_tool_classes` に `gc_prov_reach`、client の `scripts/gc_submit_client.rb` に `--tier prov-reach` | 今の client は tier1・tier2・prov だけを知る |
+| prov_proof_ref | core の小さな関数一つ（`sha256(proof_id)`）。Tier 3 段階 0 も同じ関数を使う | 同じ prov の記録を二つの草案が別の形で指さないように |
+
+#### (8) Tier 3 との関係
+
+- route B の線（§6.1 (1)）は変えない。v0.1.15 では観察を Tier 3 の関門にしない。
+- `gc_tier3_estimate` は観察の `proof_id` を渡されたら、観察の日付、`not_found`・`access_denied`・`error`・`not_attempted` の数を
+  見積もりの横に出す。〔実装 10-18、operator〕記録は、見積もりの道具が動く node の Synoptis の台帳から読む（外へは出ない）。台帳の
+  無い node では読めないと書き、見積もりだけを返す。数は分類ごとに出し、分類をまたいで足さない。GenomicsChain の側で走らせる Tier 3 では、`access_denied` の置き場所は取れない。
+
+#### (9) 後で足すもの — 顧客側の観察（`observer: "customer"`）
+
+顧客の手元の道具（仮称 `gc_prov_reach_local`、網なしの `gc_prov_check` とは別）が同じ表で問い合わせ、数を署名して出す。札は
+`customer_stated`。顧客の認証でだけ届く私設の registry と、Tier 3 段階 0 のために要る。記録の形は (6) と同じ。この改訂では作らない。
+
+#### (10) 既にあるものとの関係
+
+| 既にあるもの | 影響 | 根拠 |
+|---|---|---|
+| prov の記録（0.3、v0.1.14 の 0.4） | 無し | 別の記録として重ねる |
+| アダプタ・述語・資源の規則・ZK の検証・`gc_prov_check` | 無し | 読むだけ、または触れない |
+| core の SubmitCore | **変える**: idempotency key の分岐を新しい型の一覧に、札の語彙と `prov_proof_ref` の関数を足す | (7) |
+| 公開の読み口・検証器・client | **変える** | (7) |
+| 第 2 回の自己検査・ZK の実演・論文 | やり直し不要 | 論文の Tier 2.5 の記述は `8091516` に固定され、この観察を述べていない |
+
+**受け入れの test:**
+
+- (i) prov と core の既存の test がすべて緑。(ii) prov の記録の schema に差分が無い。
+- (iii) `gate` の test はネットワークに出ない（HTTP・DNS を差し替える）。次の宛先がすべて拒まれる: `0.0.0.0`、`127.0.0.1`、
+  `100.100.100.200`、`169.254.169.254`、`[::ffff:169.254.169.254]`、`[64:ff9b::a9fe:a9fe]`、`[2002:a9fe:a9fe::]`、`[::1]`、`[fd00::1]`、
+  `10.0.0.1`、`198.18.0.1`、anchor 自身の名前、`https://user:pw@host/`、`https://host:6379/`。A は公開・AAAA は私設、の名前も拒まれる。
+  realm の URL と redirect 先に私設の宛先を返す registry の差し替えで、二度目の問い合わせが起きない。
+- (iv) 7 つの結果の段と、host の種類、予算（200、host ごと public_registry 100・それ以外 20〔凍結 10-17〕、遮断、同時実行）がすべて出る。
+- (v) 署名の無い呼び出し・Bearer の違う呼び出し・dry_run・同じ署名の再送で、外への問い合わせが 0 回。
+- (vi) 束・置き場所・prov の proof_id・ライブラリの例外の message（host 名を含む差し替え）が log に現れない。
+- (vii) 同じ束・同じ鍵の 2 回の提出が 2 つの記録になり、counts が同じでも別の proof_id になる。
+- (viii) **idempotency key の非退行**: core を変える**前に**、Tier 1・2・3・4 と prov の記録について、新しい提出と回復の両方の道で
+  idempotency key を fixture に取っておき、変えた後も同じであることを確かめる（今の test で値を固定しているのは prov だけ。Tier 2 は
+  「違う」ことしか確かめていない〔反証 r2〕）。
+- (ix) 24 時間を過ぎた観察の記録が `expired` と読まれない。
+
+#### (11) 版 — core の版の表（三つの草案で共有する）〔査読 r1〕
+
+| core の版 | 中身 | どの改訂が運ぶか |
+|---|---|---|
+| 0.6.1 | 束の拡張の schema に `resources` | v0.1.14 |
+| 0.6.2 | idempotency key の分岐を新しい型の一覧に（`prov_reachability`）、札の語彙 `gc-backing-0.1` の定数、`prov_proof_ref` の関数 | v0.1.15 |
+| 0.6.3 | 一覧に Tier 3 段階 0 の型を足す（宣言・番号札・申告） | Tier 3 段階 0 |
+
+順番が入れ替わったときは、先に出す改訂が共有の変更を運び、表を書き直す。prov の package は v0.1.14 で 0.4.0、v0.1.15 で 0.5.0。
+新しい規則 `gc-reachability-0.1`、新しい記録 `prov_reachability` 0.1、道具 `gc_prov_reach` と client の `--tier prov-reach`。
+
+#### (12) 実装の順番（完了できる単位）
+
+1. R0 — idempotency key の fixture を取る（(10) の (viii)、core を変える前に）。〔2026-10-18、core を変える前に単独で commit した（54799bc）〕
+2. R1 — `gate`、結果の段、予算、例外の符号化（ネットワークに出ない。差し替えた HTTP・DNS で test）。
+3. R2 — 問い合わせ: OCI と git の ref の広告から（Tier 3 の実行に直接効く）。次に https、conda。
+4. R3 — core 0.6.2、記録の schema、verdict spec、`gc_prov_reach`、client、使い捨ての手元 anchor で端から端まで。
+5. R4 — 公開の読み口、`gc_prov_verify` の表示、`gc_tier3_estimate` の表示。
+
+#### 実装で決めたこと（2026-10-18。prov 0.5.0、core 0.6.2、tier3 0.5.2）
+
+凍結後の実装の待ち行列（L2 `handoff_tier25_v0114_v0115_implementation_20261017` § v0.1.15）のうち、operator に尋ねた 6 件（上の
+〔実装 10-18、operator〕）と、規則の空白を埋めた細部。新しい署名欄は足していない。足した設定は anchor 自身の名前と住所の 3 つの鍵だけ
+（(5) の関門の段 2 と、待ち行列の operator の拒否一覧が求めていたもの）。
+
+| 何 | 決めたこと | 根拠 |
+|---|---|---|
+| 関門の細部 | URL の host が数字で終われば（`127.1`、`0x7f000001`、`0177.0.0.1`、`2130706433` を含む）IP の直書きとして、名前を引く前に拒む（URL の標準の判定）。点の無い名前（`localhost` など）と ASCII でない名前も拒む（IDNA には変換しない）。名前は末尾に点を付けた絶対名で引き、検索ドメインも `/etc/hosts` も使わない。埋め込みの IPv4 を取り出すのは IPv4-compatible と NAT64 の二つだけ——IPv4-mapped と 6to4 は特別な範囲の表が丸ごと拒むので、取り出した住所は判断を変えない。IANA の表は 2026-10-18 の CSV（sha256 は code に残した）から、Globally Reachable が True でない行（空欄の廃止行を含む）すべて。True の小さな範囲が拒む範囲の内側にあれば拒む（拒みすぎる向き） | 変異の検査で、mapped と 6to4 の取り出しが判断に効いていないと分かった |
+| 問い合わせの形 | OCI: manifest に HEAD、Accept に 4 つの manifest の型。401 の Bearer の challenge に realm があれば匿名の token を一度取り（転送と同じ回数に数える）、もう一度 HEAD。200 には manifest の型の Content-Type を要る。digest で名指して、答えの digest が同じなら digest_match、答えに digest が無ければ exists、違えば error。git: ref の広告を GET（8 MB まで、超えたら not_attempted）。Content-Type と最初の行（`# service=git-upload-pack`）と pkt-line を厳しく読む。commit は 40 か 64 桁の hash が ref の先端（剥いた tag を含む）にあれば digest_match、無ければ not_checkable。7〜39 桁の短い hash は点検できないので not_checkable。hash でない名前は、そのまま・`refs/heads/`・`refs/tags/` の下で探し、無ければ not_found。https: HEAD、405 か 501 なら 1 byte の Range GET（本文は読まない）、2xx なら exists。conda: 版の API に HEAD | (4) の表の実装。公開の相手 14 か所で確かめた（下） |
+| 点検しない置き場所 | runtime と software で、URL でも conda の完全な指定でもないもの（道具の名前だけ、path）は not_checkable。image として Docker Hub に問い合わせない | 道具の名前を Docker Hub に送ってしまうのを避ける |
+| 答えの読み方 | 名前が引けない → not_checkable。401・403 → access_denied。404 → not_found。それ以外の HTTP、時間切れ、TLS、形の崩れた応答 → error。遮断に数えるのは時間切れと 5xx だけ（429 と 404 は数えない）。この層の中の予期しない誤りも error に数え、文言は捨てる | (4)(5) |
+| 読み手 | Ruby の Net::HTTP は使わない（header の大きさに上限が無く、期限が読み取り 1 回ごと）。固定した住所に TLS でつなぐ HTTP/1.1 の読み手を書いた。header は 64 KiB・100 行まで、名前を引くところから最後の 1 byte までを一つの期限で縛る。本文は求めたときだけ読み、伸長した後の bytes で数える（伸長は少しずつ行い、圧縮爆弾を一度に展開しない）。proxy の環境変数は読まない | 待ち行列 D2 |
+| 記録と提出 | 提出者が識別の欄に server の決める欄を混ぜても、識別の照合（知らない欄は拒む）が先に断る。観察は `server_set_fields` の中だけで走る。重ねる先の prov の記録の proof_id を拒否の文言に出さない。同じ署名の再送は台帳の照合で回復を返し、何も問い合わせない。回復の応答には「項目ごとの結果は残していない」と書く。anchor が忙しくて断ったときは nonce を戻すので、同じ署名で後から出し直せる。署名する欄は client と anchor が同じ関数（`Reach::SignedParams`）で作る | 待ち行列（記録） |
+| 検証者 | `gc_prov_verify` は、署名された evidence の `record_type` で検証器を選ぶ（待ち行列 D1）。表示は §8 の末尾 | (6) の検証者の表示 |
+| 公開の読み口 | `prov_reachability` の記録も返す。ほかの記録は今までどおり、知らない id と同じ返事 | (7) |
+| 査読 r1 で直したこと（2026-10-19） | 圧縮の流れが終わった後に続く bytes は拒む（zlib はそれを伸長も計上もせずに抱え込む）。期限は待つときだけでなく読むたびに確かめる。header や区切りの行が上限を超えた応答は「形の崩れた答え」（error）にし、`too_large` は本文が上限を超えたときだけにする（git の広告の `not_attempted` はこれだけを指す）。名前を引く時間は nameserver の数で割る（Resolv は nameserver を一つずつ待つ）。registry は URL として読んだ host で数え、分け、問い合わせる（`quay.io:443`、末尾の点、大文字は同じ host。`?` と `#` を含む registry は拒む）。conda の点だけの部分は拒む。60 秒の予算に削られた問い合わせの時間切れは `not_attempted` で、host の失敗に数えない。拒否（名前が引けない等）は失敗の連続を断つ。realm の 401・403 は `access_denied`、それ以外の realm の答えは image の答えにしない（error）。`own_addresses`・`denylist` に IP でも CIDR でもない項目があれば、道具は何も観察せずに止まる。anchor 全体の上限は class を読み込むときに一つ作る。識別の照合の文言は、識別に無いはずの鍵を数だけ言い、名前を出さない | 査読 r1（安全・正しさ・互換性の 3 persona、codex、Sonnet、cursor、Fable） |
+| 査読 r2 の後に直したこと（2026-10-19） | realm の 5xx は `http_5xx` のまま返す（error のまま、host の失敗にも数える。r1 の修正で「拒否」と同じ扱いになり、止まっている token の server に上限まで問い合わせていた）。観察の検証器の出力は、観察の文の後に §6.1 の (a)(b) の 2 文を置く | 査読 r2（N2）、r1（G22）、operator 2026-10-19 |
+
+受け入れの確認（2026-10-18）: (i) prov・core・tier2・tier3 の test がすべて緑（core の 2 本は以前と同じ環境の前提で落ちる）。(ii) prov の
+記録の schema（0.3・0.4 の二つのファイル）は変わっていない。(iii)〜(vii)・(ix) は test（`reach_test.rb`、`reach_prober_test.rb`、
+`reach_transport_test.rb`、`reach_submit_test.rb`）。手元の TLS の server で、終わらない header、1 byte ずつの垂れ流し、圧縮爆弾、Range を
+無視する相手、大きすぎる広告を再現した。(viii) は R0 の fixture（`genomicschain_core/test/fixtures/idempotency_keys_r0.json`、core を
+変える前に commit）で、core 0.6.2 の後も 5 種類すべて一致。公開の相手 14 か所への読むだけの確認（2026-10-18）: Docker Hub（token を
+取ってから）exists、quay.io の tag は exists・digest は digest_match・存在しない digest は not_found、ghcr.io の存在しない repository は
+access_denied（403）、Wave は exists、GitHub の repository は exists・先端の commit は digest_match・nf-core の fixture の commit は
+not_checkable（先端に無い）・存在しない repository は access_denied（401）、配布ページと配布物は exists、anaconda は exists と not_found。
+変異の検査（R1〜R4 で 41・51・27・23 個）で test の不足を埋め、判断に効いていないコードを消した。わざと残した「同じ結果になる変異」は
+5 つ（明示した拒否を外しても、後ろの別の確認が偶然同じ入力を拒むもの）。
+
 ## 7. 道具と置き場所
 
 | tool / script | 置き場所 | 動く場所 | 網 | 何をするか |
@@ -761,7 +1091,9 @@ jobspec_digest に触れていない）ので、資源の欄は Tier 3 の同一
 | `gc_prov_check` | `genomicschain_prov/bin/`（`tools/` には置かない: `Skillset#load!` が `tools/*.rb` をどの node でも eager に require するので、CLI の option parse が anchor の起動時に走る——round 3） | 顧客の workstation（off-anchor） | 使わない | 束を読み、digest・等級・数・`signed_params` を出す。`--json` で機械可読 |
 | `gc_submit_client.rb --tier prov` | `scripts/`（既存に 1 tier 足す） | 顧客の workstation | anchor へ HTTPS | `signed_params` に署名して `gc_prov_submit` を呼ぶ。`--dry-run` / `--print-only` は既存のまま |
 | `gc_prov_submit` | `genomicschain_prov/tools/`（prov の `skillset.json` の `anchor_profile_tool_classes`。core の登録を汎用化して読む） | anchor のみ | — | Tier-2 submit と同じ骨。ただし束の gate は §6 の Gate A。`dry_run` で `signed_params` を返す |
-| `gc_prov_proof` | `genomicschain_prov/lib/genomicschain_prov/place_extension.rb`——MCP tool ではなく **Meeting Place の公開 route**。prov の `skillset.json` の `place_extensions[]` に `{class, require, public_routes: ["/place/web/prov/"]}` を書き、Hestia の `PlaceRouter#register_extension(public_routes:)` が `/place/web/prov/proof/<proof_id>` を **認証なし・GET/HEAD のみ・公開 rate limiter つき**で Bearer の前に dispatch する（round 3 で実物を読んだ: MCP の `tools/call` は body を読む前に Bearer を検査し、anchor では service_grant の AccessGate も重ねてかかるので、tool として登録しても 1 本だけ認証の外には出せない） | anchor のみ（Meeting Place が動いている node） | — | `proof_id` → registry の envelope。**返すのは次の欄だけ**: `proof_id, version, attester_id, subject_ref, claim, evidence`（canonical JSON の文字列 `{manifest, manifest_body_sha256}` そのまま）`, merkle_root, timestamp, ttl, submitter_pubkey, signature` に、`evidence` を parse した `manifest` と registry の `revoked` を足す。`actor_user_id`（Bearer の `--user` 名）・`actor_role`・`metadata` は**返さない**（署名の外の欄で、検証に要らず、顧客の token 名を漏らす——round 3、3 席）。`manifest.record_type` が `prov_attestation` でなければ not found と同じ返事（registry は全 tier で 1 本の `proofs.jsonl`。Tier-2 の manifest は repo の URL を hash せずに持つ——round 3、codex と verifier）。既存の `attestation_verify` は `valid / errors / content_hash / checked_at / proof_id` を返すだけで evidence を返さず、`attestation_list` は要約だけなので、第三者は manifest を読めない（round 2 の P0）。この route が §8 の第一段の材料。**extension の契約**（Hestia `PlaceRouter` が要求する、round 4）: `initialize(router)`、`public_call(env) → Rack の三つ組か nil`、`call(env, peer_id:) → nil`、`public_route_prefixes → ['/place/web/prov']`（`skillset.json` の `public_routes` は記録、class 側の列挙が `meeting_place_start` 経由の再登録でも効く）。見つからない・prov でない → HTTP 404 に JSON `{"error":"not_found"}`（extension 自身が組む。`public_call` が nil を返すと router の既定 404 は text/html）。rate limit は Hestia の公開 limiter: **30 requests/分 / client IP**、skillset catalog と共有 |
+| `gc_submit_client.rb --tier prov-reach`（v0.1.15） | `scripts/` | 顧客の workstation | anchor へ HTTPS | `Reach::SignedParams` で署名する欄を作り（毎回新しい `observation_nonce`）、prov の記録の proof_id を署名の外に添えて `gc_prov_reach` を呼ぶ |
+| `gc_prov_reach`（v0.1.15） | `genomicschain_prov/tools/`（`anchor_profile_tool_classes`） | anchor のみ | 置き場所へ HTTPS（§6.3 の関門と予算の内側） | §6.3 の観察を記録する。`dry_run` は何も問い合わせず、proof_id も引かない |
+| `gc_prov_proof` | `genomicschain_prov/lib/genomicschain_prov/place_extension.rb`——MCP tool ではなく **Meeting Place の公開 route**。prov の `skillset.json` の `place_extensions[]` に `{class, require, public_routes: ["/place/web/prov/"]}` を書き、Hestia の `PlaceRouter#register_extension(public_routes:)` が `/place/web/prov/proof/<proof_id>` を **認証なし・GET/HEAD のみ・公開 rate limiter つき**で Bearer の前に dispatch する（round 3 で実物を読んだ: MCP の `tools/call` は body を読む前に Bearer を検査し、anchor では service_grant の AccessGate も重ねてかかるので、tool として登録しても 1 本だけ認証の外には出せない） | anchor のみ（Meeting Place が動いている node） | — | `proof_id` → registry の envelope。**返すのは次の欄だけ**: `proof_id, version, attester_id, subject_ref, claim, evidence`（canonical JSON の文字列 `{manifest, manifest_body_sha256}` そのまま）`, merkle_root, timestamp, ttl, submitter_pubkey, signature` に、`evidence` を parse した `manifest` と registry の `revoked` を足す。`actor_user_id`（Bearer の `--user` 名）・`actor_role`・`metadata` は**返さない**（署名の外の欄で、検証に要らず、顧客の token 名を漏らす——round 3、3 席）。`manifest.record_type` が `prov_attestation` でなければ not found と同じ返事（v0.1.15 から `prov_reachability` も返す）（registry は全 tier で 1 本の `proofs.jsonl`。Tier-2 の manifest は repo の URL を hash せずに持つ——round 3、codex と verifier）。既存の `attestation_verify` は `valid / errors / content_hash / checked_at / proof_id` を返すだけで evidence を返さず、`attestation_list` は要約だけなので、第三者は manifest を読めない（round 2 の P0）。この route が §8 の第一段の材料。**extension の契約**（Hestia `PlaceRouter` が要求する、round 4）: `initialize(router)`、`public_call(env) → Rack の三つ組か nil`、`call(env, peer_id:) → nil`、`public_route_prefixes → ['/place/web/prov']`（`skillset.json` の `public_routes` は記録、class 側の列挙が `meeting_place_start` 経由の再登録でも効く）。見つからない・prov でない → HTTP 404 に JSON `{"error":"not_found"}`（extension 自身が組む。`public_call` が nil を返すと router の既定 404 は text/html）。rate limit は Hestia の公開 limiter: **30 requests/分 / client IP**、skillset catalog と共有 |
 | `gc_prov_verify` | `genomicschain_prov/bin/`（同上） | 検証者（GenomicsChain または第三者） | anchor の `gc_prov_proof` route を GET | 束 + proof_id → envelope を取る → digest・等級を再計算 → manifest と照合 → 提出者の署名（と、鍵があれば anchor の署名）を**手元で**検証 → 「確かめたこと／確かめていないこと」（§8） |
 | `gc_zk_verify`（v0.1.12） | `genomicschain_prov/zk_verifier/`（Rust の crate。`Cargo.toml` と `Cargo.lock` を repo に置き、`risc0-zkvm` を 3.0.6 に固定。記憶 `skillsets-ruby-first` の「他言語は避けられないときだけ、lock で固定」の適用——RISC Zero の検証は Rust にしか無い）。Ruby 側の呼び口は `lib/genomicschain_prov/zk_verifier.rb`（実行 file の場所は環境変数 `GC_ZK_VERIFY_BIN`、無ければ crate の `target/release/gc_zk_verify`） | anchor（必須、証明つきの提出を受けるなら）、顧客と検証者（任意） | 使わない | 証明の bytes を stdin、image ID を引数で受け、§6.1 ③④ の材料を JSON 1 行で返す。証明を作る機能（prover）は持たない |
 
@@ -792,7 +1124,7 @@ attestor に渡す。(3)(4) は nil なら engine の既定に落ちるので Ti
 
 | Node | Packages | anchor_profile | 使う tool |
 |---|---|---|---|
-| anchor | core + tier1 + tier2 + tier3 + **prov**、＋ `gc_zk_verify` の実行 file（v0.1.12。anchor の Docker image に Rust の build 段を足して作る。HTTP の request body 上限は束 2 MB ＋ 証明 4 本の base64 で **5 MB 以上**——§6 の Gate A の配備条件を置き換える） | true | `gc_prov_submit` |
+| anchor | core + tier1 + tier2 + tier3 + **prov**、＋ `gc_zk_verify` の実行 file（v0.1.12。anchor の Docker image に Rust の build 段を足して作る。HTTP の request body 上限は束 2 MB ＋ 証明 4 本の base64 で **5 MB 以上**——§6 の Gate A の配備条件を置き換える） | true | `gc_prov_submit`、`gc_prov_reach`（v0.1.15） |
 | 顧客 workstation | core + tier2 + **prov**（ZK 証明を自分で確かめたいときだけ `gc_zk_verify`） | false | `gc_prov_check`, client |
 | 検証者 | core + tier2 + **prov**。core の depends_on が synoptis を、synoptis の depends_on が mmp を**要求する**（自動では入らない。install + enable の順は mmp → synoptis → core → tier2 → prov）。anchor の署名検証は `Synoptis::Verifier` と `MMP::Crypto`、提出者の署名検証は `ed25519` gem（`gem install ed25519`、README） | false | `gc_prov_verify` |
 
@@ -879,6 +1211,14 @@ Synoptis の engine と Verifier の語彙をそのまま使い、検証者が�
 第三者は proof の anchor 署名を自分で検証できない（記憶 `warranty-scope` の GxP 前 2 件の ①）。v0.1 の `gc_prov_verify` は
 鍵が無ければ「anchor-reported」と書き、公開鍵の配布は別件として起票する（§10-3）。提出者の公開鍵も同じ: 顧客が検証者に
 束と一緒に渡すか、`--submitter-pubkey` で別経路から渡す。manifest 内の鍵は自己申告。
+
+**観察の記録（v0.1.15、§6.3）。** `gc_prov_verify` は、取ってきた記録の `record_type` を署名された evidence から読み、
+`prov_reachability` なら観察の検証器（`ReachVerifier`）で読む。確かめるのは束の digest と名前、manifest の本体、6 つの署名欄から
+組み直した submission_key と claim、提出者の署名、そして `--prov-proof-id` を渡されたときに重ねる先の prov の記録とのつながり
+（`prov_proof_ref`）。数・観察の日時・同じ署名者かは「anchor が言うこと」に置く——anchor の鍵で確かめられるのは anchor がそう言った
+ことであって、置き場所がそう答えたことではない。表示は §6.3 (6) の規則のとおり: 分類をまたいだ合計と digest_match＋exists の和は
+出さず、分類ごとに段ごとに 1 行ずつ意味を添え（0 の段は出さない）、観察からの日数を出し、最後に (6) の文と §6.1 の (a)(b) の 2 文を置く（査読 r1 G22、operator 2026-10-19: 2 文はすべての検証道具の
+出力に置く）。
 
 ## 9. 実装の順番（完了できる単位、Principle 1）
 
@@ -968,6 +1308,48 @@ U0〜U5 が v0.1。U0 を先にするのは、アダプタの欄名を実物で�
   `-` になる。slim な image には `/usr/bin/time` が無いことが多く、bash の `time` には `-v` が無い。古い GNU time（1.7）は最大メモリを
   約 4 倍に出すと二つの査読が述べた（未確認。出力に版が出ないので、版を確かめる手順を書く）。Snakemake の benchmark は job ごとの
   file で、段との対応は (2) の集め方に従う。
+
+**v0.1.15 で足した未決（§6.3、2026-10-16 の草案のまま）。**
+
+- 観察を Tier 3 の関門にするか、するなら線をどこに引くか（日付の新しさ、`not_found` と `access_denied` の数）。
+- 先端でない git の commit を確かめるか（smart HTTP の fetch で `want <commit>` を送り、packfile の前で止める。未検証）。GitHub の API を
+  使うなら匿名の上限は IP ごとに 1 時間 60 回で、anchor では全顧客が共有する。token を anchor に持たせるかは operator の判断。
+- quay.io・ghcr.io での振る舞いは 2 回目の反証で一部確かめた〔反証 r2〕: 存在しない repository に quay.io は token があっても 401、
+  ghcr.io は 403、どちらも存在する image の HEAD は `Docker-Content-Digest` を返す。index と manifest の型の Accept は未確認。
+- HPC で多い Singularity / Apptainer の image〔査読 r1、反証 r2 で直した〕: 補完器は `docker run` / `podman run` の行から image を読み
+  （`nextflow_run.rb` 109 行）、無ければ trace の `container` 列に戻る（`image_by_step` 346–361 行 → `trace_image` 372–378 行）。既定の
+  trace には `container` 列が無いので、手順書で `trace.fields` に `container` を加えるよう勧める。Singularity の container の文字列が
+  `docker://…` でなく file の path なら、置き場所は local_path になる。
+- `public_registry` の一覧の見直し。
+- 入力（データ）の置き場所を対象にするか。
+- ③ 実際に組み立てられるか。Tier 3 段階 0 の準備との境界。
+- 顧客側の観察 (9) を作る時期。
+- 本番の anchor で Synoptis の `attestation_list`（subject_ref で絞れる）が顧客の Bearer から呼べるかを確かめる。呼べるなら、
+  `bundle_digest` を知る者が prov の記録を引けることになる（v0.1.15 が新しく作る問題ではないが、観察の記録も `bundle_digest` を載せる）。
+- 配備条件（(5) の resolver の query log、flow log、egress の SNI）の受け入れ。
+- 参照ゲノムの特定と乱数の種（prov の `not_checked` の残り）は、この改訂の外。
+
+**v0.1.15 の実装で名前を付けて残したもの（2026-10-18）。**
+
+- 観察をまたいだ予算——host ごとの回数、429 を受けたときの anchor 全体の停止、realm と転送先をそれぞれの host に数えること——は
+  足していない（operator 2026-10-18）。顧客が増えたら、実際の観察の数を見てから決める。
+- anchor 全体の上限（同時 2、鍵ごとに同時 1・1 日 24）は process の memory にある。再起動で 1 日の数を忘れ、複数の process で
+  動かせばその数だけ許す。配備条件として 1 process で動かす。
+- 名前を引いて時間切れになっても、名前が引けないのと同じ not_checkable になる（Ruby の Resolv が二つを分けない）。
+- 先端に無い commit は not_checkable。2026-10-18 の時点で、repository の nf-core の fixture の commit（`555d145b…`）がそうだった——
+  nf-prov が書く commit は、run の後に branch が進めば先端から外れる。上の「先端でない git の commit を確かめるか」は、この実例で
+  重みが増した。
+- 公開の registry の一覧の見直し（査読の候補: auth.docker.io、objects.githubusercontent.com、depot.galaxyproject.org、
+  community-cr-prod.seqera.io）は、種類を束に書かれた host で決めることにしたので、realm と転送先のためには要らなくなった。束に
+  直接書かれる host として要るかは、実物の束を見て決める。
+- 配備条件（観察が最長 60 秒かかるので、anchor の HTTP の request の時間切れをそれより長くする）。
+- 配備の順番〔査読 r1〕: core 0.6.2 を prov 0.5.0 より先に入れる。gem はどの node でも `tools/*.rb` を読み込み、core 0.6.1 の上では
+  この道具の `genomicschain_core/backing` の require が `LoadError` になる。gem の読み込みはそれを受け止めないので、その node では
+  どの道具も登録されず、HTTP の server も起動しない〔査読 r2 で再現〕。
+- 観察中の提出と同じ署名の再送は、SubmitCore の鍵ごとの排他で観察が終わるまで（最長 60 秒）待つ。anchor 全体の上限の外にある〔査読 r1〕。
+  待ちは試行ごとで、観察の記録が失敗すると nonce が戻り、次に待っていた再送がもう一度観察する〔査読 r2〕。
+- `own_names` と `own_addresses` は既定で空で、空のままだと関門は anchor 自身の公開された名前と住所を断らない（IANA の特殊用途の範囲は、
+  私設と loopback を含めて常に断る）。本番の anchor では両方を設定する〔査読 r1 G20、operator 2026-10-19: コードは変えず、配備で設定する〕。
 
 ## 11. デモ → 設計の対応表
 
@@ -1141,6 +1523,7 @@ registry の形のときだけ image、checksum の経路には locator が要�
 
 | 版 | 日付 | 何が変わったか |
 |---|---|---|
+| v0.1.15 | 2026-10-16 | **凍結後、五つ目の個別改訂。** operator の決定（Tier 3 の実行可能性のため、環境の置き場所から今も取れるかを ZK とは別に点検する。anchor の側を先に作る。版の順は v0.1.14 資源 → v0.1.15 この改訂 → v0.1.16 ZK の秘密）。新しい §6.3。anchor 側の道具 `gc_prov_reach`（束を verbatim で受け、memory でだけ持ち、署名の確認の後に、環境の置き場所——containers・software・git の repository と commit・runtime——に中身を取り寄せずに問い合わせる。git は子 process を使わず smart HTTP の ref の広告で）、異なる置き場所を一度だけ問い合わせ、項目と異なる置き場所の二つの単位で数える。結果 7 段（digest_match / exists / access_denied / not_found / error / not_attempted / not_checkable）、答えた host の種類（public_registry / other_host）。一つの関門 `gate`（https・443 だけ、userinfo を拒む、すべての A/AAAA を IANA の特別用途の範囲で判定、埋め込みの IPv4 を取り出す、IP を固定し SNI と証明書の検証を保つ、proxy なし。置き場所・realm・redirect に同じく通す）、壁時計の期限と伸長後の大きさの上限、host ごと・鍵ごと・全体の予算、例外の符号化、子 process なし。新しい記録 `prov_reachability` 0.1（prov の記録の上に重ね、分類ごとの数と日時だけ。prov の proof_id は SHA-256 だけ。数の中身では拒否しない。署名される nonce で再提出を新しい観察にする。claim は submission_key で終える。寿命 100 年）、規則 `gc-reachability-0.1`、`not_checked` 5 項目、札の語彙 `gc-backing-0.1` をここで定める。core 0.6.2（idempotency key を新しい型の一覧で、札の定数、prov_proof_ref の関数）、公開の読み口と検証器と client に新しい型を足す。prov の記録・アダプタ・述語・資源の規則・ZK の検証・route B の線は変えない。顧客側の観察（`observer: customer`）は同じ形で後から |（2026-10-18 実装: prov 0.5.0、core 0.6.2、tier3 0.5.2。operator の決定 6 件——答えた相手の種類は束に書かれた host、問い合わせの順を repository から、観察をまたいだ予算は足さない、記録の名前を `prov-reach:sha256:`、取り消された prov の記録は拒否、Tier 3 の見積もりは node の台帳から——と規則の空白を埋めた細部は §6.3 の「実装で決めたこと」）|
 | v0.1.14 | 2026-10-14 | **凍結後、四つ目の個別改訂。** operator の決定（計算資源の記録、案イ、GPU の型番を記録に）。束の拡張 `resources`（`machine` と段ごとの `steps[]`。取り込み口は道具ごと——Nextflow の trace、Snakemake の benchmark、GNU time、汎用 file、plan——で、等級は共通の形だけから出す）、新しい規則 `gc-resources-0.1` による `grade_resources`（absent < partial < steps < full、全段の最弱、段の無い束は多くて partial、`grade_overall` には入れない）、署名欄 9 つ（値の出どころ 3 欄を含む。GPU の型番は anchor の導出で絞る）、`not_checked` 10 項目、`record_version` 0.4。アダプタ 0.4.0 と述語 0.3.7 は変えない（7 つの等級の規則は動かず、0.3 の記録は新しい検証器でも再導出される）。検証器の再導出は、7 つの等級と資源の欄を分けて版を見る。route B の線は変えない |（2026-10-17 実装: prov 0.4.0、core 0.6.1、書き出し器 0.3.0。operator の決定 3 件——D5 はベンダー限定＋形で落とす、plan は要求値だけ、D4 は何も足さない——と規則の空白を埋めた細部は §6.2 の「実装で決めたこと」）|
 | v0.1.13 | 2026-10-12 | **凍結後、三つ目の個別改訂。** operator の決定 2 件（L2 `ruling_tier25_gate_withdrawn_20261012`）。(1) v0.1.12 の G1（immutable を発行の関門にする）を撤回: anchor はどの等級でも記録を発行し、等級を計算したとおりに載せる。`admission_rule` は `prov-admission-0.2`。`GradeBelowRequirement` を削り、schema の `grade_overall` を 6 段階に戻し、`admission_rule` は 0.1 と 0.2 の両方を許す（0.1 の記録が使い捨ての local anchor に残っているため）。検証器は記録の `admission_rule` をその名前の意味で読む。(2) Tier 3 の route B は Tier 3 の側で署名された等級を読み、D11 の元の線（`grade_overall` ≥ versioned、inputs = immutable、`outputs_with_checksum` ≥ 1）に戻す。§6.1 (1)、§8、§9 の U3・U4 の行を直した。code: prov 0.3.0（記録の欄の意味が変わり、0.2.0 の検証器は新しい記録を誤って説明するため minor を上げた）、test は prov 6 本・core・tier1/2/3・regwatch すべて緑。G2（ZK 証明の検証）は変えない |
 | v0.1.12 | 2026-10-12 | **凍結後、二つ目の個別改訂。** review の巡ではなく operator の決定 3 件（ruling `ruling_service_plan_two_stage_drive_vk_20261011` の D9・D13、L2 `ruling_tier25_gate_and_zk_verify_20261012` の G1・G2）。新しい §6.1 に集め、§6・§7・§8・§9 は該当行だけ直した。(1) immutable は発行の関門: `grade_overall` が immutable 未満の束は拒否し記録しない、server が決める欄 `admission_rule`、Tier 3 の route B もこれに合わせる。(2) CPU と OS: 束の拡張 `platform` を書き出し器が自己申告で書き（host 名は書かない、補完器は明示したときだけ）、署名欄 `platform_*` 3 つ（null 可）。(3) ZK 証明: 束の拡張 `zk_receipts[]` で宣言し、bytes は提出に添え、anchor が版固定の Rust program `gc_zk_verify`（risc0-zkvm 3.0.6）で検証し、journal の入出力 digest を束の段の入出力と照合してから記録する。記録には同一性だけ（指紋・image ID・zkVM の名前と版・段・journal の形）と server の欄 `zk_verification`。bytes と journal の値は載せない。operator は当初の選択肢文が「v0.2 に回す」と書いていた (B) を選び、追加の質問で「11/15 から」と答えた。(4) not_checked 9 項目、record_version 0.3、アダプタ 0.4.0、拡張の schema file を U3 で作る（公開は operator の判断）。(5) HTTP の body 上限 5 MB 以上。根拠の実測: succinct receipt 223,746 bytes、検証 0.012 秒、journal = (入力 file の SHA-256, 出力 bytes)（KairosChain_2026 `log/zk_demo_sizefactor_20260929/03_proofs`、`00_prereg/instances.csv` で input_sha256 = registered_commitment_sha256） |
