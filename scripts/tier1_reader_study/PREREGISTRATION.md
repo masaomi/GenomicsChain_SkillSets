@@ -223,3 +223,12 @@ registration.
   of `cells.tsv` other than that cell's count changes; the files of block 73 are kept at
   `log/tier1_reader_study_20261018/analysis_block73/`. Sensitivity (§6): without that read, every
   figure reported is unchanged except that V0 has 50 reads (D2 28 of 50).
+- **D-3 (2026-10-19, the operator's decision after review round 5 of the paper).** §7 says the raw
+  responses stay on the author's machine. They are deposited instead, with the reports, the analysis
+  files, the harness check's records and the hosted run's report, in `Tier1_reader_study_v1.0.zip`
+  with version 1.0 of the paper: they describe that paper, the fictional V0 and V1 and the fictional
+  pilot note only. Before deposit the 826 files were searched for the operator's e-mail address
+  (none found). One record of the harness check
+  (`pilot/composer25/2026-10-18T133349.562Z/attempt1.stdout`) holds the operator's home path and the
+  28-line description of this repository's own Tier-1 skill, which the default Cursor run opened
+  (§4). No read, analysis or figure changes.
