@@ -24,12 +24,14 @@ module GenomicsChainProv
   # actor_role, metadata — outside the signature, not needed to verify, and
   # the first leaks a token name (round 3, three seats).
   #
-  # Only prov records: the registry is one proofs file for every tier, and a
-  # Tier-2 manifest carries a repository URL in the clear. Anything that is not
-  # a prov_attestation answers exactly like an unknown id.
+  # Only prov records and the reachability observations laid over them
+  # (v0.1.15 §6.3 (7)): the registry is one proofs file for every tier, and a
+  # Tier-2 manifest carries a repository URL in the clear. Any other record
+  # answers exactly like an unknown id.
   class PlaceExtension
     PREFIX = '/place/web/prov'
     PROOF_PATH = %r{\A/place/web/prov/proof/([A-Za-z0-9-]{1,64})/?\z}
+    RECORD_TYPES = %w[prov_attestation prov_reachability].freeze
     RETURNED = %i[proof_id version attester_id subject_ref claim evidence merkle_root timestamp ttl
                   submitter_pubkey signature].freeze
     JSON_HEADERS = { 'Content-Type' => 'application/json', 'Cache-Control' => 'no-store' }.freeze
@@ -70,7 +72,7 @@ module GenomicsChainProv
       return nil unless envelope
 
       manifest = manifest_of(envelope.evidence)
-      return nil unless manifest.is_a?(Hash) && manifest['record_type'] == 'prov_attestation'
+      return nil unless manifest.is_a?(Hash) && RECORD_TYPES.include?(manifest['record_type'])
 
       h = envelope.to_h
       out = RETURNED.to_h { |k| [k.to_s, h[k]] }

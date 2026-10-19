@@ -12,7 +12,10 @@ Execute-only package for Tier-3 evaluation. Signing and recording live in `genom
 - `gc_tier3_execute` — run the pipeline one or more times, compare against a target if one exists,
   return `verdict_result` + `jobspec_json` for submit
 - `gc_tier3_estimate` — what a run would cost, before running it. Queries `thoa run --dry-run`
-  (spends nothing) or falls back to rates measured 2026-08-17
+  (spends nothing) or falls back to rates measured 2026-08-17. Given `reachability_proof_id` (0.5.2,
+  prov design v0.1.15 §6.3 (8)), it shows beside the estimate the observation's date and, per category,
+  the places that did not answer (not_found, access_denied, error, not_attempted), read from this node's
+  Synoptis registry; never a gate
 
 ## Two verdict axes (record 0.3)
 

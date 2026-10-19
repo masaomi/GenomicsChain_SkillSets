@@ -5,10 +5,12 @@ description: Write a pipeline's provenance bundle, or fill in one that was writt
 
 # genomicschain_prov
 
-Service (2.5) **provenance anchoring**. Prototype, v0.4.0 (writer 0.3.0, adapter 0.4.0, predicate
-0.3.7, resources rule gc-resources-0.1, record_version 0.4, admission rule prov-admission-0.2) — design
+Service (2.5) **provenance anchoring**. Prototype, v0.5.0 (writer 0.3.0, adapter 0.4.0, predicate
+0.3.7, resources rule gc-resources-0.1, record_version 0.4, admission rule prov-admission-0.2;
+reachability rule gc-reachability-0.1, record prov_reachability 0.1) — design
 `docs/design/prov_anchoring_design_v0_1.md` (frozen at v0.1.10, now v0.1.14 with four individual
-revisions), implementation units §9: U0–U5 done; v0.1.14 (computing resources) implemented.
+revisions; v0.1.15 in `docs/design/prov_v0_1_15_reachability_draft.md`), implementation units §9:
+U0–U5 done; v0.1.14 (computing resources) implemented; v0.1.15 (reachability) R0–R4 implemented.
 
 ```
         a computation ─────────┐
@@ -38,9 +40,11 @@ re-derives everything from the bundle and records identities and counts, never t
 |---|---|---|
 | `bin/gc_prov_check.rb BUNDLE [--items] [--zk-receipt F] [--json]` | customer, no network | digest, grade with reasons, the params to sign, and whether the anchor would issue a record; exit 0 / 1 / 2 |
 | `scripts/gc_submit_client.rb --tier prov --bundle F [--zk-receipt F]` | customer → anchor `/mcp` | signs the params `Identity.derive` gives and sends the bundle as the exact text checked |
+| `scripts/gc_submit_client.rb --tier prov-reach --bundle F --prov-proof-id ID` | customer → anchor `/mcp` | signs `Reach::SignedParams` (a new `observation_nonce` every run); the proof_id goes beside it, unsigned |
+| `gc_prov_reach` (MCP, anchor profile only) | anchor | the reachability observation below, recorded over the bundle's prov record; `dry_run` asks nothing |
 | `gc_prov_submit` (MCP, anchor profile only) | anchor | Gate A (2 MB, depth 32) → ZK declarations → receipt checks ①–④ → Synoptis proof, 100-year TTL. Any grade is recorded as computed (no grade gate since v0.1.13) |
-| `GET /place/web/prov/proof/<id>` (place extension) | anchor, no authentication | the envelope fields + manifest + revoked; prov records only; 404 otherwise |
-| `bin/gc_prov_verify.rb BUNDLE --proof-id ID [--anchor-pubkey PEM] [--submitter-pubkey K] [--zk-receipt F]` | anyone | CONFIRMED / THE ANCHOR SAYS / NOT CHECKED, then the two warranty statements; exit 0 / 1 / 2 |
+| `GET /place/web/prov/proof/<id>` (place extension) | anchor, no authentication | the envelope fields + manifest + revoked; prov records and their reachability observations only; 404 otherwise |
+| `bin/gc_prov_verify.rb BUNDLE --proof-id ID [--anchor-pubkey PEM] [--submitter-pubkey K] [--zk-receipt F] [--prov-proof-id ID]` | anyone | CONFIRMED / THE ANCHOR SAYS / NOT CHECKED, then the statements; exit 0 / 1 / 2. The verifier is chosen by the record's type: an observation is read by `ReachVerifier` (counts per category and result with their meanings, never summed; `--prov-proof-id` checks which prov record it is laid over) |
 | `zk_verifier/` → `gc_zk_verify` (Rust, risc0-zkvm =3.0.6, Cargo.lock) | anchor (required for receipts), optional elsewhere | `gc_zk_verify <image_id_hex> < receipt`: verifies one receipt, prints one JSON line with the journal's input digest and output sha256. Build: `cargo build --release --locked`; point `GC_ZK_VERIFY_BIN` at it |
 
 The ZK receipt checks: ① the bytes are the receipt the bundle declares; ② `Receipt::verify` against
@@ -55,6 +59,44 @@ for `--plan`, only with `--platform-of-this-machine` for a Nextflow run) and `zk
 
 When installing on an anchor, install from a copy without `zk_verifier/target/` (`skillset install`
 copies the whole directory, and a release build tree is ~330 MB).
+
+## Reachability observation (v0.1.15, design §6.3)
+
+The anchor asks the places a bundle names for its environment whether they still answer, and records
+the dated counts as a `prov_reachability` record laid over the bundle's prov record (which must exist,
+be of the same bundle and not be revoked). Nothing is fetched: a manifest's head, a git ref
+advertisement, a URL's head, a conda release's status.
+
+```
+bundle → items per category (workflow_repository → workflow_commit → runtime → containers → software)
+       → each distinct locator once → budget (200; per host 100 public / 20 other; 3 failures stop a host; 60 s)
+       → gate (https, port 443, no IP literal, every A/AAAA outside IANA special ranges, pinned, SNI, no proxy)
+       → one bucket: digest_match | exists | access_denied | not_found | error | not_attempted | not_checkable
+```
+
+`digest_match` and `exists` are split by the class of the host the bundle wrote (`public_registry`:
+the 12 hosts in `Reach::PUBLIC_REGISTRY_HOSTS`, where `docker.io` is listed as a second name for
+Docker Hub; otherwise `other_host`). The record holds counts,
+`observed_at`, `same_signer`, `prov_proof_ref` (SHA-256 of the prov proof_id) and five `not_checked`
+items; per-item results go to the submitter in the response only. The anchor's own names and addresses
+and the operator's denylist come from `genomicschain_core.yml` under `genomicschain.reach`
+(`own_names`, `own_addresses`, `denylist`). Code: `lib/genomicschain_prov/reach/` (no `Net::HTTP`; the
+HTTP/1.1 reader caps the head at 64 KiB and 100 lines and counts bodies after decompression).
+
+Named and not handled: budgets across observations (none); anchor-wide limits are in process memory
+(a restart forgets the day's counts); a commit not at a ref tip reads `not_checkable` (the nf-core
+fixture's own commit does, 2026-10-18); a nameserver timeout reads like a name that does not resolve;
+a resend of a submission still being observed waits for it (up to 60 s) outside the anchor-wide limits,
+and the wait is per attempt: when the observation's record fails, the nonce is released and the next
+waiting resend observes again (review r2).
+
+Install core 0.6.2 before prov 0.5.0. The gem loads `tools/*.rb` on every node, and on core 0.6.1 this
+tool's require of `genomicschain_core/backing` fails with a `LoadError`, which the gem's loader does not
+rescue: no tool on the node registers and the HTTP server does not start (review r1; reproduced in
+review r2). An `own_addresses` or `denylist` entry that is not an IP address or CIDR stops the tool
+before anything is observed. `own_names` and `own_addresses` are empty by default, and then the gate
+does not refuse the anchor's own public names and addresses (the IANA special-purpose ranges, private
+and loopback among them, are refused always): set both on a production anchor (operator 2026-10-19).
 
 ## Computing resources (v0.1.14, design §6.2)
 
@@ -209,7 +251,11 @@ ruby $I test/predicate_test.rb     # 33
 ruby $I test/prov_write_test.rb    # 60
 ruby $I test/resources_test.rb     # 37
 ruby $I test/prov_check_test.rb    # 6
-ruby $I test/prov_submit_test.rb   # 35  (the anchor side; needs synoptis, mmp, ed25519, json-schema)
+ruby $I test/prov_submit_test.rb   # 36  (the anchor side; needs synoptis, mmp, ed25519, json-schema)
+ruby $I test/reach_test.rb          # 32  (gate, buckets, budgets; no network)
+ruby $I test/reach_prober_test.rb   # 23  (questions per kind; real GitHub advertisement fixture)
+ruby $I test/reach_transport_test.rb # 19 (a local TLS server that misbehaves)
+ruby $I test/reach_submit_test.rb   # 22  (the observation through SubmitCore, the MCP tool, the public route, gc_prov_verify)
 ruby $I test/prov_verify_test.rb   # 20  (incl. the prov 0.3.0 record in test/fixtures/record_v0_3)
 (cd zk_verifier && cargo test --release)   # 4
 ```

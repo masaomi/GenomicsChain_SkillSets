@@ -25,7 +25,7 @@ require_relative 'genomicschain_prov/resources'
 require_relative 'genomicschain_prov/identity'
 
 module GenomicsChainProv
-  VERSION = '0.4.0'
+  VERSION = '0.5.0'
 
   # Part of the signed identity (`adapter_version`, design §6): the same bundle
   # under a different adapter version may normalise differently, so the record

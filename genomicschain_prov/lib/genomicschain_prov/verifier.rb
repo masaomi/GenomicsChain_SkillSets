@@ -63,7 +63,7 @@ module GenomicsChainProv
     def run
       @out = { 'state' => nil, 'proof_id' => @route && @route['proof_id'], 'bundle_digest' => nil,
                'confirmed' => [], 'version_note' => nil, 'resources_version_note' => nil, 'anchor_says' => [],
-               'record_notes' => [], 'not_checked' => [], 'statements' => Identity::STATEMENTS }
+               'record_notes' => [], 'not_checked' => [], 'statements' => statements }
       @out['bundle_digest'] = Identity.bundle_digest(@text)
       return not_comparable(fetch_reason) if @fetch_error || @route.nil?
 
@@ -325,7 +325,25 @@ module GenomicsChainProv
 
     # --- what the anchor says ---------------------------------------------------
 
+    def statements = Identity::STATEMENTS
+
     def anchor_lines
+      says = @out['anchor_says']
+      envelope_says
+      rule = @manifest['admission_rule']
+      says << "admission rule #{rule}: " +
+              Identity::ADMISSION_RULES.fetch(rule, 'a rule this verifier does not know (a newer anchor?)')
+      zv = @manifest['zk_verification']
+      if zv && !@zk_confirmed
+        says << "zk receipts: #{zv['receipts_verified']} verified by #{zv['verifier']} (risc0-zkvm #{zv['risc0_zkvm']}) " \
+                'and bound to their steps — anchor-reported; give --zk-receipt to check them here'
+      end
+    end
+
+    # The lines every record type shares: who witnessed it and when, its TTL,
+    # revocation, the ledger tip. Returns how the record's own fields are
+    # vouched for: by the anchor key given, or by the anchor's word.
+    def envelope_says
       says = @out['anchor_says']
       signed = anchor_signature
       where = signed ? 'confirmed with the anchor key given' : 'anchor-reported'
@@ -338,14 +356,7 @@ module GenomicsChainProv
               '(always anchor-reported: revocation is outside the signature)'
       tip = @manifest.dig('operator', 'signature', 'chain_tip_hash')
       says << "chain_tip_hash #{tip}: the anchor says it checked the submitter saw a fresh ledger tip; not verified here"
-      rule = @manifest['admission_rule']
-      says << "admission rule #{rule}: " +
-              Identity::ADMISSION_RULES.fetch(rule, 'a rule this verifier does not know (a newer anchor?)')
-      zv = @manifest['zk_verification']
-      if zv && !@zk_confirmed
-        says << "zk receipts: #{zv['receipts_verified']} verified by #{zv['verifier']} (risc0-zkvm #{zv['risc0_zkvm']}) " \
-                'and bound to their steps — anchor-reported; give --zk-receipt to check them here'
-      end
+      where
     end
 
     # nil when no key was given; true/false otherwise (and recorded as a

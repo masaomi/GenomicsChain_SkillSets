@@ -117,6 +117,12 @@ module KairosMcp
                 offline: {
                   type: 'boolean',
                   description: 'Skip the thoa query and use the measured table only (default false).'
+                },
+                reachability_proof_id: {
+                  type: 'string',
+                  description: 'A reachability observation (gc_prov_reach) of the bundle to rebuild: its date and, ' \
+                               'per category, the places that did not answer are shown beside the estimate. Read ' \
+                               'from this node\'s Synoptis registry; elsewhere the tool says it cannot read it.'
                 }
               },
               required: %w[estimated_hours]
@@ -138,14 +144,59 @@ module KairosMcp
             rate = args['offline'] ? nil : thoa_rate(cores, ram, storage)
             rate ||= measured_rate(cores, ram, storage)
 
-            text_content(JSON.pretty_generate(
-                           render(cores: cores, ram: ram, storage: storage, hours: hours, runs: runs, rate: rate)
-                         ))
+            out = render(cores: cores, ram: ram, storage: storage, hours: hours, runs: runs, rate: rate)
+            out['reachability'] = reachability(args['reachability_proof_id'].to_s) if args['reachability_proof_id']
+            text_content(JSON.pretty_generate(out))
           rescue StandardError => e
             text_content("Error: gc_tier3_estimate failed — #{e.class}: #{e.message}")
           end
 
+          # prov design v0.1.15 §6.3 (8): the observation beside the estimate,
+          # never a gate. The four results that mean "not had when asked",
+          # per category (counts are never added across categories).
+          NOT_ANSWERING = %w[not_found access_denied error not_attempted].freeze
+
           private
+
+          def reachability(proof_id)
+            registry = reach_registry
+            return { 'proof_id' => proof_id, 'note' => 'cannot be read on this node: no Synoptis registry here' } unless registry
+
+            envelope = registry.find_proof(proof_id)
+            evidence = envelope && JSON.parse(envelope.evidence.to_s)
+            manifest = evidence.is_a?(Hash) ? evidence['manifest'] : nil
+            unless manifest.is_a?(Hash) && manifest['record_type'] == 'prov_reachability'
+              return { 'proof_id' => proof_id, 'note' => 'no reachability observation under this proof_id on this node' }
+            end
+
+            per_category = manifest['counts'].to_h do |cat, c|
+              [cat, NOT_ANSWERING.to_h { |b| [b, c.is_a?(Hash) ? c[b].to_i : 0] }.select { |_, n| n.positive? }]
+            end
+            { 'proof_id' => proof_id, 'observed_at' => manifest['observed_at'], 'observer' => manifest['observer'],
+              'revoked' => registry.revoked?(proof_id) ? true : false,
+              'not_answering_per_category' => per_category.reject { |_, v| v.empty? },
+              'note' => 'Places that did not answer as asked when the anchor observed them, by category. A Tier-3 ' \
+                        'run on GenomicsChain\'s side cannot fetch what was access_denied. Not a gate; the date ' \
+                        'says how old the observation is.' }
+          # Whatever goes wrong in reading the registry or the record stays here,
+          # named by its class only: the estimate is returned regardless (§6.3
+          # (8), review r1).
+          rescue StandardError => e
+            { 'proof_id' => proof_id, 'note' => "the record under this proof_id cannot be read here (#{e.class})" }
+          end
+
+          # This node's Synoptis registry, or nil where there is none.
+          def reach_registry
+            return nil unless KairosMcp.respond_to?(:data_dir)
+
+            dir = File.join(KairosMcp.data_dir, 'synoptis_data')
+            return nil unless File.directory?(dir)
+
+            require 'synoptis/registry/file_registry'
+            ::Synoptis::Registry::FileRegistry.new(data_dir: dir)
+          rescue LoadError
+            nil
+          end
 
           # Asks thoa. --dry-run submits nothing, so this costs no credits, and
           # it also reports account-limit violations that a measured table

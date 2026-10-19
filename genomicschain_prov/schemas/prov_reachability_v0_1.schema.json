@@ -1,0 +1,620 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/prov_reachability_v0_1.schema.json",
+  "title": "GenomicsChain reachability observation over a Tier-2.5 provenance record, record_version 0.1",
+  "description": "Synoptis evidence manifest for an observation the anchor made (design docs/design/prov_anchoring_design_v0_1.md §6.3, v0.1.15): whether the places a provenance bundle names for its environment still answer, asked from the anchor on observed_at. Counts per category (items and distinct locators, then one count per result bucket, digest_match and exists split by the class of the host the bundle wrote) and dates only. Nothing was fetched: digest_match and exists are the answer of the place itself. Locators, addresses, answers, host names and the proof_id of the prov record are not recorded; prov_proof_ref is the SHA-256 of that proof_id. A dated observation, not a grade: it says nothing about other networks, later dates, or whether the environment can be built (not_checked).",
+  "type": "object",
+  "required": [
+    "record_type",
+    "record_version",
+    "mcp_tool_name",
+    "mcp_tool_version",
+    "subject_ref",
+    "prov_proof_ref",
+    "bundle_digest",
+    "reachability_rule",
+    "scope",
+    "observation_nonce",
+    "observer",
+    "observed_at",
+    "checker",
+    "same_signer",
+    "counts",
+    "backing",
+    "not_checked",
+    "submission_key",
+    "operator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": [
+        "prov_reachability"
+      ]
+    },
+    "record_version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ]
+    },
+    "mcp_tool_name": {
+      "type": "string",
+      "enum": [
+        "gc_prov_reach"
+      ]
+    },
+    "mcp_tool_version": {
+      "type": "string"
+    },
+    "subject_ref": {
+      "type": "string",
+      "pattern": "^prov-reach:sha256:[0-9a-f]{64}$"
+    },
+    "prov_proof_ref": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "bundle_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reachability_rule": {
+      "type": "string",
+      "enum": [
+        "gc-reachability-0.1"
+      ]
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "environment"
+      ]
+    },
+    "observation_nonce": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "observer": {
+      "type": "string",
+      "enum": [
+        "anchor"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "checker": {
+      "type": "object",
+      "required": [
+        "tool",
+        "adapter"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "adapter": {
+          "type": "string"
+        }
+      }
+    },
+    "same_signer": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "workflow_repository",
+        "workflow_commit",
+        "runtime",
+        "containers",
+        "software"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workflow_repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items",
+            "distinct",
+            "digest_match",
+            "exists",
+            "access_denied",
+            "not_found",
+            "error",
+            "not_attempted",
+            "not_checkable"
+          ],
+          "properties": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "distinct": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "digest_match": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "exists": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "access_denied": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_attempted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_checkable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "workflow_commit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items",
+            "distinct",
+            "digest_match",
+            "exists",
+            "access_denied",
+            "not_found",
+            "error",
+            "not_attempted",
+            "not_checkable"
+          ],
+          "properties": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "distinct": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "digest_match": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "exists": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "access_denied": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_attempted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_checkable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items",
+            "distinct",
+            "digest_match",
+            "exists",
+            "access_denied",
+            "not_found",
+            "error",
+            "not_attempted",
+            "not_checkable"
+          ],
+          "properties": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "distinct": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "digest_match": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "exists": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "access_denied": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_attempted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_checkable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "containers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items",
+            "distinct",
+            "digest_match",
+            "exists",
+            "access_denied",
+            "not_found",
+            "error",
+            "not_attempted",
+            "not_checkable"
+          ],
+          "properties": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "distinct": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "digest_match": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "exists": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "access_denied": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_attempted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_checkable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "software": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items",
+            "distinct",
+            "digest_match",
+            "exists",
+            "access_denied",
+            "not_found",
+            "error",
+            "not_attempted",
+            "not_checkable"
+          ],
+          "properties": {
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "distinct": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "digest_match": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "exists": {
+              "type": "object",
+              "required": [
+                "public_registry",
+                "other_host"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "public_registry": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "other_host": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "access_denied": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_found": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_attempted": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_checkable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "backing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vocabulary",
+        "counts",
+        "observed_at",
+        "bundle_digest",
+        "prov_proof_ref",
+        "same_signer"
+      ],
+      "properties": {
+        "vocabulary": {
+          "type": "string",
+          "enum": [
+            "gc-backing-0.1"
+          ]
+        },
+        "counts": {
+          "type": "string",
+          "enum": [
+            "procedure_checked",
+            "anchor_observed",
+            "customer_signed",
+            "customer_stated",
+            "not_checked"
+          ]
+        },
+        "observed_at": {
+          "type": "string",
+          "enum": [
+            "procedure_checked",
+            "anchor_observed",
+            "customer_signed",
+            "customer_stated",
+            "not_checked"
+          ]
+        },
+        "bundle_digest": {
+          "type": "string",
+          "enum": [
+            "procedure_checked",
+            "anchor_observed",
+            "customer_signed",
+            "customer_stated",
+            "not_checked"
+          ]
+        },
+        "prov_proof_ref": {
+          "type": "string",
+          "enum": [
+            "procedure_checked",
+            "anchor_observed",
+            "customer_signed",
+            "customer_stated",
+            "not_checked"
+          ]
+        },
+        "same_signer": {
+          "type": "string",
+          "enum": [
+            "procedure_checked",
+            "anchor_observed",
+            "customer_signed",
+            "customer_stated",
+            "not_checked"
+          ]
+        }
+      }
+    },
+    "not_checked": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "reachability_from_other_networks",
+          "content_not_fetched",
+          "answerer_independence",
+          "buildability",
+          "future_reachability"
+        ]
+      }
+    },
+    "submission_key": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "operator": {
+      "type": "object"
+    }
+  }
+}

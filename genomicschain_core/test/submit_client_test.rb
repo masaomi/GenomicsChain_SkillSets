@@ -153,6 +153,41 @@ class SubmitClientTest < Minitest::Test
     end
   end
 
+  # --tier prov-reach (prov design v0.1.15 §6.3): the identity the CLI signs
+  # is the one the anchor's VerdictSpec::Reach re-derives, with a new nonce on
+  # every run; the prov proof_id travels beside it, unsigned.
+  def test_prov_reach_request_is_what_the_anchor_rederives_with_a_new_nonce_each_run
+    GcSubmitClient.load_prov
+    require 'genomicschain_prov/verdict_spec/reach'
+    bundle = File.expand_path('../../genomicschain_prov/test/fixtures/nfcore_demo_1_2_0/bco.json', __dir__)
+    with_key do |path, _, _|
+      Dir.mktmpdir do |d|
+        run = lambda do |*extra|
+          Open3.capture3(RbConfig.ruby, CLIENT, '--tier', 'prov-reach', '--bundle', bundle, '--key', path,
+                         '--data-dir', d, '--print-only', *extra)
+        end
+        reqs = 2.times.map do
+          out, err, st = run.call('--prov-proof-id', 'attest_abc')
+          assert st.success?, err
+          JSON.parse(out)
+        end
+        args = reqs.first.dig('params', 'arguments')
+        assert_equal 'gc_prov_reach', reqs.first.dig('params', 'name')
+        assert_equal 'attest_abc', args['prov_proof_id']
+        assert_equal File.read(bundle), args['bundle']
+        spec = GenomicsChainProv::VerdictSpec::Reach.new(bundle: args['bundle'], identity: args['identity'],
+                                                         prov_proof_id: 'attest_abc', registry: nil, prober: nil)
+        spec.parse_digest_subject!
+        spec.assert_submitted_matches_signed!
+        nonces = reqs.map { |r| r.dig('params', 'arguments', 'identity', 'observation_nonce') }
+        assert_equal 2, nonces.uniq.length
+        _, err, st = run.call
+        refute st.success?
+        assert_includes err, '--prov-proof-id'
+      end
+    end
+  end
+
   def prov_bundle(dir, zk)
     w = GenomicsChainProv::Writer
     FileUtils.mkdir_p(File.join(dir, 'tools'))

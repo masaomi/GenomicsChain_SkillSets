@@ -21,6 +21,8 @@
 #        [--anchor https://meeting.genomicschain.io] [--anchor-pubkey anchor.pem] \
 #        [--submitter-pubkey ed25519:...] [--zk-receipt receipt.bin ...] [--json]
 #   ruby genomicschain_prov/bin/gc_prov_verify.rb bco.json --envelope proof.json   (offline: a saved route body)
+#   ruby genomicschain_prov/bin/gc_prov_verify.rb bco.json --proof-id OBS --prov-proof-id ID   (a reachability
+#        observation, v0.1.15 §6.3: read by its own verifier, chosen by the record's type)
 #
 # Exit status: 0 consistent; 1 a mismatch; 2 nothing to compare against
 # (the record could not be fetched or read) or the bundle is unreadable.
@@ -56,6 +58,7 @@ end
 
 require 'genomicschain_prov'
 require 'genomicschain_prov/verifier'
+require 'genomicschain_prov/reach_verifier'
 
 module GcProvVerify
   DEFAULT_ANCHOR = 'https://meeting.genomicschain.io'
@@ -72,6 +75,7 @@ module GcProvVerify
       o.on('--anchor-pubkey FILE', 'the anchor\'s RSA public key (PEM), obtained out of band') { |v| opts[:anchor_pubkey] = v }
       o.on('--submitter-pubkey KEY', 'the submitter\'s ed25519 key (ed25519:...), obtained out of band') { |v| opts[:submitter] = v }
       o.on('--zk-receipt FILE', 'a ZK receipt to check here (repeatable)') { |v| opts[:zk] << v }
+      o.on('--prov-proof-id ID', 'for an observation: the prov record it should be laid over') { |v| opts[:prov_proof_id] = v }
       o.on('--json', 'machine-readable output') { opts[:json] = true }
       o.on('-h', '--help') { |_| puts o; exit 0 }
     end.parse!(argv)
@@ -94,6 +98,17 @@ module GcProvVerify
     [nil, { 'status' => 200, 'reason' => 'the body was not JSON' }]
   rescue StandardError => e
     [nil, { 'status' => nil, 'reason' => e.class.name }]
+  end
+
+  # The record type, read from the evidence the anchor signed (not the
+  # route's convenience copy); nil when it cannot be read, which the prov
+  # verifier then reports as unreadable.
+  def record_type(route)
+    ev = route && route['evidence']
+    parsed = ev.is_a?(String) ? JSON.parse(ev) : nil
+    parsed.is_a?(Hash) ? parsed.dig('manifest', 'record_type') : nil
+  rescue JSON::ParserError
+    nil
   end
 
   def report(r)
@@ -132,11 +147,13 @@ module GcProvVerify
 
     route, error = opts[:envelope] ? [JSON.parse(File.read(opts[:envelope])), nil] : fetch(opts[:anchor], opts[:proof_id])
     receipts = opts[:zk].to_h { |p| b = File.binread(p); [Digest::SHA256.hexdigest(b), b] }
-    result = GenomicsChainProv::Verifier.new(
-      bundle_text: File.read(opts[:bundle]), route: route, fetch_error: error,
-      submitter_pubkey: opts[:submitter], anchor_pubkey_pem: opts[:anchor_pubkey] && File.read(opts[:anchor_pubkey]),
-      receipts: receipts
-    ).run
+    common = { bundle_text: File.read(opts[:bundle]), route: route, fetch_error: error, submitter_pubkey: opts[:submitter],
+               anchor_pubkey_pem: opts[:anchor_pubkey] && File.read(opts[:anchor_pubkey]) }
+    result = if record_type(route) == GenomicsChainProv::ReachVerifier::RECORD_TYPE
+               GenomicsChainProv::ReachVerifier.new(**common, prov_proof_id: opts[:prov_proof_id]).run
+             else
+               GenomicsChainProv::Verifier.new(**common, receipts: receipts).run
+             end
     result['proof_id'] ||= opts[:proof_id]
     puts(opts[:json] ? JSON.pretty_generate(result) : report(result))
     { 'consistent' => 0, 'mismatch' => 1 }.fetch(result['state'], 2)
