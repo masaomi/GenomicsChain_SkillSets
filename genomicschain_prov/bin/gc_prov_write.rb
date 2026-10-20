@@ -33,6 +33,18 @@
 #        --container-digests digests.txt --out bco.json
 #   ruby genomicschain_prov/bin/gc_prov_write.rb --plan plan.json --resources measured.json
 #
+# Option 2 (design v0.1.16 §5, §6.1, §8): the customer's order is key →
+# proof → bundle, so the key is made first, on its own, and kept apart from
+# the bundle:
+#   ruby genomicschain_prov/bin/gc_prov_write.rb --new-commitment-key ~/keys/run42.key
+#   (prove each covered step with that key: the checker writes gc-zk-journal-0.2)
+#   ruby genomicschain_prov/bin/gc_prov_write.rb --plan plan.json --commitment-key ~/keys/run42.key --out bco.json
+# With --commitment-key every file fingerprint in the bundle is the salted
+# gc-commitment-0.1 one (hmac_sha256), no sha1_checksum or plain SHA-256 is
+# written, the key's name (key_id) is written once, and every receipt is
+# declared gc-zk-journal-0.2. The key is read, checked to be 32 bytes, and
+# never written into the bundle, a note or the terminal. One key per bundle.
+#
 # The bundle goes to --out (or stdout). What was and was not collected goes to
 # stderr, always: a bundle is worth what was gathered into it, and the one
 # moment to see the gaps is before it is signed.
@@ -45,11 +57,13 @@ require 'genomicschain_prov'
 require 'genomicschain_prov/writer/environment'
 require 'genomicschain_prov/writer/nextflow_run'
 require 'genomicschain_prov/writer/resources_input'
+require 'genomicschain_prov/commitment'
 
 module GcProvWrite
   W = GenomicsChainProv::Writer
   Bco = GenomicsChainProv::Adapters::Bco
   Predicate = GenomicsChainProv::Predicate
+  Commitment = GenomicsChainProv::Commitment
 
   module_function
 
@@ -87,6 +101,10 @@ module GcProvWrite
            'the tasks may have run elsewhere)') { opts[:machine] = true }
       o.on('--resources PATH', 'a gc-resources-input-0.1 file of per-stage requested and observed values ' \
                                '(repeatable)') { |v| opts[:resources] << v }
+      o.on('--new-commitment-key PATH', 'write a fresh 32-byte gc-commitment-0.1 key to PATH (owner-only, never ' \
+                                         'overwritten) and stop; keep it apart from the bundle') { |v| opts[:new_key] = v }
+      o.on('--commitment-key PATH', 'option 2: write salted fingerprints under the 32-byte key in PATH and declare ' \
+                                     'the receipts gc-zk-journal-0.2') { |v| opts[:key] = v }
       o.on('-h', '--help') { puts o; exit 0 }
     end
     parser.parse!(argv)
@@ -95,16 +113,58 @@ module GcProvWrite
 
   def run(argv)
     opts = options(argv)
+    return new_key(opts) if opts[:new_key]
+
     abort 'give exactly one of --plan PATH or --from-nextflow-run DIR' unless opts[:plan].nil? ^ opts[:launch].nil?
 
+    opts[:commitment_key] = load_key(opts) if opts[:key]
     result = opts[:plan] ? from_plan(opts) : from_nextflow(opts)
     emit(result['bco'], opts[:out])
     report(result['bco'], result['notes'], opts)
     0
-  rescue W::PlanError, Bco::FormatError => e
+  rescue W::PlanError, Bco::FormatError, Commitment::KeyError => e
     abort "gc_prov_write: #{e.message}"
   rescue Errno::ENOENT => e
     abort "gc_prov_write: #{e.message}"
+  end
+
+  # Standalone: the key exists before the proof that uses it (§8).
+  def new_key(opts)
+    if opts[:plan] || opts[:launch]
+      abort 'gc_prov_write: --new-commitment-key makes the key only; prove with it, then write the bundle with ' \
+            '--commitment-key'
+    end
+    key = Commitment.generate_key
+    Commitment.write_key_file(opts[:new_key], key)
+    warn "wrote a new #{Commitment::RULE} key to #{opts[:new_key]} (owner-only). Keep it apart from the bundle and " \
+         'take a copy: without it nobody can check the fingerprints, and GenomicsChain does not hold it.'
+    0
+  rescue Commitment::KeyError => e
+    abort "gc_prov_write: #{e.message}"
+  end
+
+  # The key is read and checked here and passed on in memory only. An --out
+  # that names the key file is refused before anything is written: the key
+  # never travels with the bundle, and writing the bundle there would
+  # truncate the key and orphan every fingerprint made under it. "Names" is
+  # decided by the file system (same device and inode, File.identical?), not
+  # by the path string, so a symlink, a hard link, a `.`/`..` spelling or a
+  # case variant on a case-insensitive volume is caught too (round-1
+  # implementation review, H3).
+  def load_key(opts)
+    if opts[:out] && (File.expand_path(opts[:out]) == File.expand_path(opts[:key]) ||
+                      File.identical?(opts[:out], opts[:key]))
+      raise Commitment::KeyError, "#{Commitment::RULE}: the key file and the bundle cannot be the same file"
+    end
+    Commitment.read_key_file(opts[:key])
+  end
+
+  def journal(opts)
+    opts[:commitment_key] ? W::ZK_JOURNAL_V02 : W::ZK_JOURNAL
+  end
+
+  def commitment(opts)
+    opts[:commitment_key] && Commitment.declaration(opts[:commitment_key])
   end
 
   def from_plan(opts)
@@ -113,12 +173,13 @@ module GcProvWrite
     digest_map = opts[:digests] ? GenomicsChainProv::Writer::NextflowRun.digests_from(File.read(opts[:digests])) : {}
     resolved = W::Environment.resolve!(plan, base_dir: base, checksums: opts[:checksums],
                                              run_version_commands: opts[:run_version_commands],
-                                             docker: opts[:docker], digest_map: digest_map)
+                                             docker: opts[:docker], digest_map: digest_map,
+                                             commitment_key: opts[:commitment_key])
     # The plan's own statement of the platform wins; otherwise this machine,
     # which for --plan is normally the one that ran the stages (design
     # v0.1.12 §6.1). --no-platform leaves it out.
     platform = plan['platform'] || (opts[:platform] == false ? nil : W::Environment.platform)
-    zk = W::Environment.zk_declarations(plan['zk_receipts'], base_dir: base)
+    zk = W::Environment.zk_declarations(plan['zk_receipts'], base_dir: base, journal: journal(opts))
     extra = zk_from_file(opts)
     machine = plan_machine(plan, base, opts)
     inputs = resources_from_files(opts)
@@ -127,7 +188,7 @@ module GcProvWrite
     { 'bco' => W.build(plan, checksums: resolved['checksums'],
                              object_id: opts[:object_id], created: opts[:created],
                              platform: platform, zk_receipts: zk['zk_receipts'] + extra['zk_receipts'],
-                             resources: resources),
+                             resources: resources, commitment: commitment(opts)),
       'notes' => resolved['notes'] + zk['notes'] + extra['notes'] + machine['notes'] + inputs['notes'] }
   end
 
@@ -169,7 +230,8 @@ module GcProvWrite
       work_root: opts[:work] || 'work', digest_map: digest_map, script_path: opts[:script],
       jar_path: opts[:jar], checksums: opts[:checksums], docker: opts[:docker],
       platform: opts[:platform] == true ? W::Environment.platform : nil,
-      zk_receipts: extra['zk_receipts'], machine: machine['machine'], resource_steps: inputs['steps']
+      zk_receipts: extra['zk_receipts'], machine: machine['machine'], resource_steps: inputs['steps'],
+      commitment_key: opts[:commitment_key]
     )
     out['notes'] += extra['notes'] + machine['notes'] + inputs['notes']
     out['notes'] << 'no platform recorded: pass --platform-of-this-machine if the tasks ran here' unless opts[:platform] == true
@@ -183,7 +245,7 @@ module GcProvWrite
     return { 'zk_receipts' => [], 'notes' => [] } unless opts[:zk]
 
     entries = W.normalise_zk_receipts(JSON.parse(File.read(opts[:zk])))
-    W::Environment.zk_declarations(entries, base_dir: File.dirname(File.expand_path(opts[:zk])))
+    W::Environment.zk_declarations(entries, base_dir: File.dirname(File.expand_path(opts[:zk])), journal: journal(opts))
   rescue JSON::ParserError
     raise W::PlanError, '--zk-receipts is not valid JSON'
   end

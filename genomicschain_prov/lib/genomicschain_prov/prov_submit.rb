@@ -11,10 +11,12 @@ module GenomicsChainProv
     SubmitCore = KairosMcp::SkillSets::GenomicschainCore::SubmitCore
 
     # @param zk_receipt_bytes [Hash, nil] receipt sha256 => base64 bytes (§6.1)
+    # @param config [Hash, nil] the core configuration, for tests; nil = the
+    #   anchor's genomicschain_core.yml, read by Prov#admit! (v0.1.16 S4)
     def self.submit(bundle:, identity:, operator:, bearer_pubkey_hash:, tip_source:, attestor:,
-                    registry: nil, zk_receipt_bytes: nil, zk_verifier: nil)
+                    registry: nil, zk_receipt_bytes: nil, zk_verifier: nil, config: nil)
       spec = VerdictSpec::Prov.new(bundle: bundle, identity: identity,
-                                   zk_receipt_bytes: zk_receipt_bytes, zk_verifier: zk_verifier)
+                                   zk_receipt_bytes: zk_receipt_bytes, zk_verifier: zk_verifier, config: config)
       SubmitCore.submit(
         spec: spec, operator: operator, bearer_pubkey_hash: bearer_pubkey_hash,
         tip_source: tip_source, registry: registry || attestor.registry, attestor: attestor

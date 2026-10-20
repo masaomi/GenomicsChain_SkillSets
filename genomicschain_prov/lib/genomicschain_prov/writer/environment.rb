@@ -6,6 +6,7 @@ require 'etc'
 require 'open3'
 require 'rbconfig'
 require_relative '../predicate'
+require_relative '../commitment'
 
 module GenomicsChainProv
   module Writer
@@ -39,9 +40,13 @@ module GenomicsChainProv
       # the checksum map `Writer.build` keys the extension block by, together
       # with what could not be collected.
       #
-      # @return [Hash] {'checksums' => {locator => {'sha1','sha256'}}, 'notes' => [String]}
+      # With `commitment_key:` (option 2, v0.1.16 §6.1) each file gets its
+      # gc-commitment-0.1 fingerprint only — {'hmac_sha256'} — and no plain
+      # digest is computed at all.
+      #
+      # @return [Hash] {'checksums' => {locator => {'sha1','sha256'} or {'hmac_sha256'}}, 'notes' => [String]}
       def resolve!(plan, base_dir: Dir.pwd, checksums: true, run_version_commands: false,
-                   docker: true, digest_map: {})
+                   docker: true, digest_map: {}, commitment_key: nil)
         notes = []
         sums = {}
 
@@ -56,7 +61,7 @@ module GenomicsChainProv
         if checksums
           hashable(plan).each do |locator, path|
             full = absolute(path, base_dir)
-            digests = digest_file(full)
+            digests = digest_file(full, commitment_key: commitment_key)
             if digests.nil?
               notes << "no checksum for #{locator}: #{full} is not a readable file"
             else
@@ -390,8 +395,9 @@ module GenomicsChainProv
       # is left out and noted — the same rule as a missing input: never write
       # a digest of bytes this machine did not see.
       #
+      # @param journal [String] the bundle's one convention (Writer::ZK_JOURNAL or ZK_JOURNAL_V02)
       # @return [Hash] {'zk_receipts' => [declaration], 'notes' => [String]}
-      def zk_declarations(entries, base_dir: Dir.pwd)
+      def zk_declarations(entries, base_dir: Dir.pwd, journal: Writer::ZK_JOURNAL)
         notes = []
         decls = Array(entries).filter_map do |e|
           sums = digest_file(absolute(e['receipt'], base_dir))
@@ -399,13 +405,21 @@ module GenomicsChainProv
             notes << "zk receipt for step #{e['step_number']} left out: #{e['receipt']} is not a readable file"
             next nil
           end
-          Writer.zk_declaration(e, sums['sha256'])
+          Writer.zk_declaration(e, sums['sha256'], journal: journal)
         end
         { 'zk_receipts' => decls, 'notes' => notes }
       end
 
-      def digest_file(path)
+      # The receipt's own sha256 is always plain (it names the receipt file,
+      # not a data file); `commitment_key:` is for the bundle's file
+      # fingerprints only.
+      def digest_file(path, commitment_key: nil)
         return nil unless File.file?(path) && File.readable?(path)
+
+        if commitment_key
+          c = GenomicsChainProv::Commitment.commit_file(commitment_key, path)
+          return c && { 'hmac_sha256' => c }
+        end
 
         sha1 = Digest::SHA1.new
         sha256 = Digest::SHA256.new

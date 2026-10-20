@@ -4,6 +4,7 @@ require 'json'
 require 'digest'
 require 'time'
 require 'securerandom'
+require_relative 'adapters/bco'
 
 module GenomicsChainProv
   # Writer — the producer half of `gc_prov_write` (design v0.1 §4.1, §9 U1b):
@@ -37,10 +38,16 @@ module GenomicsChainProv
     # 0.2.0 (design v0.1.12): writes `platform` and `zk_receipts[]`.
     # 0.3.0 (design v0.1.14): writes `resources` — the machine and each stage's
     # requested and observed values.
-    VERSION = 'prov-writer-0.3.0'
-    # The one zkVM and the one journal shape v0.1.12 can verify (§6.1).
+    # 0.4.0 (design v0.1.16): option 2 — with a commitment key, every file
+    # fingerprint is gc-commitment-0.1 (`hmac_sha256`), no `sha1_checksum` and
+    # no plain SHA-256 is written, `commitment` is written once, and the
+    # receipts are declared gc-zk-journal-0.2. The key itself never enters
+    # the bundle: `build` is given the commitment declaration, not the key.
+    VERSION = 'prov-writer-0.4.0'
+    # The one zkVM and the journal shapes the anchor can verify (§6.1, v0.1.16 §6.2).
     ZK_VM_NAME = 'risc0-zkvm'
     ZK_JOURNAL = 'gc-zk-journal-0.1'
+    ZK_JOURNAL_V02 = 'gc-zk-journal-0.2'
     SPEC_VERSION = 'https://w3id.org/ieee/ieee-2791-schema/2791object.json'
     # Decided 2026-09-20 (design §10-1, §13.4-6). The schema file lands in
     # `genomicschain_core/schemas/` with the v0.1 implementation; publishing it
@@ -60,8 +67,15 @@ module GenomicsChainProv
     #   plan's own statement, or this machine's (Environment.platform), or nil
     # @param zk_receipts [Array<Hash>] declarations from `zk_declaration`
     # @param resources [Hash, nil] {'machine' =>, 'steps' => [...]} from `resources_block`
+    # @param commitment [Hash, nil] option 2 (v0.1.16): Commitment.declaration(key)
+    #   — the rule and key_id, never the key. `checksums` must then hold
+    #   `hmac_sha256` values only (Environment.resolve!(commitment_key:)), and
+    #   every receipt must be declared gc-zk-journal-0.2
     # @return [Hash] the BCO
-    def build(plan, checksums: {}, object_id: nil, created: nil, platform: nil, zk_receipts: [], resources: nil)
+    # @raise [PlanError] an option-2 bundle the anchor would refuse
+    def build(plan, checksums: {}, object_id: nil, created: nil, platform: nil, zk_receipts: [], resources: nil,
+              commitment: nil)
+      check_option2!(checksums, zk_receipts, commitment)
       now = created || Time.now.utc.iso8601
       steps = plan['stages'].sort_by { |s| s['step_number'] }
       bco = {
@@ -71,7 +85,7 @@ module GenomicsChainProv
         'provenance_domain' => provenance_domain(plan, now),
         'usability_domain' => [plan['description'] || plan['name']],
         'extension_domain' => [extension_block(checksums, platform: platform, zk_receipts: zk_receipts,
-                                                          resources: resources)],
+                                                          resources: resources, commitment: commitment)],
         'description_domain' => {
           'keywords' => plan['keywords'] || [],
           'pipeline_steps' => steps.map { |s| pipeline_step(s) }
@@ -82,7 +96,42 @@ module GenomicsChainProv
         'error_domain' => {}
       }
       bco['etag'] = etag(bco)
+      check_option2_bundle!(bco) if commitment
       bco
+    end
+
+    # Option 2 (v0.1.16 §6.1) or not: the two shapes never mix, so a bundle
+    # this writer produces is never one the adapter refuses for its shape.
+    def check_option2!(checksums, zk_receipts, commitment)
+      journals = Array(zk_receipts).map { |r| r['journal'] }
+      plain = checksums.values.any? { |v| v.key?('sha1') || v.key?('sha256') }
+      salted = checksums.values.any? { |v| v.key?('hmac_sha256') }
+      if commitment
+        raise PlanError, 'option 2 needs at least one zk receipt: salted fingerprints without a gc-zk-journal-0.2 ' \
+                         'receipt are refused by the anchor' if journals.empty?
+        raise PlanError, 'option 2: every zk receipt must be declared gc-zk-journal-0.2' unless journals.all?(ZK_JOURNAL_V02)
+        raise PlanError, 'option 2: a plain checksum was collected; with a commitment key only salted ones are written' if plain
+      else
+        raise PlanError, 'a gc-zk-journal-0.2 receipt needs a commitment key (--commitment-key)' if journals.include?(ZK_JOURNAL_V02)
+        raise PlanError, 'salted fingerprints need a commitment key' if salted
+      end
+    end
+
+    # Option 2: the finished bundle, read back with the adapter's own
+    # admission — the bundle refusals (§6.1) and the receipt declaration
+    # defects. A bundle the anchor would refuse is refused here, before
+    # anything is written (round-1 implementation review, H2): the shape
+    # guard above sees only what this writer collected, not what an enriched
+    # bundle already carried, nor a declaration whose files have no
+    # hmac_sha256 (`--no-checksums`). Codes only, never values.
+    # @raise [PlanError]
+    def check_option2_bundle!(bco)
+      np = Adapters::Bco.parse(bco)
+      codes = Array(np.refusals) +
+              Array(np.zk_receipts).flat_map { |r| r['defects'].map { |d| "zk receipt for stage #{r['stage'] || '?'}: #{d}" } }
+      return if codes.empty?
+
+      raise PlanError, "option 2: the anchor would refuse this bundle (#{codes.join('; ')}); nothing was written"
     end
 
     # --- the domains ----------------------------------------------------------
@@ -174,15 +223,23 @@ module GenomicsChainProv
     # §6.2) appear only when there is something to say: a bundle with none of
     # them is the same shape a 0.1.0 writer produced, apart from the producer
     # version.
-    def extension_block(checksums, platform: nil, zk_receipts: [], resources: nil)
+    #
+    # Option 2 (v0.1.16 §6.1): a row is {uri, hmac_sha256} and nothing else,
+    # and `commitment` {rule, key_id} is written once, here.
+    def extension_block(checksums, platform: nil, zk_receipts: [], resources: nil, commitment: nil)
       rows = checksums.keys.sort.filter_map do |locator|
-        sha256 = checksums[locator]['sha256']
-        { 'uri' => locator, 'sha256' => sha256 } if sha256
+        sums = checksums[locator]
+        if sums['hmac_sha256']
+          { 'uri' => locator, 'hmac_sha256' => sums['hmac_sha256'] }
+        elsif sums['sha256']
+          { 'uri' => locator, 'sha256' => sums['sha256'] }
+        end
       end
       ext = {
         'producer' => { 'name' => PRODUCER_NAME, 'version' => VERSION },
         'checksums' => rows
       }
+      ext['commitment'] = commitment.slice('rule', 'key_id') if commitment
       ext['platform'] = platform if platform
       ext['zk_receipts'] = zk_receipts unless zk_receipts.nil? || zk_receipts.empty?
       ext['resources'] = resources unless resources.nil? || resources.empty?
@@ -191,14 +248,15 @@ module GenomicsChainProv
 
     # One receipt declaration in the shape the adapter reads (§6.1). The
     # receipt's own SHA-256 is measured by Environment from the file; the rest
-    # is the plan's statement. The journal convention is not a choice: it is
-    # the only one the anchor can link to the bundle.
-    def zk_declaration(entry, receipt_sha256)
+    # is the plan's statement. The journal convention follows the bundle's
+    # option, not the plan: gc-zk-journal-0.1 without a commitment key, 0.2
+    # with one (v0.1.16 S2: one convention per bundle).
+    def zk_declaration(entry, receipt_sha256, journal: ZK_JOURNAL)
       { 'sha256' => receipt_sha256,
         'image_id' => entry['image_id'],
         'zkvm' => { 'name' => ZK_VM_NAME, 'version' => entry['zkvm_version'] },
         'step_number' => entry['step_number'],
-        'journal' => ZK_JOURNAL,
+        'journal' => journal,
         'input_uri' => entry['input'],
         'output_uri' => entry['output'] }
     end

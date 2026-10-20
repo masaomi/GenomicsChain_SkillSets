@@ -1,0 +1,15 @@
+# The demo checker claude_01, unchanged (KairosChain_2026
+# log/zk_demo_sizefactor_20260929/02_judge/extracted/claude_01, main.rs sha256
+# ab60da72…ab87cb). The demo declared `sha2 = "0.10"` (plain RustCrypto, not
+# the RISC Zero accelerated fork) and resolved it to 0.10.9; pinned here.
+[package]
+name = "checker_v01"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std"] }
+sha2 = "=0.10.9"

@@ -5,6 +5,7 @@ require 'digest'
 require 'base64'
 require_relative 'identity'
 require_relative 'zk_verifier'
+require_relative 'commitment'
 
 module GenomicsChainProv
   # Verifier — what a third party holding a bundle and a proof can say about
@@ -22,6 +23,13 @@ module GenomicsChainProv
   # envelope fields, plus `manifest` and `revoked`). The manifest is read from
   # `evidence` — the bytes the anchor signed — not from the route's parsed
   # convenience copy.
+  #
+  # v0.1.16 §7: a record whose receipts use gc-zk-journal-0.1 gets one more
+  # statement (the journal carries the output), one using gc-zk-journal-0.2
+  # gets the option-2 statement, and `commitment_key:` + `opens:` let a key
+  # holder check local files against the bundle's salted fingerprints. The
+  # key is read and used here and written nowhere; the output names
+  # locators and results, never a fingerprint.
   class Verifier
     CANONICALIZATIONS = { Identity::BUNDLE_DIGEST_CANONICALIZATION => ->(text) { Identity.bundle_digest(text) } }.freeze
     OUTPUTS_RULES = [Predicate::OUTPUTS_DIGEST_RULE].freeze
@@ -39,7 +47,38 @@ module GenomicsChainProv
       'zk_guest_program_semantics' => 'what the ZK guest program computes (the image ID names a program, not its meaning)',
       'zk_inputs_are_raw_data' => 'whether the inputs a ZK receipt binds are the raw data',
       'resources_as_written' => 'whether the computing resources the bundle states (the machine, its GPUs, each ' \
-                                "stage's requested and observed values) are true"
+                                "stage's requested and observed values) are true",
+      'zk_zero_knowledge_property' => 'what a ZK receipt reveals outside its journal (the zkVM\'s zero-knowledge ' \
+                                      'property is RISC Zero\'s, and GenomicsChain has not tested it)'
+    }.freeze
+
+    # Design v0.1.16 §7, by the convention the record's receipts were verified
+    # under. Put in English after the Japanese of the design text, as the two
+    # statements of §6.1 are.
+    JOURNAL_STATEMENTS = {
+      'gc-zk-journal-0.1' =>
+        'The journal of this receipt contains the step\'s output itself and the unsalted fingerprint of its ' \
+        'input. Anyone holding the receipt can read the output and check a candidate input file against it.',
+      'gc-zk-journal-0.2' =>
+        'The GenomicsChain anchor checked three things: that this receipt\'s journal has the gc-zk-journal-0.2 ' \
+        'form, that its values equal the values in the bundle\'s gc-commitment-0.1 fields, and that the ' \
+        'bundle text has the salted form only (this verifier checked the same of the bundle text it holds): ' \
+        'every checksums item is exactly a uri and an hmac_sha256, both text; a checksums key, with any value, ' \
+        'appears nowhere except at the top level of a genomicschain_extension block in a top-level ' \
+        'extension_domain element, and every top-level extension_domain element, and any genomicschain_extension ' \
+        'value in one, is an object; and the text has no sha1_checksum field, no repeated key and no comment ' \
+        'anywhere. A fingerprint written under any other field name is not looked at, nor is the spelling of ' \
+        'the text (whitespace, number forms, escape forms), which can carry whatever its author chooses to ' \
+        'encode. It did not check that ' \
+        'the values really are keyed fingerprints. Only if the bundle\'s author made the fingerprints as ' \
+        'gc-commitment-0.1 prescribes, with a random 32-byte key, and the checker program named by the image ID ' \
+        'wrote a journal of this form with the same key, does the journal contain neither the step\'s output ' \
+        'itself nor any unsalted fingerprint, and can someone without the key not check the fingerprints against ' \
+        'candidate files. The same receipt also passes for another bundle carrying the same values, so this ' \
+        'record does not show who made the receipt. The bundle\'s locators, file names, descriptions and ' \
+        'parameter fields, the environment\'s identifiers, which checker program ran, the counts and which ' \
+        'steps are covered are not hidden. The zero-knowledge property of the zkVM itself has not been tested ' \
+        'by GenomicsChain.'
     }.freeze
     NOT_RECONSTRUCTED = 'whether the outputs are correct, or whether a rebuild gives the same outputs (Tier 3)'
 
@@ -49,8 +88,10 @@ module GenomicsChainProv
     # @param submitter_pubkey [String, nil] the customer's key, from outside the record
     # @param anchor_pubkey_pem [String, nil] the anchor's RSA public key (PEM), from outside the record
     # @param receipts [Hash] sha256 => bytes, receipts this verifier holds
+    # @param commitment_key [String, nil] the bundle's 32-byte key (v0.1.16 §7), raw bytes
+    # @param opens [Array<Array(String, String)>] [[local path, bundle locator], ...] to check under the key
     def initialize(bundle_text:, route: nil, fetch_error: nil, submitter_pubkey: nil, anchor_pubkey_pem: nil,
-                   receipts: {}, zk_verifier: nil)
+                   receipts: {}, zk_verifier: nil, commitment_key: nil, opens: [])
       @text = bundle_text
       @route = route
       @fetch_error = fetch_error
@@ -58,6 +99,8 @@ module GenomicsChainProv
       @anchor_pem = blank(anchor_pubkey_pem)
       @receipts = receipts || {}
       @zk = zk_verifier || ZkVerifier.new
+      @commitment_key = commitment_key
+      @opens = opens || []
     end
 
     def run
@@ -75,10 +118,13 @@ module GenomicsChainProv
       reason = unreadable_reason
       return not_comparable(reason) if reason
 
+      @out['statements'] = statements + journal_statements
       envelope_notes
       bundle_checks
+      option2_shape
       anchor_lines
       not_checked_lines
+      open_commitments unless @commitment_key.nil?
       @out['state'] = @out['confirmed'].all? { |c| c['ok'] } ? 'consistent' : 'mismatch'
       @out
     rescue Adapters::Bco::FormatError => e
@@ -315,7 +361,14 @@ module GenomicsChainProv
       return if declared.empty? || @receipts.empty?
       return @out['record_notes'] << "zk receipts not checked here: gc_zk_verify is not installed (#{@zk.bin})" unless ZkVerifier.available?(@zk.bin)
 
-      res = @zk.check(declared, @receipts)
+      res = @zk.check(declared, @receipts, commitment: Identity.derive(@text)['np'].commitment)
+      # an older binary cannot verify the convention: the receipt is not
+      # shown wrong, it is not checked here (round-1 review, separation-compat);
+      # only when nothing else failed (pre-flight r2)
+      if ZkVerifier.only_not_supported?(res)
+        return @out['record_notes'] << "zk receipts not checked here: #{ZkVerifier::NOT_SUPPORTED_NOTE}"
+      end
+
       codes = res['results'].map { |r| "stage #{r['stage']}: #{r['code']}" }.join(', ')
       confirm('zk_receipts', res['ok'], "zk receipts verified here and bound to their steps (#{codes})")
       @zk_confirmed = res['ok']
@@ -323,9 +376,87 @@ module GenomicsChainProv
       @out['record_notes'] << "zk receipts not checked here: #{e.message}"
     end
 
+    # Round-3 C2: the record's subject is the canonical digest, which cannot
+    # tell the bytes the anchor checked from the same bundle with a repeated
+    # key or a comment (the parse drops both). For a record whose receipts use
+    # gc-zk-journal-0.2, the adapter's bundle refusals are run on the bytes
+    # held here; if any, the option-2 statement is withheld and a failing
+    # line names the codes.
+    def option2_shape
+      return unless journal_conventions.include?(Adapters::Bco::JOURNAL_V02)
+
+      codes = Identity.admission(Identity.derive(@text))['bundle_refusals']
+      return if codes.empty?
+
+      @out['statements'] -= [JOURNAL_STATEMENTS.fetch(Adapters::Bco::JOURNAL_V02)]
+      confirm('option2_shape', false,
+              "the bundle held here is refused as an option-2 bundle (#{codes.join(', ')}); the option-2 " \
+              'statement is not printed for it')
+    end
+
     # --- what the anchor says ---------------------------------------------------
 
     def statements = Identity::STATEMENTS
+
+    # One statement per journal convention the record's signed receipts name.
+    def journal_statements
+      conventions = journal_conventions
+      JOURNAL_STATEMENTS.keys.select { |c| conventions.include?(c) }.map { |c| JOURNAL_STATEMENTS[c] }
+    end
+
+    def journal_conventions
+      Array(@manifest['zk_receipts']).filter_map { |r| r.is_a?(Hash) ? r['journal_convention'] : nil }.uniq
+    end
+
+    # --- opening salted fingerprints with the key (v0.1.16 §7) ----------------
+
+    # Needs the record (to confirm this bundle is the record's, by
+    # bundle_digest), the bundle and the key. Each local file's C(f) is
+    # compared with the bundle's hmac_sha256 at the named locator.
+    def open_commitments
+      # key_ok: whether the key was used — callers read this, not the wording of 'key'
+      o = @out['opened'] = { 'key' => nil, 'key_ok' => false, 'match' => [], 'mismatch' => [], 'not_in_bundle' => [],
+                             'unreadable' => [] }
+      unless @out['bundle_digest'] == @manifest['bundle_digest']
+        o['key'] = 'not used: this bundle is not the one the record names (bundle_digest differs)'
+        return
+      end
+      begin
+        key = Commitment.check_key!(@commitment_key)
+      rescue Commitment::KeyError => e
+        o['key'] = "not used: #{e.message}"
+        return
+      end
+      np = Identity.derive(@text)['np']
+      c = np.commitment || {}
+      unless c['state'] == 'ok' && c['key_id'] == Commitment.key_id(key)
+        o['key'] = c['state'] == 'ok' ? 'not this bundle\'s key (its key_id differs from the bundle\'s commitment)' :
+                                        "not used: the bundle has no usable commitment (#{c['state'] || 'none'})"
+        return
+      end
+      o['key'] = 'the key is 32 bytes and its key_id is the bundle\'s'
+      o['key_ok'] = true
+      salted = salted_by_locator
+      @opens.each do |path, locator|
+        want = salted[locator]
+        if want.nil? then o['not_in_bundle'] << locator
+        else
+          got = File.file?(path.to_s) ? Commitment.commit_file(key, path.to_s) : nil
+          if got.nil? then o['unreadable'] << locator
+          else
+            (got == want ? o['match'] : o['mismatch']) << locator
+          end
+        end
+      end
+    end
+
+    # locator => hmac_sha256, as the adapter reads the bundle.
+    def salted_by_locator
+      ext = Adapters::Bco.genomicschain_extension(Adapters::Bco.load(@text))
+      Adapters::Bco.checksums_from(ext).each_with_object({}) do |(loc, fp), acc|
+        acc[loc] = fp['hmac_sha256'] if fp['hmac_sha256']
+      end
+    end
 
     def anchor_lines
       says = @out['anchor_says']

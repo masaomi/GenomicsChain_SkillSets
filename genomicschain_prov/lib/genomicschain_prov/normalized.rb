@@ -39,6 +39,10 @@ module GenomicsChainProv
     :zk_receipts,     # [{'receipt_sha256','image_id','zkvm_name','zkvm_version','step_number','stage',
                       #   'journal_convention','input_uri','output_uri','input_sha256','output_sha256','defects'}]
                       #   declared ZK receipts as the bundle alone can read them (v0.1.12); [] when none
+                      #   v0.1.16 adds 'input_hmac_sha256','output_hmac_sha256' (what a 0.2 journal is compared with)
+    :commitment,      # {'state' => 'none'|'ok'|'unreadable'|'conflict', 'key_id'} — the gc-commitment-0.1
+                      #   declaration (v0.1.16 §6.1). Never leaves the process that parsed the bundle (C5)
+    :refusals,        # [String] codes the anchor refuses the bundle for (v0.1.16 §6.1, S2); [] when none
     :notes,           # [String] what the adapter saw and refused to invent a value for
     keyword_init: true
   ) do

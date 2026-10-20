@@ -23,7 +23,8 @@ end
 
 module GenomicsChainProv
   # Identity — a bundle's bytes → the signed identity of its Tier-2.5 record
-  # (design v0.1 §6; record_version 0.3 per v0.1.12 §6.1, 0.4 per v0.1.14 §6.2).
+  # (design v0.1 §6; record_version 0.3 per v0.1.12 §6.1, 0.4 per v0.1.14 §6.2,
+  # 0.5 per v0.1.16 §6.4).
   #
   # One function for every party: the customer's gc_prov_check computes the
   # params to sign with it, the anchor derives them again from the bytes it
@@ -38,7 +39,7 @@ module GenomicsChainProv
   module Identity
     # What a record issued now carries. 0.3 records stay readable: the sets
     # below are kept per version, and the verifier picks by the record's own.
-    RECORD_VERSION = '0.4'
+    RECORD_VERSION = '0.5'
     BUNDLE_DIGEST_CANONICALIZATION = 'kairos-sorted-json-0.1'
     ADMISSION_RULE = 'prov-admission-0.2'
     # What each rule an anchor has issued under means, for the verifier's
@@ -76,7 +77,11 @@ module GenomicsChainProv
     SIGNED_FIELDS = {
       '0.3' => BASE_SIGNED_FIELDS,
       # v0.1.14 §6.2 (3): the 0.3 fields unchanged, and the nine resource fields after them
-      '0.4' => (BASE_SIGNED_FIELDS + Resources::SIGNED_FIELDS).freeze
+      '0.4' => (BASE_SIGNED_FIELDS + Resources::SIGNED_FIELDS).freeze,
+      # v0.1.16 §6.4: the 0.4 fields unchanged. zk_receipts[].journal_convention
+      # may now be gc-zk-journal-0.2; the key_id and the salted fingerprints are
+      # never signed fields (C5).
+      '0.5' => (BASE_SIGNED_FIELDS + Resources::SIGNED_FIELDS).freeze
     }.freeze
 
     # The record's not_checked list (§6, §6.1 (4), §6.2 (3)): fixed by the
@@ -93,6 +98,15 @@ module GenomicsChainProv
         reference_genome_identification seed_identification
         platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
         resources_as_written
+      ].freeze,
+      # v0.1.16 §6.4: what a receipt reveals outside its journal is RISC Zero's
+      # zero-knowledge property, which GenomicsChain has not tested. On every
+      # 0.5 record, option 1 included (§6.1 (4): the same items per version).
+      '0.5' => %w[
+        locator_reachability bundle_truthfulness bundle_schema_conformance checksum_values_as_written
+        reference_genome_identification seed_identification
+        platform_as_written zk_guest_program_semantics zk_inputs_are_raw_data
+        resources_as_written zk_zero_knowledge_property
       ].freeze
     }.freeze
     NOT_CHECKED = NOT_CHECKED_BY_VERSION.fetch(RECORD_VERSION)
@@ -196,17 +210,28 @@ module GenomicsChainProv
     # The ZK checks that need the receipt bytes are ZkVerifier.check; this
     # reports the declarations' own defects.
     #
+    #
+    # v0.1.16: the adapter's option-2 refusals (§6.1, S2) are among them, and
+    # the journal conventions the declarations name are reported so the
+    # anchor can apply its own setting (S4). No configuration is read here:
+    # a customer's gc_prov_check says "issuable" for a 0.2 bundle that an
+    # anchor with the option closed refuses.
+    #
     # @return [Hash] 'issuable' (bool, bundle-side only), 'grade_overall' (for
     #   the reader, not a condition), 'zk_receipts_declared',
-    #   'zk_defects' [{'stage','defects'}], 'too_many_zk_receipts'
+    #   'zk_defects' [{'stage','defects'}], 'too_many_zk_receipts',
+    #   'bundle_refusals' [code], 'journal_conventions' [declared, distinct]
     def admission(derived)
-      receipts = Array(derived['np'].zk_receipts)
+      np = derived['np']
+      receipts = Array(np.zk_receipts)
       defects = receipts.reject { |r| r['defects'].empty? }
                         .map { |r| { 'stage' => r['stage'], 'defects' => r['defects'] } }
       too_many = receipts.length > MAX_ZK_RECEIPTS
-      { 'issuable' => defects.empty? && !too_many,
+      refusals = Array(np.refusals)
+      { 'issuable' => defects.empty? && !too_many && refusals.empty?,
         'grade_overall' => derived['graded']['grade_overall'], 'zk_receipts_declared' => receipts.length,
-        'zk_defects' => defects, 'too_many_zk_receipts' => too_many }
+        'zk_defects' => defects, 'too_many_zk_receipts' => too_many, 'bundle_refusals' => refusals,
+        'journal_conventions' => receipts.filter_map { |r| r['journal_convention'] }.uniq.sort }
     end
 
     # The params a verifier rebuilds from a stored manifest, by its own

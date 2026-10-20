@@ -218,18 +218,21 @@ class ProvSubmitTest < Minitest::Test
                    out[:claim]
       m = manifests(registry).first
       assert_equal 'prov_attestation', m['record_type']
-      assert_equal '0.4', m['record_version']
+      # v0.1.16 S3 (i)–(iii): record 0.5, adapter 0.5.0, writer 0.4.0, one
+      # more not_checked item; the signed field set is 0.4's.
+      assert_equal '0.5', m['record_version']
       assert_equal "prov:sha256:#{signed['bundle_digest']}", m['subject_ref']
       assert_equal 'immutable', m['grade_overall']
       assert_equal 'self_reported', m['trust_tier']
       assert_equal Identity::NOT_CHECKED, m['not_checked']
-      assert_equal 10, m['not_checked'].length
-      assert_equal 'resources_as_written', m['not_checked'].last
+      assert_equal 11, m['not_checked'].length
+      assert_equal %w[resources_as_written zk_zero_knowledge_property], m['not_checked'].last(2)
       assert_equal 'prov-admission-0.2', m['admission_rule']
-      assert_equal 'prov-adapter-bco-0.4.0', m['adapter_version']
-      assert_equal 'prov-writer-0.3.0', m['producer_version']
+      assert_equal 'prov-adapter-bco-0.5.0', m['adapter_version']
+      assert_equal 'prov-writer-0.4.0', m['producer_version']
       assert_equal out[:submission_key], m['submission_key']
-      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.4'])
+      assert_equal Identity::SIGNED_FIELDS['0.4'], Identity::SIGNED_FIELDS['0.5']
+      assert_equal signed, m.slice(*Identity::SIGNED_FIELDS['0.5'])
       assert_equal 'gc-resources-0.1', m['resources_rule_version']
     end
   end
@@ -358,7 +361,17 @@ class ProvSubmitTest < Minitest::Test
   # core's R0 fixture before core 0.6.2 turns this record type's branch into a
   # list. The bundle probes nothing (no machine, docker: false), so the key
   # does not depend on the host the test runs on.
-  def test_idempotency_key_matches_the_r0_fixture
+  #
+  # v0.1.16 S3 (i): the same bundle plan now gives another bundle (writer
+  # 0.4.0 names itself in it) and another signed identity (adapter 0.5.0), so
+  # the submission_key and with it this key move. The R0 fixture is not
+  # regenerated (its own rule); what is held instead is the rule core 0.6.2
+  # set — the key is sha256(submission_key) on both paths — and the value
+  # under v0.1.16, pinned here.
+  R0_PROV_KEY = '8f8f78992c199c34513169d8c01a9fb4d433ff0bf596936ab47cfff249f5aa90'
+  V0116_PROV_KEY = '5f69a8b32d51041872d1cd15d91a4c7587bd7183bac41f73133429ba03307edf'
+
+  def test_idempotency_key_follows_the_0_6_2_rule_and_is_pinned_for_v0_1_16
     with_proofs do |registry, tip_source|
       b = bundle
       identity = ProvSubmit.signed_params_for(b)
@@ -366,7 +379,13 @@ class ProvSubmitTest < Minitest::Test
       att = ProvStubAttestor.new(registry: registry)
       first = submit(registry, tip_source, b, identity, op, pkhash, att)
       second = submit(registry, tip_source, b, identity, op, pkhash, att)
-      IdempotencyFixture.check(self, 'prov_attestation', first, second)
+      assert_equal false, first[:recovered]
+      assert_equal true, second[:recovered]
+      assert_equal R0_PROV_KEY, IdempotencyFixture.expected('prov_attestation')['fresh'], 'the R0 fixture is untouched'
+      [first, second].each do |r|
+        assert_equal Digest::SHA256.hexdigest(r[:submission_key]), r[:idempotency_key], 'the 0.6.2 rule holds'
+        assert_equal V0116_PROV_KEY, r[:idempotency_key]
+      end
     end
   end
 
@@ -423,7 +442,7 @@ class ProvSubmitTest < Minitest::Test
         submit(registry, tip_source, b, identity, op, pkhash, ProvStubAttestor.new(registry: registry))
       end
       assert_match(/predicate_version/, err.message)
-      %w[prov-adapter-bco-0.4.0 prov-predicate-0.3.7 pin-strength-0.1.0].each { |v| assert_includes err.message, v }
+      %w[prov-adapter-bco-0.5.0 prov-predicate-0.3.7 pin-strength-0.1.0].each { |v| assert_includes err.message, v }
     end
   end
 
@@ -573,7 +592,8 @@ class ProvSubmitTest < Minitest::Test
       assert_equal [{ 'receipt_sha256' => RECEIPT_SHA, 'image_id' => IMAGE_ID, 'zkvm_name' => 'risc0-zkvm',
                       'zkvm_version' => '3.0.6', 'stage' => 1, 'journal_convention' => 'gc-zk-journal-0.1' }],
                    m['zk_receipts']
-      assert_equal({ 'verifier' => 'gc_zk_verify-0.1.0', 'risc0_zkvm' => '3.0.6',
+      # S3 (ii): the binary is 0.2.0; called without --journal, it is 0.1 as before
+      assert_equal({ 'verifier' => 'gc_zk_verify-0.2.0', 'risc0_zkvm' => '3.0.6',
                      'journal_convention' => 'gc-zk-journal-0.1', 'receipts_verified' => 1 }, m['zk_verification'])
       stored = Dir[File.join(dir, '**', '*')].select { |f| File.file?(f) }.map { |f| File.binread(f) }.join
       refute_includes stored, Base64.strict_encode64(RECEIPT)[0, 64], 'receipt bytes are never stored'
@@ -818,7 +838,7 @@ class ProvSubmitTest < Minitest::Test
       op, = signed_operator(tip_source, identity)
       res = JSON.parse(tool.call('bundle' => b, 'identity' => identity, 'operator' => op).first[:text])
       assert_equal 'ProcedureVersionMismatch', res['error']
-      assert_equal({ 'adapter' => 'prov-adapter-bco-0.4.0', 'predicate' => 'prov-predicate-0.3.7',
+      assert_equal({ 'adapter' => 'prov-adapter-bco-0.5.0', 'predicate' => 'prov-predicate-0.3.7',
                      'pin_strength' => 'pin-strength-0.1.0', 'resources_rule' => 'gc-resources-0.1' }, res['versions'])
     end
   end
@@ -834,7 +854,7 @@ class ProvSubmitTest < Minitest::Test
       res = JSON.parse(tool.call('bundle' => b, 'identity' => identity, 'operator' => op).first[:text])
       assert_equal 'ProcedureVersionMismatch', res['error']
       assert_includes res['message'], 'resources_rule_version'
-      assert_includes res['message'], 'record_version 0.4'
+      assert_includes res['message'], 'record_version 0.5'
       assert_equal 'gc-resources-0.1', res.dig('versions', 'resources_rule')
       assert_empty registry.read(:proofs)
     end

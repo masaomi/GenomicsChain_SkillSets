@@ -12,7 +12,13 @@
 #   what exactly would be signed          (signed_params, §6)
 #   will the anchor issue a record        (the ZK declarations; any grade is recorded)
 #   do my ZK receipts hold                (①–④ locally, when gc_zk_verify is
-#                                          installed and --zk-receipt is given)
+#                                          installed and --zk-receipt is given;
+#                                          ①–⑤ for gc-zk-journal-0.2, v0.1.16)
+#
+# What it cannot answer is whether a particular anchor offers option 2
+# (gc-zk-journal-0.2, design v0.1.16 S4): that is the anchor's own setting,
+# so a 0.2 bundle this tool calls issuable may be refused there with
+# `convention_not_offered`.
 #
 # This runs on the customer's machine, so — unlike the anchor — it may print
 # the bundle's own values: item names, locators, the reasons a version string
@@ -88,7 +94,15 @@ module GcProvCheck
     end
 
     bytes = paths.to_h { |p| b = File.binread(p); [Digest::SHA256.hexdigest(b), b] }
-    out = verifier.check(declared, bytes)
+    out = verifier.check(declared, bytes, commitment: derived['np'].commitment)
+    # an older binary: the receipt is not shown wrong, it is not checked here
+    # (round-1 implementation review, separation-compat) — but only when that
+    # is the sole reason anything is not ok; another receipt's real failure is
+    # reported as failed, with every result (pre-flight r2)
+    if GenomicsChainProv::ZkVerifier.only_not_supported?(out)
+      return { 'state' => 'not_checked', 'why' => GenomicsChainProv::ZkVerifier::NOT_SUPPORTED_NOTE }
+    end
+
     { 'state' => out['ok'] ? 'ok' : 'failed', 'results' => out['results'], 'undeclared' => out['undeclared'],
       'verifier' => out['verifier'] }
   rescue GenomicsChainProv::ZkVerifier::Unavailable => e
@@ -119,8 +133,13 @@ module GcProvCheck
     if issuable?(result)
       lines << "Tier 2.5: the anchor would issue a record for this bundle, carrying grade #{g['grade_overall']} " \
                '(the grade is recorded, not a condition; whoever reads the record draws its own line).'
+      if adm['journal_conventions'].include?(Bco::JOURNAL_V02)
+        lines << '  — if that anchor offers gc-zk-journal-0.2 receipts (option 2); one that does not refuses ' \
+                 'the bundle with convention_not_offered.'
+      end
     else
       lines << 'Tier 2.5: the anchor would NOT issue a record:'
+      adm['bundle_refusals'].each { |code| lines << "  bundle refused: #{code}" }
       lines << "  more than #{Identity::MAX_ZK_RECEIPTS} zk receipts declared" if adm['too_many_zk_receipts']
       adm['zk_defects'].each { |d| lines << "  zk receipt for stage #{d['stage'] || '?'}: #{d['defects'].join(', ')}" }
       lines << '  a zk receipt failed the local check (see above)' if result['zk_local']['state'] == 'failed'

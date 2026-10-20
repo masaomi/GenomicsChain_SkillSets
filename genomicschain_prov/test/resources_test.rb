@@ -328,12 +328,17 @@ class ResourcesTest < Minitest::Test
 
   # Acceptance (i) as a test, on the two bundles the repository holds: the 51
   # record_version-0.3 fields as prov 0.3.0 computed them before the change.
+  # v0.1.16 S3 (i): the adapter version is the one field that moves (0.4.0 →
+  # 0.5.0); the other 50 are what prov 0.3.0 computed.
   def test_the_0_3_fields_are_what_prov_0_3_0_computed
     expected = JSON.parse(File.read(File.expand_path('fixtures/record_v0_3/signed_0_3_fields_by_prov_0_3_0.json', __dir__)))
     expected['bundles'].each do |rel, fields|
       now = Identity.derive(File.read(File.expand_path(rel, __dir__)))['signed']
       assert_equal 51, fields.length
-      assert_equal fields, now.slice(*fields.keys), rel
+      assert_equal 'prov-adapter-bco-0.4.0', fields['adapter_version']
+      assert_equal 'prov-adapter-bco-0.5.0', now['adapter_version'], 'S3 (i)'
+      same = fields.keys - ['adapter_version']
+      assert_equal fields.slice(*same), now.slice(*same), rel
     end
   end
 

@@ -358,6 +358,9 @@ module GenomicsChainProv
       #   tasks ran on)
       # @param zk_receipts [Array<Hash>] receipt declarations (Writer.zk_declaration)
       # @param resources [Hash, nil] Writer.resources_block (design v0.1.14 §6.2)
+      # @param commitment [Hash, nil] option 2 (v0.1.16 §6.1): Commitment.declaration(key);
+      #   `checksums` then holds hmac_sha256 values only, and every `sha1_checksum`
+      #   already in the bundle is removed (an option-2 bundle carries none)
       # @return [Hash] a new bundle; the argument is not touched, because the
       #   digest subject is the bytes that were read (§4)
       # @return [Array(Hash, Array<String>)] the new bundle and what it refused
@@ -367,9 +370,26 @@ module GenomicsChainProv
       #   malformed bundle into one that parses — laundering the very defect
       #   the boundary rule exists to surface (§5, round 7).
       def enrich(bco, tools_by_step: {}, image_by_step: {}, checksums: {}, platform: nil, zk_receipts: [],
-                 resources: nil)
+                 resources: nil, commitment: nil)
         out = JSON.parse(JSON.generate(bco))
         refused = []
+        if commitment
+          removed = strip_sha1!(out)
+          refused << "option 2: removed #{removed} sha1_checksum field(s) the bundle already carried" if removed.positive?
+          # the adapter's own item rule, not a copy of it (round-1 review, Fable #3)
+          # plus the elements whose shape hides their items (a list wrapping a
+          # block, the block as a list): the adapter refuses those too (pre-flight r2)
+          others = Array(out['extension_domain']).count do |e|
+            e.is_a?(Hash) && e['genomicschain_extension'].is_a?(Hash) &&
+              e.dig('genomicschain_extension', 'producer', 'name') != Writer::PRODUCER_NAME &&
+              Array(e.dig('genomicschain_extension', 'checksums')).any? { |c| !Adapters::Bco.option2_item?(c) }
+          end + Adapters::Bco.unshaped_extension_elements(out)
+          if others.positive?
+            refused << "option 2: #{others} extension block(s) by another producer, or not written as an object, " \
+                       'carry plain checksums or cannot be shown free of them; ' \
+                       'the anchor will refuse the bundle (plain_fingerprint_in_option2_bundle)'
+          end
+        end
         steps = out.dig('description_domain', 'pipeline_steps')
         Array(steps).each do |step|
           next unless step.is_a?(Hash)
@@ -388,8 +408,20 @@ module GenomicsChainProv
         end
         apply_io_checksums!(out['io_domain'], checksums)
         refused.concat(set_extension!(out, checksums, platform: platform, zk_receipts: zk_receipts,
-                                                      resources: resources))
+                                                      resources: resources, commitment: commitment))
         [out, refused]
+      end
+
+      # Every `sha1_checksum` key anywhere in the bundle, removed in place.
+      # @return [Integer] how many
+      def strip_sha1!(node)
+        case node
+        when Hash
+          n = node.delete('sha1_checksum') ? 1 : 0
+          n + node.each_value.sum { |v| strip_sha1!(v) }
+        when Array then node.sum { |v| strip_sha1!(v) }
+        else 0
+        end
       end
 
       # One `{name, version, uri}` per tool the process declared, each carrying
@@ -428,15 +460,19 @@ module GenomicsChainProv
       # two naming DIFFERENT producers cancel each other out, and a bundle
       # whose enrichment history is visible in its array length is a bundle
       # whose grade depends on how many times a command was run.
-      def set_extension!(bco, checksums, platform: nil, zk_receipts: [], resources: nil)
+      def set_extension!(bco, checksums, platform: nil, zk_receipts: [], resources: nil, commitment: nil)
         if bco.key?('extension_domain') && !bco['extension_domain'].is_a?(Array)
           return ['extension_domain is not an array; left untouched, and no checksum was written']
         end
 
-        block = Writer.extension_block(checksums, platform: platform, zk_receipts: zk_receipts, resources: resources)
+        block = Writer.extension_block(checksums, platform: platform, zk_receipts: zk_receipts, resources: resources,
+                                                  commitment: commitment)
         list = bco['extension_domain'] || []
         at = list.index do |e|
-          e.is_a?(Hash) && e.dig('genomicschain_extension', 'producer', 'name') == Writer::PRODUCER_NAME
+          # a genomicschain_extension that is not an object is not ours to replace
+          # (and dig into a list raised TypeError; pre-flight r2)
+          e.is_a?(Hash) && e['genomicschain_extension'].is_a?(Hash) &&
+            e.dig('genomicschain_extension', 'producer', 'name') == Writer::PRODUCER_NAME
         end
         at ? list[at] = block : list << block
         bco['extension_domain'] = list
@@ -453,17 +489,21 @@ module GenomicsChainProv
       # @param trace_paths [Array<String>, nil] the traces to read resources
       #   from; nil = trace_path when given, else every
       #   pipeline_info/execution_trace*.txt under the launch directory
+      # @param commitment_key [String, nil] option 2 (v0.1.16): the bundle's
+      #   32-byte key; every file fingerprint is then gc-commitment-0.1 and the
+      #   key's declaration is written. The key is not written anywhere.
       # @return [Hash] {'bco' => the enriched bundle, 'notes' => [String]}
+      # @raise [Writer::PlanError] option 2, when the anchor would refuse the enriched bundle
       def read(launch_dir, bco:, versions_path: nil, trace_path: nil, work_root: 'work',
                digest_map: {}, script_path: nil, jar_path: nil, checksums: true, docker: true,
                platform: nil, zk_receipts: [], machine: nil, host_os: Etc.uname[:sysname],
-               resource_steps: [], trace_paths: nil)
+               resource_steps: [], trace_paths: nil, commitment_key: nil)
         notes = []
         steps = Array(bco.dig('description_domain', 'pipeline_steps')).select { |s| s.is_a?(Hash) }
 
         tools_by_step = tools_by_step(steps, launch_dir, versions_path, notes)
         image_by_step = image_by_step(steps, launch_dir, work_root, trace_path, digest_map, docker, notes)
-        sums = checksums ? collect_checksums(bco, launch_dir, script_path, jar_path, notes) : {}
+        sums = checksums ? collect_checksums(bco, launch_dir, script_path, jar_path, notes, commitment_key) : {}
         notes << 'checksums were skipped (--no-checksums)' unless checksums
         # On macOS the GPU lines are never written for a Nextflow run
         # (operator, 2026-10-17, implementation review r2): nf-prov's bundle
@@ -473,9 +513,15 @@ module GenomicsChainProv
         traced = trace_resources(steps, launch_dir, trace_paths || (trace_path ? [trace_path] : nil), notes)
         resources = Writer.resources_block(machine: machine, steps: traced + resource_steps)
 
+        commitment = commitment_key && Commitment.declaration(commitment_key)
+        # option 2: the shape guard on what was collected, then the adapter's
+        # admission on the finished bundle — other and second blocks keep
+        # whatever they carried (round-1 implementation review, H2)
+        Writer.check_option2!(sums, zk_receipts, commitment) if commitment
         enriched, refused = enrich(bco, tools_by_step: tools_by_step, image_by_step: image_by_step,
                                         checksums: sums, platform: platform, zk_receipts: zk_receipts,
-                                        resources: resources)
+                                        resources: resources, commitment: commitment)
+        Writer.check_option2_bundle!(enriched) if commitment
         { 'bco' => enriched, 'notes' => notes + refused }
       end
 
@@ -565,7 +611,7 @@ module GenomicsChainProv
       # the workflow script, and the framework jar keyed by the runtime's own
       # locator (§10-9 — the jar is the engine, and the release URL the bundle
       # names is what the record joins it to).
-      def collect_checksums(bco, launch_dir, script_path, jar_path, notes)
+      def collect_checksums(bco, launch_dir, script_path, jar_path, notes, commitment_key = nil)
         sums = {}
         io = bco['io_domain'].is_a?(Hash) ? bco['io_domain'] : {}
         %w[input_subdomain output_subdomain].each do |key|
@@ -575,20 +621,20 @@ module GenomicsChainProv
             locator = entry['uri']['uri'].to_s
             next if locator.empty? || locator =~ Environment::REMOTE_SCHEME
 
-            digests = Environment.digest_file(Environment.absolute(locator, launch_dir))
+            digests = Environment.digest_file(Environment.absolute(locator, launch_dir), commitment_key: commitment_key)
             sums[locator] = digests if digests
           end
         end
         notes << 'no io file under the launch directory could be read: the run directory is gone' if sums.empty?
 
         add_file_checksum(sums, script_locator(bco), script_path, notes,
-                          'workflow script', '--script PATH')
+                          'workflow script', '--script PATH', commitment_key)
         add_file_checksum(sums, runtime_locator(bco), jar_path || runtime_jar(bco), notes,
-                          'runtime (the framework jar)', '--nextflow-jar PATH')
+                          'runtime (the framework jar)', '--nextflow-jar PATH', commitment_key)
         sums
       end
 
-      def add_file_checksum(sums, locator, path, notes, what, flag)
+      def add_file_checksum(sums, locator, path, notes, what, flag, commitment_key = nil)
         return if locator.nil? || locator.empty?
 
         if path.nil?
@@ -600,7 +646,7 @@ module GenomicsChainProv
           return
         end
 
-        digests = Environment.digest_file(path)
+        digests = Environment.digest_file(path, commitment_key: commitment_key)
         sums[locator] = digests if digests
       end
 

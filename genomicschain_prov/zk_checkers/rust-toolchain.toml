@@ -1,0 +1,6 @@
+# Host toolchain. The guests are built by risc0-build with the RISC Zero
+# toolchain installed by rzup (rust 1.97.0 at the time of writing).
+[toolchain]
+channel = "1.98.1"
+components = ["rustfmt", "rust-src"]
+profile = "minimal"

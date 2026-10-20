@@ -67,12 +67,12 @@ class ProvCheckTest < Minitest::Test
       assert_equal 0, status.exitstatus
       assert_includes out, 'resources: absent (gc-resources-0.1; not part of the grade above)'
       assert_includes out, 'machine: not recorded; GPUs not looked for'
-      assert_includes out, 'resources rule gc-resources-0.1, record_version 0.4'
+      assert_includes out, 'resources rule gc-resources-0.1, record_version 0.5'
 
       json, = run_check(path, '--json')
       res = JSON.parse(json)
-      assert_equal '0.4', res['record_version']
-      assert_equal GenomicsChainProv::Identity::SIGNED_FIELDS['0.4'], res['signed_params'].keys
+      assert_equal '0.5', res['record_version']
+      assert_equal GenomicsChainProv::Identity::SIGNED_FIELDS['0.5'], res['signed_params'].keys
       assert_equal 'gc-resources-0.1', res.dig('versions', 'resources_rule')
     end
   end

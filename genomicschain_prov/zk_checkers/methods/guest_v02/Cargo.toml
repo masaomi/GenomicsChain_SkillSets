@@ -1,0 +1,14 @@
+# The claude_01 size-factor check with the gc-zk-journal-0.2 journal (design
+# §6.2). Same plain sha2 as the 0.1 guest so that T5 compares like with like.
+[package]
+name = "checker_v02"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "=3.0.6", default-features = false, features = ["std"] }
+sha2 = "=0.10.9"
+hmac = "=0.12.1"

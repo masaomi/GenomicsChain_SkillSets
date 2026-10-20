@@ -127,8 +127,10 @@ class ProvVerifyTest < Minitest::Test
       assert_includes details(res), 'self-consistent with the key in the manifest — this does not show who the submitter is'
       assert(res['anchor_says'].any? { |s| s.include?('(anchor-reported)') && s.include?('mmp:test-anchor') })
       assert(res['anchor_says'].any? { |s| s.include?('zk receipts: 1 verified') && s.include?('anchor-reported') })
-      assert_equal 11, res['not_checked'].length, 'ten from the record and the one nobody can say (Tier 3)'
-      assert_equal GenomicsChainProv::Identity::STATEMENTS, res['statements']
+      assert_equal 12, res['not_checked'].length, 'eleven from the record and the one nobody can say (Tier 3)'
+      # v0.1.16 §7: the two statements, and the one for a gc-zk-journal-0.1 receipt
+      assert_equal GenomicsChainProv::Identity::STATEMENTS + [Verifier::JOURNAL_STATEMENTS['gc-zk-journal-0.1']],
+                   res['statements']
       assert_includes res['summary'].join, 'platform as stated in the bundle: x86_64 Linux 6.8.0'
     end
   end
@@ -206,6 +208,11 @@ class ProvVerifyTest < Minitest::Test
   # (ii): a record prov 0.3.0 made, before the change (made_with.json says
   # so), read by this verifier. Everything it signed re-derives, and nothing
   # is said about resources — a 0.3 record has none.
+  #
+  # v0.1.16 S3 (v): the record names adapter 0.4.0 and this verifier runs
+  # 0.5.0, so the grades and counts are not re-derived and the difference is
+  # reported as one of version. Every other check — digest, signatures,
+  # submission_key, claim — is unchanged.
   def test_a_record_made_by_prov_0_3_0_is_consistent_under_this_verifier
     route = JSON.parse(File.read(File.join(V03, 'route.json')))
     signed = JSON.parse(route['evidence'])['manifest']
@@ -217,11 +224,13 @@ class ProvVerifyTest < Minitest::Test
                  anchor_pubkey_pem: File.read(File.join(V03, 'anchor_pubkey.pem')))
     assert_equal 'consistent', res['state']
     assert_equal %w[bundle_digest subject_ref manifest_body_sha256 submitter_pubkey submission_key claim
-                    submitter_signature grades_and_counts anchor_signature], res['confirmed'].map { |c| c['check'] }
-    assert_nil res['version_note']
+                    submitter_signature anchor_signature], res['confirmed'].map { |c| c['check'] }
+    assert_includes res['version_note'], 'prov-adapter-bco-0.5.0'
+    assert_includes res['version_note'], 'prov-adapter-bco-0.4.0'
+    assert_includes res['version_note'], 'a difference of version, not a mismatch'
     assert_nil res['resources_version_note']
     assert_equal 10, res['not_checked'].length, 'the nine the 0.3 record carries, and the Tier 3 line'
-    refute(res['summary'].any? { |l| l.start_with?('resources') })
+    refute(Array(res['summary']).any? { |l| l.start_with?('resources') })
   end
 
   def swap_rule(version)
