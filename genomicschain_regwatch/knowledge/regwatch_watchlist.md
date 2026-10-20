@@ -66,7 +66,7 @@ operator decides what that means.
 - kind: dated
 - due: 2027-01-15
 - title: ICH E6(R3) Annex 2 applies in the EU
-- url: https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline
+- url: https://www.ema.europa.eu/en/scientific-guidelines/ich-e6-good-clinical-practice
 - watch: text
 - binds: sponsors and investigators in the EU
 - why: Added 2026-10-04. ICH adopted Annex 2 at Step 4 on 2026-06-03; the EU applies it from 2027-01-15. FDA still listed it as draft on 2026-10-03 and the Swiss application date could not be found, so the same text arrives on three different dates. Annex 2 is where decentralised and pragmatic trial elements, and the data they generate, are addressed.
@@ -165,10 +165,10 @@ operator decides what that means.
 ## edpb-blockchain-guidelines
 - kind: undated
 - title: EDPB Guidelines 02/2025 on processing personal data through blockchain — final v2.0 adopted 2026-07-07
-- url: https://www.edpb.europa.eu/our-work-tools/general-guidance/guidelines-recommendations-best-practices_en
+- url: https://www.edpb.europa.eu/documents/guideline/guidelines-022025-on-processing-of-personal-data-through-blockchain_en
 - watch: text
 - binds: controllers
-- why: Final v2.0 adopted 2026-07-07; on a mechanical comparison §52, §53 and §104 are identical to the consultation version apart from one comma. This one document determines the architecture. §52 makes the hash itself personal data and rejects unsalted, unkeyed hashes — reversing CNIL 2018. §104 rules out clear-text, encrypted and hashed personal data on-chain alike. §53 prefers perfectly-hiding commitments, which is the primitive a selective-disclosure protocol wants anyway. Watch the guidance index for a v3 or for sector guidance.
+- why: Final v2.0 adopted 2026-07-07; on a mechanical comparison §52, §53 and §104 are identical to the consultation version apart from one comma. This one document determines the architecture. §52 makes the hash itself personal data and rejects unsalted, unkeyed hashes — reversing CNIL 2018. §104 rules out clear-text, encrypted and hashed personal data on-chain alike. §53 prefers perfectly-hiding commitments, which is the primitive a selective-disclosure protocol wants anyway. Watch the guidance index for a v3 or for sector guidance. URL changed 2026-10-20: the guidelines index used before had been redirecting to the public-consultations list since at least 2026-08-29, so it could not show a new version; this is the document page itself.
 
 ## edpb-scientific-research-guidelines
 - kind: undated
@@ -181,7 +181,7 @@ operator decides what that means.
 ## ich-e6-r3-annex-2
 - kind: undated
 - title: ICH E6(R3) Good Clinical Practice — Annex 2 and the consolidated guideline
-- url: https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline
+- url: https://www.ema.europa.eu/en/scientific-guidelines/ich-e6-good-clinical-practice
 - watch: text
 - binds: sponsors and investigators
 - why: Principles and Annex 1 in force in the EU since 2025-07-23; Annex 2 and the consolidated text from 2027-01-15. The new §4 data governance is the substantive change. Note R3 deleted R2's retention rule and weakened the certified-copy definition, while both EMA guidelines still carry the R2 wording — plan against R2 until that is reconciled.
@@ -638,3 +638,78 @@ The 2026-10-03 agent-team check found that FDA, Swissmedic and the Swiss data pr
 - watch: full
 - binds: manufacturers, importers, distributors, open-source stewards
 - why: Added 2026-10-04. EUR-Lex answers automated clients with a challenge page, so the text of EU acts could only be re-read by hand and every claim resting on them was carried as a permanent gap. The Publications Office's Cellar SPARQL endpoint, which holds the same documents, lists every consolidated version, every corrigendum and every act recorded as amending this one, and all three are how an EU text changes. This watches that list — on 2026-10-04: 1 consolidated version (2024-11-20), 7 corrigenda, 1 amending act (2025/327, the EHDS Regulation). A change means something new exists and must be read; it does not say what changed, and a consolidated version can lag the amending act by weeks, which is why amending acts are in the list too. The result is XML and its digest was stable across repeated fetches.
+
+---
+
+# Tier 6 — GCP self-assessment checklist sources (added 2026-10-20)
+
+Third admission route, from 2026-10-20: an entry may be added because the Tier 6 GCP
+self-assessment checklist rests on it. Tier 6 also rests on these entries already on the list:
+`ich-e6-r3-annex-2-eu-applies`, `ich-e6-r3-annex-2`, `ema-computerised-systems-gcp`, the
+`ema-tmf-guideline`, `fda-e6r3-annex-2`, `swissmedic-ich-e6r3`,
+`ema-gcp-iwg`, `ecfr-part11-versions`, `fedlex-klinv-versions`, `eurlex-ctr-versions`.
+
+## jp-gcp-ordinance-amendment-2027
+- kind: dated
+- due: 2027-05-20
+- title: Japan GCP ordinance (平成九年厚生省令第二十八号) — amendment promulgated 2026-06-30 takes effect
+- url: https://laws.e-gov.go.jp/api/2/law_revisions/409M50000100028
+- watch: pattern:"law_revision_id":"[^"]+"
+- binds: sponsors, investigators and medical institutions conducting clinical trials in Japan
+- why: Tier 6. e-Gov lists revision 409M50000100028_20270520_508M60000100110 as UnEnforced, from the 薬機法 amendment's ministerial-ordinance package. Read what changes before the date; the checklist's Japanese items must not describe the old text after it.
+
+## egov-jp-gcp-ordinance-versions
+- kind: undated
+- title: e-Gov — revision list of the Japan GCP ordinance (GCP省令)
+- url: https://laws.e-gov.go.jp/api/2/law_revisions/409M50000100028
+- watch: pattern:"law_revision_id":"[^"]+"
+- binds: sponsors, investigators and medical institutions conducting clinical trials in Japan
+- why: Tier 6. Compares only the revision ids, because the JSON also carries an `updated` timestamp that moves without any change to the text. A new id means a new amendment.
+
+## pmda-ich-e6
+- kind: undated
+- title: PMDA — ICH-E6 GCP page (Japanese implementation status of E6(R3) and its annexes)
+- url: https://www.pmda.go.jp/int-activities/int-harmony/ich/0028.html
+- watch: text
+- binds: sponsors running trials in Japan
+- why: Tier 6. Where Japan's adoption of E6(R3) and Annex 2 shows up first; the ordinance itself changes later, if at all.
+
+## ich-e6-r3-step4-guideline
+- kind: undated
+- title: ICH E6(R3) Step 4 final guideline (principles and Annex 1), 2025-01-06
+- url: https://database.ich.org/sites/default/files/ICH_E6(R3)_Step4_FinalGuideline_2025_0106.pdf
+- watch: full
+- binds: sponsors and investigators in ICH regions
+- why: Tier 6. The source text the checklist adapts (ICH copyright notice permits adaptation with acknowledgement and labelled changes). A PDF, so raw bytes; a change here means ICH reissued the file. The ich.org guideline index is a script-only page and cannot be watched.
+
+## ecfr-part50-versions
+- kind: undated
+- title: eCFR version history for 21 CFR Part 50 (protection of human subjects)
+- url: https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=50
+- watch: full
+- binds: sponsors and investigators under FDA jurisdiction
+- why: Tier 6. Informed-consent requirements; last amendment 2024-01-22. JSON, so raw bytes.
+
+## ecfr-part56-versions
+- kind: undated
+- title: eCFR version history for 21 CFR Part 56 (institutional review boards)
+- url: https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=56
+- watch: full
+- binds: IRBs, sponsors and investigators under FDA jurisdiction
+- why: Tier 6. IRB requirements. JSON, so raw bytes.
+
+## ecfr-part312-versions
+- kind: undated
+- title: eCFR version history for 21 CFR Part 312 (investigational new drug application)
+- url: https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=312
+- watch: full
+- binds: sponsors and investigators of IND studies
+- why: Tier 6. Sponsor and investigator obligations under an IND. JSON, so raw bytes.
+
+## eurlex-ai-hs-decision-versions
+- kind: undated
+- title: Cellar — consolidated versions, corrigenda and amending acts of Implementing Decision (EU) 2026/2274 (harmonised standards under the AI Act)
+- url: https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202026D2274%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232026D2274R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232026D2274%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex
+- watch: full
+- binds: providers of high-risk AI systems
+- why: Added 2026-10-20, cited as `oj-2026-2274` on the EU AI Act page. The decision cites EN 18286:2026, the first harmonised standard under the AI Act; further standards would arrive as an amendment. Empty on 2026-10-20 (no corrigendum or amendment yet); the same query shape returns 10 rows for the CRA, so empty here means none, not a broken query. JSON, so raw bytes.

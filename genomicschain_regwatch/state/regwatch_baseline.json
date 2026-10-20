@@ -1,6 +1,6 @@
 {
   "rules_version": "regwatch-scan-0.1.0",
-  "recorded_at": "2026-10-04T04:28:38Z",
+  "recorded_at": "2026-10-20T13:41:20Z",
   "entries": {
     "ai-act-definition-guidelines": {
       "digest": "2960f5d95fecb1b12e5fcf81c4ac6bf1f3530aba912f8c97e95df2b194565e51",
@@ -23,9 +23,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-highrisk-guidelines-page": {
-      "digest": "c484cac78282f58aa8ea2d26b18d0d7807e7d6563aa6698bf6610ee4598ebdf2",
+      "digest": "adecc9f9b6a08a3546609575d49761226106f6053d49cedb7355401a2196ed6e",
       "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "mdcg-2025-6-mdr-ai-interplay": {
       "digest": "48db859581fb5f1677068cd4eca770e062c5fcc2a8483d6459daceeb98478626",
@@ -43,9 +43,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "ich-e6-r3-annex-2-eu-applies": {
-      "digest": "6ebc537a46300b2860fa8be7e38006500a4ee201843bfe5fc07bf95b084baafc",
-      "url": "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "digest": "3fef8a8db71f469badfa59fcaed9197ae1e543978d9f7ff8870aea58e39441e0",
+      "url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-e6-good-clinical-practice",
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "ehds-art73-implementing-act": {
       "digest": "c176a071ac37db9059b94279b62db8ec349fe4ca7599b27f75eabc574a541f4e",
@@ -63,9 +63,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "cra-steward-reporting": {
-      "digest": "cbc14d3147dffb00cde55098b90f38dd3c967f3044e61341f14cacfa3a489fc8",
+      "digest": "f9a4b061c735f030982182853f735ba9e21444732c5410abb9eba5c7ec6e0faf",
       "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-open-source",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "ai-act-annex-i-high-risk": {
       "digest": "69d39905fe9995ecee74c767e068f7c631229f1b2b61c4bb91ee622c7c73e84e",
@@ -93,19 +93,19 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "edpb-blockchain-guidelines": {
-      "digest": "1e552bbfe69858b74f15faa64c9b8fdcd26b7530e67e58430d43e454bc94fc36",
-      "url": "https://www.edpb.europa.eu/our-work-tools/general-guidance/guidelines-recommendations-best-practices_en",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "digest": "2ce1ed3808d75c905b51e6b692291c170d4645e02d3b1f0b53da2e9755511b9b",
+      "url": "https://www.edpb.europa.eu/documents/guideline/guidelines-022025-on-processing-of-personal-data-through-blockchain_en",
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "edpb-scientific-research-guidelines": {
-      "digest": "7c6d2e06565b13bef08d5b5625fd0e0f130e82e7a00fc93e498856b1ab65b9b8",
+      "digest": "16ba33cd9f0bac390216917df53dd8cb0339b28fdb94340199fbcd2ad979c849",
       "url": "https://www.edpb.europa.eu/public-consultations/guidelines-12026-on-processing-of-personal-data-for-scientific-research_en",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "ich-e6-r3-annex-2": {
-      "digest": "6ebc537a46300b2860fa8be7e38006500a4ee201843bfe5fc07bf95b084baafc",
-      "url": "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "digest": "3fef8a8db71f469badfa59fcaed9197ae1e543978d9f7ff8870aea58e39441e0",
+      "url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-e6-good-clinical-practice",
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "ema-tmf-guideline": {
       "digest": "69e6299397472765372c610785e79b323778b89621eeb03e8f0ebc43b27f105f",
@@ -163,9 +163,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "ai-act-enforcement-page": {
-      "digest": "39f329e37d6729b5110af72f35399913281ae46e43c7df77774f1eb4abb8e4a6",
+      "digest": "8a63c9f1aefa87d4ae7ab347915b4fba20ae880dddb8fb3a83e97aab86819289",
       "url": "https://digital-strategy.ec.europa.eu/en/policies/enforcement-ai-act",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "fda-ai-drug-decision-guidance": {
       "digest": "c9eff14cc2294a69dd1d970d6e60c41f11066908a16049f478f4755887aee182",
@@ -193,9 +193,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "doj-data-security-program": {
-      "digest": "5e69da5219bb614b168a1fb679c3503b9b7fb74cd91cd1b30838f2829a04be18",
+      "digest": "a6ca21a234c89e30b269d46802314d6c9fe33acd05f4c8791b21600a65b31e8d",
       "url": "https://www.justice.gov/nsd/data-security",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "swissmedic-ich-e6r3": {
       "digest": "8ca46ffa0f1d975902423804de91f7a4d78b119997e5f1c346481eac4b09b848",
@@ -243,9 +243,9 @@
       "seen_at": "2026-10-04T02:43:37Z"
     },
     "edpb-anonymisation-guidelines": {
-      "digest": "78518c4914ab814f5681234cc4ce062746492daee5f802b7c078608082bd2b85",
+      "digest": "ed62243e932cf065f0bcb76ecee5548b2aa8c6cb083d1287a4427d2df46e8521",
       "url": "https://www.edpb.europa.eu/public-consultations/guidelines-022026-on-anonymisation_en",
-      "seen_at": "2026-10-04T02:43:37Z"
+      "seen_at": "2026-10-20T13:41:20Z"
     },
     "ema-gcp-iwg": {
       "digest": "5847eb4dff9c38a9b4bd23c3a28b9b5476201fc26e55056c47044e1f7a77a387",
@@ -348,9 +348,49 @@
       "seen_at": "2026-10-04T04:28:38Z"
     },
     "eurlex-cra-versions": {
-      "digest": "7c0eb3a867ee6350ddd6eb6307a17d6cd1baa6b80ea2ead2965dd42fec72eab2",
+      "digest": "9cf13120806955089c5cf45a0ab090809409951c16822567fd3352f1cbdbb8c6",
       "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202024R2847%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232024R2847R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232024R2847%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
-      "seen_at": "2026-10-04T04:28:38Z"
+      "seen_at": "2026-10-20T13:41:20Z"
+    },
+    "jp-gcp-ordinance-amendment-2027": {
+      "digest": "75705b92457c5133947def56f299d13c23c89247f90248518536125cb1a920e3",
+      "url": "https://laws.e-gov.go.jp/api/2/law_revisions/409M50000100028",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "egov-jp-gcp-ordinance-versions": {
+      "digest": "75705b92457c5133947def56f299d13c23c89247f90248518536125cb1a920e3",
+      "url": "https://laws.e-gov.go.jp/api/2/law_revisions/409M50000100028",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "pmda-ich-e6": {
+      "digest": "a4cad2cb13331f9e38e2dd5a44fa386b9584f2bcc178dec61c46efa3f7835201",
+      "url": "https://www.pmda.go.jp/int-activities/int-harmony/ich/0028.html",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "ich-e6-r3-step4-guideline": {
+      "digest": "e6ce19e36ce7d2e294f89ee89492b9e035178c3cca48984392bbd92eec9b002c",
+      "url": "https://database.ich.org/sites/default/files/ICH_E6(R3)_Step4_FinalGuideline_2025_0106.pdf",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "ecfr-part50-versions": {
+      "digest": "735c3a891f0a442f727eed401304e10c0bcecfc7416c3cb6709273936264bc43",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=50",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "ecfr-part56-versions": {
+      "digest": "ca77a6377d9144af5fac8611d948c2fa18eef6807b7c28c39a87959d685aff1f",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=56",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "ecfr-part312-versions": {
+      "digest": "52b32ff5a2fd36b713a0f07c6a5888ccfdaef63af686deda94ff6cf4fb510b12",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-21.json?part=312",
+      "seen_at": "2026-10-20T06:58:05Z"
+    },
+    "eurlex-ai-hs-decision-versions": {
+      "digest": "0d986e68f909b49546407e2aa9a6269201d06b7138d25e16197095940887307f",
+      "url": "https://publications.europa.eu/webapi/rdf/sparql?query=PREFIX+cdm%3A+%3Chttp%3A%2F%2Fpublications.europa.eu%2Fontology%2Fcdm%23%3E+PREFIX+xsd%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2001%2FXMLSchema%23%3E+SELECT+DISTINCT+%3Fcelex+WHERE+%7B+%7B+%3Fw+cdm%3Aresource_legal_id_celex+%3Fcelex+.+FILTER%28STRSTARTS%28STR%28%3Fcelex%29%2C+%2202026D2274%22%29+%7C%7C+STRSTARTS%28STR%28%3Fcelex%29%2C+%2232026D2274R%22%29%29+%7D+UNION+%7B+%3Fb+cdm%3Aresource_legal_id_celex+%2232026D2274%22%5E%5Exsd%3Astring+.+%3Fa+cdm%3Aresource_legal_amends_resource_legal+%3Fb+.+%3Fa+cdm%3Aresource_legal_id_celex+%3Fcelex+.+%7D+%7D+ORDER+BY+%3Fcelex",
+      "seen_at": "2026-10-20T13:41:20Z"
     }
   }
 }
