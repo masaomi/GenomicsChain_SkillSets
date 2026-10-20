@@ -8,3 +8,11 @@
 # Proofs are append-only. A misconfigured second anchor cannot be un-recorded.
 genomicschain:
   anchor_profile: true
+  # Tier 2.5 option 2 (prov design v0.1.16 S4): whether this anchor accepts
+  # bundles whose ZK receipts use the salted journal gc-zk-journal-0.2. Off by
+  # default; a bundle declaring such a receipt is then refused with
+  # convention_not_offered before any receipt is verified. The operator turns
+  # it on, and only after the confidentiality tests (design §10, T1–T5) pass.
+  # Only gc_prov_submit reads it, and only in Prov#admit!.
+  zk:
+    confidential_receipts: false

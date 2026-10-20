@@ -23,6 +23,8 @@ Since 0.6.0 any SkillSet may list `anchor_profile_tool_classes` in its own `skil
 
 0.6.2 (prov design v0.1.15 §6.3 (7), (11)): `SubmitCore::SUBMISSION_KEYED` lists the record types whose idempotency key is `sha256(submission_key)` — `prov_attestation` and now `prov_reachability`; every other type keeps its derivation, pinned before the change in `test/fixtures/idempotency_keys_r0.json`. Adds `Backing` (the label vocabulary `gc-backing-0.1`) and `ProvProofRef.for(proof_id)` (how a record points at a prov record without naming it).
 
+0.6.3 (prov design v0.1.16 §6.1, §9): the BCO extension schema's `checksums[]` items carry exactly one of `sha256` or `hmac_sha256` (the salted fingerprint `gc-commitment-0.1`), the extension may carry `commitment` `{rule, key_id}`, and a ZK receipt's `journal` may be `gc-zk-journal-0.2`. The schema URL stays `v0_1` (not yet published). Whether a bundle may use them is the prov adapter's rule, not the schema's. The anchor example config documents `genomicschain.zk.confidential_receipts` (default `false`), read only by `gc_prov_submit`.
+
 ## Deployment profiles
 
 | Node | Packages | anchor_profile | Submit tools |

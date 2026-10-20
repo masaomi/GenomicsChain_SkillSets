@@ -15,15 +15,27 @@
       }
     },
     "checksums": {
-      "description": "SHA-256 of the bytes behind a locator, joined to inputs, outputs, tools, the runtime and workflow scripts by the exact locator string. The standard's own field is SHA-1; this carries SHA-256 beside it. Two different digests for one locator pin nothing.",
+      "description": "A fingerprint of the bytes behind a locator, joined to inputs, outputs, tools, the runtime and workflow scripts by the exact locator string. Each item carries exactly one of sha256 (plain SHA-256) or hmac_sha256 (gc-commitment-0.1, design v0.1.16 §5: HMAC-SHA256 under the bundle's own 32-byte key). The standard's own field is SHA-1; this carries SHA-256 beside it. Two different fingerprints for one locator pin nothing. The anchor accepts hmac_sha256 only in a bundle that declares a gc-zk-journal-0.2 receipt, and such a bundle carries nothing else: every item is exactly {uri, hmac_sha256} and no sha1_checksum appears anywhere (v0.1.16 §6.1). That condition is the adapter's, not this schema's.",
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["uri", "sha256"],
+        "required": ["uri"],
+        "oneOf": [{ "required": ["sha256"] }, { "required": ["hmac_sha256"] }],
         "properties": {
           "uri": { "type": "string", "minLength": 1 },
-          "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" }
+          "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+          "hmac_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "gc-commitment-0.1: HMAC-SHA256(key, bytes), lowercase hex. Only someone holding the key can check it against a file." }
         }
+      }
+    },
+    "commitment": {
+      "description": "The salted-fingerprint rule and the name of the bundle's key (design v0.1.16 §5, §6.1). Written once, and only in a bundle that declares a gc-zk-journal-0.2 receipt. Two extension blocks with different commitments record neither, and the bundle's gc-zk-journal-0.2 receipts then fail check ⑤. The key itself is never in the bundle.",
+      "type": "object",
+      "required": ["rule", "key_id"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "enum": ["gc-commitment-0.1"] },
+        "key_id": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256(\"gc-commitment-0.1/key-id\" ‖ key), lowercase hex" }
       }
     },
     "platform": {
@@ -55,9 +67,9 @@
             }
           },
           "step_number": { "type": "integer", "description": "the pipeline_steps[].step_number the receipt covers" },
-          "journal": { "type": "string", "enum": ["gc-zk-journal-0.1"], "description": "journal = risc0 serde of ([u8;32], Vec<u8>): (SHA-256 of the step's input file, the step's output bytes)" },
-          "input_uri": { "type": "string", "description": "a locator in that step's input_list, with a SHA-256 in checksums[]" },
-          "output_uri": { "type": "string", "description": "a locator in that step's output_list, with a SHA-256 in checksums[]" }
+          "journal": { "type": "string", "enum": ["gc-zk-journal-0.1", "gc-zk-journal-0.2"], "description": "gc-zk-journal-0.1 = risc0 serde of ([u8;32], Vec<u8>): (SHA-256 of the step's input file, the step's output bytes). gc-zk-journal-0.2 (design v0.1.16 §6.2) = risc0 serde of (u32, [u8;32], [u8;32], [u8;32]): (tag 0x475A4B32 \"GZK2\", key_id, C(input), C(output)), exactly 388 bytes, succinct receipts only. A bundle uses one convention for all its receipts." },
+          "input_uri": { "type": "string", "description": "a locator in that step's input_list, with a fingerprint in checksums[] (sha256 for 0.1, hmac_sha256 for 0.2)" },
+          "output_uri": { "type": "string", "description": "a locator in that step's output_list, with a fingerprint in checksums[] (sha256 for 0.1, hmac_sha256 for 0.2)" }
         }
       }
     },
