@@ -124,3 +124,48 @@ on every unrelated edit; watching `draft-…-\d+` fires only when the revision m
   only as good as the `due` field, which is hand-maintained.
 - Normalisation strips layout, so a layout-only change is invisible and a change to
   unrelated boilerplate on the same page still fires. Narrow with `pattern:` when it matters.
+
+## Publishing what the watch finds — the legal boundary
+
+Added 2026-10-20 from a six-seat survey of Switzerland, EU member states, EU horizontal law,
+the US and Japan (kept by the operator, not published). Research support by agents,
+not legal advice. No lawyer has been consulted yet. The statutes cited below are not on the
+watchlist, so this section is dated (2026-10-20), not watched.
+
+Publishing general summaries of legal changes is outside the work reserved to lawyers in
+all five places surveyed. Germany and France say so in the statute: RDG § 2 Abs. 3 Nr. 5
+excludes "die an die Allgemeinheit gerichtete Darstellung und Erörterung von Rechtsfragen
+und Rechtsfällen in den Medien"; Loi n° 71-1130 art. 66-1 does not prevent "la diffusion en
+matière juridique de renseignements et informations à caractère documentaire". Japan's
+弁護士法 72条 reaches 鑑定 in a concrete 法律事件, not general commentary; US case law
+treats self-help publications as outside UPL (*Dacey*, NY 1967; *Upsolve v. James*).
+
+The line is general versus individual:
+
+```
+general information                      application to someone's own situation
+"Art. 50 applies from 2026-08-02"        "does your system breach Art. 50?"
+"the omnibus moved the dates to …"       "your company should do …"
+──────────────────────────────           ─────────────────────────────────────
+free in all five                         reserved to lawyers in some states (DE, FR, AT, PT, JP, US)
+```
+
+Rules for anything published from a regwatch finding:
+
+1. **Stay general.** No question form, chat, or reply that answers a reader's own case.
+   A page that answers "what about us?" has crossed the line, whatever it is called.
+2. **Never label it 法律相談 / legal advice / Rechtsberatung / consultation juridique.**
+   Japan's 弁護士法 74条 forbids the label itself for non-lawyers. Use 法令の動向 /
+   regulatory update.
+3. **A person reads the full text before it goes out.** EU AI Act Art. 50(4) requires
+   AI-generated text that informs the public on matters of public interest to be marked as
+   such, unless it has undergone human review and a person holds editorial responsibility.
+   The operator-reads-then-deploys step is that exemption; automating publication removes it.
+4. **Every item carries its check date, its source and a link to the original.** Statute
+   text may be quoted (not copyright-protected: 著作権法 13条, URG Art. 5, EU Decision
+   2011/833); law-firm commentary may not be copied.
+
+If a summary is packaged as a downloadable skill rather than a page, one more axis applies:
+tying a free package to a paid service counts as monetisation under the AI Act (recital 103),
+the PLD (recital 14) and the CRA (recital 15), and as possible indirect remuneration under
+the Japanese 2023 MOJ guideline § 1(2) — see `docs/REGCHECK.md` § The legal boundary.

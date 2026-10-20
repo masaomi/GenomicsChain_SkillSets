@@ -29,8 +29,8 @@ published. That is why the join came before the publication and not after.
 
 | Piece | Where | State |
 |---|---|---|
-| Watch | `genomicschain_regwatch` v0.1.2 — 72 sources (42 added 2026-10-04: FDA, Swissmedic, FADP, GDPR, CRA, the sources the two published pages cite, eight Swiss statutes through the fedlex SPARQL version list, and five EU acts through the Publications Office Cellar SPARQL list of versions, corrigenda and amending acts), `gc_regwatch_scan`, `gc_regwatch_report` | SkillSet, installed normally. Baseline recorded for 70 of 72 on 2026-10-04 (the other 2 cannot be fetched: an IVDR page that returns 404, and the EUR-Lex text of the AI omnibus, kept to show the block); before that only 6 of 30 had one, so 24 sources had never been compared |
-| Frame | `GenomicsChain_2025/data/eu_ai_act/guidance.json` v0.2.0 at `/eu-ai-act`, and `data/data_regulation/guidance.json` v0.1.0 at `/data-regulation` (GCP, FDA, Swiss research law, GDPR, FADP) — neither deployed as of 2026-10-04 | Rails data files, not a package |
+| Watch | `genomicschain_regwatch` v0.1.2 — 80 sources (8 added 2026-10-20: seven GCP sources for Tier 6 and the AI Act harmonised-standards decision; 42 added 2026-10-04: FDA, Swissmedic, FADP, GDPR, CRA, the sources the two published pages cite, eight Swiss statutes through the fedlex SPARQL version list, and five EU acts through the Publications Office Cellar SPARQL list of versions, corrigenda and amending acts), `gc_regwatch_scan`, `gc_regwatch_report` | SkillSet, installed normally. Baseline recorded for 78 of 80 as of 2026-10-20 (the other 2 cannot be fetched: an IVDR page that returns 404, and the EUR-Lex text of the AI omnibus, kept to show the block); before that only 6 of 30 had one, so 24 sources had never been compared |
+| Frame | `GenomicsChain_2025/data/eu_ai_act/guidance.json` v0.2.1 at `/eu-ai-act`, and `data/data_regulation/guidance.json` v0.1.1 at `/data-regulation` (GCP, FDA, Swiss research law, GDPR, FADP) — both live at genomicschain.ch, last updated 2026-10-20 | Rails data files, not a package |
 | Join | `scripts/gc_regcheck_staleness.rb` rules 0.1.0 | Operator script, alongside `gc_submit_client.rb` |
 | Check, run 1 | kept outside this repository — subject a third party's internal system | Record 0.1.1. **Not published** — operator decision 2026-09-14: the subject is someone else's system |
 | Check, run 2 | kept outside this repository — subject the hosted site | Record 0.2.0, `trust_tier: self_reported` |
@@ -97,6 +97,65 @@ No third party's system, names or infrastructure appear.
 internal system. That is a decision about whose system it is, not about whether the text
 could be scrubbed — subject consent, not redaction, is the gate on any check whose subject
 is someone else. The record is kept outside this repository.
+
+## The legal boundary
+
+Survey of 2026-10-20, six seats (Switzerland, EU member states, EU horizontal law, the US,
+Japan, cross-border enforcement). Research support by agents, not legal advice. The full survey
+is kept by the operator and not published: it contains the question lists prepared for lawyers.
+This section governs both the check (Tier 5) and anything published from the watch.
+
+**This section is dated, not watched.** The statutes and guidance it cites (RDG, Loi n° 71-1130,
+弁護士法, the Japanese MOJ guidelines, the Swiss Ukraine ordinance) are not on the regwatch
+watchlist, so nothing here goes stale automatically. Read it as of 2026-10-20.
+
+**Publishing general information is outside the reserved work everywhere surveyed.**
+RDG § 2 Abs. 3 Nr. 5 and Loi n° 71-1130 art. 66-1 say so expressly; 弁護士法 72条 and US UPL
+law reach application to a concrete matter, not general commentary. The rules for pages and
+summaries built from regwatch findings live in `genomicschain_regwatch/plugin/SKILL.md`
+§ Publishing what the watch finds: stay general, never the label 法律相談 / legal advice
+(弁護士法 74条), a person reads the full text before release (EU AI Act Art. 50(4)
+exemption), every item dated and sourced.
+
+**For the check itself, free and anonymous is riskier than paid B2B on almost every axis.**
+Without a contract there is no forum clause, no liability cap and no GDPR Art. 28 processor
+contract, consumers are in scope, and an EU user can sue at home and enforce in Zurich under
+the Lugano Convention. "Free" does not lift the German reservation (RDG § 6 Abs. 2 requires a
+qualified person even for free services), does not lift US UPL in most states, and does not
+lift Swiss liability for gross negligence (OR Art. 100 Abs. 1).
+
+**Three places where the current design leaks**, found independently by the DE, US and JP seats:
+
+1. A legal term inside a "technical" question ("does it process personal data?") makes the
+   LLM classify under law. Rewrite in technical terms ("does it read columns holding name,
+   birth date or genome sequence — which line?").
+2. Showing, hiding or reordering legal text according to the customer's code facts is the
+   software-applies-law-to-facts pattern (*Parsons*, *Janson v. LegalZoom*). Legal text is
+   identical and in the same order for every customer.
+3. LLM prose that summarises legal meaning reaching the customer (JP MOJ グレーゾーン回答
+   2025-08-04; OLG Hamm 4 UKl 3/25 attributes chatbot statements to the operator).
+
+Strongest additional measure proposed: all legal text in one public, versioned frame
+document; the per-customer report carries only code facts, cited lines and the frame
+version. For Germany, keep German national law out of the frame to preserve the RDG
+§ 1 Abs. 2 argument (a service given only from abroad is covered only if its subject is
+German law).
+
+**What does not work:** the user's lawyer-check consent helps on liability, not on whether
+the activity is reserved (JP グレーゾーン回答 2022-10-14); any benefit from lawyer referrals is
+周旋 under Japanese law. Disclaimers were decisive only in Texas.
+
+**Hard requirement:** block Russia and the annexed territories — Swiss Ukraine ordinance
+Art. 28e bans legal advisory, IT consultancy and AI-model access services to Russian
+entities, free or not.
+
+**Packaging a free skill.** Releasing summaries or the check as a downloadable skill tied to
+a paid tier counts as monetisation (AI Act recital 103, PLD recital 14, CRA recital 15 — CRA
+Art. 14 reporting applies since 2026-09-11) and as possible indirect remuneration in Japan
+(2023 MOJ guideline § 1(2)) and France (art. 54 requires paid activity). A free package not
+used to sell anything keeps those exemptions. Decided 2026-10-20: Tier 5 is published as free OSS under four conditions (no tie to a paid service; users run it with their own LLM keys; the design rules above stay in the code; no individual consultation), and Tier 6 (GCP self-assessment checklist) follows the same conditions. GenomicsChain itself runs Tier 5 and Tier 6 only on its own system — code, hosted service and procedures — and not on data registered on the chain (signer identities would otherwise be sent to LLM providers). Paid services are limited to reproducibility. Recorded in the operator's KairosChain instance (L2 `decision_tier5_oss_tier6_gcp_20261020`, `decision_tier56_own_system_scope_b2b_reproducibility_20261020`).
+
+No lawyer has been consulted yet. Planned order: Switzerland, then Germany, then Japan before Japanese customers.
 
 ## What run 3 found that is not a legal matter at all
 
