@@ -22,8 +22,11 @@ module KairosMcp
         # (prov design v0.1.15 (7)): a list, so a new type is added by name and
         # the derivation every other tier uses stays as it was. Their values
         # from before this list existed are pinned in
-        # test/fixtures/idempotency_keys_r0.json.
-        SUBMISSION_KEYED = %w[prov_attestation prov_reachability].freeze
+        # test/fixtures/idempotency_keys_r0.json. Tier 3 v0.1 (design §9-1)
+        # adds its declaration and attestation: neither carries a jobspec_digest
+        # or a result_hash, so the derivation below would make their key a
+        # constant per pubkey (19:257–262).
+        SUBMISSION_KEYED = %w[prov_attestation prov_reachability tier3_declaration tier3_attestation].freeze
 
         @submission_mutexes = {}
         @submission_mutex_guard = Mutex.new

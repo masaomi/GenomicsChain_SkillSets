@@ -11,6 +11,22 @@ module KairosMcp
         # gc_tier3_submit — MCP skin over SubmitCore (design v0.4.1).
         # Synoptis-only recording; no KairosChain operational chain writes.
         class GcTier3Submit < KairosMcp::Tools::BaseTool
+          # The value the submitted verdict_result is read into: the members and
+          # keyword construction of genomicschain_tier3's
+          # Tier3Executor::VerdictResult (tier3_executor.rb:25–34), held here so
+          # the anchor records 0.3 without loading tier3, which it never installs
+          # (Tier 3 design §5〔実装〕, operator 2026-10-21 question 7).
+          VerdictResult = Struct.new(
+            :subject_ref, :jobspec_digest, :execution_verdict, :comparison_verdict,
+            :environment_provenance, :inputs_provenance, :run_count, :self_consistency,
+            :trust_tier, :result_hash, :backend_result_hash, :container_digest,
+            :expected_output, :expected_output_sha256,
+            :expected_output_source, :expected_output_validated_by,
+            :expected_output_source_citation, :expected_output_target,
+            :comparator_id, :comparator_version, :backend_id, :output_files,
+            :first_divergence, :receipt, :receipts, keyword_init: true
+          )
+
           def name
             'gc_tier3_submit'
           end
@@ -225,9 +241,8 @@ module KairosMcp
           end
 
           def build_verdict_result(raw)
-            require 'genomicschain_tier3/tier3_executor'
             h = hashify(raw)
-            KairosMcp::SkillSets::GenomicschainTier3::Tier3Executor::VerdictResult.new(
+            VerdictResult.new(
               subject_ref: h['subject_ref'], jobspec_digest: h['jobspec_digest'],
               execution_verdict: h['execution_verdict'], comparison_verdict: h['comparison_verdict'],
               environment_provenance: h['environment_provenance'],
