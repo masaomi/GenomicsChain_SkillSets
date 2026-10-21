@@ -8,10 +8,17 @@
 #
 #   what is this bundle's digest          (the digest subject, §2)
 #   what grade, and why                   (§5; per item, with reasons)
+#   what the resources grade is           (v0.1.14 §6.2; beside the grade, not in it)
 #   what exactly would be signed          (signed_params, §6)
-#   will the anchor issue a record        (immutable gate, ZK declarations)
+#   will the anchor issue a record        (the ZK declarations; any grade is recorded)
 #   do my ZK receipts hold                (①–④ locally, when gc_zk_verify is
-#                                          installed and --zk-receipt is given)
+#                                          installed and --zk-receipt is given;
+#                                          ①–⑤ for gc-zk-journal-0.2, v0.1.16)
+#
+# What it cannot answer is whether a particular anchor offers option 2
+# (gc-zk-journal-0.2, design v0.1.16 S4): that is the anchor's own setting,
+# so a 0.2 bundle this tool calls issuable may be refused there with
+# `convention_not_offered`.
 #
 # This runs on the customer's machine, so — unlike the anchor — it may print
 # the bundle's own values: item names, locators, the reasons a version string
@@ -67,9 +74,11 @@ module GcProvCheck
       'zk_local' => zk_local(derived, admission, receipt_paths, verifier),
       'graded' => derived['graded'],
       'platform' => derived['np'].platform,
-      'notes' => derived['np'].notes,
+      'resources' => derived['resources'].slice('machine', 'steps'),
+      'notes' => derived['np'].notes + derived['resources']['notes'],
       'versions' => { 'adapter' => Bco::VERSION, 'predicate' => derived['graded']['predicate_version'],
-                      'pin_strength' => derived['graded']['pin_strength_version'] } }
+                      'pin_strength' => derived['graded']['pin_strength_version'],
+                      'resources_rule' => derived['signed']['resources_rule_version'] } }
   end
 
   # ①–④ on this machine. Not run — and said so — when the bundle declares
@@ -85,7 +94,15 @@ module GcProvCheck
     end
 
     bytes = paths.to_h { |p| b = File.binread(p); [Digest::SHA256.hexdigest(b), b] }
-    out = verifier.check(declared, bytes)
+    out = verifier.check(declared, bytes, commitment: derived['np'].commitment)
+    # an older binary: the receipt is not shown wrong, it is not checked here
+    # (round-1 implementation review, separation-compat) — but only when that
+    # is the sole reason anything is not ok; another receipt's real failure is
+    # reported as failed, with every result (pre-flight r2)
+    if GenomicsChainProv::ZkVerifier.only_not_supported?(out)
+      return { 'state' => 'not_checked', 'why' => GenomicsChainProv::ZkVerifier::NOT_SUPPORTED_NOTE }
+    end
+
     { 'state' => out['ok'] ? 'ok' : 'failed', 'results' => out['results'], 'undeclared' => out['undeclared'],
       'verifier' => out['verifier'] }
   rescue GenomicsChainProv::ZkVerifier::Unavailable => e
@@ -110,19 +127,26 @@ module GcProvCheck
              "params #{c['params_count']}/#{c['params_total']}"
     p = result['platform']
     lines << "  platform: #{p ? p.values.compact.join(' ') : 'not recorded (the record will carry null)'}"
+    lines.concat(resource_lines(result['signed_params'], c['stages_total']))
     lines.concat(zk_lines(result))
     lines << ''
     if issuable?(result)
       lines << "Tier 2.5: the anchor would issue a record for this bundle, carrying grade #{g['grade_overall']} " \
                '(the grade is recorded, not a condition; whoever reads the record draws its own line).'
+      if adm['journal_conventions'].include?(Bco::JOURNAL_V02)
+        lines << '  — if that anchor offers gc-zk-journal-0.2 receipts (option 2); one that does not refuses ' \
+                 'the bundle with convention_not_offered.'
+      end
     else
       lines << 'Tier 2.5: the anchor would NOT issue a record:'
+      adm['bundle_refusals'].each { |code| lines << "  bundle refused: #{code}" }
       lines << "  more than #{Identity::MAX_ZK_RECEIPTS} zk receipts declared" if adm['too_many_zk_receipts']
       adm['zk_defects'].each { |d| lines << "  zk receipt for stage #{d['stage'] || '?'}: #{d['defects'].join(', ')}" }
       lines << '  a zk receipt failed the local check (see above)' if result['zk_local']['state'] == 'failed'
     end
     v = result['versions']
-    lines << "  (adapter #{v['adapter']}, predicate #{v['predicate']}, pin_strength #{v['pin_strength']} — " \
+    lines << "  (adapter #{v['adapter']}, predicate #{v['predicate']}, pin_strength #{v['pin_strength']}, " \
+             "resources rule #{v['resources_rule']}, record_version #{result['record_version']} — " \
              'the anchor refuses a signature made under other versions)'
     result['notes'].each { |n| lines << "  note: #{n}" }
     if items
@@ -133,6 +157,22 @@ module GcProvCheck
       end
     end
     lines.join("\n")
+  end
+
+  # What the record will say about resources (v0.1.14 §6.2 (3)). The
+  # per-stage values and the machine stay in the bundle; only the GPU vendors
+  # and models reach the record, filtered as the anchor filters them.
+  def resource_lines(sp, stages_total)
+    gpus = if sp['gpus_total'].nil? then 'not looked for'
+           else
+             named = Array(sp['gpu_models']).map { |g| "#{g['count']} × #{g['vendor']} #{g['model']}" }
+             "#{sp['gpus_total']}#{named.empty? ? '' : " (#{named.join(', ')})"}"
+           end
+    sources = Array(sp['resources_sources'])
+    ["  resources: #{sp['grade_resources']} (#{sp['resources_rule_version']}; not part of the grade above) — " \
+     "requested on #{sp['stages_with_requested_resources']}/#{stages_total} stages, observed on " \
+     "#{sp['stages_with_observed_resources']}/#{stages_total}, from #{sources.empty? ? 'nowhere' : sources.join(', ')}",
+     "  machine: #{sp['machine_source'] || 'not recorded'}; GPUs #{gpus}"]
   end
 
   def zk_lines(result)

@@ -16,14 +16,18 @@ that makes "which one is authoritative" unanswerable the moment the two differ.
 
 | Package | Version | Role |
 |---|---|---|
-| `genomicschain_core` | 0.5.0 | Submit path: digest, admission gates, signing, Synoptis recording |
+| `genomicschain_core` | 0.6.4 | Submit path: digest, admission gates, signing, Synoptis recording |
 | `genomicschain_tier1` | 0.2.1 | Tier-1 readiness assessment — `gc_tier1_assess`, report schema v0.2.6, the rubric |
 | `genomicschain_tier2` | 0.4.1 | Tier-2 code reading — `gc_tier2_scan`, `gc_tier2_adjudicate`; static, LLM-free |
-| `genomicschain_tier3` | 0.5.0 | Tier-3 execution — backends, comparator, cost estimation |
+| `genomicschain_prov` | 0.6.0 | Tier-2.5 provenance anchoring — the bundle writer and reader, `gc_prov_submit` / `gc_prov_reach` (anchor only) |
+| `genomicschain_tier3` | 0.6.0 | Tier-3 execution — backends, comparator, cost estimation |
+| `genomicschain_tier3_record` | 0.1.0 | Tier-3 record side — `tier3_declaration` / `tier3_attestation`, `gc_tier3_record_submit` (its tool registers on the anchor only; the anchor installs this package without `tier3`) |
 | `genomicschain_regwatch` | 0.1.1 | Regulatory watch — `gc_regwatch_scan`, `gc_regwatch_report`, a 30-source watchlist |
 
-The first four version independently but install as a set: `tier1` and `tier3` declare
-`genomicschain_core >= 0.2.0`; `tier2` depends on nothing and reads only what is on disk.
+All but `regwatch` version independently but install as a set: `tier1` declares
+`genomicschain_core`; `tier2` depends on nothing and reads only what is on disk; `prov` declares
+core and `tier2`; `tier3_record` declares core >= 0.6.4 and `prov` >= 0.6.0; `tier3` declares core >= 0.6.4,
+`prov` >= 0.6.0 and `tier3_record` >= 0.1.0. An anchor installs the set without `tier3` (`install.sh --anchor`).
 
 `regwatch` is on a separate axis and depends on nothing. It watches the law rather than a
 paper, and since 2026-09-14 it also carries the join that tells the published EU AI Act
@@ -79,6 +83,8 @@ no third party can reach.
 | `gc_tier3_submit` | core | `anchor_profile: true` only |
 | `gc_tier3_execute` | tier3 | always |
 | `gc_tier3_estimate` | tier3 | always |
+| `gc_tier3_attest` | tier3 | always (an executor node; tier3 is never on the anchor) |
+| `gc_tier3_record_submit` | tier3_record | `anchor_profile: true` only |
 
 ## Requirements
 
@@ -121,21 +127,31 @@ relabelled them. That is why it is a declared minimum rather than a note.
 ```sh
 git clone https://github.com/masaomi/GenomicsChain_SkillSets.git
 cd GenomicsChain_SkillSets
-bash install.sh --data-dir /path/to/your/.kairos
+bash install.sh --data-dir /path/to/your/.kairos            # an executor or reader node
+bash install.sh --anchor --data-dir /path/to/anchor/.kairos  # the anchor: no genomicschain_tier3
 ```
 
-`install.sh` also installs `mmp`, and checks afterwards that all four packages
-are actually listed — see the note on argument order below.
+`install.sh` also installs `mmp`, and checks afterwards that all six packages (five with
+`--anchor`) are actually listed — see the note on argument order below. The anchor records
+Tier 3 declarations and attestations (`genomicschain_tier3_record`) and never executes, so it
+does not install `genomicschain_tier3`, whose execution tools would register there.
 
-Or by hand, in dependency order:
+Or by hand, in dependency order — every node, the anchor included:
 
 ```sh
 export KAIROS_DATA_DIR=/path/to/your/.kairos
 kairos-chain skillset install ./genomicschain_core
 kairos-chain skillset install ./genomicschain_tier1
 kairos-chain skillset install ./genomicschain_tier2
-kairos-chain skillset install ./genomicschain_tier3
+kairos-chain skillset install ./genomicschain_prov
+kairos-chain skillset install ./genomicschain_tier3_record
 kairos-chain skillset list
+```
+
+then, on an executor or reader node only — an anchor never runs this line:
+
+```sh
+kairos-chain skillset install ./genomicschain_tier3
 ```
 
 `install` copies the package and enables it.
@@ -163,10 +179,14 @@ instance runs:
 
 ```sh
 git pull
-bash install.sh --force --data-dir /path/to/your/.kairos
+bash install.sh --force --data-dir /path/to/your/.kairos                   # an executor or reader node
+bash install.sh --anchor --force --data-dir /path/to/anchor/.kairos         # the anchor
 ```
 
-`--force` preserves `config/`, so your `anchor_profile` setting is not reset.
+`--force` preserves `config/`, so your `anchor_profile` setting is not reset. An anchor is
+always upgraded with `--anchor`: without it `install.sh` refuses a target whose core has
+`anchor_profile: true`, and with it `install.sh` refuses a target that still carries
+`genomicschain_tier3` (remove it with `kairos-chain skillset remove genomicschain_tier3`).
 
 ## anchor_profile — read this before deploying
 
@@ -175,9 +195,13 @@ tools are **absent from the tool list** rather than present-and-refusing. A node
 that was never meant to sign cannot be talked into signing.
 
 Exactly one node in a deployment should be the anchor: the one holding the signing
-key and owning the Synoptis proof registry. To make a node the anchor, copy
-`genomicschain_core.anchor.yml.example` over `config/genomicschain_core.yml` in the
-*installed* copy and restart.
+key and owning the Synoptis proof registry. To make a node the anchor, install it with
+`bash install.sh --anchor`, copy `genomicschain_core.anchor.yml.example` over
+`config/genomicschain_core.yml` in the *installed* copy, and restart.
+genomicschain_tier3 is never installed on an anchor: its execution tools would register there and
+could read files and run commands for any admitted caller. A node that already carries it is
+converted by `kairos-chain skillset remove genomicschain_tier3` first, which `install.sh --anchor`
+asks for.
 
 Proofs are append-only. A second anchor recording under a different key cannot be
 un-recorded, only superseded.
@@ -215,6 +239,11 @@ genomicschain_tier3/
   lib/     execution backends (local, Thoa), comparator, executor
   tools/   gc_tier3_execute, gc_tier3_estimate
   test/
+genomicschain_tier3_record/
+  lib/     tier3_declaration / tier3_attestation specs, anchor library, wording reader
+  tools/   gc_tier3_record_submit  (anchor only)
+  schemas/ tier3_declaration v0.1, tier3_attestation v0.1
+  test/
 ```
 
 ## Tests
@@ -223,8 +252,8 @@ The suites fall into three groups, because some of them test integration with
 sibling SkillSets and therefore need those siblings to exist.
 
 **Run from a clone, no extra paths** — `genomicschain_core/test/b1_manifest_hash_test.rb`,
-`tip_source_test.rb`, all four of `genomicschain_tier3/test/`, and both of
-`genomicschain_tier2/test/`:
+`tip_source_test.rb`, four of the nine files in `genomicschain_tier3/test/` (`tier3_executor_test.rb`,
+`tools_test.rb`, `thoa_backend_test.rb`, `estimate_test.rb`), and both of `genomicschain_tier2/test/`:
 
 ```sh
 cd genomicschain_core && ruby -Ilib -Itest test/b1_manifest_hash_test.rb
@@ -233,7 +262,9 @@ cd genomicschain_tier3 && ruby -Ilib -Itest -I../genomicschain_core/lib test/too
 ```
 
 **Run from a clone with synoptis and mmp on the load path** — `tier1_submit_test.rb`,
-`tier2_submit_test.rb`, `tier3_submit_test.rb`:
+`tier2_submit_test.rb`, `tier3_submit_test.rb`; the other five `genomicschain_tier3/test/` files and
+`genomicschain_tier3_record/test/` also need `../genomicschain_tier2/lib`, `../genomicschain_prov/lib` and
+`../genomicschain_tier3_record/lib`:
 
 ```sh
 cd genomicschain_core

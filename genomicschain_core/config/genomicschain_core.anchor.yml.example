@@ -1,5 +1,7 @@
 # Anchor deployment profile. Copy to genomicschain_core.yml on the ONE node that
-# signs and records.
+# signs and records, after installing that node with `bash install.sh --anchor`.
+# genomicschain_tier3 is never installed on the anchor: its execution tools would
+# register there. install.sh --anchor refuses a target that still carries it.
 #
 # Turning this on registers gc_tier1_submit and gc_tier3_submit. That node then
 # needs an MMP identity with a signing key; without one the submit path fails
@@ -8,3 +10,11 @@
 # Proofs are append-only. A misconfigured second anchor cannot be un-recorded.
 genomicschain:
   anchor_profile: true
+  # Tier 2.5 option 2 (prov design v0.1.16 S4): whether this anchor accepts
+  # bundles whose ZK receipts use the salted journal gc-zk-journal-0.2. Off by
+  # default; a bundle declaring such a receipt is then refused with
+  # convention_not_offered before any receipt is verified. The operator turns
+  # it on, and only after the confidentiality tests (design §10, T1–T5) pass.
+  # Only gc_prov_submit reads it, and only in Prov#admit!.
+  zk:
+    confidential_receipts: false

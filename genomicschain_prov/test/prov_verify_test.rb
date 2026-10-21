@@ -123,12 +123,14 @@ class ProvVerifyTest < Minitest::Test
       res = verify(text, route)
       assert_equal 'consistent', res['state']
       assert_equal %w[bundle_digest subject_ref manifest_body_sha256 submitter_pubkey submission_key claim
-                      submitter_signature grades_and_counts], res['confirmed'].map { |c| c['check'] }
+                      submitter_signature grades_and_counts resources], res['confirmed'].map { |c| c['check'] }
       assert_includes details(res), 'self-consistent with the key in the manifest — this does not show who the submitter is'
       assert(res['anchor_says'].any? { |s| s.include?('(anchor-reported)') && s.include?('mmp:test-anchor') })
       assert(res['anchor_says'].any? { |s| s.include?('zk receipts: 1 verified') && s.include?('anchor-reported') })
-      assert_equal 10, res['not_checked'].length, 'nine from the record and the one nobody can say (Tier 3)'
-      assert_equal GenomicsChainProv::Identity::STATEMENTS, res['statements']
+      assert_equal 12, res['not_checked'].length, 'eleven from the record and the one nobody can say (Tier 3)'
+      # v0.1.16 §7: the two statements, and the one for a gc-zk-journal-0.1 receipt
+      assert_equal GenomicsChainProv::Identity::STATEMENTS + [Verifier::JOURNAL_STATEMENTS['gc-zk-journal-0.1']],
+                   res['statements']
       assert_includes res['summary'].join, 'platform as stated in the bundle: x86_64 Linux 6.8.0'
     end
   end
@@ -196,6 +198,97 @@ class ProvVerifyTest < Minitest::Test
       assert_equal 'consistent', res['state']
       assert_includes details(res), 'zk receipts verified here and bound to their steps (stage 1: ok)'
       refute(res['anchor_says'].any? { |s| s.start_with?('zk receipts:') }, 'no longer only the anchor\'s word')
+    end
+  end
+
+  # --- v0.1.14 §6.2 (6): old records and the resource rule ----------------------
+
+  V03 = File.expand_path('fixtures/record_v0_3', __dir__)
+
+  # (ii): a record prov 0.3.0 made, before the change (made_with.json says
+  # so), read by this verifier. Everything it signed re-derives, and nothing
+  # is said about resources — a 0.3 record has none.
+  #
+  # v0.1.16 S3 (v): the record names adapter 0.4.0 and this verifier runs
+  # 0.5.0, so the grades and counts are not re-derived and the difference is
+  # reported as one of version. Every other check — digest, signatures,
+  # submission_key, claim — is unchanged.
+  def test_a_record_made_by_prov_0_3_0_is_consistent_under_this_verifier
+    route = JSON.parse(File.read(File.join(V03, 'route.json')))
+    signed = JSON.parse(route['evidence'])['manifest']
+    assert_equal '0.3', signed['record_version'], 'the record itself, inside the anchor-signed evidence'
+    assert_equal 9, signed['not_checked'].length
+    assert_nil signed['grade_resources']
+    res = verify(File.read(File.join(V03, 'bundle.json')), route,
+                 submitter_pubkey: File.read(File.join(V03, 'submitter_pubkey.txt')).strip,
+                 anchor_pubkey_pem: File.read(File.join(V03, 'anchor_pubkey.pem')))
+    assert_equal 'consistent', res['state']
+    assert_equal %w[bundle_digest subject_ref manifest_body_sha256 submitter_pubkey submission_key claim
+                    submitter_signature anchor_signature], res['confirmed'].map { |c| c['check'] }
+    assert_includes res['version_note'], 'prov-adapter-bco-0.5.0'
+    assert_includes res['version_note'], 'prov-adapter-bco-0.4.0'
+    assert_includes res['version_note'], 'a difference of version, not a mismatch'
+    assert_nil res['resources_version_note']
+    assert_equal 10, res['not_checked'].length, 'the nine the 0.3 record carries, and the Tier 3 line'
+    refute(Array(res['summary']).any? { |l| l.start_with?('resources') })
+  end
+
+  def swap_rule(version)
+    R.send(:remove_const, :RULE_VERSION)
+    R.const_set(:RULE_VERSION, version)
+  end
+  R = GenomicsChainProv::Resources
+
+  # (v): a 0.4 record made under another resource rule. The seven grades and
+  # the counts still re-derive; only the resource fields go under the
+  # version heading. One gate over all four versions would have lost both.
+  def test_a_different_resource_rule_affects_the_resource_fields_only
+    saved = R::RULE_VERSION
+    swap_rule('gc-resources-0.0')
+    recorded do |text, route|
+      swap_rule(saved)
+      res = verify(text, route)
+      assert_equal 'consistent', res['state']
+      assert_includes res['confirmed'].map { |c| c['check'] }, 'grades_and_counts'
+      refute_includes res['confirmed'].map { |c| c['check'] }, 'resources'
+      assert_nil res['version_note']
+      assert_includes res['resources_version_note'], 'gc-resources-0.0'
+      assert_includes res['resources_version_note'], 'not a mismatch'
+    end
+  ensure
+    swap_rule(saved) unless R::RULE_VERSION == saved
+  end
+
+  # A record whose fields disagree with the bundle under the same versions:
+  # each gate reports its mismatch, and the verifier does not crash on a
+  # field of the wrong type (implementation review r1).
+  def tampered(route, changes)
+    ev = JSON.parse(route['evidence'])
+    ev['manifest'].merge!(changes)
+    ev['manifest_body_sha256'] = Digest::SHA256.hexdigest(KairosMcp::Manifest.canonical_json(ev['manifest']))
+    route.merge('evidence' => JSON.generate(ev))
+  end
+
+  def test_each_gate_reports_a_field_that_does_not_re_derive
+    recorded do |text, route|
+      res = verify(text, tampered(route, 'gpus_total' => '2', 'gpu_models' => [{ 'count' => 'x' }]))
+      assert_equal 'mismatch', res['state']
+      assert_includes bad(res), 'resources'
+      refute(res['summary'].to_a.any? { |l| l.start_with?('resources:') }, 'no summary from fields that did not re-derive')
+
+      res = verify(text, tampered(route, 'stages_total' => 7))
+      assert_includes bad(res), 'grades_and_counts'
+      refute_includes bad(res), 'resources'
+      line = res['summary'].find { |l| l.start_with?('resources:') }
+      assert_includes line, 'requested on 0/1 stages', 'the stage count comes from the bundle, not the tampered record'
+    end
+  end
+
+  def test_the_summary_says_what_the_record_carries_about_resources
+    recorded do |text, route|
+      lines = verify(text, route)['summary']
+      assert(lines.any? { |l| l.start_with?('resources: absent (gc-resources-0.1, not part of the overall grade)') })
+      assert(lines.any? { |l| l.include?('machine as stated (none): GPUs not looked for') })
     end
   end
 

@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier3_declaration_v0_1.schema.json",
+  "title": "GenomicsChain Tier 3 declaration, record_version 0.1",
+  "description": "Synoptis evidence manifest for a Tier 3 declaration (design docs/design/tier3_design_v0_1.md §3.3, §4.1): signed by the Tier 3 executor before building, it fixes the binding list (§4.1) the attestation must repeat, plus route, sources, scored items, expiry, attempts_max and the checker. Under fingerprint_form = salted the fingerprint and digest fields are gc-commitment-0.1 values under the job's commitment key; route_ref and the route B target reference stay plain (§4.3). The record carries params verbatim; declaration_digest, recorded_at (T_d, the anchor's clock) and backing are the anchor's. The route B proof_id is not recorded; route_ref is its SHA-256. Route B targets.paths holds one entry per row, in row order: a relative path for each row the comparator compares, null for the others. definitions.params is what the executor signs.",
+  "type": "object",
+  "required": [
+    "record_type", "record_version", "mcp_tool_name", "mcp_tool_version",
+    "subject_ref", "job_identity", "inputs_commitment", "targets", "comparator", "tolerance",
+    "build_plan_digest", "route_ref", "fingerprint_form", "data_class", "route", "scored_items",
+    "expires_at", "attempts_max", "checker",
+    "declaration_digest", "recorded_at", "backing", "submission_key", "operator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_type": { "type": "string", "enum": ["tier3_declaration"] },
+    "record_version": { "type": "string", "enum": ["0.1"] },
+    "mcp_tool_name": { "type": "string", "enum": ["gc_tier3_record_submit"] },
+    "mcp_tool_version": { "type": "string" },
+    "subject_ref": { "$ref": "#/definitions/subject_ref" },
+    "job_identity": { "$ref": "#/definitions/job_identity" },
+    "inputs_commitment": { "$ref": "#/definitions/hex64" },
+    "targets": { "$ref": "#/definitions/targets" },
+    "comparator": { "$ref": "#/definitions/comparator" },
+    "tolerance": { "$ref": "#/definitions/tolerance" },
+    "build_plan_digest": { "$ref": "#/definitions/hex64" },
+    "route_ref": { "$ref": "#/definitions/route_ref" },
+    "fingerprint_form": { "$ref": "#/definitions/fingerprint_form" },
+    "data_class": { "$ref": "#/definitions/data_class" },
+    "commitment": { "$ref": "#/definitions/commitment" },
+    "route": { "$ref": "#/definitions/route" },
+    "source": { "$ref": "#/definitions/source" },
+    "source_citation": { "$ref": "#/definitions/text" },
+    "validated_by": { "$ref": "#/definitions/text" },
+    "scored_items": { "$ref": "#/definitions/scored_items" },
+    "expires_at": { "$ref": "#/definitions/time" },
+    "attempts_max": { "$ref": "#/definitions/attempts_max" },
+    "checker": { "$ref": "#/definitions/checker" },
+    "declaration_digest": { "$ref": "#/definitions/hex64" },
+    "recorded_at": { "$ref": "#/definitions/time" },
+    "backing": {
+      "type": "object",
+      "required": ["vocabulary", "recorded_at", "declaration", "route_ref"],
+      "additionalProperties": false,
+      "properties": {
+        "vocabulary": { "type": "string", "enum": ["gc-backing-0.1"] },
+        "recorded_at": { "type": "string", "enum": ["anchor_observed"] },
+        "declaration": { "type": "string", "enum": ["customer_signed"] },
+        "route_ref": { "type": "string", "enum": ["procedure_checked", "not_checked"] },
+        "outputs_digest": { "type": "string", "enum": ["procedure_checked"] }
+      }
+    },
+    "submission_key": { "$ref": "#/definitions/hex64" },
+    "operator": { "type": "object" }
+  },
+  "definitions": {
+    "params": {
+      "type": "object",
+      "required": [
+        "subject_ref", "job_identity", "inputs_commitment", "targets", "comparator", "tolerance",
+        "build_plan_digest", "route_ref", "fingerprint_form", "data_class", "route", "scored_items",
+        "expires_at", "attempts_max", "checker"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subject_ref": { "$ref": "#/definitions/subject_ref" },
+        "job_identity": { "$ref": "#/definitions/job_identity" },
+        "inputs_commitment": { "$ref": "#/definitions/hex64" },
+        "targets": { "$ref": "#/definitions/targets" },
+        "comparator": { "$ref": "#/definitions/comparator" },
+        "tolerance": { "$ref": "#/definitions/tolerance" },
+        "build_plan_digest": { "$ref": "#/definitions/hex64" },
+        "route_ref": { "$ref": "#/definitions/route_ref" },
+        "fingerprint_form": { "$ref": "#/definitions/fingerprint_form" },
+        "data_class": { "$ref": "#/definitions/data_class" },
+        "commitment": { "$ref": "#/definitions/commitment" },
+        "route": { "$ref": "#/definitions/route" },
+        "source": { "$ref": "#/definitions/source" },
+        "source_citation": { "$ref": "#/definitions/text" },
+        "validated_by": { "$ref": "#/definitions/text" },
+        "scored_items": { "$ref": "#/definitions/scored_items" },
+        "expires_at": { "$ref": "#/definitions/time" },
+        "attempts_max": { "$ref": "#/definitions/attempts_max" },
+        "checker": { "$ref": "#/definitions/checker" }
+      }
+    },
+    "hex64": { "type": "string", "pattern": "\\A[0-9a-f]{64}\\z" },
+    "target_path": { "type": "string", "minLength": 1, "not": { "pattern": "\\A[/~]|(\\A|/)\\.\\.(/|\\z)|[\\x00-\\x1f\\x7f\\u0080-\\u009f]" } },
+    "time": { "type": "string", "pattern": "\\A[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\\z" },
+    "text": { "type": "string", "minLength": 1 },
+    "subject_ref": { "type": "string", "minLength": 1 },
+    "route_ref": { "type": "string", "minLength": 1 },
+    "job_identity": {
+      "type": "object",
+      "required": ["rule", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "enum": ["gc-job-identity-0.3"] },
+        "digest": { "$ref": "#/definitions/hex64" }
+      }
+    },
+    "targets": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["paper_declared"] },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "algorithm", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "path": { "$ref": "#/definitions/target_path" },
+                  "algorithm": { "type": "string", "enum": ["sha256"] },
+                  "value": { "$ref": "#/definitions/hex64" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "bundle_digest", "outputs_digest", "rows", "paths"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["tier2_5_bundle"] },
+            "bundle_digest": { "$ref": "#/definitions/hex64" },
+            "outputs_digest": { "$ref": "#/definitions/hex64" },
+            "rows": {
+              "type": "array",
+              "items": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } }
+            },
+            "paths": { "type": "array", "items": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/target_path" }] } }
+          }
+        }
+      ]
+    },
+    "comparator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["id", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string", "enum": ["exact_sha256"] },
+            "version": { "type": "string", "enum": ["0.2.0"] }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["id", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string", "enum": ["exact_commitment"] },
+            "version": { "type": "string", "enum": ["0.1.0"] }
+          }
+        }
+      ]
+    },
+    "tolerance": { "type": "string", "enum": ["exact"] },
+    "fingerprint_form": { "type": "string", "enum": ["plain", "salted"] },
+    "data_class": { "type": "string", "enum": ["non_human", "human"] },
+    "commitment": {
+      "type": "object",
+      "required": ["rule", "key_id"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "enum": ["gc-commitment-0.1"] },
+        "key_id": { "$ref": "#/definitions/hex64" }
+      }
+    },
+    "route": { "type": "string", "enum": ["A", "B"] },
+    "source": { "type": "string", "enum": ["paper_declared", "llm_extracted", "operator_supplied"] },
+    "scored_items": { "type": "array", "enum": [["rebuild", "rerun", "reproduce"]] },
+    "attempts_max": { "type": "integer", "minimum": 1 },
+    "checker": {
+      "type": "object",
+      "required": ["tool", "tree_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "tree_digest": { "$ref": "#/definitions/hex64" }
+      }
+    }
+  }
+}

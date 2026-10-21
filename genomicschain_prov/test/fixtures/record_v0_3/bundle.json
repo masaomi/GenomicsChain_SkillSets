@@ -1,0 +1,129 @@
+{
+  "object_id": "urn:uuid:00000000-0000-4000-8000-000000000003",
+  "spec_version": "https://w3id.org/ieee/ieee-2791-schema/2791object.json",
+  "etag": "28045ef68963dae80385bf91dc4c6d64117501e2bf583d3941cda250c41ade06",
+  "provenance_domain": {
+    "name": "record-v0-3-fixture",
+    "version": "1.0",
+    "license": "UNLICENSED",
+    "created": "2026-10-17T00:00:00Z",
+    "modified": "2026-10-17T00:00:00Z",
+    "contributors": [],
+    "review": []
+  },
+  "usability_domain": [
+    "record-v0-3-fixture"
+  ],
+  "extension_domain": [
+    {
+      "extension_schema": "https://genomicschain.ch/schemas/bco_extension_genomicschain_v0_1.json",
+      "genomicschain_extension": {
+        "producer": {
+          "name": "gc_prov_write",
+          "version": "prov-writer-0.2.0"
+        },
+        "checksums": [
+          {
+            "uri": "/bin/sh",
+            "sha256": "cc0669eae7f2cb851dab60ea6b3c2a4e42ac80739d89cb231e8122cd14362f1d"
+          },
+          {
+            "uri": "counts.tsv",
+            "sha256": "69e5aa7baf57f6af0bc17412ab55d10d00c87908e16a2b60985be00743076323"
+          },
+          {
+            "uri": "reads.fastq",
+            "sha256": "8add5b3bf0a7df65f939b0f2f0650f97ae63c37796bf0d1e769b384e666986cd"
+          },
+          {
+            "uri": "run.sh",
+            "sha256": "a8076d3d28d21e02012b20eaf7dbf75409a6277134439025f282e368e3305abf"
+          },
+          {
+            "uri": "tools/count.sh",
+            "sha256": "a8076d3d28d21e02012b20eaf7dbf75409a6277134439025f282e368e3305abf"
+          }
+        ],
+        "platform": {
+          "cpu_architecture": "x86_64",
+          "os_name": "Linux",
+          "os_release": "6.8.0"
+        }
+      }
+    }
+  ],
+  "description_domain": {
+    "keywords": [],
+    "pipeline_steps": [
+      {
+        "step_number": 1,
+        "name": "count",
+        "input_list": [
+          {
+            "uri": "reads.fastq"
+          }
+        ],
+        "output_list": [
+          {
+            "uri": "counts.tsv"
+          }
+        ],
+        "prerequisite": [
+          {
+            "name": "count.sh",
+            "version": "0.1.0",
+            "uri": {
+              "uri": "tools/count.sh"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "execution_domain": {
+    "script": [
+      {
+        "uri": {
+          "uri": "run.sh"
+        }
+      }
+    ],
+    "script_driver": "sh",
+    "software_prerequisites": [
+      {
+        "name": "sh",
+        "version": "5.2.21",
+        "uri": {
+          "uri": "/bin/sh"
+        }
+      }
+    ],
+    "external_data_endpoints": [],
+    "environment_variables": {}
+  },
+  "parametric_domain": [
+    {
+      "param": "min_count",
+      "value": "1"
+    }
+  ],
+  "io_domain": {
+    "input_subdomain": [
+      {
+        "uri": {
+          "uri": "reads.fastq",
+          "sha1_checksum": "8dda2e187ba431c0d4e02048f8ea5cc2455cdacf"
+        }
+      }
+    ],
+    "output_subdomain": [
+      {
+        "uri": {
+          "uri": "counts.tsv",
+          "sha1_checksum": "dd785d3102eaf6615d6bbf9d7cc869b199493c65"
+        }
+      }
+    ]
+  },
+  "error_domain": {}
+}

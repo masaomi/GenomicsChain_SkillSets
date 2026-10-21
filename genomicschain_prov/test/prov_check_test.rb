@@ -58,6 +58,25 @@ class ProvCheckTest < Minitest::Test
     Open3.capture3(RbConfig.ruby, CHECK, *args)
   end
 
+  # v0.1.14 §6.2: the resources grade beside the grade, the nine fields in
+  # what would be signed, and the resource rule among the versions the
+  # anchor would refuse a mismatch on.
+  def test_it_shows_the_resources_grade_and_the_resource_rule
+    with_bundle do |path|
+      out, _err, status = run_check(path)
+      assert_equal 0, status.exitstatus
+      assert_includes out, 'resources: absent (gc-resources-0.1; not part of the grade above)'
+      assert_includes out, 'machine: not recorded; GPUs not looked for'
+      assert_includes out, 'resources rule gc-resources-0.1, record_version 0.5'
+
+      json, = run_check(path, '--json')
+      res = JSON.parse(json)
+      assert_equal '0.5', res['record_version']
+      assert_equal GenomicsChainProv::Identity::SIGNED_FIELDS['0.5'], res['signed_params'].keys
+      assert_equal 'gc-resources-0.1', res.dig('versions', 'resources_rule')
+    end
+  end
+
   def test_an_immutable_bundle_would_be_recorded_and_the_params_are_the_anchors
     with_bundle do |path|
       out, err, st = run_check(path)

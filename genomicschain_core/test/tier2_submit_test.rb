@@ -11,6 +11,7 @@ require 'kairos_mcp/version'
 require 'kairos_mcp/kairos_chain/chain'
 require 'kairos_mcp/storage/file_backend'
 require_relative 'proofs_sandbox'
+require_relative 'idempotency_fixture'
 require 'kairos_mcp/skillset'
 require 'genomicschain_core'
 
@@ -110,8 +111,7 @@ class Tier2SubmitCoreTest < Minitest::Test
     { 'url' => 'https://forgemia.inra.fr/urgi-anagen/panREPET', 'commit' => '6d8748a03a7e053cfe2b84364170bf1712c6df0f' }
   end
 
-  def signed_operator(tip_source, params)
-    sk = Ed25519::SigningKey.generate
+  def signed_operator(tip_source, params, sk: Ed25519::SigningKey.generate)
     pk = sk.verify_key
     nonce = SecureRandom.hex(16)
     tip = tip_source.latest_tip_hash
@@ -349,6 +349,20 @@ class Tier2SubmitCoreTest < Minitest::Test
 
       refute_equal out1[:idempotency_key], out2[:idempotency_key]
       assert out2[:claim].start_with?('tier2:declared_lock:3:')
+    end
+  end
+
+  # Design v0.1.15 (10) (viii): until now this file checked only that two keys
+  # differ; the value itself is pinned here, on both paths, before core 0.6.2.
+  def test_idempotency_key_matches_the_r0_fixture
+    with_proofs do |registry, tip_source|
+      adj = adjudication
+      identity = GCore2::Tier2Submit.signed_params_for(adj, repository)
+      op, pkhash, = signed_operator(tip_source, identity, sk: IdempotencyFixture::SIGNING_KEY)
+      att = Tier2StubAttestor.new(registry: registry)
+      first = submit(registry, tip_source, adj, identity, op, pkhash, att, repository: repository)
+      second = submit(registry, tip_source, adj, identity, op, pkhash, att, repository: repository)
+      IdempotencyFixture.check(self, 'tier2_adjudication', first, second)
     end
   end
 

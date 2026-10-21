@@ -193,6 +193,141 @@ module GenomicsChainProv
         end
       end
 
+      # --- resources from the execution trace (design v0.1.14 §6.2 (4)) --------
+
+      # Trace columns → the bundle's fields. `accelerator` is the number of
+      # GPUs a task REQUESTED (a column since Nextflow 2026-01), not the model
+      # of one it got. The default 14 columns carry `realtime` and `peak_rss`
+      # only; `trace.fields` REPLACES the column list, so the others appear
+      # only when the run listed them beside the default ones.
+      TRACE_REQUESTED = { 'cpus' => %w[cpus count], 'memory' => %w[memory_bytes bytes],
+                          'time' => %w[time_seconds duration], 'disk' => %w[disk_bytes bytes],
+                          'accelerator' => %w[accelerators count] }.freeze
+      TRACE_OBSERVED = { 'peak_rss' => %w[peak_memory_bytes bytes], 'realtime' => %w[realtime_seconds duration],
+                         '%cpu' => %w[cpu_percent percent], 'read_bytes' => %w[read_bytes bytes],
+                         'write_bytes' => %w[write_bytes bytes], 'cpu_model' => %w[cpu_model text] }.freeze
+      # Nextflow's MemoryUnit prints powers of 1024 under these names.
+      MEMORY_UNITS = { 'B' => 0, 'KB' => 1, 'MB' => 2, 'GB' => 3, 'TB' => 4, 'PB' => 5 }.freeze
+      DURATION_UNITS = { 'ms' => 0.001, 's' => 1, 'm' => 60, 'h' => 3600, 'd' => 86_400 }.freeze
+      HUMAN_DURATION = /\A(?:\d+(?:\.\d+)?(?:ms|s|m|h|d)\s*)+\z/
+
+      # One trace file → short task hash ('7a/51f65b') => {'requested', 'observed'}.
+      # @return [Array(Hash, Boolean)] the rows, and whether any value was in
+      #   the rounded human form ('11.2 MB', '663ms') rather than `trace.raw`
+      def resources_from_trace(text)
+        rows = text.lines.reject { |l| l.strip.empty? }
+        header = rows.first.to_s.chomp.split("\t")
+        hash_at = header.index('hash')
+        return [{}, false] if hash_at.nil?
+
+        rounded = false
+        out = rows.drop(1).each_with_object({}) do |line, acc|
+          cells = line.chomp.split("\t")
+          key = cells[hash_at].to_s.strip
+          next if key.empty? || key == '-'
+
+          entry = { 'requested' => {}, 'observed' => {} }
+          { 'requested' => TRACE_REQUESTED, 'observed' => TRACE_OBSERVED }.each do |part, columns|
+            columns.each do |column, (field, kind)|
+              at = header.index(column)
+              value, human = at && trace_value(cells[at], kind)
+              next if value.nil?
+
+              rounded ||= human
+              entry[part][field] = value
+            end
+          end
+          # Two rows printing the same short hash in one file are two tasks
+          # the trace does not tell apart; neither is read (review r1).
+          acc[key] = acc.key?(key) ? AMBIGUOUS : entry
+        end
+        [out, rounded]
+      end
+
+      AMBIGUOUS = { 'ambiguous' => true }.freeze
+
+      # Under `-resume` a run leaves one trace per launch. Every file is read,
+      # in the order given, and for each task a value in a later file wins
+      # over the same field in an earlier one; a cell the later file left
+      # empty does not erase what an earlier one measured.
+      def merge_trace_resources(per_file)
+        per_file.each_with_object({}) do |by_hash, acc|
+          by_hash.each do |key, e|
+            if e['ambiguous'] || acc[key]&.dig('ambiguous')
+              acc[key] = AMBIGUOUS
+              next
+            end
+            t = (acc[key] ||= { 'requested' => {}, 'observed' => {} })
+            t['requested'].merge!(e['requested'])
+            t['observed'].merge!(e['observed'])
+          end
+        end
+      end
+
+      # A cell as a number in bytes or seconds. `-` and empty are absent. The
+      # second value says the cell was in a rounded human form.
+      def trace_value(cell, kind)
+        s = cell.to_s.strip
+        return nil if s.empty? || s == '-'
+
+        case kind
+        when 'text' then [s, false]
+        when 'count' then s =~ /\A\d+\z/ ? [s.to_i, false] : nil
+        when 'percent' then s =~ /\A(\d+(?:\.\d+)?)%?\z/ ? [Regexp.last_match(1).to_f, false] : nil
+        when 'bytes'
+          return [s.to_i, false] if s =~ /\A\d+\z/
+
+          m = s.match(/\A(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB|PB)\z/)
+          m && [(m[1].to_f * (1024**MEMORY_UNITS.fetch(m[2]))).round, true]
+        when 'duration'
+          return [seconds(s.to_i / 1000r), false] if s =~ /\A\d+\z/ # trace.raw: milliseconds
+          return nil unless s =~ HUMAN_DURATION
+
+          total = s.scan(/(\d+(?:\.\d+)?)(ms|s|m|h|d)/).sum { |n, u| n.to_r * DURATION_UNITS.fetch(u).to_r }
+          [seconds(total), true]
+        end
+      end
+
+      # Seconds as an Integer when whole, otherwise a Float to the millisecond.
+      def seconds(rational)
+        rational.denominator == 1 ? rational.to_i : rational.round(3).to_f
+      end
+
+      # The trace rows joined to the bundle's steps by task hash — the join
+      # `trace_image` makes for the container column.
+      # @return [Array<Hash>] bundle step entries, source nextflow_trace
+      #
+      # The join must be one to one (implementation review r1): a step whose
+      # hash more than one row's short hash begins, or a row whose short hash
+      # begins more than one step's hash, is ambiguous and is not read — the
+      # bundle would otherwise carry another task's values with nothing to say
+      # so. The step number is written as the integer the adapter reads.
+      def trace_resource_steps(steps, merged, notes)
+        keys = steps.to_h { |st| [st, work_dir_of(st)&.sub(%r{\A.*\bwork/}, '')] }
+        steps.filter_map do |step|
+          number = step['step_number'].to_s =~ /\A-?\d+\z/ ? step['step_number'].to_i : nil
+          key = keys[step]
+          shorts = key ? merged.keys.select { |short| key.start_with?(short) } : []
+          shared = shorts.length == 1 && keys.values.count { |k| k&.start_with?(shorts.first) } > 1
+          row = shorts.length == 1 && !shared ? merged[shorts.first] : nil
+          if number.nil?
+            notes << 'a step whose step_number is not an integer: its trace row is not read'
+            next nil
+          end
+          if shorts.length > 1 || shared || row&.dig('ambiguous')
+            notes << "step #{number}: the trace row cannot be told apart from another task's; not read"
+            next nil
+          end
+          if row.nil? || (row['requested'].empty? && row['observed'].empty?)
+            notes << "step #{step['step_number']}: no trace row with resources"
+            next nil
+          end
+          Writer.compact_h('step_number' => number, 'source' => 'nextflow_trace',
+                           'requested' => row['requested'].empty? ? nil : row['requested'],
+                           'observed' => row['observed'].empty? ? nil : row['observed'])
+        end
+      end
+
       # `work/7a/51f65ba…` for a step. nf-prov names a step by its full task
       # hash; when it does not, the work path is in the step's own io lists.
       def work_dir_of(step)
@@ -222,6 +357,10 @@ module GenomicsChainProv
       #   v0.1.12 §6.1: the machine running the enricher need not be the one the
       #   tasks ran on)
       # @param zk_receipts [Array<Hash>] receipt declarations (Writer.zk_declaration)
+      # @param resources [Hash, nil] Writer.resources_block (design v0.1.14 §6.2)
+      # @param commitment [Hash, nil] option 2 (v0.1.16 §6.1): Commitment.declaration(key);
+      #   `checksums` then holds hmac_sha256 values only, and every `sha1_checksum`
+      #   already in the bundle is removed (an option-2 bundle carries none)
       # @return [Hash] a new bundle; the argument is not touched, because the
       #   digest subject is the bytes that were read (§4)
       # @return [Array(Hash, Array<String>)] the new bundle and what it refused
@@ -230,9 +369,27 @@ module GenomicsChainProv
       #   rejects, and an enricher that quietly replaced it would turn a
       #   malformed bundle into one that parses — laundering the very defect
       #   the boundary rule exists to surface (§5, round 7).
-      def enrich(bco, tools_by_step: {}, image_by_step: {}, checksums: {}, platform: nil, zk_receipts: [])
+      def enrich(bco, tools_by_step: {}, image_by_step: {}, checksums: {}, platform: nil, zk_receipts: [],
+                 resources: nil, commitment: nil)
         out = JSON.parse(JSON.generate(bco))
         refused = []
+        if commitment
+          removed = strip_sha1!(out)
+          refused << "option 2: removed #{removed} sha1_checksum field(s) the bundle already carried" if removed.positive?
+          # the adapter's own item rule, not a copy of it (round-1 review, Fable #3)
+          # plus the elements whose shape hides their items (a list wrapping a
+          # block, the block as a list): the adapter refuses those too (pre-flight r2)
+          others = Array(out['extension_domain']).count do |e|
+            e.is_a?(Hash) && e['genomicschain_extension'].is_a?(Hash) &&
+              e.dig('genomicschain_extension', 'producer', 'name') != Writer::PRODUCER_NAME &&
+              Array(e.dig('genomicschain_extension', 'checksums')).any? { |c| !Adapters::Bco.option2_item?(c) }
+          end + Adapters::Bco.unshaped_extension_elements(out)
+          if others.positive?
+            refused << "option 2: #{others} extension block(s) by another producer, or not written as an object, " \
+                       'carry plain checksums or cannot be shown free of them; ' \
+                       'the anchor will refuse the bundle (plain_fingerprint_in_option2_bundle)'
+          end
+        end
         steps = out.dig('description_domain', 'pipeline_steps')
         Array(steps).each do |step|
           next unless step.is_a?(Hash)
@@ -250,8 +407,21 @@ module GenomicsChainProv
           step['prerequisite'] = keep + entries
         end
         apply_io_checksums!(out['io_domain'], checksums)
-        refused.concat(set_extension!(out, checksums, platform: platform, zk_receipts: zk_receipts))
+        refused.concat(set_extension!(out, checksums, platform: platform, zk_receipts: zk_receipts,
+                                                      resources: resources, commitment: commitment))
         [out, refused]
+      end
+
+      # Every `sha1_checksum` key anywhere in the bundle, removed in place.
+      # @return [Integer] how many
+      def strip_sha1!(node)
+        case node
+        when Hash
+          n = node.delete('sha1_checksum') ? 1 : 0
+          n + node.each_value.sum { |v| strip_sha1!(v) }
+        when Array then node.sum { |v| strip_sha1!(v) }
+        else 0
+        end
       end
 
       # One `{name, version, uri}` per tool the process declared, each carrying
@@ -290,15 +460,19 @@ module GenomicsChainProv
       # two naming DIFFERENT producers cancel each other out, and a bundle
       # whose enrichment history is visible in its array length is a bundle
       # whose grade depends on how many times a command was run.
-      def set_extension!(bco, checksums, platform: nil, zk_receipts: [])
+      def set_extension!(bco, checksums, platform: nil, zk_receipts: [], resources: nil, commitment: nil)
         if bco.key?('extension_domain') && !bco['extension_domain'].is_a?(Array)
           return ['extension_domain is not an array; left untouched, and no checksum was written']
         end
 
-        block = Writer.extension_block(checksums, platform: platform, zk_receipts: zk_receipts)
+        block = Writer.extension_block(checksums, platform: platform, zk_receipts: zk_receipts, resources: resources,
+                                                  commitment: commitment)
         list = bco['extension_domain'] || []
         at = list.index do |e|
-          e.is_a?(Hash) && e.dig('genomicschain_extension', 'producer', 'name') == Writer::PRODUCER_NAME
+          # a genomicschain_extension that is not an object is not ours to replace
+          # (and dig into a list raised TypeError; pre-flight r2)
+          e.is_a?(Hash) && e['genomicschain_extension'].is_a?(Hash) &&
+            e.dig('genomicschain_extension', 'producer', 'name') == Writer::PRODUCER_NAME
         end
         at ? list[at] = block : list << block
         bco['extension_domain'] = list
@@ -307,21 +481,65 @@ module GenomicsChainProv
 
       # --- reading a launch directory ----------------------------------------
 
+      # @param machine [Hash, nil] Environment.machine's, only when the caller
+      #   was told the tasks ran here (--machine-of-this-machine); the enricher
+      #   may run on a head node while the tasks ran elsewhere (§6.2 (1))
+      # @param host_os [String] where this runs, for the macOS container rule
+      # @param resource_steps [Array<Hash>] entries from gc-resources-input files
+      # @param trace_paths [Array<String>, nil] the traces to read resources
+      #   from; nil = trace_path when given, else every
+      #   pipeline_info/execution_trace*.txt under the launch directory
+      # @param commitment_key [String, nil] option 2 (v0.1.16): the bundle's
+      #   32-byte key; every file fingerprint is then gc-commitment-0.1 and the
+      #   key's declaration is written. The key is not written anywhere.
       # @return [Hash] {'bco' => the enriched bundle, 'notes' => [String]}
+      # @raise [Writer::PlanError] option 2, when the anchor would refuse the enriched bundle
       def read(launch_dir, bco:, versions_path: nil, trace_path: nil, work_root: 'work',
                digest_map: {}, script_path: nil, jar_path: nil, checksums: true, docker: true,
-               platform: nil, zk_receipts: [])
+               platform: nil, zk_receipts: [], machine: nil, host_os: Etc.uname[:sysname],
+               resource_steps: [], trace_paths: nil, commitment_key: nil)
         notes = []
         steps = Array(bco.dig('description_domain', 'pipeline_steps')).select { |s| s.is_a?(Hash) }
 
         tools_by_step = tools_by_step(steps, launch_dir, versions_path, notes)
         image_by_step = image_by_step(steps, launch_dir, work_root, trace_path, digest_map, docker, notes)
-        sums = checksums ? collect_checksums(bco, launch_dir, script_path, jar_path, notes) : {}
+        sums = checksums ? collect_checksums(bco, launch_dir, script_path, jar_path, notes, commitment_key) : {}
         notes << 'checksums were skipped (--no-checksums)' unless checksums
+        # On macOS the GPU lines are never written for a Nextflow run
+        # (operator, 2026-10-17, implementation review r2): nf-prov's bundle
+        # names no container even when every task ran in one, so whether the
+        # tasks could reach the host GPU cannot be read back once work/ is gone.
+        machine = Environment.without_host_gpus(machine, notes) if machine && host_os == 'Darwin'
+        traced = trace_resources(steps, launch_dir, trace_paths || (trace_path ? [trace_path] : nil), notes)
+        resources = Writer.resources_block(machine: machine, steps: traced + resource_steps)
 
+        commitment = commitment_key && Commitment.declaration(commitment_key)
+        # option 2: the shape guard on what was collected, then the adapter's
+        # admission on the finished bundle — other and second blocks keep
+        # whatever they carried (round-1 implementation review, H2)
+        Writer.check_option2!(sums, zk_receipts, commitment) if commitment
         enriched, refused = enrich(bco, tools_by_step: tools_by_step, image_by_step: image_by_step,
-                                        checksums: sums, platform: platform, zk_receipts: zk_receipts)
+                                        checksums: sums, platform: platform, zk_receipts: zk_receipts,
+                                        resources: resources, commitment: commitment)
+        Writer.check_option2_bundle!(enriched) if commitment
         { 'bco' => enriched, 'notes' => notes + refused }
+      end
+
+      def trace_resources(steps, launch_dir, paths, notes)
+        paths ||= Dir[File.join(launch_dir, '**', 'pipeline_info', 'execution_trace*.txt')].sort_by { |p| File.basename(p) }
+        readable = paths.select { |p| File.file?(p) }
+        if readable.empty?
+          notes << 'no execution trace found: no per-stage resources collected'
+          return []
+        end
+
+        parsed = readable.map { |p| resources_from_trace(File.read(p)) }
+        notes << "resources read from #{readable.length} trace file(s), later files winning: " \
+                 "#{readable.map { |p| File.basename(p) }.join(', ')}"
+        if parsed.any? { |_, rounded| rounded }
+          notes << 'trace values are in rounded human form (e.g. 11.2 MB, 663ms); set trace.raw = true for exact values'
+        end
+        trace_resource_steps(steps, merge_trace_resources(parsed.map(&:first)), notes)
       end
 
       def tools_by_step(steps, launch_dir, versions_path, notes)
@@ -393,7 +611,7 @@ module GenomicsChainProv
       # the workflow script, and the framework jar keyed by the runtime's own
       # locator (§10-9 — the jar is the engine, and the release URL the bundle
       # names is what the record joins it to).
-      def collect_checksums(bco, launch_dir, script_path, jar_path, notes)
+      def collect_checksums(bco, launch_dir, script_path, jar_path, notes, commitment_key = nil)
         sums = {}
         io = bco['io_domain'].is_a?(Hash) ? bco['io_domain'] : {}
         %w[input_subdomain output_subdomain].each do |key|
@@ -403,20 +621,20 @@ module GenomicsChainProv
             locator = entry['uri']['uri'].to_s
             next if locator.empty? || locator =~ Environment::REMOTE_SCHEME
 
-            digests = Environment.digest_file(Environment.absolute(locator, launch_dir))
+            digests = Environment.digest_file(Environment.absolute(locator, launch_dir), commitment_key: commitment_key)
             sums[locator] = digests if digests
           end
         end
         notes << 'no io file under the launch directory could be read: the run directory is gone' if sums.empty?
 
         add_file_checksum(sums, script_locator(bco), script_path, notes,
-                          'workflow script', '--script PATH')
+                          'workflow script', '--script PATH', commitment_key)
         add_file_checksum(sums, runtime_locator(bco), jar_path || runtime_jar(bco), notes,
-                          'runtime (the framework jar)', '--nextflow-jar PATH')
+                          'runtime (the framework jar)', '--nextflow-jar PATH', commitment_key)
         sums
       end
 
-      def add_file_checksum(sums, locator, path, notes, what, flag)
+      def add_file_checksum(sums, locator, path, notes, what, flag, commitment_key = nil)
         return if locator.nil? || locator.empty?
 
         if path.nil?
@@ -428,7 +646,7 @@ module GenomicsChainProv
           return
         end
 
-        digests = Environment.digest_file(path)
+        digests = Environment.digest_file(path, commitment_key: commitment_key)
         sums[locator] = digests if digests
       end
 

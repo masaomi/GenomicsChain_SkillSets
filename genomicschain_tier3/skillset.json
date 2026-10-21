@@ -1,16 +1,19 @@
 {
   "name": "genomicschain_tier3",
-  "version": "0.5.1",
-  "description": "GenomicsChain Tier-3 execution layer (backends, comparator, executor, gc_tier3_execute, gc_tier3_estimate). Record 0.3: two verdict axes.",
+  "version": "0.6.0",
+  "description": "GenomicsChain Tier-3 execution layer (backends, comparator, executor, gc_tier3_execute, gc_tier3_estimate). Record 0.3: two verdict axes. Tier 3 v0.1: the executor's gc_tier3_attest (declare, attempt, attest); the record side and its anchor tool are in genomicschain_tier3_record. Not installed on the anchor.",
   "author": "Masaomi Hatakeyama",
   "layer": "L1",
   "depends_on": [
-    {"name": "genomicschain_core", "version": ">= 0.2.0"}
+    {"name": "genomicschain_core", "version": ">= 0.6.4"},
+    {"name": "genomicschain_prov", "version": ">= 0.6.0"},
+    {"name": "genomicschain_tier3_record", "version": ">= 0.1.0"}
   ],
   "provides": ["genomics_job_execution", "tier3_executed_r"],
   "tool_classes": [
     "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Execute",
-    "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Estimate"
+    "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Estimate",
+    "KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Attest"
   ],
   "config_files": [],
   "knowledge_dirs": [],

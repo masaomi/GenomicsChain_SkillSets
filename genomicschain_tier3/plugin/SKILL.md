@@ -5,14 +5,42 @@ description: Tier-3 execution (local/thoa backends, two-axis verdict, cost estim
 
 # genomicschain_tier3
 
-Execute-only package for Tier-3 evaluation. Signing and recording live in `genomicschain_core`.
+Execution package for Tier-3 evaluation. Record 0.3 is signed by the caller and recorded by `genomicschain_core`;
+Tier 3 v0.1 is signed here by `gc_tier3_attest` and recorded by `genomicschain_tier3_record`.
 
 ## Tools
 
 - `gc_tier3_execute` — run the pipeline one or more times, compare against a target if one exists,
   return `verdict_result` + `jobspec_json` for submit
 - `gc_tier3_estimate` — what a run would cost, before running it. Queries `thoa run --dry-run`
-  (spends nothing) or falls back to rates measured 2026-08-17
+  (spends nothing) or falls back to rates measured 2026-08-17. Given `reachability_proof_id` (0.5.2,
+  prov design v0.1.15 §6.3 (8)), it shows beside the estimate the observation's date and, per category,
+  the places that did not answer (not_found, access_denied, error, not_attempted), read from this node's
+  Synoptis registry; never a gate
+- `gc_tier3_attest` (0.6.0, design `docs/design/tier3_design_v0_1.md`) — the Tier 3 executor's side.
+  `declare` signs the plan, targets and binding list before building; `attempt` builds once in a fresh
+  `work_root/attempt-<n>`, runs `gc_tier3_execute` once if it built, and compares the declared targets
+  (relative paths that resolve inside that directory; route B one per bundle row) the run created or
+  changed; `attest` signs every attempt row, failures included. Build steps and observes run as argv,
+  never through a shell. `attempt` and `attest` hold the process record's lock and use the local copy
+  only after it recomputes to the signed declaration (plan, pipeline, targets, the key's `key_id`); an
+  interrupted attempt keeps its number and is closed by the next call. Keys never leave the tool;
+  `thoa` is refused for salted and option-2 jobs; the process record (0700 / 0600) stays with the
+  executor. A commitment key comes from `gc_prov_write --new-commitment-key`. The process record and
+  both keys must be protected by the executor's own account: anyone who can write them with the
+  executor's rights can also sign, so the tool's checks of the local copy do not stand against them.
+  Keep one `work_root` per process record: attempt directories are numbered per record, so two records
+  sharing a work_root cannot tell each other's directories apart
+
+The record side — `tier3_declaration` / `tier3_attestation` 0.1, `gc_tier3_record_submit` — is the
+package `genomicschain_tier3_record`. The anchor installs that package and never this one, which would
+register the execution tools there.
+
+A lone declaration reads 「宣言されたが attestation されていない」. Every reading carries both sentences:
+
+> **ZK 証明（Tier 2.5 の任意の添付）:** 証明が示すのは、指定した段の計算が、記録された入力から正しく行われたことだけ。対象は指定した段だけで、入力が本当にその生データであるかは示さない。
+
+> **Tier 3:** 保証するのは私たちの手順と記録まで。Tier 3 の記録は「その日、宣言どおりの結果になった」という日付つきの観察であり、将来も再現することの約束ではない。
 
 ## Two verdict axes (record 0.3)
 
@@ -60,6 +88,8 @@ implemented. Read `first_divergence` before concluding a pipeline is nondetermin
 ## Dependencies
 
 - `genomicschain_core` (Manifest, canonical JSON, schema)
+- `genomicschain_prov` (gc-commitment-0.1, the `outputs_digest` rule, the Tier-2.5 record)
+- `genomicschain_tier3_record` (the record names the executor signs against)
 
 ## Tests
 

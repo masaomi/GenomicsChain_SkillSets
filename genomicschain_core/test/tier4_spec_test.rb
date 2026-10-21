@@ -10,6 +10,7 @@ require 'base64'
 require 'ed25519'
 require 'kairos_mcp/version'
 require_relative 'proofs_sandbox'
+require_relative 'idempotency_fixture'
 require 'kairos_mcp/skillset'
 require 'genomicschain_core'
 require 'genomicschain_core/verdict_spec/tier4'
@@ -75,8 +76,7 @@ class Tier4SpecTest < Minitest::Test
     T4Core::VerdictSpec::Tier4.new(distillation: d, package_files_json: files_json)
   end
 
-  def signed_operator(tip_source, sp)
-    sk = Ed25519::SigningKey.generate
+  def signed_operator(tip_source, sp, sk: Ed25519::SigningKey.generate)
     nonce = SecureRandom.hex(16)
     tip = tip_source.latest_tip_hash
     payload = KairosMcp::Manifest.canonical_json(
@@ -113,6 +113,24 @@ class Tier4SpecTest < Minitest::Test
     assert_equal false, out[:leaderboard_eligible]
     assert_nil manifest.dig('reversion', 'tier3_record_ref')
     assert KairosMcp::Manifest.validate_tier4!(manifest)
+  end
+
+  # Design v0.1.15 (10) (viii): the key on both paths, pinned before core 0.6.2.
+  def test_idempotency_key_matches_the_r0_fixture
+    Dir.mktmpdir do |tmp|
+      registry, tip_source, = ProofsSandbox.context(tmp)
+      KairosMcp::Manifest::Signer.bootstrap_seen_list!(tip_source: tip_source)
+      sp = spec
+      op, pkhash = signed_operator(tip_source, sp, sk: IdempotencyFixture::SIGNING_KEY)
+      att = Tier4StubAttestor.new(registry: registry)
+      run = lambda do
+        T4Core::SubmitCore.submit(spec: sp, operator: op, bearer_pubkey_hash: pkhash, tip_source: tip_source,
+                                  registry: registry, attestor: att)
+      end
+      first = run.call
+      second = run.call
+      IdempotencyFixture.check(self, 'tier4_distillation', first, second)
+    end
   end
 
   def test_package_list_that_does_not_hash_to_the_claim_is_refused

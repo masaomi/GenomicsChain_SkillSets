@@ -113,4 +113,64 @@ class GcTier3EstimateTest < Minitest::Test
     assert_equal %w[estimated_hours], tool.input_schema[:required]
     assert_equal 'gc_tier3_estimate', tool.name
   end
+  # prov design v0.1.15 §6.3 (8): an observation beside the estimate, read
+  # from this node's registry (a stand-in here), per category, never summed.
+  FakeEnvelope = Struct.new(:evidence)
+
+  def with_registry(manifest, revoked: false)
+    t = tool
+    reg = Object.new
+    reg.define_singleton_method(:find_proof) { |id| id == 'obs1' ? FakeEnvelope.new(JSON.generate('manifest' => manifest)) : nil }
+    reg.define_singleton_method(:revoked?) { |_| revoked }
+    t.define_singleton_method(:reach_registry) { reg }
+    yield t
+  end
+
+  def test_an_observation_is_shown_beside_the_estimate_per_category
+    counts = { 'containers' => { 'not_found' => 1, 'access_denied' => 2, 'error' => 0, 'not_attempted' => 0, 'exists' => { 'public_registry' => 5 } },
+               'runtime' => { 'not_found' => 0, 'access_denied' => 0, 'error' => 1, 'not_attempted' => 0 },
+               'software' => { 'not_found' => 0, 'access_denied' => 0, 'error' => 0, 'not_attempted' => 0 } }
+    manifest = { 'record_type' => 'prov_reachability', 'observed_at' => '2026-10-18T12:00:00Z', 'observer' => 'anchor', 'counts' => counts }
+    with_registry(manifest) do |t|
+      out = JSON.parse(t.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'obs1').first[:text])
+      r = out['reachability']
+      assert_equal '2026-10-18T12:00:00Z', r['observed_at']
+      assert_equal({ 'containers' => { 'not_found' => 1, 'access_denied' => 2 }, 'runtime' => { 'error' => 1 } },
+                   r['not_answering_per_category'])
+      assert_equal false, r['revoked']
+      assert_equal 261.4, out.dig('credits', 'total'), 'the estimate itself is unchanged'
+      other = JSON.parse(t.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'nope').first[:text])
+      assert_includes other.dig('reachability', 'note'), 'no reachability observation'
+    end
+    with_registry(manifest.merge('record_type' => 'prov_attestation')) do |t|
+      out = JSON.parse(t.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'obs1').first[:text])
+      assert_includes out.dig('reachability', 'note'), 'no reachability observation'
+    end
+  end
+
+  def test_a_node_without_a_registry_says_so_and_still_estimates
+    t = tool
+    t.define_singleton_method(:reach_registry) { nil }
+    out = JSON.parse(t.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'obs1').first[:text])
+    assert_includes out.dig('reachability', 'note'), 'cannot be read on this node'
+    assert_equal 261.4, out.dig('credits', 'total')
+    refute JSON.parse(tool.call('estimated_hours' => 1.0, 'offline' => true).first[:text]).key?('reachability')
+  end
+
+  # Review r1: a registry that fails, or a record whose counts are not
+  # numbers, is named by its class beside an estimate that still comes back.
+  def test_an_unreadable_registry_or_record_never_stops_the_estimate
+    t = tool
+    t.define_singleton_method(:reach_registry) { raise Errno::EACCES, '/secret/path/synoptis_data' }
+    out = JSON.parse(t.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'obs1').first[:text])
+    assert_equal 261.4, out.dig('credits', 'total')
+    assert_includes out.dig('reachability', 'note'), 'Errno::EACCES'
+    refute_includes out.to_s, '/secret/path'
+    bad = { 'record_type' => 'prov_reachability', 'counts' => { 'containers' => { 'not_found' => { 'x' => 1 } } } }
+    with_registry(bad) do |t2|
+      out = JSON.parse(t2.call('estimated_hours' => 1.0, 'offline' => true, 'reachability_proof_id' => 'obs1').first[:text])
+      assert_equal 261.4, out.dig('credits', 'total')
+      assert_includes out.dig('reachability', 'note'), 'cannot be read here'
+    end
+  end
 end

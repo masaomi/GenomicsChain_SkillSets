@@ -2,6 +2,7 @@
 
 require 'json'
 require 'set'
+require 'strscan'
 require_relative '../normalized'
 # The adapter reduces duplicate declarations with the predicate's own rule,
 # and reads image references with the predicate's own shape. Requiring it
@@ -30,13 +31,22 @@ module GenomicsChainProv
     # One extension of the standard is read: an `extension_domain` entry holding
     # `genomicschain_extension` (written by the enricher) may carry
     #   producer:    {name, version}
-    #   checksums:   [{uri, sha256}]   joined to inputs/outputs by exact locator
+    #   checksums:   [{uri, sha256 | hmac_sha256}]   joined to inputs/outputs by exact locator
+    #   commitment:  {rule, key_id}                           (design v0.1.16 §6.1)
     #   platform:    {cpu_architecture, os_name, os_release}   (design v0.1.12 §6.1)
     #   zk_receipts: [{sha256, image_id, zkvm{name,version}, step_number,
     #                  journal, input_uri, output_uri}]          (same)
     # because the standard's own checksum field is SHA-1 and the record wants
     # SHA-256 beside it, and because the standard has no field for the machine
     # or for a proof. The extension_schema URL is fixed (design §10-1).
+    #
+    # Option 2 (design v0.1.16 §6.1, S2). A bundle that declares a
+    # gc-zk-journal-0.2 receipt is an option-2 bundle: every checksums[] item
+    # is exactly {uri, hmac_sha256} and no `sha1_checksum` appears anywhere.
+    # `hmac_sha256` (gc-commitment-0.1) is read as a content-fixing fingerprint
+    # exactly like `sha256` — the predicate is unchanged and grades on its
+    # presence. What this adapter refuses is reported in `refusals` (codes,
+    # never values) and refused by the anchor; it reads no configuration.
     #
     # Stage identity (review round 2): a stage is its POSITION after sorting
     # the steps on `step_number`, and every per-stage item carries that
@@ -55,12 +65,22 @@ module GenomicsChainProv
       # Part of the signed identity (`adapter_version`, design §6): the same
       # bundle under a different adapter version may normalise differently.
       # 0.4.0 (design v0.1.12): reads `platform` and `zk_receipts`.
-      VERSION = 'prov-adapter-bco-0.4.0'
+      # 0.5.0 (design v0.1.16): reads `hmac_sha256` as a fingerprint and
+      # `commitment`; the option-2 refusals (§6.1, S2).
+      VERSION = 'prov-adapter-bco-0.5.0'
 
       # ZK receipts this version can name (design §6.1). Anything else is a
       # declaration defect, which the anchor refuses rather than records.
       ZK_VM_NAME = 'risc0-zkvm'
-      ZK_JOURNALS = %w[gc-zk-journal-0.1].freeze
+      JOURNAL_V01 = 'gc-zk-journal-0.1'
+      JOURNAL_V02 = 'gc-zk-journal-0.2'
+      ZK_JOURNALS = [JOURNAL_V01, JOURNAL_V02].freeze
+      COMMITMENT_RULE = 'gc-commitment-0.1'
+      # The two fingerprint fields a checksums[] item may carry, one of them.
+      FINGERPRINT_FIELDS = %w[sha256 hmac_sha256].freeze
+      # An option-2 item: these keys and no other (design §6.1, an allow-list).
+      OPTION2_ITEM_KEYS = %w[hmac_sha256 uri].freeze
+      HMAC_HEX = /\A[0-9a-f]{64}\z/
       PLATFORM_KEYS = %w[cpu_architecture os_name os_release].freeze
 
       SPEC_MARK   = /2791|biocompute/i
@@ -95,16 +115,27 @@ module GenomicsChainProv
       # @raise [FormatError] when the input is not a BCO
       def parse(bundle)
         bco = load(bundle)
+        # The option-2 shape rule reads the bundle as written: normalisation
+        # empties or drops what it cannot read (a list where an object
+        # belongs, a list element that is not an object), and a fingerprint
+        # hidden there must still be refused (round-1 implementation review,
+        # Codex H1: `platform: [{sha1_checksum}]` was accepted). Its objects
+        # remember a repeated key, which the parse itself drops (round-2 M1).
+        # The text itself is kept for the comment scan (round-3 C1): a bundle
+        # given as an object is re-serialised and cannot carry a comment.
+        text = bundle.is_a?(String) ? bundle : JSON.generate(bundle)
+        as_written = parse_as_written(text)
         notes = []
         ed = bco['execution_domain']
         steps = ordered_steps(bco)
         params = Array(bco['parametric_domain']).select { |p| p.is_a?(Hash) }
         extension = genomicschain_extension(bco)
-        sha256_by_locator = checksums_from(extension, notes)
+        fp_by_locator = checksums_from(extension, notes)
+        commitment = commitment_of(bco)
         notes << 'a checksum field that is not a hex digest was ignored' if malformed_checksum?(bco, extension)
 
-        runtime = runtime_of(ed, notes, sha256_by_locator)
-        software = software_of(ed, steps, runtime, sha256_by_locator)
+        runtime = runtime_of(ed, notes, fp_by_locator)
+        software = software_of(ed, steps, runtime, fp_by_locator)
         # An unreadable entry might have been an image, so it weakens the
         # container route as well as the package route (round 7, codex,
         # reproduced): with it in the package route only, replacing an honestly
@@ -113,8 +144,8 @@ module GenomicsChainProv
         # because the stage takes the stronger of the two routes (§5, §10-8).
         containers = software.select { |s| oci_ref?(s['locator']) || (s['name'].nil? && s['locator'].nil?) }
                              .map { |s| { 'ref' => s['locator'], 'name' => s['name'], 'stage' => s['stage'] } }
-        inputs = inputs_of(bco['io_domain'], internal_locators(steps).to_set, sha256_by_locator)
-        outputs = outputs_of(bco['io_domain'], sha256_by_locator)
+        inputs = inputs_of(bco['io_domain'], internal_locators(steps).to_set, fp_by_locator)
+        outputs = outputs_of(bco['io_domain'], fp_by_locator)
         recorded = params.reject { |p| unset?(p['value']) }
         producer = producer_of(extension)
         platform = platform_of(extension, notes)
@@ -130,20 +161,193 @@ module GenomicsChainProv
           format: 'bco',
           format_version: bco['spec_version'].to_s,
           producer: producer,
-          workflow: workflow_of(bco, ed, sha256_by_locator, notes),
+          workflow: workflow_of(bco, ed, fp_by_locator, notes),
           runtime: runtime,
           software: software,
           containers: containers,
-          stages: stages_of(steps, sha256_by_locator),
+          stages: stages_of(steps, fp_by_locator),
           inputs: inputs,
           outputs: outputs,
           params_total: params.length,
           params_count: recorded.length,
           seed_recorded: recorded.any? { |p| p['param'].to_s =~ SEED },
           platform: platform,
-          zk_receipts: zk_receipts_of(extension, steps, sha256_by_locator),
+          zk_receipts: zk_receipts_of(extension, steps, fp_by_locator),
+          commitment: commitment,
+          refusals: refusals_of(as_written, extension, text),
           notes: notes
         )
+      end
+
+      # --- option 2 (design v0.1.16 §6.1, S2, S3 (vii)) --------------------------
+
+      # The journal conventions the bundle's receipt declarations name, as
+      # written (an unknown one is a declaration defect, reported elsewhere).
+      def declared_journals(extension)
+        Array(extension['zk_receipts']).map { |d| blank_to_nil(readable(d)['journal']) }
+      end
+
+      # What the anchor refuses this bundle for, before any receipt is
+      # looked at. Codes only, in a fixed order; [] when nothing.
+      #
+      #   mixed_journal_conventions            0.1 and 0.2 receipts in one bundle (S2)
+      #   plain_fingerprint_in_option2_bundle  an option-2 bundle with a checksums[]
+      #                                        item other than exactly {uri, hmac_sha256}
+      #                                        (two strings), a sha1_checksum anywhere, or
+      #                                        an extension_domain element / genomicschain_extension
+      #                                        value that is not an object — its items are not
+      #                                        read, so it cannot be shown free of plain
+      #                                        fingerprints (§6.1; pre-flight r2); or one whose
+      #                                        bytes cannot be shown free of them either:
+      #                                        any object anywhere that repeats a key (the
+      #                                        parse keeps only the last value; round-2 M1),
+      #                                        or a `checksums` key anywhere other than the
+      #                                        top level of a genomicschain_extension block
+      #                                        in a top-level extension_domain element —
+      #                                        another extension's, a sibling key, a nested
+      #                                        extension_domain, a zk declaration (round-2 M2);
+      #                                        or a comment anywhere in the text (the parse
+      #                                        drops it; round-3 C1)
+      #   commitment_outside_option2           hmac_sha256 or commitment in a bundle
+      #                                        that declares no 0.2 receipt (§6.1, S3 (vii))
+      #
+      # The design names the third `commitment_outside_option2`; the review
+      # queue (r2 N6) floated `salted_fingerprint_outside_option2`. The frozen
+      # design's name is the one used.
+      #
+      # @param as_written [Hash] the bundle as parsed by `parse_as_written`,
+      #   BEFORE normalisation: the items, the sha1_checksum and checksums
+      #   scans and the repeated-key check are read there, so nothing
+      #   normalisation or the parse drops escapes
+      # @param extension [Hash] the normalised extension (for the journals)
+      # @param text [String] the bundle text the two parses read (for the comment scan)
+      def refusals_of(as_written, extension, text)
+        journals = declared_journals(extension)
+        items = extension_blocks(as_written).flat_map { |b| Array(b['checksums']) }
+        out = []
+        if journals.include?(JOURNAL_V02)
+          out << 'mixed_journal_conventions' if journals.include?(JOURNAL_V01)
+          plain = items.any? { |c| !option2_item?(c) } || key_anywhere?(as_written, 'sha1_checksum') ||
+                  !unshaped_extension_elements(as_written).zero? || key_repeated?(as_written) ||
+                  checksums_outside_blocks?(as_written) || comment?(text)
+          out << 'plain_fingerprint_in_option2_bundle' if plain
+        elsif items.any? { |c| c.is_a?(Hash) && c.key?('hmac_sha256') } ||
+              extension_blocks(as_written).any? { |b| b.key?('commitment') }
+          out << 'commitment_outside_option2'
+        end
+        out
+      end
+
+      # Exactly {uri, hmac_sha256}, both strings: an object under either key
+      # could carry a plain fingerprint inside it (round-1 review, F1).
+      def option2_item?(c)
+        c.is_a?(Hash) && c.keys.sort == OPTION2_ITEM_KEYS && c['uri'].is_a?(String) && c['hmac_sha256'].is_a?(String)
+      end
+
+      # An object that remembers whether a key was written into it twice.
+      # json 2.9.1 builds an `object_class` object with `[]=` once per member,
+      # in document order (checked 2026-10-20: `{"a":1,"a":2}` calls `[]=`
+      # twice), and keeps the last value; this records that it happened.
+      class KeyRepeatHash < Hash
+        def []=(key, value)
+          @repeated = true if key?(key)
+          super
+        end
+
+        def repeated? = @repeated == true
+      end
+
+      # The bundle as written, for the option-2 scans only: plain Hash
+      # behaviour, plus the repeated-key mark. Same limits as `load`.
+      def parse_as_written(text)
+        JSON.parse(text, object_class: KeyRepeatHash)
+      end
+
+      # Whether the text holds a JSON comment. json 2.9.1 accepts /* */ and //
+      # comments and has no option to refuse them (round-3 C1, checked
+      # 2026-10-20). Standard JSON allows a '/' only inside a string token, so
+      # a '/' outside one is a comment. Walks the text tracking string state:
+      # outside a string, the next '"' opens one and a '/' is a comment; inside,
+      # a backslash takes the byte after it, and the next other '"' closes it.
+      # Called on text the parser accepted, so every string closes; one that
+      # did not would leave the text unshown, and is counted as a comment.
+      def comment?(text)
+        sc = StringScanner.new(text.b)
+        while sc.skip_until(%r{["/]}n)
+          return true if sc.matched == '/'
+
+          loop do
+            return true if sc.skip_until(/["\\]/n).nil?
+            break if sc.matched == '"'
+
+            sc.getch
+          end
+        end
+        false
+      end
+
+      def key_repeated?(node)
+        case node
+        when Hash then (node.respond_to?(:repeated?) && node.repeated?) || node.each_value.any? { |v| key_repeated?(v) }
+        when Array then node.any? { |v| key_repeated?(v) }
+        else false
+        end
+      end
+
+      # A `checksums` key in any object other than a block `extension_blocks`
+      # reads (by identity: the same content elsewhere is still elsewhere).
+      def checksums_outside_blocks?(bco)
+        # identity before insertion: two equal blocks are two blocks
+        read = Set.new.compare_by_identity.merge(extension_blocks(bco))
+        walk = lambda do |node|
+          case node
+          when Hash then (node.key?('checksums') && !read.include?(node)) || node.each_value.any?(&walk)
+          when Array then node.any?(&walk)
+          else false
+          end
+        end
+        walk.call(bco)
+      end
+
+      def key_anywhere?(node, key)
+        case node
+        when Hash then node.key?(key) || node.each_value.any? { |v| key_anywhere?(v, key) }
+        when Array then node.any? { |v| key_anywhere?(v, key) }
+        else false
+        end
+      end
+
+      # extension_domain elements whose shape hides any items they carry: an
+      # element that is not an object, or an object whose genomicschain_extension
+      # is present and not an object (a list wrapping a block, the block as a
+      # list). Read only in option 2; option 1 ignores them as before.
+      def unshaped_extension_elements(bco)
+        Array(bco['extension_domain']).count do |x|
+          !x.is_a?(Hash) || (x.key?('genomicschain_extension') && !x['genomicschain_extension'].is_a?(Hash))
+        end
+      end
+
+      def extension_blocks(bco)
+        Array(bco['extension_domain']).filter_map do |x|
+          x['genomicschain_extension'] if x.is_a?(Hash) && x['genomicschain_extension'].is_a?(Hash)
+        end
+      end
+
+      # The bundle's `commitment`, read once over every extension block (§6.1).
+      # Two blocks that disagree are the bundle saying two things, so neither
+      # is taken — the rule `producer` and `platform` follow — and the 0.2
+      # receipts then fail ⑤ with `commitment_declared_twice`.
+      #
+      # @return [Hash] {'state' => 'none'|'ok'|'unreadable'|'conflict', 'key_id' => hex or nil}
+      def commitment_of(bco)
+        declared = extension_blocks(bco).select { |b| b.key?('commitment') }.map { |b| b['commitment'] }.uniq
+        return { 'state' => 'none', 'key_id' => nil } if declared.empty?
+        return { 'state' => 'conflict', 'key_id' => nil } if declared.length > 1
+
+        c = declared.first
+        ok = c.is_a?(Hash) && c.keys.sort == %w[key_id rule] && c['rule'] == COMMITMENT_RULE &&
+             c['key_id'].is_a?(String) && c['key_id'] =~ HMAC_HEX
+        ok ? { 'state' => 'ok', 'key_id' => c['key_id'] } : { 'state' => 'unreadable', 'key_id' => nil }
       end
 
       def load(bundle)
@@ -263,7 +467,7 @@ module GenomicsChainProv
 
       # --- the seven conditions -------------------------------------------------
 
-      def workflow_of(bco, ed, sha256_by_locator = {}, notes = [])
+      def workflow_of(bco, ed, fp_by_locator = {}, notes = [])
         pd = bco['provenance_domain'].is_a?(Hash) ? bco['provenance_domain'] : {}
         # A block that names nothing is not a declaration and does not enter
         # the weakest-declaration scan (round 8, cursor): as an empty object it
@@ -303,7 +507,7 @@ module GenomicsChainProv
           blank_to_nil(e.is_a?(Hash) ? (e['uri'].is_a?(Hash) ? e['uri']['uri'] : e['uri']) : e)
         end
         script = scripts.compact.first
-        all_pinned = !scripts.empty? && scripts.all? { |l| l && sha256_by_locator[l] }
+        all_pinned = !scripts.empty? && scripts.all? { |l| l && fp_by_locator[l] }
         {
           'name' => blank_to_nil(pd['name']),
           'version' => blank_to_nil(pd['version']),
@@ -315,16 +519,16 @@ module GenomicsChainProv
           'path' => scm && blank_to_nil(scm['scm_path']),
           'script' => script,
           'scripts_total' => scripts.length,
-          'scripts_with_checksum' => scripts.count { |l| l && sha256_by_locator[l] },
+          'scripts_with_checksum' => scripts.count { |l| l && fp_by_locator[l] },
           # extension checksums[] joined by every script locator (rounds 4–5):
           # the first script's digest, present only when all scripts have one
-          'checksum' => all_pinned ? { 'sha256' => sha256_by_locator[script] } : nil
+          'checksum' => all_pinned ? fp_by_locator[script].dup : nil
         }
       end
 
       # The runtime is the engine `script_driver` names; its version is the
       # software_prerequisites entry of the same name, when there is one.
-      def runtime_of(ed, notes, sha256_by_locator = {})
+      def runtime_of(ed, notes, fp_by_locator = {})
         engine = blank_to_nil(ed['script_driver'])
         return nil if engine.nil?
 
@@ -334,7 +538,7 @@ module GenomicsChainProv
         # Two entries naming the engine are two declarations; the weaker one
         # decides, like every other category (round 4: `find` took the first
         # and the order of two lines chose the signed grade).
-        se = weakest_runtime_entry(entries, sha256_by_locator)
+        se = weakest_runtime_entry(entries, fp_by_locator)
         # locator and checksum are what would let the runtime grade above
         # `versioned` (a digest-pinned engine image, a checksummed launcher);
         # nf-prov writes a release-tag URL and no checksum. The enricher writes
@@ -355,11 +559,11 @@ module GenomicsChainProv
       # The checksum is in the key because it decides the grade: two entries
       # alike but for their checksum are two declarations, and the weaker one
       # must survive (round 3).
-      def software_of(ed, steps, runtime, sha256_by_locator = {})
-        top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil, sha256_by_locator) }
+      def software_of(ed, steps, runtime, fp_by_locator = {})
+        top = Array(ed['software_prerequisites']).filter_map { |s| software_entry(s, nil, fp_by_locator) }
         top = top.reject { |s| runtime && s['name'].to_s.casecmp?(runtime['engine'].to_s) }
         per_step = steps.flat_map do |pos, st|
-          Array(st['prerequisite']).filter_map { |s| software_entry(s, pos, sha256_by_locator) }
+          Array(st['prerequisite']).filter_map { |s| software_entry(s, pos, fp_by_locator) }
         end
         (top + per_step).uniq { |s| [s['name'], s['version'], s['locator'], s['checksum'], s['stage']] }
       end
@@ -375,19 +579,19 @@ module GenomicsChainProv
       # workflow-level items and grade above a stage that declared its weak
       # tool honestly. The same argument `ordered_steps` already makes for a
       # non-object step — a dropped entry shrinks a signed denominator.
-      def software_entry(entry, stage, sha256_by_locator = {})
+      def software_entry(entry, stage, fp_by_locator = {})
         entry = readable(entry)
         uri = entry['uri'].is_a?(Hash) ? entry['uri'] : { 'uri' => entry['uri'] }
         name = blank_to_nil(entry['name'])
         locator = blank_to_nil(uri['uri'])
 
         { 'name' => name || locator, 'version' => blank_to_nil(entry['version']), 'locator' => locator,
-          'checksum' => checksum_of(uri, locator, sha256_by_locator), 'stage' => stage.nil? ? nil : stage.to_i }
+          'checksum' => checksum_of(uri, locator, fp_by_locator), 'stage' => stage.nil? ? nil : stage.to_i }
       end
 
-      def stages_of(steps, sha256_by_locator = {})
+      def stages_of(steps, fp_by_locator = {})
         steps.map do |pos, s|
-          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, pos, sha256_by_locator) }
+          sw = Array(s['prerequisite']).filter_map { |p| software_entry(p, pos, fp_by_locator) }
           {
             'id' => pos,
             'step_number' => s['step_number'].to_i,
@@ -409,7 +613,7 @@ module GenomicsChainProv
       # `immutable`, while the same producer declaring that second input with
       # a path signed 1/2 and `local_path`. Omitting a field must never grade
       # above declaring it.
-      def inputs_of(io, internal, sha256_by_locator)
+      def inputs_of(io, internal, fp_by_locator)
         Array(io['input_subdomain']).map do |raw|
           i = readable(raw)
           uri = i['uri'].is_a?(Hash) ? i['uri'] : { 'uri' => i['uri'] }
@@ -417,13 +621,13 @@ module GenomicsChainProv
           name = blank_to_nil(uri['filename']) || locator
           name = basename(name) unless name.nil?
           { 'name' => name, 'locator' => locator,
-            'checksum' => checksum_of(uri, locator, sha256_by_locator),
+            'checksum' => checksum_of(uri, locator, fp_by_locator),
             'internal' => locator ? internal.include?(locator) : false,
             'reference_hint' => name.to_s =~ REFERENCE_HINT ? true : false }
         end
       end
 
-      def outputs_of(io, sha256_by_locator)
+      def outputs_of(io, fp_by_locator)
         Array(io['output_subdomain']).map do |raw|
           o = readable(raw)
           uri = o['uri'].is_a?(Hash) ? o['uri'] : { 'uri' => o['uri'] }
@@ -431,7 +635,7 @@ module GenomicsChainProv
 
           name = blank_to_nil(uri['filename']) || locator
           { 'name' => name.nil? ? nil : basename(name), 'locator' => locator,
-            'checksum' => checksum_of(uri, locator, sha256_by_locator),
+            'checksum' => checksum_of(uri, locator, fp_by_locator),
             'mediatype' => blank_to_nil(o['mediatype']) }
         end
       end
@@ -527,7 +731,7 @@ module GenomicsChainProv
       # the declaration unusable. Nothing is dropped or repaired: a defective
       # declaration is reported (gc_prov_check) and refused (the anchor), never
       # quietly left out of the record. Defect codes are names, not values (§6).
-      def zk_receipts_of(extension, steps, sha256_by_locator)
+      def zk_receipts_of(extension, steps, fp_by_locator)
         decls = Array(extension['zk_receipts'])
         by_number = steps.to_h { |pos, st| [st['step_number'].to_i, [pos, st]] }
         shas = decls.map { |d| hex64(readable(d)['sha256']) }
@@ -549,8 +753,11 @@ module GenomicsChainProv
             'journal_convention' => blank_to_nil(d['journal']),
             'input_uri' => input_uri,
             'output_uri' => output_uri,
-            'input_sha256' => input_uri && sha256_by_locator[input_uri],
-            'output_sha256' => output_uri && sha256_by_locator[output_uri]
+            'input_sha256' => input_uri && fp_by_locator.dig(input_uri, 'sha256'),
+            'output_sha256' => output_uri && fp_by_locator.dig(output_uri, 'sha256'),
+            # v0.1.16: what a gc-zk-journal-0.2 receipt is compared with (③④)
+            'input_hmac_sha256' => input_uri && fp_by_locator.dig(input_uri, 'hmac_sha256'),
+            'output_hmac_sha256' => output_uri && fp_by_locator.dig(output_uri, 'hmac_sha256')
           }
           r['defects'] = zk_defects(r, st, shas)
           r
@@ -570,8 +777,15 @@ module GenomicsChainProv
           out << 'input_not_in_step' unless r['input_uri'] && uris_of(step['input_list']).include?(r['input_uri'])
           out << 'output_not_in_step' unless r['output_uri'] && uris_of(step['output_list']).include?(r['output_uri'])
         end
-        out << 'input_has_no_sha256' unless r['input_sha256']
-        out << 'output_has_no_sha256' unless r['output_sha256']
+        # The fingerprint the journal is compared with is the convention's own:
+        # a plain SHA-256 for 0.1, a gc-commitment-0.1 fingerprint for 0.2.
+        if r['journal_convention'] == JOURNAL_V02
+          out << 'input_has_no_hmac_sha256' unless r['input_hmac_sha256']
+          out << 'output_has_no_hmac_sha256' unless r['output_hmac_sha256']
+        else
+          out << 'input_has_no_sha256' unless r['input_sha256']
+          out << 'output_has_no_sha256' unless r['output_sha256']
+        end
         out
       end
 
@@ -593,9 +807,9 @@ module GenomicsChainProv
       # be loaded, so two declarations reduced to different entries and the
       # signed grade depended on the entry point rather than on the bundle.
       # The levels come from the same constant for the same reason.
-      def weakest_runtime_entry(entries, sha256_by_locator)
+      def weakest_runtime_entry(entries, fp_by_locator)
         pred = GenomicsChainProv::Predicate
-        ses = entries.filter_map { |e| software_entry(e, nil, sha256_by_locator) }
+        ses = entries.filter_map { |e| software_entry(e, nil, fp_by_locator) }
         grade = lambda do |x|
           pred.runtime_grade('engine' => x['name'], 'version' => x['version'],
                              'locator' => x['locator'], 'checksum' => x['checksum']).first
@@ -613,27 +827,47 @@ module GenomicsChainProv
       # not a missing one (round 7, opus5): skipping it before the disagreement
       # test meant a good digest plus an unreadable one kept the pin while two
       # readable disagreeing digests lost it — writing nonsense outranked
-      # writing something checkable. A locator with no `sha256` field at all
+      # writing something checkable. A locator with no fingerprint field at all
       # says nothing about the digest and is ignored.
+      #
+      # v0.1.16 §6.1: an item carries `sha256` or `hmac_sha256` (gc-commitment-0.1),
+      # and either one fixes the bytes behind the locator. The value is
+      # {field => hex}, so the predicate's rows name the field (§6.1
+      # outputs_digest). An item carrying both says two things and pins
+      # nothing, as does a locator given a `sha256` in one item and an
+      # `hmac_sha256` in another. An `hmac_sha256` must be lowercase hex: the
+      # rule's own output form, so two spellings of one value cannot disagree.
       def checksums_from(extension, notes = [])
         by_locator = Array(extension['checksums']).each_with_object({}) do |c, acc|
           # PRESENCE of the field, not a usable value (round 8, codex): a
           # `sha256` written as null, "" or whitespace was skipped before the
           # disagreement test, so a good digest beside a blank one kept the pin
           # while a good digest beside "?" lost it.
-          next unless c.is_a?(Hash) && blank_to_nil(c['uri']) && c.key?('sha256')
+          next unless c.is_a?(Hash) && blank_to_nil(c['uri'])
 
-          (acc[c['uri'].to_s] ||= []) << (blank_to_nil(c['sha256']).to_s =~ SHA256_HEX ? c['sha256'].to_s.downcase : nil)
+          present = FINGERPRINT_FIELDS.select { |f| c.key?(f) }
+          next if present.empty?
+
+          (acc[c['uri'].to_s] ||= []) << (present.length == 1 ? fingerprint(present.first, c[present.first]) : nil)
         end
-        pinned = by_locator.filter_map { |k, v| [k, v.first] if v.uniq.length == 1 && v.first }.to_h
+        pinned = by_locator.filter_map { |k, v| [k, v.first.dup] if v.uniq.length == 1 && v.first }.to_h
         if pinned.length < by_locator.length
           notes << 'the extension gives one locator more than one checksum, or an unreadable one; that locator is not pinned'
         end
         pinned
       end
 
+      # {field => lowercase hex}, or nil for a value the field cannot hold.
+      def fingerprint(field, value)
+        v = blank_to_nil(value).to_s
+        ok = field == 'hmac_sha256' ? v =~ HMAC_HEX : v =~ SHA256_HEX
+        ok ? { field => v.downcase } : nil
+      end
+
       def malformed_checksum?(bco, extension)
-        ext_bad = Array(extension['checksums']).any? { |c| c.is_a?(Hash) && blank_to_nil(c['sha256']) && c['sha256'].to_s !~ SHA256_HEX }
+        ext_bad = Array(extension['checksums']).any? do |c|
+          c.is_a?(Hash) && FINGERPRINT_FIELDS.any? { |f| blank_to_nil(c[f]) && fingerprint(f, c[f]).nil? }
+        end
         io = bco['io_domain']
         io_bad = (Array(io['input_subdomain']) + Array(io['output_subdomain'])).any? do |i|
           u = i.is_a?(Hash) && i['uri'].is_a?(Hash) ? i['uri'] : {}
@@ -642,13 +876,13 @@ module GenomicsChainProv
         ext_bad || io_bad
       end
 
-      def checksum_of(uri, locator, sha256_by_locator)
+      def checksum_of(uri, locator, fp_by_locator)
         h = {}
         sha1 = blank_to_nil(uri['sha1_checksum'])
         sha1 = nil if sha1 && sha1 !~ SHA1_HEX
         h['sha1'] = sha1.downcase if sha1
-        sha256 = locator && sha256_by_locator[locator]
-        h['sha256'] = sha256 if sha256
+        fp = locator && fp_by_locator[locator]
+        h.merge!(fp) if fp
         h.empty? ? nil : h
       end
 

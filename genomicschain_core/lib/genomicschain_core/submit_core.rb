@@ -18,6 +18,16 @@ module KairosMcp
         class EvidenceTooLarge < SubmitError; end
         class RecordingFailed < SubmitError; end
 
+        # The record types whose idempotency key is sha256(submission_key)
+        # (prov design v0.1.15 (7)): a list, so a new type is added by name and
+        # the derivation every other tier uses stays as it was. Their values
+        # from before this list existed are pinned in
+        # test/fixtures/idempotency_keys_r0.json. Tier 3 v0.1 (design §9-1)
+        # adds its declaration and attestation: neither carries a jobspec_digest
+        # or a result_hash, so the derivation below would make their key a
+        # constant per pubkey (19:257–262).
+        SUBMISSION_KEYED = %w[prov_attestation prov_reachability tier3_declaration tier3_attestation].freeze
+
         @submission_mutexes = {}
         @submission_mutex_guard = Mutex.new
 
@@ -237,7 +247,7 @@ module KairosMcp
             # whole signed identity — three procedure versions included — and
             # the pubkey. Selected by record_type, not by the key's presence,
             # because every tier's manifest carries a submission_key.
-            if manifest['record_type'] == 'prov_attestation'
+            if SUBMISSION_KEYED.include?(manifest['record_type'])
               out[:idempotency_key] = Digest::SHA256.hexdigest(submission_key.to_s)
               return out
             end

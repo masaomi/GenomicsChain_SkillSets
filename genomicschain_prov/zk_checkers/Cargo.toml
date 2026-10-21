@@ -1,0 +1,22 @@
+# zk_checkers — TEST-ONLY RISC Zero checker guests and a proving host for
+# GenomicsChain Tier 2.5 v0.1.16 (design docs/design/prov_v0_1_16_zk_confidentiality_draft.md
+# §11 steps 9 and 10). Not shipped to customers and not used by the anchor:
+# it exists to produce the receipts that test gc_zk_verify 0.2.0 and the
+# option-2 anchor path (§10, T2/T4/T5). Lock files are kept beside each
+# manifest (memory skillsets-ruby-first: other languages only where
+# unavoidable, always lock-pinned).
+#
+#   methods/guest_v01  the size-factor checker claude_01, byte-for-byte, journal gc-zk-journal-0.1
+#   methods/guest_v02  the same check, journal gc-zk-journal-0.2 (design §6.2)
+#   host               gc_zk_test_prove: proves one guest, writes a bincode Receipt
+[workspace]
+resolver = "2"
+members = ["host", "methods"]
+
+# Building and running the guest is much slower without optimisation.
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+debug = 1
+lto = true
