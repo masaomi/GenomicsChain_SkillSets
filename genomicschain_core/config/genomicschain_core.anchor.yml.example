@@ -1,5 +1,7 @@
 # Anchor deployment profile. Copy to genomicschain_core.yml on the ONE node that
-# signs and records.
+# signs and records, after installing that node with `bash install.sh --anchor`.
+# genomicschain_tier3 is never installed on the anchor: its execution tools would
+# register there. install.sh --anchor refuses a target that still carries it.
 #
 # Turning this on registers gc_tier1_submit and gc_tier3_submit. That node then
 # needs an MMP identity with a signing key; without one the submit path fails

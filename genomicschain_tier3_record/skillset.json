@@ -1,0 +1,21 @@
+{
+  "name": "genomicschain_tier3_record",
+  "version": "0.1.0",
+  "description": "GenomicsChain Tier-3 record side (anchor): the tier3_declaration and tier3_attestation 0.1 record types, their checks, and gc_tier3_record_submit. The anchor installs this package with core and prov, never genomicschain_tier3.",
+  "author": "Masaomi Hatakeyama",
+  "layer": "L1",
+  "depends_on": [
+    {"name": "genomicschain_core", "version": ">= 0.6.4"},
+    {"name": "genomicschain_prov", "version": ">= 0.6.0"}
+  ],
+  "provides": ["tier3_declaration_record", "tier3_attestation_record"],
+  "tool_classes": [],
+  "anchor_profile_tool_classes": [
+    "KairosMcp::SkillSets::GenomicschainTier3Record::Tools::GcTier3RecordSubmit"
+  ],
+  "config_files": [],
+  "knowledge_dirs": [],
+  "plugin": {
+    "skill_md": "plugin/SKILL.md"
+  }
+}

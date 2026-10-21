@@ -17,7 +17,8 @@ SUBMIT_TOOLS = [
 ].freeze
 EXECUTE_TOOL = 'KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Execute'
 ESTIMATE_TOOL = 'KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Estimate'
-TIER3_TOOLS = [EXECUTE_TOOL, ESTIMATE_TOOL].freeze
+ATTEST_TOOL = 'KairosMcp::SkillSets::GenomicschainTier3::Tools::GcTier3Attest'
+TIER3_TOOLS = [EXECUTE_TOOL, ESTIMATE_TOOL, ATTEST_TOOL].freeze
 ASSESS_TOOL = 'KairosMcp::SkillSets::GenomicschainTier1::Tools::GcTier1Assess'
 SCAN_TOOLS = [
   'KairosMcp::SkillSets::GenomicschainTier2::Tools::GcTier2Scan',
@@ -66,8 +67,16 @@ class TopologyTest < Minitest::Test
     File.write(cfg_path, backup) if backup
   end
 
+  # tier3 0.6.0 requires genomicschain_prov (Tier 3 v0.1, operator 2026-10-20
+  # 「tier3 が prov に依存」) and genomicschain_tier3_record (2026-10-21, question
+  # 5), and prov requires genomicschain_tier2, so their libs go on the load path
+  # beside core's for any package this suite loads.
   def ensure_core_on_load_path
     core_skillset.load! unless core_skillset.loaded?
+    %w[genomicschain_tier2 genomicschain_prov genomicschain_tier3_record].each do |pkg|
+      lib = File.join(SKILLSETS_DIR, pkg, 'lib')
+      $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+    end
   end
 
   def registered_tool_classes(skillset)
@@ -136,10 +145,14 @@ class TopologyTest < Minitest::Test
   end
 
   # The invariant is the SECOND assertion: the execution package never carries a
-  # submit path, so running and recording stay separable. The exact-set check is
-  # deliberately strict rather than a subset check — adding a tool to tier3 should
-  # require editing this list, so the surface cannot grow unreviewed. gc_tier3_estimate
-  # arrived in tier3 v0.4.0 and this guard was not updated with it.
+  # submit path, in any profile, so running and recording stay separable. Tier 3
+  # v0.1's record tool gc_tier3_record_submit lives in its own package,
+  # genomicschain_tier3_record, which the anchor installs instead of tier3
+  # (operator 2026-10-21, question 5 「記録の部分を別 package に」). The exact-set
+  # check is deliberately strict rather than a subset check — adding a tool to
+  # tier3 should require editing this list, so the surface cannot grow unreviewed
+  # (gc_tier3_estimate arrived in v0.4.0 without such an edit; gc_tier3_attest
+  # arrived with one, operator 2026-10-20, question 3 「認めて test を直す」).
   def test_tier3_package_exposes_execution_tools_only
     ensure_core_on_load_path
     tier3 = KairosMcp::Skillset.new(File.join(SKILLSETS_DIR, 'genomicschain_tier3'))

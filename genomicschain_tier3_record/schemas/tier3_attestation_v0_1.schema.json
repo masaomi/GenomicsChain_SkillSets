@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://genomicschain.ch/schemas/tier3_attestation_v0_1.schema.json",
+  "title": "GenomicsChain Tier 3 attestation, record_version 0.1",
+  "description": "Synoptis evidence manifest for a Tier 3 attestation (design docs/design/tier3_design_v0_1.md §4.1): the executor's per-attempt scores of the three items (① rebuild, ② rerun, ③ reproduce, with m and n), signed under the declaration's signing key and pointing at it by declaration_ref (declaration_digest and T_d). The binding fields repeat the declaration's; here they are checked for shape only, their values are fixed by equality with the declaration (§4.1). A cannot_build row carries no ② ③ fields. No headline score: the score is the list (§3.2). recorded_at (T_a, the anchor's clock) and backing are the anchor's. definitions.params is what the executor signs.",
+  "type": "object",
+  "required": [
+    "record_type", "record_version", "mcp_tool_name", "mcp_tool_version",
+    "subject_ref", "job_identity", "inputs_commitment", "targets", "comparator", "tolerance",
+    "build_plan_digest", "route_ref", "fingerprint_form", "data_class",
+    "declaration_ref", "attempts", "environment_provenance", "result_commitment", "process_record_digest",
+    "not_checked", "recorded_at", "backing", "submission_key", "operator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_type": { "type": "string", "enum": ["tier3_attestation"] },
+    "record_version": { "type": "string", "enum": ["0.1"] },
+    "mcp_tool_name": { "type": "string", "enum": ["gc_tier3_record_submit"] },
+    "mcp_tool_version": { "type": "string" },
+    "subject_ref": { "$ref": "#/definitions/text" },
+    "job_identity": { "$ref": "#/definitions/job_identity" },
+    "inputs_commitment": { "$ref": "#/definitions/hex64" },
+    "targets": { "$ref": "#/definitions/targets" },
+    "comparator": { "$ref": "#/definitions/comparator" },
+    "tolerance": { "$ref": "#/definitions/text" },
+    "build_plan_digest": { "$ref": "#/definitions/hex64" },
+    "route_ref": { "$ref": "#/definitions/text" },
+    "fingerprint_form": { "$ref": "#/definitions/fingerprint_form" },
+    "data_class": { "$ref": "#/definitions/data_class" },
+    "commitment": { "$ref": "#/definitions/commitment" },
+    "declaration_ref": { "$ref": "#/definitions/declaration_ref" },
+    "attempts": { "$ref": "#/definitions/attempts" },
+    "environment_provenance": { "$ref": "#/definitions/environment_provenance" },
+    "result_commitment": { "$ref": "#/definitions/hex64" },
+    "process_record_digest": { "$ref": "#/definitions/hex64" },
+    "not_checked": { "$ref": "#/definitions/not_checked" },
+    "recorded_at": { "$ref": "#/definitions/time" },
+    "backing": {
+      "type": "object",
+      "required": ["vocabulary", "recorded_at", "signing_key", "binding", "attestation", "attempts", "comparator"],
+      "additionalProperties": false,
+      "properties": {
+        "vocabulary": { "type": "string", "enum": ["gc-backing-0.1"] },
+        "recorded_at": { "type": "string", "enum": ["anchor_observed"] },
+        "signing_key": { "type": "string", "enum": ["procedure_checked"] },
+        "binding": { "type": "string", "enum": ["procedure_checked"] },
+        "attestation": { "type": "string", "enum": ["customer_signed"] },
+        "attempts": { "type": "string", "enum": ["customer_stated"] },
+        "comparator": { "type": "string", "enum": ["customer_stated"] }
+      }
+    },
+    "submission_key": { "$ref": "#/definitions/hex64" },
+    "operator": { "type": "object" }
+  },
+  "definitions": {
+    "params": {
+      "type": "object",
+      "required": [
+        "subject_ref", "job_identity", "inputs_commitment", "targets", "comparator", "tolerance",
+        "build_plan_digest", "route_ref", "fingerprint_form", "data_class",
+        "declaration_ref", "attempts", "environment_provenance", "result_commitment", "process_record_digest",
+        "not_checked"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "subject_ref": { "$ref": "#/definitions/text" },
+        "job_identity": { "$ref": "#/definitions/job_identity" },
+        "inputs_commitment": { "$ref": "#/definitions/hex64" },
+        "targets": { "$ref": "#/definitions/targets" },
+        "comparator": { "$ref": "#/definitions/comparator" },
+        "tolerance": { "$ref": "#/definitions/text" },
+        "build_plan_digest": { "$ref": "#/definitions/hex64" },
+        "route_ref": { "$ref": "#/definitions/text" },
+        "fingerprint_form": { "$ref": "#/definitions/fingerprint_form" },
+        "data_class": { "$ref": "#/definitions/data_class" },
+        "commitment": { "$ref": "#/definitions/commitment" },
+        "declaration_ref": { "$ref": "#/definitions/declaration_ref" },
+        "attempts": { "$ref": "#/definitions/attempts" },
+        "environment_provenance": { "$ref": "#/definitions/environment_provenance" },
+        "result_commitment": { "$ref": "#/definitions/hex64" },
+        "process_record_digest": { "$ref": "#/definitions/hex64" },
+        "not_checked": { "$ref": "#/definitions/not_checked" }
+      }
+    },
+    "hex64": { "type": "string", "pattern": "\\A[0-9a-f]{64}\\z" },
+    "target_path": { "type": "string", "minLength": 1, "not": { "pattern": "\\A[/~]|(\\A|/)\\.\\.(/|\\z)|[\\x00-\\x1f\\x7f\\u0080-\\u009f]" } },
+    "time": { "type": "string", "pattern": "\\A[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\\z" },
+    "text": { "type": "string", "minLength": 1 },
+    "job_identity": {
+      "type": "object",
+      "required": ["rule", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "minLength": 1 },
+        "digest": { "$ref": "#/definitions/hex64" }
+      }
+    },
+    "targets": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["paper_declared"] },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "algorithm", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "path": { "$ref": "#/definitions/target_path" },
+                  "algorithm": { "type": "string", "minLength": 1 },
+                  "value": { "$ref": "#/definitions/hex64" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind", "bundle_digest", "outputs_digest", "rows", "paths"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["tier2_5_bundle"] },
+            "bundle_digest": { "$ref": "#/definitions/hex64" },
+            "outputs_digest": { "$ref": "#/definitions/hex64" },
+            "rows": {
+              "type": "array",
+              "items": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } }
+            },
+            "paths": { "type": "array", "items": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/target_path" }] } }
+          }
+        }
+      ]
+    },
+    "comparator": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "fingerprint_form": { "type": "string", "enum": ["plain", "salted"] },
+    "data_class": { "type": "string", "enum": ["non_human", "human"] },
+    "commitment": {
+      "type": "object",
+      "required": ["rule", "key_id"],
+      "additionalProperties": false,
+      "properties": {
+        "rule": { "type": "string", "enum": ["gc-commitment-0.1"] },
+        "key_id": { "$ref": "#/definitions/hex64" }
+      }
+    },
+    "declaration_ref": {
+      "type": "object",
+      "required": ["declaration_digest", "recorded_at"],
+      "additionalProperties": false,
+      "properties": {
+        "declaration_digest": { "$ref": "#/definitions/hex64" },
+        "recorded_at": { "$ref": "#/definitions/time" }
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["attempt", "backend_id", "rebuild", "env_digest", "execution_verdict", "comparison_verdict",
+                         "m", "n", "output_fingerprints"],
+            "additionalProperties": false,
+            "properties": {
+              "attempt": { "type": "integer", "minimum": 1 },
+              "backend_id": { "$ref": "#/definitions/backend_id" },
+              "rebuild": { "type": "string", "enum": ["built"] },
+              "env_digest": { "$ref": "#/definitions/hex64" },
+              "execution_verdict": { "type": "string", "enum": ["completed", "env_failed", "outputs_unusable", "data_blocked"] },
+              "comparison_verdict": { "type": "string", "enum": ["match_exact", "mismatch", "no_target_declared", "not_attempted"] },
+              "m": { "type": "integer", "minimum": 0 },
+              "n": { "type": "integer", "minimum": 0 },
+              "output_fingerprints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["path", "value"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": { "$ref": "#/definitions/target_path" },
+                    "value": { "$ref": "#/definitions/hex64" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["attempt", "backend_id", "rebuild"],
+            "additionalProperties": false,
+            "properties": {
+              "attempt": { "type": "integer", "minimum": 1 },
+              "backend_id": { "$ref": "#/definitions/backend_id" },
+              "rebuild": { "type": "string", "enum": ["cannot_build"] }
+            }
+          }
+        ]
+      }
+    },
+    "backend_id": { "type": "string", "enum": ["local", "thoa"] },
+    "environment_provenance": {
+      "type": "string",
+      "enum": ["declared_container", "declared_lock", "declared_tools", "authored_by_operator", "none"]
+    },
+    "not_checked": {
+      "type": "array",
+      "enum": [["ran_as_stated", "inputs_are_the_real_data", "runs_outside_the_record", "machine", "route_a_targets_complete"]]
+    }
+  }
+}
